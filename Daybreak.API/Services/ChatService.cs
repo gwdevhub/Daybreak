@@ -1,6 +1,5 @@
 ﻿using Daybreak.API.Interop;
 using Daybreak.API.Interop.GuildWars;
-using Daybreak.API.Models;
 using Daybreak.API.Services.Interop;
 using System.Core.Extensions;
 using System.Extensions;
@@ -70,8 +69,15 @@ public sealed class ChatService(
                     span[^2] = '\u0001';
                 });
 
-            using var packet = new UnmanagedStruct<UIPackets.UIChatMessage>(new UIPackets.UIChatMessage(channel, encoded, channel));
-            this.uiContextService.SendMessage(UIMessage.WriteToChatLog, (nuint)packet.Address, 0x0);
+            unsafe
+            {
+                fixed (char* encodedPtr = encoded)
+                {
+                    using var packet = new UnmanagedStruct<kPrintChatMessage>(new kPrintChatMessage { Channel = (GWCA.GW.Chat.Channel)channel, Message = (nint)encodedPtr });
+                    this.uiContextService.SendMessage(UIMessage.kWriteToChatLog, (nuint)packet.Address, 0x0);
+                }
+            }
+
         }, cancellationToken);
     }
 }

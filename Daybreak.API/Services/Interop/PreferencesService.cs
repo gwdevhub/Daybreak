@@ -5,7 +5,7 @@ namespace Daybreak.API.Services.Interop;
 
 public sealed class PreferencesService()
 {
-    public uint? GetEnumPreference(EnumPreference pref) => GWCA.GW.UI.GetPreference(pref);
+    public uint? GetEnumPreference(EnumPreference pref) => GWCA.GW.UI.GetPreference((GWCA.GW.UI.EnumPreference)pref);
 
-    public bool SetEnumPreference(EnumPreference pref, uint value) => GWCA.GW.UI.SetPreference(pref, value);
+    public bool SetEnumPreference(EnumPreference pref, uint value) => GWCA.GW.UI.SetPreference((GWCA.GW.UI.EnumPreference)pref, value);
 }

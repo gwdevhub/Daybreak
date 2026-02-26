@@ -1,6 +1,5 @@
 ﻿using Daybreak.API.Interop;
 using Daybreak.API.Interop.GuildWars;
-using Daybreak.API.Models;
 using Daybreak.API.Services.Interop;
 using System.Extensions.Core;
 
@@ -20,7 +19,7 @@ public sealed class UIService(
         var scopedLogger = this.logger.CreateScopedLogger();
         var keyDownResult = await this.gameThreadService.QueueOnGameThread(() =>
         {
-            if (!this.uIContextService.KeyDown(action, frame))
+            if (!this.uIContextService.KeyDown((GWCA.GW.UI.ControlAction)action, frame))
             {
                 scopedLogger.LogError("Failed to send keydown action {action}", action);
                 return false;
@@ -36,7 +35,7 @@ public sealed class UIService(
 
         var keyUpResult = await this.gameThreadService.QueueOnGameThread(() =>
         {
-            if (!this.uIContextService.KeyUp(action, frame))
+            if (!this.uIContextService.KeyUp((GWCA.GW.UI.ControlAction)action, frame))
             {
                 scopedLogger.LogError("Failed to send keyup action {action}", action);
                 return false;
@@ -86,7 +85,7 @@ public sealed class UIService(
         });
     }
 
-    public async Task<string?> DecodeString(string encoded, Language language, CancellationToken cancellationToken)
+    public async Task<string?> DecodeString(string encoded, GWCA.GW.Constants.Language language, CancellationToken cancellationToken)
     {
         // GWCA's AsyncDecodeStr handles language switching internally (sets language, decodes, restores)
         return await this.uIContextService.AsyncDecodeStringAsync(encoded, language, cancellationToken);
@@ -96,14 +95,14 @@ public sealed class UIService(
     {
         return frameLabel switch
         {
-            "AgentCommander0" => ControlAction.OpenHeroCommander1,
-            "AgentCommander1" => ControlAction.OpenHeroCommander2,
-            "AgentCommander2" => ControlAction.OpenHeroCommander3,
-            "AgentCommander3" => ControlAction.OpenHeroCommander4,
-            "AgentCommander4" => ControlAction.OpenHeroCommander5,
-            "AgentCommander5" => ControlAction.OpenHeroCommander6,
-            "AgentCommander6" => ControlAction.OpenHeroCommander7,
-            _ => ControlAction.None
+            "AgentCommander0" => ControlAction.ControlAction_OpenHeroCommander1,
+            "AgentCommander1" => ControlAction.ControlAction_OpenHeroCommander2,
+            "AgentCommander2" => ControlAction.ControlAction_OpenHeroCommander3,
+            "AgentCommander3" => ControlAction.ControlAction_OpenHeroCommander4,
+            "AgentCommander4" => ControlAction.ControlAction_OpenHeroCommander5,
+            "AgentCommander5" => ControlAction.ControlAction_OpenHeroCommander6,
+            "AgentCommander6" => ControlAction.ControlAction_OpenHeroCommander7,
+            _ => ControlAction.ControlAction_None
         };
     }
 }

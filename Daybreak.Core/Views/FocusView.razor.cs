@@ -488,7 +488,6 @@ public sealed class FocusViewModel(
         }
 
         if (this.BuildComponentContext?.CharacterUnlockedSkills.SequenceEqual(mainPlayerBuildContext.UnlockedCharacterSkills) is true &&
-            this.BuildComponentContext?.AccountUnlockedSkills.SequenceEqual(mainPlayerBuildContext.UnlockedAccountSkills) is true &&
             this.BuildComponentContext?.UnlockedProfessions == mainPlayerBuildContext.UnlockedProfessions &&
             this.BuildComponentContext?.PrimaryProfessionId == mainPlayerBuildContext.PrimaryProfessionId &&
             DateTime.Now < this.lastBuildCheck + BuildsCheckFrequency)
@@ -518,7 +517,6 @@ public sealed class FocusViewModel(
         {
             IsInOutpost = instanceInfo.Type is Shared.Models.Api.InstanceType.Outpost,
             PrimaryProfessionId = mainPlayerBuildContext.PrimaryProfessionId,
-            AccountUnlockedSkills = mainPlayerBuildContext.UnlockedAccountSkills,
             CharacterUnlockedSkills = mainPlayerBuildContext.UnlockedCharacterSkills,
             UnlockedProfessions = mainPlayerBuildContext.UnlockedProfessions,
             AvailableBuilds = matchingBuilds

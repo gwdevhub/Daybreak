@@ -643,15 +643,15 @@ public static unsafe partial class GWCA
 
             // GW::Chat::GetChannel
             [LibraryImport(DllName, EntryPoint = "?GetChannel@Chat@GW@@YA?AW4Channel@12@D@Z")]
-            public static partial global::Daybreak.API.Models.Channel GetChannel(byte value);
+            public static partial global::Daybreak.API.Interop.GWCA.GW.Chat.Channel GetChannel(byte value);
 
             // GW::Chat::GetChannel
             [LibraryImport(DllName, EntryPoint = "?GetChannel@Chat@GW@@YA?AW4Channel@12@_W@Z")]
-            public static partial global::Daybreak.API.Models.Channel GetChannel(ushort value);
+            public static partial global::Daybreak.API.Interop.GWCA.GW.Chat.Channel GetChannel(ushort value);
 
             // GW::Chat::GetChannelColors
             [LibraryImport(DllName, EntryPoint = "?GetChannelColors@Chat@GW@@YAXW4Channel@12@PAI1@Z")]
-            public static partial void GetChannelColors(global::Daybreak.API.Models.Channel channel1, uint* ptr2, nint ptr3);
+            public static partial void GetChannelColors(global::Daybreak.API.Interop.GWCA.GW.Chat.Channel channel1, uint* ptr2, nint ptr3);
 
             // GW::Chat::GetChatLog
             [LibraryImport(DllName, EntryPoint = "?GetChatLog@Chat@GW@@YAPAUChatBuffer@12@XZ")]
@@ -659,7 +659,7 @@ public static unsafe partial class GWCA
 
             // GW::Chat::GetDefaultColors
             [LibraryImport(DllName, EntryPoint = "?GetDefaultColors@Chat@GW@@YAXW4Channel@12@PAI1@Z")]
-            public static partial void GetDefaultColors(global::Daybreak.API.Models.Channel channel1, uint* ptr2, nint ptr3);
+            public static partial void GetDefaultColors(global::Daybreak.API.Interop.GWCA.GW.Chat.Channel channel1, uint* ptr2, nint ptr3);
 
             // GW::Chat::GetIsTyping
             [LibraryImport(DllName, EntryPoint = "?GetIsTyping@Chat@GW@@YA_NXZ")]
@@ -683,11 +683,11 @@ public static unsafe partial class GWCA
 
             // GW::Chat::SetMessageColor
             [LibraryImport(DllName, EntryPoint = "?SetMessageColor@Chat@GW@@YAIW4Channel@12@I@Z")]
-            public static partial uint SetMessageColor(global::Daybreak.API.Models.Channel channel1, uint value2);
+            public static partial uint SetMessageColor(global::Daybreak.API.Interop.GWCA.GW.Chat.Channel channel1, uint value2);
 
             // GW::Chat::SetSenderColor
             [LibraryImport(DllName, EntryPoint = "?SetSenderColor@Chat@GW@@YAIW4Channel@12@I@Z")]
-            public static partial uint SetSenderColor(global::Daybreak.API.Models.Channel channel1, uint value2);
+            public static partial uint SetSenderColor(global::Daybreak.API.Interop.GWCA.GW.Chat.Channel channel1, uint value2);
 
             // GW::Chat::SetTimestampsColor
             [LibraryImport(DllName, EntryPoint = "?SetTimestampsColor@Chat@GW@@YAXI@Z")]
@@ -703,11 +703,11 @@ public static unsafe partial class GWCA
 
             // GW::Chat::WriteChat
             [LibraryImport(DllName, EntryPoint = "?WriteChat@Chat@GW@@YAXW4Channel@12@PB_W1_N@Z")]
-            public static partial void WriteChat(global::Daybreak.API.Models.Channel channel1, ushort* ptr2, nint ptr3, [MarshalAs(UnmanagedType.U1)] bool flag4);
+            public static partial void WriteChat(global::Daybreak.API.Interop.GWCA.GW.Chat.Channel channel1, ushort* ptr2, nint ptr3, [MarshalAs(UnmanagedType.U1)] bool flag4);
 
             // GW::Chat::WriteChatEnc
             [LibraryImport(DllName, EntryPoint = "?WriteChatEnc@Chat@GW@@YAXW4Channel@12@PB_W1_N@Z")]
-            public static partial void WriteChatEnc(global::Daybreak.API.Models.Channel channel1, ushort* ptr2, nint ptr3, [MarshalAs(UnmanagedType.U1)] bool flag4);
+            public static partial void WriteChatEnc(global::Daybreak.API.Interop.GWCA.GW.Chat.Channel channel1, ushort* ptr2, nint ptr3, [MarshalAs(UnmanagedType.U1)] bool flag4);
 
             // GW::Chat::WriteChatF — varargs, requires manual interop
         }
@@ -2106,10 +2106,10 @@ public static unsafe partial class GWCA
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
             public static partial uint GetNextChildFrameId(nint self, uint* ptr2);
 
-            // GW::ScrollableFrame::GetPage | returns TODO: map struct GW::UI::Frame
-            // [LibraryImport(DllName, EntryPoint = "?GetPage@ScrollableFrame@GW@@QAEPAUFrame@UI@2@XZ")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            // public static partial Frame* GetPage(nint self);
+            // GW::ScrollableFrame::GetPage
+            [LibraryImport(DllName, EntryPoint = "?GetPage@ScrollableFrame@GW@@QAEPAUFrame@UI@2@XZ")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
+            public static partial global::Daybreak.API.Interop.Frame* GetPage(nint self);
 
             // GW::ScrollableFrame::GetPrevChildFrameId
             [LibraryImport(DllName, EntryPoint = "?GetPrevChildFrameId@ScrollableFrame@GW@@QAEIIPAI@Z")]
@@ -2131,10 +2131,10 @@ public static unsafe partial class GWCA
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
             public static partial double RemoveItem(nint self, uint value2);
 
-            // GW::ScrollableFrame::SetPage | returns TODO: map struct GW::UI::Frame | scrollablePageContext2: TODO: map struct GW::ScrollableFrame::ScrollablePageContext
+            // GW::ScrollableFrame::SetPage | scrollablePageContext2: TODO: map struct GW::ScrollableFrame::ScrollablePageContext
             // [LibraryImport(DllName, EntryPoint = "?SetPage@ScrollableFrame@GW@@QAEPAUFrame@UI@2@PAUScrollablePageContext@12@@Z")]
             // [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            // public static partial Frame* SetPage(nint self, ScrollablePageContext* scrollablePageContext2);
+            // public static partial global::Daybreak.API.Interop.Frame* SetPage(nint self, ScrollablePageContext* scrollablePageContext2);
 
             // GW::ScrollableFrame::SetSortHandler
             [LibraryImport(DllName, EntryPoint = "?SetSortHandler@ScrollableFrame@GW@@QAE_NP6AHII@Z@Z")]
@@ -2314,20 +2314,20 @@ public static unsafe partial class GWCA
         public static partial class TabsFrame
         {
 
-            // GW::TabsFrame::AddTab | returns TODO: map struct GW::UI::Frame
-            // [LibraryImport(DllName, EntryPoint = "?AddTab@TabsFrame@GW@@QAEPAUFrame@UI@2@PB_WIIP6AXPAUInteractionMessage@42@PAX2@Z2@Z")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            // public static partial Frame* AddTab(nint self, ushort* ptr2, uint value3, uint value4, nint callback5, nint ptr6);
+            // GW::TabsFrame::AddTab
+            [LibraryImport(DllName, EntryPoint = "?AddTab@TabsFrame@GW@@QAEPAUFrame@UI@2@PB_WIIP6AXPAUInteractionMessage@42@PAX2@Z2@Z")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
+            public static partial global::Daybreak.API.Interop.Frame* AddTab(nint self, ushort* ptr2, uint value3, uint value4, nint callback5, nint ptr6);
 
             // GW::TabsFrame::ChooseTab
             [LibraryImport(DllName, EntryPoint = "?ChooseTab@TabsFrame@GW@@QAE_NI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
             public static partial double ChooseTab(nint self, uint value2);
 
-            // GW::TabsFrame::ChooseTab | frame2: TODO: map struct GW::UI::Frame
-            // [LibraryImport(DllName, EntryPoint = "?ChooseTab@TabsFrame@GW@@QAE_NPAUFrame@UI@2@@Z")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            // public static partial double ChooseTab(nint self, Frame* frame2);
+            // GW::TabsFrame::ChooseTab
+            [LibraryImport(DllName, EntryPoint = "?ChooseTab@TabsFrame@GW@@QAE_NPAUFrame@UI@2@@Z")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
+            public static partial double ChooseTab(nint self, global::Daybreak.API.Interop.Frame* frame2);
 
             // GW::TabsFrame::DisableTab
             [LibraryImport(DllName, EntryPoint = "?DisableTab@TabsFrame@GW@@QAE_NI@Z")]
@@ -2339,10 +2339,10 @@ public static unsafe partial class GWCA
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
             public static partial double EnableTab(nint self, uint value2);
 
-            // GW::TabsFrame::GetCurrentTab | returns TODO: map struct GW::UI::Frame
-            // [LibraryImport(DllName, EntryPoint = "?GetCurrentTab@TabsFrame@GW@@QAEPAUFrame@UI@2@XZ")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            // public static partial Frame* GetCurrentTab(nint self);
+            // GW::TabsFrame::GetCurrentTab
+            [LibraryImport(DllName, EntryPoint = "?GetCurrentTab@TabsFrame@GW@@QAEPAUFrame@UI@2@XZ")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
+            public static partial global::Daybreak.API.Interop.Frame* GetCurrentTab(nint self);
 
             // GW::TabsFrame::GetCurrentTabIndex
             [LibraryImport(DllName, EntryPoint = "?GetCurrentTabIndex@TabsFrame@GW@@QAE_NPAI@Z")]
@@ -2354,15 +2354,15 @@ public static unsafe partial class GWCA
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
             public static partial double GetIsTabEnabled(nint self, uint value2, uint* ptr3);
 
-            // GW::TabsFrame::GetTabButton | returns TODO: map struct GW::ButtonFrame | frame2: TODO: map struct GW::UI::Frame
+            // GW::TabsFrame::GetTabButton | returns TODO: map struct GW::ButtonFrame
             // [LibraryImport(DllName, EntryPoint = "?GetTabButton@TabsFrame@GW@@QAEPAUButtonFrame@2@PAUFrame@UI@2@@Z")]
             // [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            // public static partial ButtonFrame* GetTabButton(nint self, Frame* frame2);
+            // public static partial ButtonFrame* GetTabButton(nint self, global::Daybreak.API.Interop.Frame* frame2);
 
-            // GW::TabsFrame::GetTabByLabel | returns TODO: map struct GW::UI::Frame
-            // [LibraryImport(DllName, EntryPoint = "?GetTabByLabel@TabsFrame@GW@@QAEPAUFrame@UI@2@PB_W@Z")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            // public static partial Frame* GetTabByLabel(nint self, ushort* ptr2);
+            // GW::TabsFrame::GetTabByLabel
+            [LibraryImport(DllName, EntryPoint = "?GetTabByLabel@TabsFrame@GW@@QAEPAUFrame@UI@2@PB_W@Z")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
+            public static partial global::Daybreak.API.Interop.Frame* GetTabByLabel(nint self, ushort* ptr2);
 
             // GW::TabsFrame::GetTabFrameId
             [LibraryImport(DllName, EntryPoint = "?GetTabFrameId@TabsFrame@GW@@QAE_NIPAI@Z")]
@@ -2449,10 +2449,10 @@ public static unsafe partial class GWCA
         public static partial class UI
         {
 
-            // GW::UI::AddFrameUIInteractionCallback | frame1: TODO: map struct GW::UI::Frame
-            // [LibraryImport(DllName, EntryPoint = "?AddFrameUIInteractionCallback@UI@GW@@YA_NPAUFrame@12@P6AXPAUInteractionMessage@12@PAX2@Z2@Z")]
-            // [return: MarshalAs(UnmanagedType.U1)]
-            // public static partial bool AddFrameUIInteractionCallback(Frame* frame1, nint callback2, nint ptr3);
+            // GW::UI::AddFrameUIInteractionCallback
+            [LibraryImport(DllName, EntryPoint = "?AddFrameUIInteractionCallback@UI@GW@@YA_NPAUFrame@12@P6AXPAUInteractionMessage@12@PAX2@Z2@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool AddFrameUIInteractionCallback(global::Daybreak.API.Interop.Frame* frame1, nint callback2, nint ptr3);
 
             // GW::UI::AsyncDecodeStr
             [LibraryImport(DllName, EntryPoint = "?AsyncDecodeStr@UI@GW@@YAXPB_WP6AXPAX0@Z1W4Language@Constants@2@@Z")]
@@ -2462,10 +2462,10 @@ public static unsafe partial class GWCA
             [LibraryImport(DllName, EntryPoint = "?AsyncDecodeStr@UI@GW@@YAXPB_WPA_WI@Z")]
             public static partial void AsyncDecodeStr(ushort* ptr1, ushort* ptr2, uint value3);
 
-            // GW::UI::ButtonClick | frame: TODO: map struct GW::UI::Frame
-            // [LibraryImport(DllName, EntryPoint = "?ButtonClick@UI@GW@@YA_NPAUFrame@12@@Z")]
-            // [return: MarshalAs(UnmanagedType.U1)]
-            // public static partial bool ButtonClick(Frame* frame);
+            // GW::UI::ButtonClick
+            [LibraryImport(DllName, EntryPoint = "?ButtonClick@UI@GW@@YA_NPAUFrame@12@@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool ButtonClick(global::Daybreak.API.Interop.Frame* frame);
 
             // GW::UI::CreateUIComponent
             [LibraryImport(DllName, EntryPoint = "?CreateUIComponent@UI@GW@@YAIIIIP6AXPAUInteractionMessage@12@PAX1@Z1PB_W@Z")]
@@ -2476,10 +2476,10 @@ public static unsafe partial class GWCA
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool Default_UICallback(global::Daybreak.API.Interop.GuildWars.InteractionMessage* interactionMessage1, void* ptr2, nint ptr3);
 
-            // GW::UI::DestroyUIComponent | frame: TODO: map struct GW::UI::Frame
-            // [LibraryImport(DllName, EntryPoint = "?DestroyUIComponent@UI@GW@@YA_NPAUFrame@12@@Z")]
-            // [return: MarshalAs(UnmanagedType.U1)]
-            // public static partial bool DestroyUIComponent(Frame* frame);
+            // GW::UI::DestroyUIComponent
+            [LibraryImport(DllName, EntryPoint = "?DestroyUIComponent@UI@GW@@YA_NPAUFrame@12@@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool DestroyUIComponent(global::Daybreak.API.Interop.Frame* frame);
 
             // GW::UI::DrawOnCompass
             [LibraryImport(DllName, EntryPoint = "?DrawOnCompass@UI@GW@@YA_NIIPAUCompassPoint@12@@Z")]
@@ -2490,9 +2490,9 @@ public static unsafe partial class GWCA
             [LibraryImport(DllName, EntryPoint = "?EncStrToUInt32@UI@GW@@YAIPB_W@Z")]
             public static partial uint EncStrToUInt32(ushort* ptr);
 
-            // GW::UI::GetChildFrame | returns TODO: map struct GW::UI::Frame | frame1: TODO: map struct GW::UI::Frame
-            // [LibraryImport(DllName, EntryPoint = "?GetChildFrame@UI@GW@@YAPAUFrame@12@PAU312@I@Z")]
-            // public static partial Frame* GetChildFrame(Frame* frame1, uint value2);
+            // GW::UI::GetChildFrame
+            [LibraryImport(DllName, EntryPoint = "?GetChildFrame@UI@GW@@YAPAUFrame@12@PAU312@I@Z")]
+            public static partial global::Daybreak.API.Interop.Frame* GetChildFrame(global::Daybreak.API.Interop.Frame* frame1, uint value2);
 
             // GW::UI::GetCommandLinePref
             [LibraryImport(DllName, EntryPoint = "?GetCommandLinePref@UI@GW@@YA_NPB_WPAI@Z")]
@@ -2508,17 +2508,17 @@ public static unsafe partial class GWCA
             [LibraryImport(DllName, EntryPoint = "?GetCurrentTooltip@UI@GW@@YAPAUTooltipInfo@12@XZ")]
             public static partial global::Daybreak.API.Interop.GuildWars.TooltipInfo* GetCurrentTooltip();
 
-            // GW::UI::GetFrameById | returns TODO: map struct GW::UI::Frame
-            // [LibraryImport(DllName, EntryPoint = "?GetFrameById@UI@GW@@YAPAUFrame@12@I@Z")]
-            // public static partial Frame* GetFrameById(uint value);
+            // GW::UI::GetFrameById
+            [LibraryImport(DllName, EntryPoint = "?GetFrameById@UI@GW@@YAPAUFrame@12@I@Z")]
+            public static partial global::Daybreak.API.Interop.Frame* GetFrameById(uint value);
 
-            // GW::UI::GetFrameByLabel | returns TODO: map struct GW::UI::Frame
-            // [LibraryImport(DllName, EntryPoint = "?GetFrameByLabel@UI@GW@@YAPAUFrame@12@PB_W@Z")]
-            // public static partial Frame* GetFrameByLabel(ushort* ptr);
+            // GW::UI::GetFrameByLabel
+            [LibraryImport(DllName, EntryPoint = "?GetFrameByLabel@UI@GW@@YAPAUFrame@12@PB_W@Z")]
+            public static partial global::Daybreak.API.Interop.Frame* GetFrameByLabel(ushort* ptr);
 
-            // GW::UI::GetFrameContext | frame: TODO: map struct GW::UI::Frame
-            // [LibraryImport(DllName, EntryPoint = "?GetFrameContext@UI@GW@@YAPAXPAUFrame@12@@Z")]
-            // public static partial void* GetFrameContext(Frame* frame);
+            // GW::UI::GetFrameContext
+            [LibraryImport(DllName, EntryPoint = "?GetFrameContext@UI@GW@@YAPAXPAUFrame@12@@Z")]
+            public static partial void* GetFrameContext(global::Daybreak.API.Interop.Frame* frame);
 
             // GW::UI::GetIsShiftScreenShot
             [LibraryImport(DllName, EntryPoint = "?GetIsShiftScreenShot@UI@GW@@YA_NXZ")]
@@ -2535,9 +2535,9 @@ public static unsafe partial class GWCA
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool GetIsWorldMapShowing();
 
-            // GW::UI::GetParentFrame | returns TODO: map struct GW::UI::Frame | frame: TODO: map struct GW::UI::Frame
-            // [LibraryImport(DllName, EntryPoint = "?GetParentFrame@UI@GW@@YAPAUFrame@12@PAU312@@Z")]
-            // public static partial Frame* GetParentFrame(Frame* frame);
+            // GW::UI::GetParentFrame
+            [LibraryImport(DllName, EntryPoint = "?GetParentFrame@UI@GW@@YAPAUFrame@12@PAU312@@Z")]
+            public static partial global::Daybreak.API.Interop.Frame* GetParentFrame(global::Daybreak.API.Interop.Frame* frame);
 
             // GW::UI::GetPreference
             [LibraryImport(DllName, EntryPoint = "?GetPreference@UI@GW@@YAIW4EnumPreference@12@@Z")]
@@ -2560,9 +2560,9 @@ public static unsafe partial class GWCA
             [LibraryImport(DllName, EntryPoint = "?GetPreferenceOptions@UI@GW@@YAIW4EnumPreference@12@PAPAI@Z")]
             public static partial uint GetPreferenceOptions(global::Daybreak.API.Interop.GWCA.GW.UI.EnumPreference enumPreference1, void* ptr2);
 
-            // GW::UI::GetRootFrame | returns TODO: map struct GW::UI::Frame
-            // [LibraryImport(DllName, EntryPoint = "?GetRootFrame@UI@GW@@YAPAUFrame@12@XZ")]
-            // public static partial Frame* GetRootFrame();
+            // GW::UI::GetRootFrame
+            [LibraryImport(DllName, EntryPoint = "?GetRootFrame@UI@GW@@YAPAUFrame@12@XZ")]
+            public static partial global::Daybreak.API.Interop.Frame* GetRootFrame();
 
             // GW::UI::GetSettings
             [LibraryImport(DllName, EntryPoint = "?GetSettings@UI@GW@@YAPAV?$Array@E@2@XZ")]
@@ -2591,28 +2591,28 @@ public static unsafe partial class GWCA
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool IsValidEncStr(ushort* ptr);
 
-            // GW::UI::Keydown | frame2: TODO: map struct GW::UI::Frame
-            // [LibraryImport(DllName, EntryPoint = "?Keydown@UI@GW@@YA_NW4ControlAction@12@PAUFrame@12@@Z")]
-            // [return: MarshalAs(UnmanagedType.U1)]
-            // public static partial bool Keydown(global::Daybreak.API.Interop.GWCA.GW.UI.ControlAction controlAction1, Frame* frame2);
+            // GW::UI::Keydown
+            [LibraryImport(DllName, EntryPoint = "?Keydown@UI@GW@@YA_NW4ControlAction@12@PAUFrame@12@@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool Keydown(global::Daybreak.API.Interop.GWCA.GW.UI.ControlAction controlAction1, global::Daybreak.API.Interop.Frame* frame2);
 
-            // GW::UI::Keypress | frame2: TODO: map struct GW::UI::Frame
-            // [LibraryImport(DllName, EntryPoint = "?Keypress@UI@GW@@YA_NW4ControlAction@12@PAUFrame@12@@Z")]
-            // [return: MarshalAs(UnmanagedType.U1)]
-            // public static partial bool Keypress(global::Daybreak.API.Interop.GWCA.GW.UI.ControlAction controlAction1, Frame* frame2);
+            // GW::UI::Keypress
+            [LibraryImport(DllName, EntryPoint = "?Keypress@UI@GW@@YA_NW4ControlAction@12@PAUFrame@12@@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool Keypress(global::Daybreak.API.Interop.GWCA.GW.UI.ControlAction controlAction1, global::Daybreak.API.Interop.Frame* frame2);
 
-            // GW::UI::Keyup | frame2: TODO: map struct GW::UI::Frame
-            // [LibraryImport(DllName, EntryPoint = "?Keyup@UI@GW@@YA_NW4ControlAction@12@PAUFrame@12@@Z")]
-            // [return: MarshalAs(UnmanagedType.U1)]
-            // public static partial bool Keyup(global::Daybreak.API.Interop.GWCA.GW.UI.ControlAction controlAction1, Frame* frame2);
+            // GW::UI::Keyup
+            [LibraryImport(DllName, EntryPoint = "?Keyup@UI@GW@@YA_NW4ControlAction@12@PAUFrame@12@@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool Keyup(global::Daybreak.API.Interop.GWCA.GW.UI.ControlAction controlAction1, global::Daybreak.API.Interop.Frame* frame2);
 
             // GW::UI::RegisterCreateUIComponentCallback | function2: TODO: map struct function
             // [LibraryImport(DllName, EntryPoint = "?RegisterCreateUIComponentCallback@UI@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUCreateUIComponentPacket@UI@GW@@@Z@std@@H@Z")]
             // public static partial void RegisterCreateUIComponentCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2);
 
-            // GW::UI::RegisterFrameUIMessageCallback | function3: TODO: map struct function | frame4: TODO: map struct GW::UI::Frame
+            // GW::UI::RegisterFrameUIMessageCallback | function3: TODO: map struct function
             // [LibraryImport(DllName, EntryPoint = "?RegisterFrameUIMessageCallback@UI@GW@@YAXPAUHookEntry@2@W4UIMessage@12@ABV?$function@$$A6AXPAUHookStatus@GW@@PBUFrame@UI@2@W4UIMessage@42@PAX3@Z@std@@H@Z")]
-            // public static partial void RegisterFrameUIMessageCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, global::Daybreak.API.Models.UIMessage uIMessage2, function* function3, Frame* frame4, global::Daybreak.API.Models.UIMessage uIMessage5, void* ptr6, nint ptr7);
+            // public static partial void RegisterFrameUIMessageCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, global::Daybreak.API.Interop.GWCA.GW.UI.UIMessage uIMessage2, function* function3, global::Daybreak.API.Interop.Frame* frame4, global::Daybreak.API.Interop.GWCA.GW.UI.UIMessage uIMessage5, void* ptr6, nint ptr7);
 
             // GW::UI::RegisterKeydownCallback | function2: TODO: map struct function
             // [LibraryImport(DllName, EntryPoint = "?RegisterKeydownCallback@UI@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUHookStatus@GW@@I@Z@std@@@Z")]
@@ -2624,7 +2624,7 @@ public static unsafe partial class GWCA
 
             // GW::UI::RegisterUIMessageCallback | function3: TODO: map struct function
             // [LibraryImport(DllName, EntryPoint = "?RegisterUIMessageCallback@UI@GW@@YAXPAUHookEntry@2@W4UIMessage@12@ABV?$function@$$A6AXPAUHookStatus@GW@@W4UIMessage@UI@2@PAX2@Z@std@@H@Z")]
-            // public static partial void RegisterUIMessageCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, global::Daybreak.API.Models.UIMessage uIMessage2, function* function3, global::Daybreak.API.Models.UIMessage uIMessage4, void* ptr5, nint ptr6);
+            // public static partial void RegisterUIMessageCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, global::Daybreak.API.Interop.GWCA.GW.UI.UIMessage uIMessage2, function* function3, global::Daybreak.API.Interop.GWCA.GW.UI.UIMessage uIMessage4, void* ptr5, nint ptr6);
 
             // GW::UI::RemoveCreateUIComponentCallback
             [LibraryImport(DllName, EntryPoint = "?RemoveCreateUIComponentCallback@UI@GW@@YAXPAUHookEntry@2@@Z")]
@@ -2644,22 +2644,22 @@ public static unsafe partial class GWCA
 
             // GW::UI::RemoveUIMessageCallback
             [LibraryImport(DllName, EntryPoint = "?RemoveUIMessageCallback@UI@GW@@YAXPAUHookEntry@2@W4UIMessage@12@@Z")]
-            public static partial void RemoveUIMessageCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, global::Daybreak.API.Models.UIMessage uIMessage2);
+            public static partial void RemoveUIMessageCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, global::Daybreak.API.Interop.GWCA.GW.UI.UIMessage uIMessage2);
 
-            // GW::UI::SelectDropdownOption | frame1: TODO: map struct GW::UI::Frame
-            // [LibraryImport(DllName, EntryPoint = "?SelectDropdownOption@UI@GW@@YA_NPAUFrame@12@I@Z")]
-            // [return: MarshalAs(UnmanagedType.U1)]
-            // public static partial bool SelectDropdownOption(Frame* frame1, uint value2);
+            // GW::UI::SelectDropdownOption
+            [LibraryImport(DllName, EntryPoint = "?SelectDropdownOption@UI@GW@@YA_NPAUFrame@12@I@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool SelectDropdownOption(global::Daybreak.API.Interop.Frame* frame1, uint value2);
 
-            // GW::UI::SendFrameUIMessage | frame1: TODO: map struct GW::UI::Frame
-            // [LibraryImport(DllName, EntryPoint = "?SendFrameUIMessage@UI@GW@@YA_NPAUFrame@12@W4UIMessage@12@PAX2@Z")]
-            // [return: MarshalAs(UnmanagedType.U1)]
-            // public static partial bool SendFrameUIMessage(Frame* frame1, global::Daybreak.API.Models.UIMessage uIMessage2, void* ptr3, nint ptr4);
+            // GW::UI::SendFrameUIMessage
+            [LibraryImport(DllName, EntryPoint = "?SendFrameUIMessage@UI@GW@@YA_NPAUFrame@12@W4UIMessage@12@PAX2@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool SendFrameUIMessage(global::Daybreak.API.Interop.Frame* frame1, global::Daybreak.API.Interop.GWCA.GW.UI.UIMessage uIMessage2, void* ptr3, nint ptr4);
 
             // GW::UI::SendUIMessage
             [LibraryImport(DllName, EntryPoint = "?SendUIMessage@UI@GW@@YA_NW4UIMessage@12@PAX1@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SendUIMessage(global::Daybreak.API.Models.UIMessage uIMessage1, void* ptr2, nint ptr3);
+            public static partial bool SendUIMessage(global::Daybreak.API.Interop.GWCA.GW.UI.UIMessage uIMessage1, void* ptr2, nint ptr3);
 
             // GW::UI::SetCommandLinePref
             [LibraryImport(DllName, EntryPoint = "?SetCommandLinePref@UI@GW@@YA_NPB_WI@Z")]
@@ -2671,25 +2671,25 @@ public static unsafe partial class GWCA
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool SetCommandLinePref(ushort* ptr1, ushort* ptr2);
 
-            // GW::UI::SetFrameDisabled | frame1: TODO: map struct GW::UI::Frame
-            // [LibraryImport(DllName, EntryPoint = "?SetFrameDisabled@UI@GW@@YA_NPAUFrame@12@_N@Z")]
-            // [return: MarshalAs(UnmanagedType.U1)]
-            // public static partial bool SetFrameDisabled(Frame* frame1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            // GW::UI::SetFrameDisabled
+            [LibraryImport(DllName, EntryPoint = "?SetFrameDisabled@UI@GW@@YA_NPAUFrame@12@_N@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool SetFrameDisabled(global::Daybreak.API.Interop.Frame* frame1, [MarshalAs(UnmanagedType.U1)] bool flag2);
 
-            // GW::UI::SetFrameMargins | frame1: TODO: map struct GW::UI::Frame
-            // [LibraryImport(DllName, EntryPoint = "?SetFrameMargins@UI@GW@@YA_NPAUFrame@12@IQAM1I@Z")]
-            // [return: MarshalAs(UnmanagedType.U1)]
-            // public static partial bool SetFrameMargins(Frame* frame1, uint value2, float* ptr3, nint ptr4, uint value5);
+            // GW::UI::SetFrameMargins
+            [LibraryImport(DllName, EntryPoint = "?SetFrameMargins@UI@GW@@YA_NPAUFrame@12@IQAM1I@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool SetFrameMargins(global::Daybreak.API.Interop.Frame* frame1, uint value2, float* ptr3, nint ptr4, uint value5);
 
-            // GW::UI::SetFrameTitle | frame1: TODO: map struct GW::UI::Frame
-            // [LibraryImport(DllName, EntryPoint = "?SetFrameTitle@UI@GW@@YA_NPAUFrame@12@PB_W@Z")]
-            // [return: MarshalAs(UnmanagedType.U1)]
-            // public static partial bool SetFrameTitle(Frame* frame1, ushort* ptr2);
+            // GW::UI::SetFrameTitle
+            [LibraryImport(DllName, EntryPoint = "?SetFrameTitle@UI@GW@@YA_NPAUFrame@12@PB_W@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool SetFrameTitle(global::Daybreak.API.Interop.Frame* frame1, ushort* ptr2);
 
-            // GW::UI::SetFrameVisible | frame1: TODO: map struct GW::UI::Frame
-            // [LibraryImport(DllName, EntryPoint = "?SetFrameVisible@UI@GW@@YA_NPAUFrame@12@_N@Z")]
-            // [return: MarshalAs(UnmanagedType.U1)]
-            // public static partial bool SetFrameVisible(Frame* frame1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            // GW::UI::SetFrameVisible
+            [LibraryImport(DllName, EntryPoint = "?SetFrameVisible@UI@GW@@YA_NPAUFrame@12@_N@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool SetFrameVisible(global::Daybreak.API.Interop.Frame* frame1, [MarshalAs(UnmanagedType.U1)] bool flag2);
 
             // GW::UI::SetOpenLinks
             [LibraryImport(DllName, EntryPoint = "?SetOpenLinks@UI@GW@@YAX_N@Z")]
@@ -2725,10 +2725,10 @@ public static unsafe partial class GWCA
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool SetWindowVisible(global::Daybreak.API.Interop.GWCA.GW.UI.WindowID windowID1, [MarshalAs(UnmanagedType.U1)] bool flag2);
 
-            // GW::UI::TriggerFrameRedraw | frame: TODO: map struct GW::UI::Frame
-            // [LibraryImport(DllName, EntryPoint = "?TriggerFrameRedraw@UI@GW@@YA_NPAUFrame@12@@Z")]
-            // [return: MarshalAs(UnmanagedType.U1)]
-            // public static partial bool TriggerFrameRedraw(Frame* frame);
+            // GW::UI::TriggerFrameRedraw
+            [LibraryImport(DllName, EntryPoint = "?TriggerFrameRedraw@UI@GW@@YA_NPAUFrame@12@@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool TriggerFrameRedraw(global::Daybreak.API.Interop.Frame* frame);
 
             // GW::UI::UInt32ToEncStr
             [LibraryImport(DllName, EntryPoint = "?UInt32ToEncStr@UI@GW@@YA_NIPA_WI@Z")]
@@ -2738,49 +2738,49 @@ public static unsafe partial class GWCA
             public static partial class FramePosition
             {
 
-                // GW::UI::FramePosition::GetBottomRightOnScreen | frame2: TODO: map struct GW::UI::Frame
-                // [LibraryImport(DllName, EntryPoint = "?GetBottomRightOnScreen@FramePosition@UI@GW@@QBE?AUVec2f@3@PBUFrame@23@@Z")]
-                // [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                // public static partial global::Daybreak.API.Interop.GuildWars.Vec2fStruct* GetBottomRightOnScreen(nint self, Frame* frame2);
+                // GW::UI::FramePosition::GetBottomRightOnScreen
+                [LibraryImport(DllName, EntryPoint = "?GetBottomRightOnScreen@FramePosition@UI@GW@@QBE?AUVec2f@3@PBUFrame@23@@Z")]
+                [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
+                public static partial global::Daybreak.API.Interop.GuildWars.Vec2fStruct* GetBottomRightOnScreen(nint self, global::Daybreak.API.Interop.Frame* frame2);
 
-                // GW::UI::FramePosition::GetContentBottomRight | frame2: TODO: map struct GW::UI::Frame
-                // [LibraryImport(DllName, EntryPoint = "?GetContentBottomRight@FramePosition@UI@GW@@QBE?AUVec2f@3@PBUFrame@23@@Z")]
-                // [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                // public static partial global::Daybreak.API.Interop.GuildWars.Vec2fStruct* GetContentBottomRight(nint self, Frame* frame2);
+                // GW::UI::FramePosition::GetContentBottomRight
+                [LibraryImport(DllName, EntryPoint = "?GetContentBottomRight@FramePosition@UI@GW@@QBE?AUVec2f@3@PBUFrame@23@@Z")]
+                [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
+                public static partial global::Daybreak.API.Interop.GuildWars.Vec2fStruct* GetContentBottomRight(nint self, global::Daybreak.API.Interop.Frame* frame2);
 
-                // GW::UI::FramePosition::GetContentTopLeft | frame2: TODO: map struct GW::UI::Frame
-                // [LibraryImport(DllName, EntryPoint = "?GetContentTopLeft@FramePosition@UI@GW@@QBE?AUVec2f@3@PBUFrame@23@@Z")]
-                // [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                // public static partial global::Daybreak.API.Interop.GuildWars.Vec2fStruct* GetContentTopLeft(nint self, Frame* frame2);
+                // GW::UI::FramePosition::GetContentTopLeft
+                [LibraryImport(DllName, EntryPoint = "?GetContentTopLeft@FramePosition@UI@GW@@QBE?AUVec2f@3@PBUFrame@23@@Z")]
+                [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
+                public static partial global::Daybreak.API.Interop.GuildWars.Vec2fStruct* GetContentTopLeft(nint self, global::Daybreak.API.Interop.Frame* frame2);
 
-                // GW::UI::FramePosition::GetSizeOnScreen | frame2: TODO: map struct GW::UI::Frame
-                // [LibraryImport(DllName, EntryPoint = "?GetSizeOnScreen@FramePosition@UI@GW@@QBE?AUVec2f@3@PBUFrame@23@@Z")]
-                // [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                // public static partial global::Daybreak.API.Interop.GuildWars.Vec2fStruct* GetSizeOnScreen(nint self, Frame* frame2);
+                // GW::UI::FramePosition::GetSizeOnScreen
+                [LibraryImport(DllName, EntryPoint = "?GetSizeOnScreen@FramePosition@UI@GW@@QBE?AUVec2f@3@PBUFrame@23@@Z")]
+                [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
+                public static partial global::Daybreak.API.Interop.GuildWars.Vec2fStruct* GetSizeOnScreen(nint self, global::Daybreak.API.Interop.Frame* frame2);
 
-                // GW::UI::FramePosition::GetTopLeftOnScreen | frame2: TODO: map struct GW::UI::Frame
-                // [LibraryImport(DllName, EntryPoint = "?GetTopLeftOnScreen@FramePosition@UI@GW@@QBE?AUVec2f@3@PBUFrame@23@@Z")]
-                // [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                // public static partial global::Daybreak.API.Interop.GuildWars.Vec2fStruct* GetTopLeftOnScreen(nint self, Frame* frame2);
+                // GW::UI::FramePosition::GetTopLeftOnScreen
+                [LibraryImport(DllName, EntryPoint = "?GetTopLeftOnScreen@FramePosition@UI@GW@@QBE?AUVec2f@3@PBUFrame@23@@Z")]
+                [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
+                public static partial global::Daybreak.API.Interop.GuildWars.Vec2fStruct* GetTopLeftOnScreen(nint self, global::Daybreak.API.Interop.Frame* frame2);
 
-                // GW::UI::FramePosition::GetViewportScale | frame2: TODO: map struct GW::UI::Frame
-                // [LibraryImport(DllName, EntryPoint = "?GetViewportScale@FramePosition@UI@GW@@QBE?AUVec2f@3@PBUFrame@23@@Z")]
-                // [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                // public static partial global::Daybreak.API.Interop.GuildWars.Vec2fStruct* GetViewportScale(nint self, Frame* frame2);
+                // GW::UI::FramePosition::GetViewportScale
+                [LibraryImport(DllName, EntryPoint = "?GetViewportScale@FramePosition@UI@GW@@QBE?AUVec2f@3@PBUFrame@23@@Z")]
+                [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
+                public static partial global::Daybreak.API.Interop.GuildWars.Vec2fStruct* GetViewportScale(nint self, global::Daybreak.API.Interop.Frame* frame2);
             }
 
             public static partial class FrameRelation
             {
 
-                // GW::UI::FrameRelation::GetFrame | returns TODO: map struct GW::UI::Frame
-                // [LibraryImport(DllName, EntryPoint = "?GetFrame@FrameRelation@UI@GW@@QAEPAUFrame@23@XZ")]
-                // [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                // public static partial Frame* GetFrame(nint self);
+                // GW::UI::FrameRelation::GetFrame
+                [LibraryImport(DllName, EntryPoint = "?GetFrame@FrameRelation@UI@GW@@QAEPAUFrame@23@XZ")]
+                [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
+                public static partial global::Daybreak.API.Interop.Frame* GetFrame(nint self);
 
-                // GW::UI::FrameRelation::GetParent | returns TODO: map struct GW::UI::Frame
-                // [LibraryImport(DllName, EntryPoint = "?GetParent@FrameRelation@UI@GW@@QBEPAUFrame@23@XZ")]
-                // [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                // public static partial Frame* GetParent(nint self);
+                // GW::UI::FrameRelation::GetParent
+                [LibraryImport(DllName, EntryPoint = "?GetParent@FrameRelation@UI@GW@@QBEPAUFrame@23@XZ")]
+                [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
+                public static partial global::Daybreak.API.Interop.Frame* GetParent(nint self);
             }
 
             public static partial class WindowPosition
@@ -18119,7 +18119,7 @@ namespace Daybreak.API.Interop.GuildWars
     public unsafe struct InteractionMessage
     {
         public uint FrameId;
-        public global::Daybreak.API.Models.UIMessage MessageId; // Same as UIMessage from UIMgr, but includes things like mouse move, click etc
+        public global::Daybreak.API.Interop.GWCA.GW.UI.UIMessage MessageId; // Same as UIMessage from UIMgr, but includes things like mouse move, click etc
         public nint WParam;
     }
 
@@ -18187,7 +18187,7 @@ namespace Daybreak.API.Interop.GuildWars
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
     public unsafe struct kAllyOrGuildMessage
     {
-        public global::Daybreak.API.Models.Channel Channel;
+        public global::Daybreak.API.Interop.GWCA.GW.Chat.Channel Channel;
         public nint Message;
         public nint Sender;
         public nint GuildTag;
@@ -18241,7 +18241,7 @@ namespace Daybreak.API.Interop.GuildWars
     public unsafe struct kGetColor
     {
         public uint* Color;
-        public global::Daybreak.API.Models.Channel Channel;
+        public global::Daybreak.API.Interop.GWCA.GW.Chat.Channel Channel;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
@@ -18303,7 +18303,7 @@ namespace Daybreak.API.Interop.GuildWars
     public unsafe struct kLogChatMessage
     {
         public nint Message;
-        public global::Daybreak.API.Models.Channel Channel;
+        public global::Daybreak.API.Interop.GWCA.GW.Chat.Channel Channel;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x8)]
@@ -18400,7 +18400,7 @@ namespace Daybreak.API.Interop.GuildWars
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
     public unsafe struct kPlayerChatMessage
     {
-        public global::Daybreak.API.Models.Channel Channel;
+        public global::Daybreak.API.Interop.GWCA.GW.Chat.Channel Channel;
         public nint Message;
         public uint PlayerNumber;
     }
@@ -18443,7 +18443,7 @@ namespace Daybreak.API.Interop.GuildWars
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
     public unsafe struct kPrintChatMessage
     {
-        public global::Daybreak.API.Models.Channel Channel;
+        public global::Daybreak.API.Interop.GWCA.GW.Chat.Channel Channel;
         public nint Message;
         public ulong Timestamp;
         public uint IsReprint;
@@ -18665,9 +18665,9 @@ namespace Daybreak.API.Interop.GuildWars
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
     public unsafe struct kWriteToChatLog
     {
-        public global::Daybreak.API.Models.Channel Channel;
+        public global::Daybreak.API.Interop.GWCA.GW.Chat.Channel Channel;
         public nint Message;
-        public global::Daybreak.API.Models.Channel ChannelDupe;
+        public global::Daybreak.API.Interop.GWCA.GW.Chat.Channel ChannelDupe;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
