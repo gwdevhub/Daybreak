@@ -72,7 +72,7 @@ public sealed class MainPlayerService : IDisposable
 
                 var gameContext = this.gameContextService.GetGameContext();
                 if (gameContext.IsNull ||
-                    gameContext.Pointer->WorldContext is null)
+                    gameContext.Pointer->World is null)
                 {
                     scopedLogger.LogError("Failed to get game context");
                     return false;
@@ -85,23 +85,23 @@ public sealed class MainPlayerService : IDisposable
                     return false;
                 }
 
-                var playerAgent = this.GetAgentContext(playerAgentId);
+                var playerAgent = this.agentContextService.GetAgentById(playerAgentId);
                 if (playerAgent is null ||
-                    playerAgent->Type is not AgentType.Living ||
+                    playerAgent->Type is not (uint)AgentType.Living ||
                     playerAgent->AgentId != playerAgentId)
                 {
                     scopedLogger.LogError("Player agent {playerAgentId} not found in agent array", playerAgentId);
                     return false;
                 }
 
-                var livingAgent = (AgentLivingContext*)playerAgent;
-                if (livingAgent->Level != gameContext.Pointer->WorldContext->Level)
+                var livingAgent = (AgentLiving*)playerAgent;
+                if (livingAgent->Level != gameContext.Pointer->World->Level)
                 {
                     scopedLogger.LogError("Player agent not found. Player level mismatch: {level} != {gameLevel}", livingAgent->Level, gameContext.Pointer->WorldContext->Level);
                     return false;
                 }
 
-                var agentProfession = gameContext.Pointer->WorldContext->Professions.AsValueEnumerable().FirstOrDefault(p => p.AgentId == playerAgentId);
+                var agentProfession = gameContext.Pointer->World->PartyProfessionStates.AsValueEnumerable().FirstOrDefault(p => p.AgentId == playerAgentId);
                 if (agentProfession.AgentId != playerAgentId)
                 {
                     scopedLogger.LogError("Failed to find agent profession for player agent id {agentId}", playerAgentId);
@@ -114,7 +114,7 @@ public sealed class MainPlayerService : IDisposable
                     singleBuild.Skills.AsValueEnumerable().Select(s => (uint)s.Id).ToArray(),
                     livingAgent->Primary,
                     agentProfession.UnlockedProfessionsFlags,
-                    [.. gameContext.Pointer->WorldContext->UnlockedCharacterSkills]);
+                    [.. gameContext.Pointer->World->UnlockedCharacterSkills]);
 
                 if (!this.buildTemplateManager.CanTemplateApply(validationRequest))
                 {
@@ -141,14 +141,15 @@ public sealed class MainPlayerService : IDisposable
                     skills[i] = (uint)singleBuild.Skills[i].Id;
                 }
 
-                var skillTemplate = new SkillTemplate(
-                    (uint)singleBuild.Primary.Id,
-                    (uint)singleBuild.Secondary.Id,
-                    (uint)Math.Min(singleBuild.Attributes.Count, 12),
-                    attributeIds,
-                    attributeValues,
-                    skills);
-
+                var skillTemplate = new SkillTemplate
+                {
+                    Primary = (uint)singleBuild.Primary.Id,
+                    Secondary = (uint)singleBuild.Secondary.Id,
+                    AttributesCount = (uint)Math.Min(singleBuild.Attributes.Count, 12),
+                    AttributeIds = attributeIds,
+                    AttributeValues = attributeValues,
+                    Skills = skills
+                };
                 this.skillbarContextService.LoadBuild(playerAgentId, &skillTemplate);
                 return true;
             }
@@ -531,18 +532,5 @@ public sealed class MainPlayerService : IDisposable
 
             }
         }, cancellationToken);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private unsafe AgentContext* GetAgentContext(uint agentId)
-    {
-        var agentArray = this.agentContextService.GetAgentArray();
-        if (agentArray.IsNull || agentArray.Pointer->Buffer is null ||
-            agentArray.Pointer->Size <= agentId)
-        {
-            return null;
-        }
-
-        return agentArray.Pointer->Buffer[agentId].Pointer;
     }
 }

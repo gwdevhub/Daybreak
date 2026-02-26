@@ -278,6 +278,10 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         sb.AppendLine("namespace Daybreak.API.Interop.GuildWars");
         sb.AppendLine("{");
         var emittedNames = new HashSet<string>(StringComparer.Ordinal);
+        
+        // Emit manually-defined helper structs first (TLink, etc.)
+        EmitManualHelperStructs(sb, 4, emittedNames);
+        
         // Emit enums first - they're often referenced by structs (e.g. Attribute enum vs Attribute struct)
         EmitEnumsToGuildWarsNamespace(sb, headerRoot, 4, emittedNames);
         EmitStructsToGuildWarsNamespace(sb, headerRoot, typeMap, 4, emittedNames);
@@ -676,7 +680,8 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
             if (Regex.IsMatch(cppType, @"\bT\b") && !cppType.Contains("Array"))
                 return (false, $"template param T in field {field.Name}");
             // Skip structs with complex template containers we can't represent
-            if (cppType.Contains("TList<") || cppType.Contains("TLink<") || 
+            // Note: TLink<T> is handled separately in MapCppFieldTypeToCs (8-byte linked list node)
+            if (cppType.Contains("TList<") || 
                 cppType.Contains("PrioQ<") || cppType.Contains("PrioQLink<") ||
                 cppType.Contains("BaseArray<"))
                 return (false, $"complex template in field {field.Name}: {cppType}");
@@ -815,6 +820,33 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         foreach (var child in node.Children.Values)
         {
             EmitStructsRecursive(sb, child, typeMap, indent, emittedNames);
+        }
+    }
+
+    /// <summary>
+    /// Emits manually-defined helper structs that can't be parsed from headers.
+    /// These are typically C++ template containers with known fixed layouts.
+    /// </summary>
+    private static void EmitManualHelperStructs(StringBuilder sb, int indent, HashSet<string> emittedNames)
+    {
+        var pad = new string(' ', indent);
+        
+        // TLink<T> - doubly-linked list node used in Agent and other structs
+        // C++ definition: struct TLink { TLink* prev_link; T* next_node; }
+        // Size: 8 bytes (2 pointers on x86)
+        if (emittedNames.Add("TLink"))
+        {
+            sb.AppendLine($"{pad}/// <summary>");
+            sb.AppendLine($"{pad}/// TLink&lt;T&gt; - doubly-linked list node (8 bytes: 2 pointers).");
+            sb.AppendLine($"{pad}/// Used in Agent structs for linked list chaining.");
+            sb.AppendLine($"{pad}/// </summary>");
+            sb.AppendLine($"{pad}[global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]");
+            sb.AppendLine($"{pad}public struct TLink");
+            sb.AppendLine($"{pad}{{");
+            sb.AppendLine($"{pad}    public nint PrevLink;");
+            sb.AppendLine($"{pad}    public nint NextNode;");
+            sb.AppendLine($"{pad}}}");
+            sb.AppendLine();
         }
     }
 
@@ -958,12 +990,48 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         if (cppType.StartsWith("GW::"))
             cppType = cppType.Substring(4);
 
-        // Handle Array<T> and similar template containers - convert to fixed-size inline struct
-        // These are GWCA's Array template which is a {T* data, uint size, uint capacity}
+        // Handle Array<T> - GWCA's Array template which is a {T* data, uint size, uint capacity} (12 bytes)
         if (cppType.StartsWith("Array<"))
         {
-            // For struct fields, Array<T> is 12 bytes (pointer + 2 uints), represent as placeholder
-            return "nint"; // Simplified: just use nint, actual layout needs manual handling
+            // Extract the inner type from Array<T>
+            var innerStart = cppType.IndexOf('<') + 1;
+            var innerEnd = cppType.LastIndexOf('>');
+            if (innerEnd > innerStart)
+            {
+                var innerCpp = cppType.Substring(innerStart, innerEnd - innerStart).Trim();
+                // Handle pointer inner types (e.g., Array<Agent*>)
+                // C# does NOT allow pointer types as generic type arguments (CS0306), so use nint
+                if (innerCpp.EndsWith("*"))
+                {
+                    return "global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint>";
+                }
+                // Handle non-pointer inner types
+                // Strip "struct " prefix
+                if (innerCpp.StartsWith("struct "))
+                    innerCpp = innerCpp.Substring(7).Trim();
+                // Strip namespace
+                if (innerCpp.Contains("::"))
+                {
+                    var parts = innerCpp.Split(new[] { "::" }, StringSplitOptions.RemoveEmptyEntries);
+                    innerCpp = parts[parts.Length - 1];
+                }
+                // Map primitives
+                var csInner = MapPrimitiveType(innerCpp);
+                if (csInner != innerCpp)
+                    return "global::Daybreak.API.Interop.GuildWars.GuildWarsArray<" + csInner + ">";
+                // Check typeMap for structs/enums
+                if (typeMap.TryGetValue(innerCpp, out var mappedInner))
+                    return "global::Daybreak.API.Interop.GuildWars.GuildWarsArray<" + mappedInner + ">";
+                // Fallback for unmapped types
+                return "global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint>";
+            }
+            return "global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint>";
+        }
+
+        // Handle TLink<T> - linked list node, always 8 bytes (2 pointers)
+        if (cppType.StartsWith("TLink<"))
+        {
+            return "global::Daybreak.API.Interop.GuildWars.TLink";
         }
 
         // Handle pointers
@@ -971,12 +1039,21 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         if (isPointer)
         {
             var inner = cppType.TrimEnd('*').Trim();
+            // Strip namespace qualifiers before lookup
+            var innerStripped = inner;
+            if (inner.Contains("::"))
+            {
+                var parts = inner.Split(new[] { "::" }, StringSplitOptions.RemoveEmptyEntries);
+                innerStripped = parts[parts.Length - 1];
+            }
+            
             var csInner = MapCppFieldTypeToCs(inner, typeMap);
             // Special case: void* and char* and wchar_t* map to nint
             if (csInner is "void" or "char" or "byte")
                 return "nint";
-            // If the inner type is unmapped (returns the raw C++ name), use nint for the pointer
-            if (!IsKnownCsType(csInner) && !typeMap.ContainsKey(csInner))
+            // If the inner type is unmapped (csInner equals the stripped name), use nint for the pointer
+            // A mapped type will have a fully-qualified name or be a known primitive
+            if (!IsKnownCsType(csInner) && csInner == innerStripped)
                 return "nint";
             return csInner + "*";
         }
@@ -1299,8 +1376,34 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
             TypeKind.Primitive => MapPrimitiveType(arg.Name),
             TypeKind.Enum => typeMap.TryGetValue(arg.Name, out var e) ? e : arg.Name,
             TypeKind.Struct => typeMap.TryGetValue(arg.Name, out var s) ? s : "nint", // unmapped struct -> nint
-            TypeKind.Pointer => "nint", // pointer types cannot be generic type arguments
+            TypeKind.Pointer => "nint", // C# does NOT allow pointer types as generic type arguments (CS0306)
             _ => "nint",
+        };
+    }
+    
+    /// <summary>
+    /// Resolves a pointer type used as a template argument (e.g., Agent* in Array&lt;Agent*&gt;).
+    /// In unsafe C#, pointer types can be used as generic type arguments for unmanaged structs.
+    /// </summary>
+    private static string ResolvePointerTemplateArg(DemangledType arg, Dictionary<string, string> typeMap)
+    {
+        // arg.Name is the inner type (e.g., "Agent" for Agent*)
+        var innerName = arg.Name;
+        
+        // Check if the inner type is mapped
+        if (typeMap.TryGetValue(innerName, out var mapped))
+            return mapped + "*";
+        
+        // Check for primitives
+        var primitive = MapPrimitiveType(innerName);
+        if (primitive != innerName)
+            return primitive + "*";
+        
+        // Special cases
+        return innerName switch
+        {
+            "void" => "nint", // void* -> nint
+            _ => "nint", // unmapped pointer -> nint
         };
     }
     

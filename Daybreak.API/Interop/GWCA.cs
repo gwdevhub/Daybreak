@@ -66,7 +66,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.AccountInfo: 7 fields [OK]
     // GWCA.GW.AccountUnlockedCount: 3 fields [OK]
     // GWCA.GW.AccountUnlockedItemInfo: 3 fields [OK]
-    // GWCA.GW.Agent: 29 fields [SKIP: complex template in field link: TLink<Agent>]
+    // GWCA.GW.Agent: 29 fields [OK]
     // GWCA.GW.AgentContext: 27 fields [OK]
     // GWCA.GW.AgentEffects: 3 fields [OK]
     // GWCA.GW.AgentGadget: 5 fields [OK]
@@ -148,7 +148,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.PartyAlly: 3 fields [OK]
     // GWCA.GW.PartyAttribute: 2 fields [OK]
     // GWCA.GW.PartyContext: 16 fields [SKIP: complex template in field requests: TList<PartyInfo>]
-    // GWCA.GW.PartyInfo: 7 fields [SKIP: complex template in field invite_link: TLink<PartyInfo>]
+    // GWCA.GW.PartyInfo: 7 fields [OK]
     // GWCA.GW.PartyMemberMoraleInfo: 4 fields [OK]
     // GWCA.GW.PartyMoraleLink: 3 fields [OK]
     // GWCA.GW.PartySearch: 13 fields [OK]
@@ -423,30 +423,30 @@ public static unsafe partial class GWCA
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool ChangeTarget(uint value);
 
-            // GW::Agents::ChangeTarget | agent: TODO: map struct GW::Agent
-            // [LibraryImport(DllName, EntryPoint = "?ChangeTarget@Agents@GW@@YA_NPBUAgent@2@@Z")]
-            // [return: MarshalAs(UnmanagedType.U1)]
-            // public static partial bool ChangeTarget(Agent* agent);
+            // GW::Agents::ChangeTarget
+            [LibraryImport(DllName, EntryPoint = "?ChangeTarget@Agents@GW@@YA_NPBUAgent@2@@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool ChangeTarget(global::Daybreak.API.Interop.GuildWars.Agent* agent);
 
             // GW::Agents::CountAllegianceInRange
             [LibraryImport(DllName, EntryPoint = "?CountAllegianceInRange@Agents@GW@@YAIW4Allegiance@Constants@2@M@Z")]
             public static partial uint CountAllegianceInRange(global::Daybreak.API.Interop.GWCA.GW.Constants.Allegiance allegiance1, float value2);
 
             // GW::Agents::GetAgentArray
-            // [LibraryImport(DllName, EntryPoint = "?GetAgentArray@Agents@GW@@YAPAV?$Array@PAUAgent@GW@@@2@XZ")]
-            // public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint>* GetAgentArray();
+            [LibraryImport(DllName, EntryPoint = "?GetAgentArray@Agents@GW@@YAPAV?$Array@PAUAgent@GW@@@2@XZ")]
+            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint>* GetAgentArray();
 
-            // GW::Agents::GetAgentByID | returns TODO: map struct GW::Agent
-            // [LibraryImport(DllName, EntryPoint = "?GetAgentByID@Agents@GW@@YAPAUAgent@2@I@Z")]
-            // public static partial Agent* GetAgentByID(uint value);
+            // GW::Agents::GetAgentByID
+            [LibraryImport(DllName, EntryPoint = "?GetAgentByID@Agents@GW@@YAPAUAgent@2@I@Z")]
+            public static partial global::Daybreak.API.Interop.GuildWars.Agent* GetAgentByID(uint value);
 
             // GW::Agents::GetAgentEncName
             [LibraryImport(DllName, EntryPoint = "?GetAgentEncName@Agents@GW@@YAPA_WI@Z")]
             public static partial ushort* GetAgentEncName(uint value);
 
-            // GW::Agents::GetAgentEncName | agent: TODO: map struct GW::Agent
-            // [LibraryImport(DllName, EntryPoint = "?GetAgentEncName@Agents@GW@@YAPA_WPBUAgent@2@@Z")]
-            // public static partial ushort* GetAgentEncName(Agent* agent);
+            // GW::Agents::GetAgentEncName
+            [LibraryImport(DllName, EntryPoint = "?GetAgentEncName@Agents@GW@@YAPA_WPBUAgent@2@@Z")]
+            public static partial ushort* GetAgentEncName(global::Daybreak.API.Interop.GuildWars.Agent* agent);
 
             // GW::Agents::GetAgentIdByLoginNumber
             [LibraryImport(DllName, EntryPoint = "?GetAgentIdByLoginNumber@Agents@GW@@YAII@Z")]
@@ -472,10 +472,10 @@ public static unsafe partial class GWCA
             [LibraryImport(DllName, EntryPoint = "?GetHeroAgentID@Agents@GW@@YAII@Z")]
             public static partial uint GetHeroAgentID(uint value);
 
-            // GW::Agents::GetIsAgentTargettable | agent: TODO: map struct GW::Agent
-            // [LibraryImport(DllName, EntryPoint = "?GetIsAgentTargettable@Agents@GW@@YA_NPBUAgent@2@@Z")]
-            // [return: MarshalAs(UnmanagedType.U1)]
-            // public static partial bool GetIsAgentTargettable(Agent* agent);
+            // GW::Agents::GetIsAgentTargettable
+            [LibraryImport(DllName, EntryPoint = "?GetIsAgentTargettable@Agents@GW@@YA_NPBUAgent@2@@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool GetIsAgentTargettable(global::Daybreak.API.Interop.GuildWars.Agent* agent);
 
             // GW::Agents::GetMapAgentArray
             [LibraryImport(DllName, EntryPoint = "?GetMapAgentArray@Agents@GW@@YAPAV?$Array@UMapAgent@GW@@@2@XZ")]
@@ -501,9 +501,9 @@ public static unsafe partial class GWCA
             [LibraryImport(DllName, EntryPoint = "?GetPlayerArray@Agents@GW@@YAPAV?$Array@UPlayer@GW@@@2@XZ")]
             public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.Player>* GetPlayerArray();
 
-            // GW::Agents::GetPlayerByID | returns TODO: map struct GW::Agent
-            // [LibraryImport(DllName, EntryPoint = "?GetPlayerByID@Agents@GW@@YAPAUAgent@2@I@Z")]
-            // public static partial Agent* GetPlayerByID(uint value);
+            // GW::Agents::GetPlayerByID
+            [LibraryImport(DllName, EntryPoint = "?GetPlayerByID@Agents@GW@@YAPAUAgent@2@I@Z")]
+            public static partial global::Daybreak.API.Interop.GuildWars.Agent* GetPlayerByID(uint value);
 
             // GW::Agents::GetPlayerNameByLoginNumber
             [LibraryImport(DllName, EntryPoint = "?GetPlayerNameByLoginNumber@Agents@GW@@YAPA_WI@Z")]
@@ -517,10 +517,10 @@ public static unsafe partial class GWCA
             [LibraryImport(DllName, EntryPoint = "?GetTargetId@Agents@GW@@YAIXZ")]
             public static partial uint GetTargetId();
 
-            // GW::Agents::InteractAgent | agent1: TODO: map struct GW::Agent
-            // [LibraryImport(DllName, EntryPoint = "?InteractAgent@Agents@GW@@YA_NPBUAgent@2@_N@Z")]
-            // [return: MarshalAs(UnmanagedType.U1)]
-            // public static partial bool InteractAgent(Agent* agent1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            // GW::Agents::InteractAgent
+            [LibraryImport(DllName, EntryPoint = "?InteractAgent@Agents@GW@@YA_NPBUAgent@2@_N@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool InteractAgent(global::Daybreak.API.Interop.GuildWars.Agent* agent1, [MarshalAs(UnmanagedType.U1)] bool flag2);
 
             // GW::Agents::IsObserving
             [LibraryImport(DllName, EntryPoint = "?IsObserving@Agents@GW@@YA_NXZ")]
@@ -1647,9 +1647,9 @@ public static unsafe partial class GWCA
             [LibraryImport(DllName, EntryPoint = "?GetPartyHeroCount@PartyMgr@GW@@YAIXZ")]
             public static partial uint GetPartyHeroCount();
 
-            // GW::PartyMgr::GetPartyInfo | returns TODO: map struct GW::PartyInfo
-            // [LibraryImport(DllName, EntryPoint = "?GetPartyInfo@PartyMgr@GW@@YAPAUPartyInfo@2@I@Z")]
-            // public static partial PartyInfo* GetPartyInfo(uint value);
+            // GW::PartyMgr::GetPartyInfo
+            [LibraryImport(DllName, EntryPoint = "?GetPartyInfo@PartyMgr@GW@@YAPAUPartyInfo@2@I@Z")]
+            public static partial global::Daybreak.API.Interop.GuildWars.PartyInfo* GetPartyInfo(uint value);
 
             // GW::PartyMgr::GetPartyPlayerCount
             [LibraryImport(DllName, EntryPoint = "?GetPartyPlayerCount@PartyMgr@GW@@YAIXZ")]
@@ -8575,6 +8575,17 @@ public static unsafe partial class GWCA
 
 namespace Daybreak.API.Interop.GuildWars
 {
+    /// <summary>
+    /// TLink&lt;T&gt; - doubly-linked list node (8 bytes: 2 pointers).
+    /// Used in Agent structs for linked list chaining.
+    /// </summary>
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public struct TLink
+    {
+        public nint PrevLink;
+        public nint NextNode;
+    }
+
 
     public enum LogLevel : int
     {
@@ -14090,17 +14101,17 @@ namespace Daybreak.API.Interop.GuildWars
     public unsafe struct AccountContext
     {
         [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-        public nint AccountUnlockedCounts; // e.g. number of unlocked storage panes
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.AccountUnlockedCount> AccountUnlockedCounts; // e.g. number of unlocked storage panes
         [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
         public fixed byte H0010[164];
         [global::System.Runtime.InteropServices.FieldOffset(0x00B4)]
-        public nint UnlockedPvpHeros; // Unused, hero battles is no more :(
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<uint> UnlockedPvpHeros; // Unused, hero battles is no more :(
         [global::System.Runtime.InteropServices.FieldOffset(0x00C4)]
-        public nint H00c4; // If an item is unlocked, the mod struct is stored here. Use unlocked_pvp_items_info to find the index. Idk why, chaos reigns I guess
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<uint> H00c4; // If an item is unlocked, the mod struct is stored here. Use unlocked_pvp_items_info to find the index. Idk why, chaos reigns I guess
         [global::System.Runtime.InteropServices.FieldOffset(0x00E4)]
-        public nint UnlockedPvpItemInfo; // If an item is unlocked, the details are stored here
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.AccountUnlockedItemInfo> UnlockedPvpItemInfo; // If an item is unlocked, the details are stored here
         [global::System.Runtime.InteropServices.FieldOffset(0x00F4)]
-        public nint UnlockedPvpItems; // Bitwise array of which pvp items are unlocked
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<uint> UnlockedPvpItems; // Bitwise array of which pvp items are unlocked
         [global::System.Runtime.InteropServices.FieldOffset(0x0104)]
         public fixed byte H0104[48]; // Some arrays, some linked lists, meh
         [global::System.Runtime.InteropServices.FieldOffset(0x0134)]
@@ -14136,10 +14147,73 @@ namespace Daybreak.API.Interop.GuildWars
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct Agent
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint* Vtable;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint H0004;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public uint H0008;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public fixed uint H000C[2];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public uint Timer2;
+        [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
+        public global::Daybreak.API.Interop.GuildWars.TLink Link;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
+        public global::Daybreak.API.Interop.GuildWars.TLink Link2;
+        [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
+        public uint AgentId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
+        public float Z; // Z coord in float
+        [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
+        public float Width1; // Width of the model's box
+        [global::System.Runtime.InteropServices.FieldOffset(0x0038)]
+        public float Height1; // Height of the model's box
+        [global::System.Runtime.InteropServices.FieldOffset(0x0050)]
+        public float RotationCos; // cosine of rotation
+        [global::System.Runtime.InteropServices.FieldOffset(0x0054)]
+        public float RotationSin; // sine of rotation
+        [global::System.Runtime.InteropServices.FieldOffset(0x0058)]
+        public uint NameProperties; // Bitmap basically telling what the agent is
+        [global::System.Runtime.InteropServices.FieldOffset(0x005C)]
+        public uint Ground;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0060)]
+        public uint H0060;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0064)]
+        public global::System.Numerics.Vector3 TerrainNormal;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0070)]
+        public fixed byte H0070[4];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0080)]
+        public fixed byte H0080[4];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0084)]
+        public float NameTagX; // Exactly the same as X above
+        [global::System.Runtime.InteropServices.FieldOffset(0x0088)]
+        public float NameTagY; // Exactly the same as Y above
+        [global::System.Runtime.InteropServices.FieldOffset(0x008C)]
+        public float NameTagZ; // Z coord in float
+        [global::System.Runtime.InteropServices.FieldOffset(0x0092)]
+        public ushort H0092;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0094)]
+        public fixed uint H0094[2];
+        [global::System.Runtime.InteropServices.FieldOffset(0x009C)]
+        public uint Type; // Livings = 0xDB, Gadgets = 0x200, Items = 0x400.
+        [global::System.Runtime.InteropServices.FieldOffset(0x00A8)]
+        public uint H00A8; // always 0?
+        [global::System.Runtime.InteropServices.FieldOffset(0x00AC)]
+        public float RotationCos2; // same as cosine above
+        [global::System.Runtime.InteropServices.FieldOffset(0x00B0)]
+        public float RotationSin2; // same as sine above
+        [global::System.Runtime.InteropServices.FieldOffset(0x00B4)]
+        public fixed uint H00B4[4];
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
     public unsafe struct AgentContext
     {
         [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-        public nint H0000;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H0000;
         [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
         public fixed uint H0010[5];
         [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
@@ -14163,15 +14237,15 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0058)]
         public fixed uint H0058[11];
         [global::System.Runtime.InteropServices.FieldOffset(0x0084)]
-        public nint H0084;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H0084;
         [global::System.Runtime.InteropServices.FieldOffset(0x0094)]
         public uint H0094; // this field and the next array are link together in a structure.
         [global::System.Runtime.InteropServices.FieldOffset(0x0098)]
-        public nint AgentSummaryInfo; // elements are of size 12. {ptr, func, ptr}
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> AgentSummaryInfo; // elements are of size 12. {ptr, func, ptr}
         [global::System.Runtime.InteropServices.FieldOffset(0x00A8)]
-        public nint H00A8;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H00A8;
         [global::System.Runtime.InteropServices.FieldOffset(0x00B8)]
-        public nint H00B8;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H00B8;
         [global::System.Runtime.InteropServices.FieldOffset(0x00C8)]
         public uint Rand1; // Number seems to be randomized quite a bit o.o seems to be accessed by textparser.cpp
         [global::System.Runtime.InteropServices.FieldOffset(0x00CC)]
@@ -14179,15 +14253,15 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x00D0)]
         public fixed byte H00D0[24];
         [global::System.Runtime.InteropServices.FieldOffset(0x00E8)]
-        public nint AgentMovement;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> AgentMovement;
         [global::System.Runtime.InteropServices.FieldOffset(0x00F8)]
-        public nint H00F8;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H00F8;
         [global::System.Runtime.InteropServices.FieldOffset(0x0108)]
         public fixed uint H0108[17];
         [global::System.Runtime.InteropServices.FieldOffset(0x014C)]
-        public nint AgentArray1;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> AgentArray1;
         [global::System.Runtime.InteropServices.FieldOffset(0x015C)]
-        public nint AgentAsyncMovement;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> AgentAsyncMovement;
         [global::System.Runtime.InteropServices.FieldOffset(0x016C)]
         public fixed uint H016C[16];
         [global::System.Runtime.InteropServices.FieldOffset(0x01AC)]
@@ -14271,7 +14345,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0104)]
         public uint H0104; // New variable added here
         [global::System.Runtime.InteropServices.FieldOffset(0x0108)]
-        public nint Tags; // struct { uint16_t guild_id, uint8_t primary, uint8_t secondary, uint16_t level
+        public global::Daybreak.API.Interop.GuildWars.TagInfo* Tags; // struct { uint16_t guild_id, uint8_t primary, uint8_t secondary, uint16_t level
         [global::System.Runtime.InteropServices.FieldOffset(0x010C)]
         public ushort H010C;
         [global::System.Runtime.InteropServices.FieldOffset(0x0110)]
@@ -14614,17 +14688,17 @@ namespace Daybreak.API.Interop.GuildWars
     public unsafe struct CharContext
     {
         [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-        public nint H0000;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H0000;
         [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
         public uint H0010;
         [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-        public nint H0014;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H0014;
         [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
         public fixed uint H0024[4];
         [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
-        public nint H0034;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H0034;
         [global::System.Runtime.InteropServices.FieldOffset(0x0044)]
-        public nint H0044;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H0044;
         [global::System.Runtime.InteropServices.FieldOffset(0x0054)]
         public fixed uint H0054[4]; // load head variables
         [global::System.Runtime.InteropServices.FieldOffset(0x0064)]
@@ -14634,7 +14708,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x009C)]
         public fixed uint H009C[20];
         [global::System.Runtime.InteropServices.FieldOffset(0x00EC)]
-        public nint H00EC;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H00EC;
         [global::System.Runtime.InteropServices.FieldOffset(0x00FC)]
         public fixed uint H00FC[37]; // 40
         [global::System.Runtime.InteropServices.FieldOffset(0x0190)]
@@ -14666,7 +14740,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0238)]
         public fixed uint H0238[5];
         [global::System.Runtime.InteropServices.FieldOffset(0x024C)]
-        public nint ObserverMatches;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> ObserverMatches;
         [global::System.Runtime.InteropServices.FieldOffset(0x025C)]
         public fixed uint H025C[17];
         [global::System.Runtime.InteropServices.FieldOffset(0x02A0)]
@@ -14676,7 +14750,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x02A8)]
         public fixed uint H02A8[40];
         [global::System.Runtime.InteropServices.FieldOffset(0x0348)]
-        public nint ProgressBar; // seems to never be nullptr
+        public global::Daybreak.API.Interop.GuildWars.ProgressBarContext* ProgressBar; // seems to never be nullptr
         [global::System.Runtime.InteropServices.FieldOffset(0x034C)]
         public fixed uint H034C[27];
         [global::System.Runtime.InteropServices.FieldOffset(0x03B8)]
@@ -14778,7 +14852,7 @@ namespace Daybreak.API.Interop.GuildWars
     public unsafe struct GadgetContext
     {
         [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-        public nint GadgetInfo;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.GadgetInfo> GadgetInfo;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
@@ -14802,15 +14876,15 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
         public nint H0004;
         [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-        public nint Agent; // Most functions that access are prefixed with Agent.
+        public global::Daybreak.API.Interop.GuildWars.AgentContext* Agent; // Most functions that access are prefixed with Agent.
         [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
         public nint Event;
         [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
         public nint H0010;
         [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-        public nint Map; // Static object/collision data
+        public global::Daybreak.API.Interop.GuildWars.MapContext* Map; // Static object/collision data
         [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
-        public nint TextParser;
+        public global::Daybreak.API.Interop.GuildWars.TextParser* TextParser;
         [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
         public nint H001C;
         [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
@@ -14818,21 +14892,21 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
         public nint H0024;
         [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
-        public nint Account;
+        public global::Daybreak.API.Interop.GuildWars.AccountContext* Account;
         [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
-        public nint World; // Best name to fit it that I can think of.
+        public global::Daybreak.API.Interop.GuildWars.WorldContext* World; // Best name to fit it that I can think of.
         [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
-        public nint Cinematic;
+        public global::Daybreak.API.Interop.GuildWars.Cinematic* Cinematic;
         [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
         public nint H0034;
         [global::System.Runtime.InteropServices.FieldOffset(0x0038)]
-        public nint Gadget;
+        public global::Daybreak.API.Interop.GuildWars.GadgetContext* Gadget;
         [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
-        public nint Guild;
+        public global::Daybreak.API.Interop.GuildWars.GuildContext* Guild;
         [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
-        public nint Items;
+        public global::Daybreak.API.Interop.GuildWars.ItemContext* Items;
         [global::System.Runtime.InteropServices.FieldOffset(0x0044)]
-        public nint Character;
+        public global::Daybreak.API.Interop.GuildWars.CharContext* Character;
         [global::System.Runtime.InteropServices.FieldOffset(0x0048)]
         public nint H0048;
         [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
@@ -14842,7 +14916,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0054)]
         public nint H0054;
         [global::System.Runtime.InteropServices.FieldOffset(0x0058)]
-        public nint Trade;
+        public global::Daybreak.API.Interop.GuildWars.TradeContext* Trade;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
@@ -14902,7 +14976,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
         public uint H001C;
         [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
-        public nint H0020;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H0020;
         [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
         public uint H0030;
         [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
@@ -14924,7 +14998,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x02A4)]
         public uint H02A4;
         [global::System.Runtime.InteropServices.FieldOffset(0x02A8)]
-        public nint FactionsOutpostGuilds;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.TownAlliance> FactionsOutpostGuilds;
         [global::System.Runtime.InteropServices.FieldOffset(0x02B8)]
         public uint KurzickTownCount;
         [global::System.Runtime.InteropServices.FieldOffset(0x02BC)]
@@ -14944,11 +15018,11 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0308)]
         public fixed uint H0308[4];
         [global::System.Runtime.InteropServices.FieldOffset(0x0318)]
-        public nint H0318;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H0318;
         [global::System.Runtime.InteropServices.FieldOffset(0x0328)]
         public uint H0328;
         [global::System.Runtime.InteropServices.FieldOffset(0x032C)]
-        public nint H032C;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H032C;
         [global::System.Runtime.InteropServices.FieldOffset(0x033C)]
         public fixed uint H033C[7];
         [global::System.Runtime.InteropServices.FieldOffset(0x0358)]
@@ -15132,7 +15206,7 @@ namespace Daybreak.API.Interop.GuildWars
     public unsafe struct Inventory
     {
         [global::System.Runtime.InteropServices.FieldOffset(0x005C)]
-        public nint Bundle;
+        public global::Daybreak.API.Interop.GuildWars.ItemStruct* Bundle;
         [global::System.Runtime.InteropServices.FieldOffset(0x0060)]
         public uint StoragePanesUnlocked;
         [global::System.Runtime.InteropServices.FieldOffset(0x0084)]
@@ -15153,11 +15227,11 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
         public uint AgentId;
         [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-        public nint BagEquipped; // Only valid if Item is a equipped Bag
+        public global::Daybreak.API.Interop.GuildWars.Bag* BagEquipped; // Only valid if Item is a equipped Bag
         [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-        public nint Bag;
+        public global::Daybreak.API.Interop.GuildWars.Bag* Bag;
         [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-        public nint ModStruct; // Pointer to an array of mods.
+        public global::Daybreak.API.Interop.GuildWars.ItemModifier* ModStruct; // Pointer to an array of mods.
         [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
         public uint ModStructSize; // Size of this array.
         [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
@@ -15204,29 +15278,29 @@ namespace Daybreak.API.Interop.GuildWars
     public unsafe struct ItemContext
     {
         [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-        public nint H0000;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H0000;
         [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-        public nint H0010;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H0010;
         [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
         public uint H0020;
         [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
-        public nint BagsArray;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> BagsArray;
         [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
         public fixed byte H0034[12];
         [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
-        public nint H0040;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H0040;
         [global::System.Runtime.InteropServices.FieldOffset(0x0050)]
-        public nint H0050;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H0050;
         [global::System.Runtime.InteropServices.FieldOffset(0x0060)]
         public fixed byte H0060[88];
         [global::System.Runtime.InteropServices.FieldOffset(0x00B8)]
-        public nint ItemArray;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> ItemArray;
         [global::System.Runtime.InteropServices.FieldOffset(0x00C8)]
         public fixed byte H00C8[48];
         [global::System.Runtime.InteropServices.FieldOffset(0x00F8)]
-        public nint Inventory;
+        public global::Daybreak.API.Interop.GuildWars.Inventory* Inventory;
         [global::System.Runtime.InteropServices.FieldOffset(0x00FC)]
-        public nint H00FC;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H00FC;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x10)]
@@ -15245,7 +15319,7 @@ namespace Daybreak.API.Interop.GuildWars
         public uint GoldCost;
         public uint SkillPointCost;
         public uint MaterialCostCount;
-        public nint MaterialCostBuffer; // NB: The game stores a cached array of material amounts that the player has in inventory; we don't care about it though!
+        public global::Daybreak.API.Interop.GuildWars.MaterialCost* MaterialCostBuffer; // NB: The game stores a cached array of material amounts that the player has in inventory; we don't care about it though!
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
@@ -15304,17 +15378,17 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
         public fixed uint H0014[6];
         [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
-        public nint Spawns1; // Seem to be arena spawns. struct is X,Y,unk 4 byte value,unk 4 byte value.
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Spawns1; // Seem to be arena spawns. struct is X,Y,unk 4 byte value,unk 4 byte value.
         [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
-        public nint Spawns2; // Same as above
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Spawns2; // Same as above
         [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
-        public nint Spawns3; // Same as above
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Spawns3; // Same as above
         [global::System.Runtime.InteropServices.FieldOffset(0x005C)]
         public fixed float H005C[6]; // Some trapezoid i think.
         [global::System.Runtime.InteropServices.FieldOffset(0x0074)]
         public nint Path;
         [global::System.Runtime.InteropServices.FieldOffset(0x0078)]
-        public nint PathEngine;
+        public global::Daybreak.API.Interop.GuildWars.PathEngineContext* PathEngine;
         [global::System.Runtime.InteropServices.FieldOffset(0x007C)]
         public nint Props;
         [global::System.Runtime.InteropServices.FieldOffset(0x0080)]
@@ -15437,7 +15511,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
         public fixed uint H0034[5];
         [global::System.Runtime.InteropServices.FieldOffset(0x0058)]
-        public nint InteractiveModel;
+        public global::Daybreak.API.Interop.GuildWars.RecObject* InteractiveModel;
         [global::System.Runtime.InteropServices.FieldOffset(0x005C)]
         public fixed uint H005C[4];
         [global::System.Runtime.InteropServices.FieldOffset(0x006C)]
@@ -15447,7 +15521,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0064)]
         public fixed uint H0064[5];
         [global::System.Runtime.InteropServices.FieldOffset(0x0088)]
-        public nint PropObjectInfo;
+        public global::Daybreak.API.Interop.GuildWars.PropByType* PropObjectInfo;
         [global::System.Runtime.InteropServices.FieldOffset(0x008C)]
         public uint H008C;
     }
@@ -15493,11 +15567,11 @@ namespace Daybreak.API.Interop.GuildWars
         public global::System.Numerics.Vector2 Size; // Dimensions of the drawable area inside the mission map frame
         public uint H0008;
         public uint FrameId;
-        public nint H0020;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H0020;
         public uint H0030;
         public uint H0034;
         public uint H0038;
-        public nint H003c;
+        public global::Daybreak.API.Interop.GuildWars.MissionMapSubContext2* H003c;
         public uint H0040;
         public uint H0044;
     }
@@ -15602,7 +15676,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
         public nint FreeList; // This is a singly linked list of free object. The last object freed is always the pointer.
         [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-        public nint Blocks; // This is a singly linked list of blocks that were allocated. Every blocks will generally be for many elements.
+        public global::Daybreak.API.Interop.GuildWars.ObjectPoolBlock* Blocks; // This is a singly linked list of blocks that were allocated. Every blocks will generally be for many elements.
         [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
         public uint Count;
     }
@@ -15611,7 +15685,7 @@ namespace Daybreak.API.Interop.GuildWars
     public unsafe struct ObjectPoolBlock
     {
         [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-        public nint Next;
+        public global::Daybreak.API.Interop.GuildWars.ObjectPoolBlock* Next;
         [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
         public uint H0004;
     }
@@ -15673,6 +15747,25 @@ namespace Daybreak.API.Interop.GuildWars
         public global::Daybreak.API.Interop.GuildWars.Attribute Attribute; // [54]
     }
 
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x84)]
+    public unsafe struct PartyInfo
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint PartyId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.PlayerPartyMember> Players;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.HenchmanPartyMember> Henchmen;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.HeroPartyMember> Heroes;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<uint> Others; // agent id of allies, minions, pets.
+        [global::System.Runtime.InteropServices.FieldOffset(0x0044)]
+        public fixed uint H0044[14];
+        [global::System.Runtime.InteropServices.FieldOffset(0x007C)]
+        public global::Daybreak.API.Interop.GuildWars.TLink InviteLink;
+    }
+
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
     public unsafe struct PartyMemberMoraleInfo
     {
@@ -15687,7 +15780,7 @@ namespace Daybreak.API.Interop.GuildWars
     {
         public uint Unk;
         public uint Unk2;
-        public nint PartyMemberInfo;
+        public global::Daybreak.API.Interop.GuildWars.PartyMemberMoraleInfo* PartyMemberInfo;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
@@ -15762,7 +15855,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
         public uint Plane;
         [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-        public nint NextTrap;
+        public global::Daybreak.API.Interop.GuildWars.PathingTrapezoid* NextTrap;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x30)]
@@ -15832,7 +15925,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
         public uint PartySize;
         [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
-        public nint H0040;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H0040;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x134)]
@@ -15949,11 +16042,11 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
         public uint Flags; // 0x4 => "Not used for path finding"
         [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-        public nint Pair;
+        public global::Daybreak.API.Interop.GuildWars.Portal* Pair;
         [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
         public uint Count;
         [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-        public nint Trapezoids;
+        public global::Daybreak.API.Interop.GuildWars.PathingTrapezoid* Trapezoids;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
@@ -15972,7 +16065,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0144)]
         public uint Index2;
         [global::System.Runtime.InteropServices.FieldOffset(0x0148)]
-        public nint Chars;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.LoginCharacter> Chars;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
@@ -15981,7 +16074,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
         public uint MLinkOffset;
         [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-        public nint MNodes;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> MNodes;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x14)]
@@ -16124,7 +16217,7 @@ namespace Daybreak.API.Interop.GuildWars
     public unsafe struct SinkNode
     {
         [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-        public nint Trapezoid;
+        public global::Daybreak.API.Interop.GuildWars.PathingTrapezoid* Trapezoid;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0xA4)]
@@ -16284,9 +16377,9 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
         public uint BufferUsed; // if it's 1 then uses s1 & if it's 0 uses s2.
         [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-        public nint S1;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<char> S1;
         [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
-        public nint S2;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<char> S2;
         [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
         public uint H002C;
         [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
@@ -16331,7 +16424,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
         public uint Substitute2; // related to h0020 & h0024
         [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
-        public nint Cache;
+        public global::Daybreak.API.Interop.GuildWars.TextCache* Cache;
         [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
         public fixed uint H0034[75];
         [global::System.Runtime.InteropServices.FieldOffset(0x0160)]
@@ -16343,7 +16436,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x016C)]
         public fixed uint H016C[5];
         [global::System.Runtime.InteropServices.FieldOffset(0x0180)]
-        public nint SubStruct;
+        public global::Daybreak.API.Interop.GuildWars.SubStruct1* SubStruct;
         [global::System.Runtime.InteropServices.FieldOffset(0x0184)]
         public fixed uint H0184[19];
         [global::System.Runtime.InteropServices.FieldOffset(0x01D0)]
@@ -16438,7 +16531,7 @@ namespace Daybreak.API.Interop.GuildWars
     public unsafe struct TradePlayer
     {
         public uint Gold;
-        public nint Items;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.TradeItem> Items;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
@@ -16468,20 +16561,20 @@ namespace Daybreak.API.Interop.GuildWars
     public unsafe struct WeaponSet
     {
         [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-        public nint Weapon;
+        public global::Daybreak.API.Interop.GuildWars.ItemStruct* Weapon;
         [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-        public nint Offhand;
+        public global::Daybreak.API.Interop.GuildWars.ItemStruct* Offhand;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x854)]
     public unsafe struct WorldContext
     {
         [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-        public nint AccountInfo;
+        public global::Daybreak.API.Interop.GuildWars.AccountInfo* AccountInfo;
         [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-        public nint MessageBuff;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<char> MessageBuff;
         [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-        public nint DialogBuff;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<char> DialogBuff;
         [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
         public MerchItemArray MerchItems;
         [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
@@ -16503,7 +16596,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x007C)]
         public MapAgentArray MapAgents;
         [global::System.Runtime.InteropServices.FieldOffset(0x008C)]
-        public nint PartyAllies; // List of allies added to the current party
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.PartyAlly> PartyAllies; // List of allies added to the current party
         [global::System.Runtime.InteropServices.FieldOffset(0x009C)]
         public global::System.Numerics.Vector3 AllFlag;
         [global::System.Runtime.InteropServices.FieldOffset(0x00A8)]
@@ -16513,19 +16606,19 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x00BC)]
         public fixed uint H00BC[255];
         [global::System.Runtime.InteropServices.FieldOffset(0x04B8)]
-        public nint H04B8;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H04B8;
         [global::System.Runtime.InteropServices.FieldOffset(0x04C8)]
-        public nint H04C8;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H04C8;
         [global::System.Runtime.InteropServices.FieldOffset(0x04D8)]
         public uint H04D8;
         [global::System.Runtime.InteropServices.FieldOffset(0x04DC)]
-        public nint H04DC;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H04DC;
         [global::System.Runtime.InteropServices.FieldOffset(0x04EC)]
         public fixed uint H04EC[7];
         [global::System.Runtime.InteropServices.FieldOffset(0x0508)]
         public AgentEffectsArray PartyEffects;
         [global::System.Runtime.InteropServices.FieldOffset(0x0518)]
-        public nint H0518;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H0518;
         [global::System.Runtime.InteropServices.FieldOffset(0x0528)]
         public global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID ActiveQuestId;
         [global::System.Runtime.InteropServices.FieldOffset(0x052C)]
@@ -16533,43 +16626,43 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x053C)]
         public fixed uint H053C[10];
         [global::System.Runtime.InteropServices.FieldOffset(0x0564)]
-        public nint MissionObjectives;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.MissionObjective> MissionObjectives;
         [global::System.Runtime.InteropServices.FieldOffset(0x0574)]
-        public nint HenchmenAgentIds;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<uint> HenchmenAgentIds;
         [global::System.Runtime.InteropServices.FieldOffset(0x0584)]
         public HeroFlagArray HeroFlags;
         [global::System.Runtime.InteropServices.FieldOffset(0x0594)]
         public HeroInfoArray HeroInfo;
         [global::System.Runtime.InteropServices.FieldOffset(0x05A4)]
-        public nint CartographedAreas; // Struct size = 0x20
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> CartographedAreas; // Struct size = 0x20
         [global::System.Runtime.InteropServices.FieldOffset(0x05B4)]
         public fixed uint H05B4[2];
         [global::System.Runtime.InteropServices.FieldOffset(0x05BC)]
-        public nint ControlledMinionCount;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.ControlledMinions> ControlledMinionCount;
         [global::System.Runtime.InteropServices.FieldOffset(0x05CC)]
-        public nint MissionsCompleted;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<uint> MissionsCompleted;
         [global::System.Runtime.InteropServices.FieldOffset(0x05DC)]
-        public nint MissionsBonus;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<uint> MissionsBonus;
         [global::System.Runtime.InteropServices.FieldOffset(0x05EC)]
-        public nint MissionsCompletedHm;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<uint> MissionsCompletedHm;
         [global::System.Runtime.InteropServices.FieldOffset(0x05FC)]
-        public nint MissionsBonusHm;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<uint> MissionsBonusHm;
         [global::System.Runtime.InteropServices.FieldOffset(0x060C)]
-        public nint UnlockedMap;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<uint> UnlockedMap;
         [global::System.Runtime.InteropServices.FieldOffset(0x061C)]
         public fixed uint H061C[2];
         [global::System.Runtime.InteropServices.FieldOffset(0x0624)]
-        public nint PlayerMoraleInfo;
+        public global::Daybreak.API.Interop.GuildWars.PartyMemberMoraleInfo* PlayerMoraleInfo;
         [global::System.Runtime.InteropServices.FieldOffset(0x0628)]
         public uint H028C;
         [global::System.Runtime.InteropServices.FieldOffset(0x062C)]
-        public nint PartyMoraleRelated;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.PartyMoraleLink> PartyMoraleRelated;
         [global::System.Runtime.InteropServices.FieldOffset(0x063C)]
         public fixed uint H063C[16];
         [global::System.Runtime.InteropServices.FieldOffset(0x067C)]
         public uint PlayerNumber;
         [global::System.Runtime.InteropServices.FieldOffset(0x0680)]
-        public nint PlayerControlledChar; // Struct size = 0x134 ?
+        public global::Daybreak.API.Interop.GuildWars.PlayerControlledCharacter* PlayerControlledChar; // Struct size = 0x134 ?
         [global::System.Runtime.InteropServices.FieldOffset(0x0684)]
         public uint IsHardModeUnlocked;
         [global::System.Runtime.InteropServices.FieldOffset(0x0688)]
@@ -16581,25 +16674,25 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x06A8)]
         public uint PlayerTeamToken;
         [global::System.Runtime.InteropServices.FieldOffset(0x06AC)]
-        public nint Pets;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.PetInfo> Pets;
         [global::System.Runtime.InteropServices.FieldOffset(0x06BC)]
-        public nint PartyProfessionStates; // Current state of primary/secondary/unlocked for current player and party heroes, used in skill window. aka attribStates
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.ProfessionState> PartyProfessionStates; // Current state of primary/secondary/unlocked for current player and party heroes, used in skill window. aka attribStates
         [global::System.Runtime.InteropServices.FieldOffset(0x06CC)]
-        public nint H06CC;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H06CC;
         [global::System.Runtime.InteropServices.FieldOffset(0x06DC)]
         public uint H06DC;
         [global::System.Runtime.InteropServices.FieldOffset(0x06E0)]
-        public nint H06E0;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H06E0;
         [global::System.Runtime.InteropServices.FieldOffset(0x06F0)]
         public SkillbarArray Skillbar;
         [global::System.Runtime.InteropServices.FieldOffset(0x0700)]
-        public nint LearnableCharacterSkills; // populated at skill trainer and when using signet of capture
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<uint> LearnableCharacterSkills; // populated at skill trainer and when using signet of capture
         [global::System.Runtime.InteropServices.FieldOffset(0x0710)]
-        public nint UnlockedCharacterSkills; // bit field
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<uint> UnlockedCharacterSkills; // bit field
         [global::System.Runtime.InteropServices.FieldOffset(0x0720)]
-        public nint DuplicatedCharacterSkills; // When res signet is bought more than once, its mapped into this array. Used in skill window.
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.DupeSkill> DuplicatedCharacterSkills; // When res signet is bought more than once, its mapped into this array. Used in skill window.
         [global::System.Runtime.InteropServices.FieldOffset(0x0730)]
-        public nint H0730;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H0730;
         [global::System.Runtime.InteropServices.FieldOffset(0x0740)]
         public uint Experience;
         [global::System.Runtime.InteropServices.FieldOffset(0x0744)]
@@ -16673,7 +16766,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x07CC)]
         public AgentInfoArray AgentInfos;
         [global::System.Runtime.InteropServices.FieldOffset(0x07DC)]
-        public nint H07DC;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H07DC;
         [global::System.Runtime.InteropServices.FieldOffset(0x07EC)]
         public MissionMapIconArray MissionMapIcons;
         [global::System.Runtime.InteropServices.FieldOffset(0x07FC)]
@@ -16683,9 +16776,9 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x081C)]
         public TitleArray Titles;
         [global::System.Runtime.InteropServices.FieldOffset(0x082C)]
-        public nint TitleTiers;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.TitleTier> TitleTiers;
         [global::System.Runtime.InteropServices.FieldOffset(0x083C)]
-        public nint VanquishedAreas;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<uint> VanquishedAreas;
         [global::System.Runtime.InteropServices.FieldOffset(0x084C)]
         public uint FoesKilled;
         [global::System.Runtime.InteropServices.FieldOffset(0x0850)]
@@ -16726,9 +16819,9 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
         public global::System.Numerics.Vector2 Dir;
         [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
-        public nint Left;
+        public global::Daybreak.API.Interop.GuildWars.Node* Left;
         [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
-        public nint Right;
+        public global::Daybreak.API.Interop.GuildWars.Node* Right;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x18)]
@@ -16737,9 +16830,9 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
         public global::System.Numerics.Vector2 Pos;
         [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-        public nint Above;
+        public global::Daybreak.API.Interop.GuildWars.Node* Above;
         [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-        public nint Below;
+        public global::Daybreak.API.Interop.GuildWars.Node* Below;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
@@ -16761,7 +16854,7 @@ namespace Daybreak.API.Interop.GuildWars
         public uint Next;
         public uint Unk1;
         public uint Unk2;
-        public nint Messages; // [CHAT_LOG_LENGTH]
+        public global::Daybreak.API.Interop.GuildWars.ChatMessage* Messages; // [CHAT_LOG_LENGTH]
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
@@ -16820,7 +16913,7 @@ namespace Daybreak.API.Interop.GuildWars
     {
         public uint AgentId;
         public uint Type; // 0 = build, 1 = equipment
-        public nint Code;
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<char> Code;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
@@ -16965,7 +17058,7 @@ namespace Daybreak.API.Interop.GuildWars
         public uint PlayerNumber;
         public uint SessionId;
         public uint NumberOfPoints;
-        public nint Points;
+        public global::Daybreak.API.Interop.GuildWars.CompassPoint* Points;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
@@ -16982,7 +17075,7 @@ namespace Daybreak.API.Interop.GuildWars
     public unsafe struct kEffectAdd
     {
         public uint AgentId;
-        public nint Effect;
+        public global::Daybreak.API.Interop.GuildWars.EffectData* Effect;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
@@ -17250,7 +17343,7 @@ namespace Daybreak.API.Interop.GuildWars
     public unsafe struct kSendLoadSkillTemplate
     {
         public uint AgentId;
-        public nint SkillTemplate;
+        public global::Daybreak.API.Interop.GuildWars.SkillTemplate* SkillTemplate;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
@@ -17365,7 +17458,7 @@ namespace Daybreak.API.Interop.GuildWars
     public unsafe struct kUIPositionChanged
     {
         public uint WindowId;
-        public nint Position;
+        public global::Daybreak.API.Interop.GuildWars.WindowPositionData* Position;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
@@ -17441,7 +17534,7 @@ namespace Daybreak.API.Interop.GuildWars
     public unsafe struct AgentArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Value; }
     public unsafe struct AgentEffectsArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.AgentEffects> Value; }
     public unsafe struct AgentInfoArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.AgentInfo> Value; }
-    public unsafe struct AgentList { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Value; }
+    public unsafe struct AgentList { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.Agent> Value; }
     public unsafe struct AgentMovementArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Value; }
     public unsafe struct BlockedPlaneArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<uint> Value; }
     public unsafe struct BuffArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.Buff> Value; }
