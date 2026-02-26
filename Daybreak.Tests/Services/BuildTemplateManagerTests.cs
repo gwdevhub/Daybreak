@@ -1,6 +1,7 @@
 ﻿using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.BuildTemplates;
+using Daybreak.Shared.Services.BuildTemplates.Parsers;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -12,13 +13,14 @@ namespace Daybreak.Tests.Services;
 public class BuildTemplateManagerTests
 {
     private const string EncodedSingleTemplate = "OwBk0texXNu0Dj/z+TDzBj+TN4AE";
-    private const string EncodedTeamTemplate = "OQJUAMxOEMLnw0nDXQGY6aw2B OQNCA8wDP9B8DyzmOUi1veC OggjYxXTIPWbp5krZfxEAAAoD OwUTM4HDn5gc9TJSh6xddmETA";
+    private const string EncodedTeamTemplate = "OQJUAMxOEMLnw0nDXQGY6aw2B OQNCA8wDP9B8DyzmOUi1veC OggjcNWcIPWbp5krZfxEAAAoD OwUTAnHP45gc9TJSh6xddmETA";
     private BuildTemplateManager buildTemplateManager = default!;
 
     [TestInitialize]
     public void Initialize()
     {
-        this.buildTemplateManager = new BuildTemplateManager(Substitute.For<ILogger<BuildTemplateManager>>());
+        ITemplateParser[] templateParsers = [new SkillTemplateParser(), new LegacySkillTemplateParser(), new PartyLoadoutTemplateParser()];
+        this.buildTemplateManager = new BuildTemplateManager(templateParsers, Substitute.For<ILogger<BuildTemplateManager>>());
     }
 
     [TestMethod]
@@ -30,14 +32,14 @@ public class BuildTemplateManagerTests
         singleBuildEntry.Primary.Should().Be(Profession.Assassin);
         singleBuildEntry.Secondary.Should().Be(Profession.None);
         singleBuildEntry.Attributes.Count.Should().Be(4);
-        singleBuildEntry.Attributes[1].Attribute.Should().Be(Attribute.DaggerMastery);
-        singleBuildEntry.Attributes[1].Points.Should().Be(11);
-        singleBuildEntry.Attributes[2].Attribute.Should().Be(Attribute.DeadlyArts);
-        singleBuildEntry.Attributes[2].Points.Should().Be(1);
-        singleBuildEntry.Attributes[3].Attribute.Should().Be(Attribute.ShadowArts);
-        singleBuildEntry.Attributes[3].Points.Should().Be(5);
-        singleBuildEntry.Attributes[0].Attribute.Should().Be(Attribute.CriticalStrikes);
+        singleBuildEntry.Attributes[0].Attribute.Should().Be(Attribute.DaggerMastery);
         singleBuildEntry.Attributes[0].Points.Should().Be(11);
+        singleBuildEntry.Attributes[1].Attribute.Should().Be(Attribute.DeadlyArts);
+        singleBuildEntry.Attributes[1].Points.Should().Be(1);
+        singleBuildEntry.Attributes[2].Attribute.Should().Be(Attribute.ShadowArts);
+        singleBuildEntry.Attributes[2].Points.Should().Be(5);
+        singleBuildEntry.Attributes[3].Attribute.Should().Be(Attribute.CriticalStrikes);
+        singleBuildEntry.Attributes[3].Points.Should().Be(11);
         singleBuildEntry.Skills.Count.Should().Be(8);
         singleBuildEntry.Skills[0].Should().Be(Skill.UnsuspectingStrike);
         singleBuildEntry.Skills[1].Should().Be(Skill.WildStrike);
@@ -74,23 +76,8 @@ public class BuildTemplateManagerTests
             },
             new AttributeEntry
             {
-                Attribute = Attribute.IllusionMagic,
-                Points = 0
-            },
-            new AttributeEntry
-            {
                 Attribute = Attribute.InspirationMagic,
                 Points = 2
-            },
-            new AttributeEntry
-            {
-                Attribute = Attribute.BeastMastery,
-                Points = 0
-            },
-            new AttributeEntry
-            {
-                Attribute = Attribute.Marksmanship,
-                Points = 0
             },
             new AttributeEntry
             {
@@ -122,33 +109,8 @@ public class BuildTemplateManagerTests
             },
             new AttributeEntry
             {
-                Attribute = Attribute.DominationMagic,
-                Points = 0
-            },
-            new AttributeEntry
-            {
-                Attribute = Attribute.IllusionMagic,
-                Points = 0
-            },
-            new AttributeEntry
-            {
                 Attribute = Attribute.InspirationMagic,
                 Points = 12
-            },
-            new AttributeEntry
-            {
-                Attribute = Attribute.HealingPrayers,
-                Points = 0
-            },
-            new AttributeEntry
-            {
-                Attribute = Attribute.SmitingPrayers,
-                Points = 0
-            },
-            new AttributeEntry
-            {
-                Attribute = Attribute.ProtectionPrayers,
-                Points = 0
             },
         ]);
         secondBuild.Skills.Should().BeEquivalentTo(
@@ -180,26 +142,6 @@ public class BuildTemplateManagerTests
             },
             new AttributeEntry
             {
-                Attribute = Attribute.Marksmanship,
-                Points = 0
-            },
-            new AttributeEntry
-            {
-                Attribute = Attribute.WildernessSurvival,
-                Points = 0
-            },
-            new AttributeEntry
-            {
-                Attribute = Attribute.ChannelingMagic,
-                Points = 0
-            },
-            new AttributeEntry
-            {
-                Attribute = Attribute.Communing,
-                Points = 0
-            },
-            new AttributeEntry
-            {
                 Attribute = Attribute.RestorationMagic,
                 Points = 12
             },
@@ -228,28 +170,8 @@ public class BuildTemplateManagerTests
             },
             new AttributeEntry
             {
-                Attribute = Attribute.HealingPrayers,
-                Points = 0
-            },
-            new AttributeEntry
-            {
-                Attribute = Attribute.SmitingPrayers,
-                Points = 0
-            },
-            new AttributeEntry
-            {
                 Attribute = Attribute.ProtectionPrayers,
                 Points = 12
-            },
-            new AttributeEntry
-            {
-                Attribute = Attribute.DominationMagic,
-                Points = 0
-            },
-            new AttributeEntry
-            {
-                Attribute = Attribute.IllusionMagic,
-                Points = 0
             },
             new AttributeEntry
             {
@@ -340,23 +262,8 @@ public class BuildTemplateManagerTests
                         },
                         new AttributeEntry
                         {
-                            Attribute = Attribute.IllusionMagic,
-                            Points = 0
-                        },
-                        new AttributeEntry
-                        {
                             Attribute = Attribute.InspirationMagic,
                             Points = 2
-                        },
-                        new AttributeEntry
-                        {
-                            Attribute = Attribute.BeastMastery,
-                            Points = 0
-                        },
-                        new AttributeEntry
-                        {
-                            Attribute = Attribute.Marksmanship,
-                            Points = 0
                         },
                         new AttributeEntry
                         {
@@ -387,33 +294,8 @@ public class BuildTemplateManagerTests
                         },
                         new AttributeEntry
                         {
-                            Attribute = Attribute.DominationMagic,
-                            Points = 0
-                        },
-                        new AttributeEntry
-                        {
-                            Attribute = Attribute.IllusionMagic,
-                            Points = 0
-                        },
-                        new AttributeEntry
-                        {
                             Attribute = Attribute.InspirationMagic,
                             Points = 12
-                        },
-                        new AttributeEntry
-                        {
-                            Attribute = Attribute.HealingPrayers,
-                            Points = 0
-                        },
-                        new AttributeEntry
-                        {
-                            Attribute = Attribute.SmitingPrayers,
-                            Points = 0
-                        },
-                        new AttributeEntry
-                        {
-                            Attribute = Attribute.ProtectionPrayers,
-                            Points = 0
                         },
                     ],
                     Skills = [
@@ -444,26 +326,6 @@ public class BuildTemplateManagerTests
                         },
                         new AttributeEntry
                         {
-                            Attribute = Attribute.Marksmanship,
-                            Points = 0
-                        },
-                        new AttributeEntry
-                        {
-                            Attribute = Attribute.WildernessSurvival,
-                            Points = 0
-                        },
-                        new AttributeEntry
-                        {
-                            Attribute = Attribute.ChannelingMagic,
-                            Points = 0
-                        },
-                        new AttributeEntry
-                        {
-                            Attribute = Attribute.Communing,
-                            Points = 0
-                        },
-                        new AttributeEntry
-                        {
                             Attribute = Attribute.RestorationMagic,
                             Points = 12
                         },
@@ -491,28 +353,8 @@ public class BuildTemplateManagerTests
                         },
                         new AttributeEntry
                         {
-                            Attribute = Attribute.HealingPrayers,
-                            Points = 0
-                        },
-                        new AttributeEntry
-                        {
-                            Attribute = Attribute.SmitingPrayers,
-                            Points = 0
-                        },
-                        new AttributeEntry
-                        {
                             Attribute = Attribute.ProtectionPrayers,
                             Points = 12
-                        },
-                        new AttributeEntry
-                        {
-                            Attribute = Attribute.DominationMagic,
-                            Points = 0
-                        },
-                        new AttributeEntry
-                        {
-                            Attribute = Attribute.IllusionMagic,
-                            Points = 0
                         },
                         new AttributeEntry
                         {
