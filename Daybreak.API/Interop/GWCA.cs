@@ -8586,6 +8586,60 @@ namespace Daybreak.API.Interop.GuildWars
         public nint NextNode;
     }
 
+    /// <summary>
+    /// Inline array of 12 Attribute elements.
+    /// </summary>
+    [global::System.Runtime.CompilerServices.InlineArray(12)]
+    public unsafe struct AttributeArray12
+    {
+        private global::Daybreak.API.Interop.GuildWars.Attribute _element0;
+    }
+
+    /// <summary>
+    /// Inline array of 54 Attribute elements.
+    /// </summary>
+    [global::System.Runtime.CompilerServices.InlineArray(54)]
+    public unsafe struct AttributeArray54
+    {
+        private global::Daybreak.API.Interop.GuildWars.Attribute _element0;
+    }
+
+    /// <summary>
+    /// Inline array of 1 ChatMessagePtr elements.
+    /// </summary>
+    [global::System.Runtime.CompilerServices.InlineArray(1)]
+    public unsafe struct ChatMessagePtrArray1
+    {
+        private global::Daybreak.API.Interop.GuildWars.ChatMessage* _element0;
+    }
+
+    /// <summary>
+    /// Inline array of 2 ObserverMatchTeam elements.
+    /// </summary>
+    [global::System.Runtime.CompilerServices.InlineArray(2)]
+    public unsafe struct ObserverMatchTeamArray2
+    {
+        private global::Daybreak.API.Interop.GuildWars.ObserverMatchTeam _element0;
+    }
+
+    /// <summary>
+    /// Inline array of 8 SkillbarSkillData elements.
+    /// </summary>
+    [global::System.Runtime.CompilerServices.InlineArray(8)]
+    public unsafe struct SkillbarSkillDataArray8
+    {
+        private global::Daybreak.API.Interop.GuildWars.SkillbarSkillData _element0;
+    }
+
+    /// <summary>
+    /// Inline array of 8 SkillID elements.
+    /// </summary>
+    [global::System.Runtime.CompilerServices.InlineArray(8)]
+    public unsafe struct SkillIDArray8
+    {
+        private global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID _element0;
+    }
+
 
     public enum LogLevel : int
     {
@@ -15710,7 +15764,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
         public uint Count; // number of teams
         [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
-        public global::Daybreak.API.Interop.GuildWars.ObserverMatchTeam Team; // [2]
+        public ObserverMatchTeamArray2 Team;
         [global::System.Runtime.InteropServices.FieldOffset(0x0078)]
         public nint Team1NameDup;
         [global::System.Runtime.InteropServices.FieldOffset(0x007C)]
@@ -15744,7 +15798,7 @@ namespace Daybreak.API.Interop.GuildWars
     public unsafe struct PartyAttribute
     {
         public uint AgentId;
-        public global::Daybreak.API.Interop.GuildWars.Attribute Attribute; // [54]
+        public AttributeArray54 Attribute;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x84)]
@@ -16325,7 +16379,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
         public uint AgentId; // id of the agent whose skillbar this is
         [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-        public global::Daybreak.API.Interop.GuildWars.SkillbarSkillData Skills; // [8]
+        public SkillbarSkillDataArray8 Skills;
         [global::System.Runtime.InteropServices.FieldOffset(0x00A4)]
         public uint Disabled;
         [global::System.Runtime.InteropServices.FieldOffset(0x00A8)]
@@ -16854,7 +16908,7 @@ namespace Daybreak.API.Interop.GuildWars
         public uint Next;
         public uint Unk1;
         public uint Unk2;
-        public global::Daybreak.API.Interop.GuildWars.ChatMessage* Messages; // [CHAT_LOG_LENGTH]
+        public ChatMessagePtrArray1 Messages;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
@@ -16872,9 +16926,9 @@ namespace Daybreak.API.Interop.GuildWars
         public global::Daybreak.API.Interop.GWCA.GW.Constants.Profession Primary;
         public global::Daybreak.API.Interop.GWCA.GW.Constants.Profession Secondary;
         public uint AttributesCount;
-        public global::Daybreak.API.Interop.GuildWars.Attribute AttributeIds; // [12]
+        public AttributeArray12 AttributeIds;
         public fixed uint AttributeValues[12];
-        public global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID Skills; // [8]
+        public SkillIDArray8 Skills;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]

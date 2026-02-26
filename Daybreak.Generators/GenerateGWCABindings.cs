@@ -279,12 +279,19 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         sb.AppendLine("{");
         var emittedNames = new HashSet<string>(StringComparer.Ordinal);
         
+        // Collect inline array types needed by struct fields (for non-blittable array fields)
+        var inlineArrayTypes = new HashSet<(string csType, int size)>();
+        CollectInlineArrayTypes(headerRoot, typeMap, inlineArrayTypes);
+        
         // Emit manually-defined helper structs first (TLink, etc.)
         EmitManualHelperStructs(sb, 4, emittedNames);
         
+        // Emit inline array types for non-blittable arrays (e.g., enum arrays)
+        EmitInlineArrayTypes(sb, 4, inlineArrayTypes, emittedNames);
+        
         // Emit enums first - they're often referenced by structs (e.g. Attribute enum vs Attribute struct)
         EmitEnumsToGuildWarsNamespace(sb, headerRoot, 4, emittedNames);
-        EmitStructsToGuildWarsNamespace(sb, headerRoot, typeMap, 4, emittedNames);
+        EmitStructsToGuildWarsNamespace(sb, headerRoot, typeMap, 4, emittedNames, inlineArrayTypes);
         EmitTypeAliasesToGuildWarsNamespace(sb, headerRoot, typeMap, 4, emittedNames);
         sb.AppendLine("}");
 
@@ -712,7 +719,7 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
     /// <summary>
     /// Emits a C# struct from a parsed C++ struct definition.
     /// </summary>
-    private static void EmitStruct(StringBuilder sb, CppStructDef structDef, Dictionary<string, string> typeMap, int indent, string? csStructName = null)
+    private static void EmitStruct(StringBuilder sb, CppStructDef structDef, Dictionary<string, string> typeMap, int indent, HashSet<(string csType, int size)>? inlineArrayTypes = null, string? csStructName = null)
     {
         var pad = new string(' ', indent);
 
@@ -766,10 +773,15 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
                 {
                     sb.AppendLine($"{innerPad}public fixed {csType} {fieldName}[{size}];{comment}");
                 }
+                else if (inlineArrayTypes is not null && inlineArrayTypes.Contains((csType, size)))
+                {
+                    // Use the inline array type we generated
+                    var inlineArrayTypeName = GetInlineArrayTypeName(csType, size);
+                    sb.AppendLine($"{innerPad}public {inlineArrayTypeName} {fieldName};{comment}");
+                }
                 else
                 {
-                    // For non-blittable types in fixed arrays, just use the first element
-                    // and note the array in comments
+                    // Fallback: use single element with comment (shouldn't happen if inlineArrayTypes is properly populated)
                     sb.AppendLine($"{innerPad}public {csType} {fieldName}; // [{field.ArraySize}]{comment}");
                 }
             }
@@ -786,12 +798,12 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
     /// Emits all emittable structs from the constants tree into the GuildWars namespace.
     /// This provides compatibility for consumer code that uses `using Daybreak.API.Interop.GuildWars;`
     /// </summary>
-    private static void EmitStructsToGuildWarsNamespace(StringBuilder sb, ConstantsNode node, Dictionary<string, string> typeMap, int indent, HashSet<string> emittedNames)
+    private static void EmitStructsToGuildWarsNamespace(StringBuilder sb, ConstantsNode node, Dictionary<string, string> typeMap, int indent, HashSet<string> emittedNames, HashSet<(string csType, int size)> inlineArrayTypes)
     {
-        EmitStructsRecursive(sb, node, typeMap, indent, emittedNames);
+        EmitStructsRecursive(sb, node, typeMap, indent, emittedNames, inlineArrayTypes);
     }
     
-    private static void EmitStructsRecursive(StringBuilder sb, ConstantsNode node, Dictionary<string, string> typeMap, int indent, HashSet<string> emittedNames)
+    private static void EmitStructsRecursive(StringBuilder sb, ConstantsNode node, Dictionary<string, string> typeMap, int indent, HashSet<string> emittedNames, HashSet<(string csType, int size)> inlineArrayTypes)
     {
         foreach (var structDef in node.Structs.OrderBy(s => s.Name, StringComparer.Ordinal))
         {
@@ -813,13 +825,13 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
                 continue;
                 
             emittedNames.Add(csName);
-            EmitStruct(sb, structDef, typeMap, indent, csName);
+            EmitStruct(sb, structDef, typeMap, indent, inlineArrayTypes, csName);
         }
         
         // Recurse into children
         foreach (var child in node.Children.Values)
         {
-            EmitStructsRecursive(sb, child, typeMap, indent, emittedNames);
+            EmitStructsRecursive(sb, child, typeMap, indent, emittedNames, inlineArrayTypes);
         }
     }
 
@@ -848,6 +860,96 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
             sb.AppendLine($"{pad}}}");
             sb.AppendLine();
         }
+    }
+
+    /// <summary>
+    /// Collects all inline array types needed for non-blittable array fields in emittable structs.
+    /// </summary>
+    private static void CollectInlineArrayTypes(ConstantsNode node, Dictionary<string, string> typeMap, HashSet<(string csType, int size)> inlineArrayTypes)
+    {
+        foreach (var structDef in node.Structs)
+        {
+            if (!CanEmitStruct(structDef))
+                continue;
+                
+            foreach (var field in structDef.Fields)
+            {
+                if (field.ArraySize is null)
+                    continue;
+                    
+                var size = ParseArraySize(field.ArraySize);
+                if (size <= 0)
+                    continue;
+                    
+                var csType = MapCppFieldTypeToCs(field.CppType, typeMap);
+                if (!IsBlittableForFixed(csType))
+                {
+                    inlineArrayTypes.Add((csType, size));
+                }
+            }
+        }
+        
+        foreach (var child in node.Children.Values)
+        {
+            CollectInlineArrayTypes(child, typeMap, inlineArrayTypes);
+        }
+    }
+
+    /// <summary>
+    /// Emits InlineArray types for non-blittable array fields.
+    /// Uses [InlineArray(N)] attribute introduced in .NET 8.
+    /// </summary>
+    private static void EmitInlineArrayTypes(StringBuilder sb, int indent, HashSet<(string csType, int size)> inlineArrayTypes, HashSet<string> emittedNames)
+    {
+        var pad = new string(' ', indent);
+        
+        foreach (var (csType, size) in inlineArrayTypes.OrderBy(x => x.csType).ThenBy(x => x.size))
+        {
+            // Generate a name like "AttributeArray12" or "SkillIDArray8"
+            var simpleName = GetSimpleTypeName(csType);
+            var arrayTypeName = $"{simpleName}Array{size}";
+            
+            if (!emittedNames.Add(arrayTypeName))
+                continue;
+            
+            sb.AppendLine($"{pad}/// <summary>");
+            sb.AppendLine($"{pad}/// Inline array of {size} {simpleName} elements.");
+            sb.AppendLine($"{pad}/// </summary>");
+            sb.AppendLine($"{pad}[global::System.Runtime.CompilerServices.InlineArray({size})]");
+            sb.AppendLine($"{pad}public unsafe struct {arrayTypeName}");
+            sb.AppendLine($"{pad}{{");
+            sb.AppendLine($"{pad}    private {csType} _element0;");
+            sb.AppendLine($"{pad}}}");
+            sb.AppendLine();
+        }
+    }
+
+    /// <summary>
+    /// Extracts the simple type name from a fully-qualified type name.
+    /// e.g., "global::Daybreak.API.Interop.GuildWars.Attribute" -> "Attribute"
+    /// Handles pointer types: "ChatMessage*" -> "ChatMessagePtr"
+    /// </summary>
+    private static string GetSimpleTypeName(string csType)
+    {
+        // Handle pointer types
+        var isPointer = csType.EndsWith("*");
+        if (isPointer)
+            csType = csType.TrimEnd('*');
+            
+        var lastDot = csType.LastIndexOf('.');
+        var name = lastDot >= 0 ? csType.Substring(lastDot + 1) : csType;
+        
+        // Append Ptr for pointer types to make valid identifier
+        return isPointer ? name + "Ptr" : name;
+    }
+
+    /// <summary>
+    /// Gets the inline array type name for a given element type and size.
+    /// </summary>
+    private static string GetInlineArrayTypeName(string csType, int size)
+    {
+        var simpleName = GetSimpleTypeName(csType);
+        return $"{simpleName}Array{size}";
     }
 
     /// <summary>
