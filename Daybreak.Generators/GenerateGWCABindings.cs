@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Sybil;
 using static Daybreak.Generators.MsvcDemangler;
@@ -15,10 +16,10 @@ namespace Daybreak.Generators;
 /// Incremental source generator that reads PE exports from gwca.dll,
 /// demangles MSVC-decorated C++ names to recover type and namespace
 /// information, and emits a <c>GWCA</c> class with nested static classes
-/// mirroring the C++ namespace hierarchy.
+/// mirroring the C++ namespace hierarchy (e.g. GW::Agents → GWCA.GW.Agents).
 ///
-/// For example, <c>GW::Agents::ChangeTarget(uint)</c> becomes
-/// <c>GWCA.GW.Agents.ChangeTarget(uint)</c>.
+/// Additionally scans C++ header files under Constants/ for enum and constexpr
+/// declarations, emitting matching C# enums and const fields.
 ///
 /// Types annotated with <c>[GWCAEquivalent("CppName")]</c> are resolved
 /// automatically so the generated signatures use the correct C# types.
@@ -107,7 +108,7 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         // Combine each matching DLL with all type mappings and generate
         var combined = exportsProvider.Combine(typeMappingsProvider);
         context.RegisterSourceOutput(combined, static (ctx, source) =>
-            EmitSource(ctx, source.Left.Path, source.Left.Exports, source.Right));
+            EmitSource(source.Left.Path, source.Left.Exports, source.Right));
     }
 
     // ════════════════════════════════════════════════════════════════
@@ -115,7 +116,6 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
     // ════════════════════════════════════════════════════════════════
 
     private static void EmitSource(
-        SourceProductionContext context,
         string dllPath,
         ImmutableArray<string> exports,
         ImmutableArray<TypeMapping> mappings)
@@ -176,6 +176,33 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
             node.Functions.Add(new ExportEntry(mangledName, info));
         }
 
+        // ── Parse C++ headers for enums and constexpr ──────────────
+        var headerRoot = new ConstantsNode("GWCA");
+        var dllDir = Path.GetDirectoryName(dllPath)!;
+        var includeDir = Path.Combine(dllDir, "Include", "GWCA", "Constants");
+#pragma warning disable RS1035
+        if (Directory.Exists(includeDir))
+        {
+            foreach (var headerFile in Directory.GetFiles(includeDir, "*.h"))
+            {
+                try
+                {
+                    var headerText = File.ReadAllText(headerFile);
+                    CppHeaderParser.Parse(headerText, headerRoot);
+                }
+                catch
+                {
+                    // Skip headers that fail to parse
+                }
+            }
+        }
+#pragma warning restore RS1035
+
+        // Register generated enums in the typeMap so demangled signatures
+        // resolve to the generated C# enum types instead of falling back
+        // to int/uint.  GWCAEquivalent entries take priority (already in map).
+        CollectGeneratedEnumMappings(headerRoot, "GWCA", typeMap);
+
         // Emit
         var sb = new StringBuilder(65536);
         EmitHeader(sb, totalExports, skippedExports);
@@ -184,6 +211,15 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         foreach (var child in root.Children.Values.OrderBy(c => c.Name, StringComparer.Ordinal))
         {
             EmitNamespaceNode(sb, child, typeMap, cExports, 4);
+        }
+
+        // Emit constants from headers (merge into the same GWCA class)
+        // The headerRoot is "GWCA" → children are "GW", etc.
+        // Each node emits as a partial class, which C# merges with the
+        // identically-named class already emitted by the export tree.
+        foreach (var child in headerRoot.Children.Values.OrderBy(c => c.Name, StringComparer.Ordinal))
+        {
+            EmitConstantsNode(sb, child, 4);
         }
 
         sb.AppendLine("}");
@@ -369,6 +405,139 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         if (retAttr.Length > 0)
             sb.AppendLine($"{pad}{prefix}{retAttr}");
         sb.AppendLine($"{pad}{prefix}internal static partial {csRet} {methodName}({paramStr});");
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // Constants / Enum emission from parsed headers
+    // ════════════════════════════════════════════════════════════════
+
+    /// <summary>
+    /// Emits a <see cref="ConstantsNode"/> tree as nested static classes
+    /// containing enums and const fields. If a namespace node already
+    /// exists in the export tree, the constants are merged into it.
+    /// </summary>
+    private static void EmitConstantsNode(
+        StringBuilder sb,
+        ConstantsNode node,
+        int indent)
+    {
+        var pad = new string(' ', indent);
+
+        // If the node has nothing to emit (no enums, no consts, no children with content), skip
+        if (!HasAnyContent(node))
+            return;
+
+        // Always emit a partial class wrapper — C# allows multiple partial
+        // declarations for the same nested class, so this merges cleanly
+        // with any class already emitted by the export tree.
+        sb.AppendLine();
+        sb.AppendLine($"{pad}internal static partial class {SanitizeIdentifier(node.Name)}");
+        sb.AppendLine($"{pad}{{");
+
+        var innerIndent = indent + 4;
+        var innerPad = new string(' ', innerIndent);
+
+        // Emit enums
+        foreach (var enumDef in node.Enums.OrderBy(e => e.Name, StringComparer.Ordinal))
+        {
+            sb.AppendLine();
+            if (enumDef.Name is not null)
+            {
+                var baseType = MapCppTypeToCs(enumDef.UnderlyingType);
+                sb.AppendLine($"{innerPad}internal enum {SanitizeIdentifier(enumDef.Name)} : {baseType}");
+                sb.AppendLine($"{innerPad}{{");
+                foreach (var member in enumDef.Members)
+                {
+                    var comment = member.Comment is not null ? $" // {member.Comment}" : "";
+                    if (member.Value is not null)
+                        sb.AppendLine($"{innerPad}    {SanitizeIdentifier(member.Name)} = {member.Value},{comment}");
+                    else
+                        sb.AppendLine($"{innerPad}    {SanitizeIdentifier(member.Name)},{comment}");
+                }
+                sb.AppendLine($"{innerPad}}}");
+            }
+            else
+            {
+                // Anonymous enum → emit as const fields
+                foreach (var member in enumDef.Members)
+                {
+                    var csType = MapCppTypeToCs(enumDef.UnderlyingType);
+                    var comment = member.Comment is not null ? $" // {member.Comment}" : "";
+                    sb.AppendLine($"{innerPad}internal const {csType} {SanitizeIdentifier(member.Name)} = {member.Value};{comment}");
+                }
+            }
+        }
+
+        // Emit constexpr fields
+        foreach (var field in node.Constants.OrderBy(f => f.Name, StringComparer.Ordinal))
+        {
+            var csType = MapCppTypeToCs(field.CppType);
+            var value = field.Value;
+            var comment = field.Comment is not null ? $" // {field.Comment}" : "";
+            sb.AppendLine($"{innerPad}internal const {csType} {SanitizeIdentifier(field.Name)} = {value};{comment}");
+        }
+
+        // Emit children
+        foreach (var child in node.Children.Values.OrderBy(c => c.Name, StringComparer.Ordinal))
+        {
+            EmitConstantsNode(sb, child, innerIndent);
+        }
+
+        sb.AppendLine($"{pad}}}");
+    }
+
+    private static bool HasAnyContent(ConstantsNode node)
+    {
+        if (node.Enums.Count > 0 || node.Constants.Count > 0)
+            return true;
+        return node.Children.Values.Any(HasAnyContent);
+    }
+
+    /// <summary>
+    /// Walks the constants tree and adds each named enum to the type map
+    /// so that <see cref="ResolveCsType"/> can resolve demangled enum
+    /// references to the generated C# enum type.  Existing entries
+    /// (from <c>[GWCAEquivalent]</c>) are never overwritten.
+    /// </summary>
+    private static void CollectGeneratedEnumMappings(
+        ConstantsNode node,
+        string csPath,
+        Dictionary<string, string> typeMap)
+    {
+        foreach (var enumDef in node.Enums)
+        {
+            if (enumDef.Name is null)
+                continue; // skip anonymous enums
+
+            if (!typeMap.ContainsKey(enumDef.Name))
+                typeMap[enumDef.Name] = "global::Daybreak.API.Interop." + csPath + "." + SanitizeIdentifier(enumDef.Name);
+        }
+
+        foreach (var child in node.Children.Values)
+        {
+            CollectGeneratedEnumMappings(child, csPath + "." + SanitizeIdentifier(child.Name), typeMap);
+        }
+    }
+
+    private static string MapCppTypeToCs(string? cppType)
+    {
+        if (cppType is null)
+            return "int";
+        return cppType switch
+        {
+            "uint32_t" => "uint",
+            "int32_t" => "int",
+            "uint16_t" => "ushort",
+            "int16_t" => "short",
+            "uint8_t" => "byte",
+            "int8_t" => "sbyte",
+            "int" => "int",
+            "unsigned int" => "uint",
+            "size_t" => "uint",
+            "float" => "float",
+            "double" => "double",
+            _ => "int",
+        };
     }
 
     // ════════════════════════════════════════════════════════════════
@@ -669,7 +838,7 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
 
     /// <summary>A node in the namespace tree, representing a C++ namespace
     /// as a nested static class.</summary>
-    private sealed class NamespaceNode(string name)
+    internal sealed class NamespaceNode(string name)
     {
         public string Name { get; } = name;
         public Dictionary<string, NamespaceNode> Children { get; } = new(StringComparer.Ordinal);
@@ -677,10 +846,53 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
     }
 
     /// <summary>A single mangled export with its demangled info.</summary>
-    private sealed class ExportEntry(string mangledName, DemangledFunction info)
+    internal sealed class ExportEntry(string mangledName, DemangledFunction info)
     {
         public string MangledName { get; } = mangledName;
         public DemangledFunction Info { get; } = info;
     }
-}
 
+    // ════════════════════════════════════════════════════════════════
+    // Constants tree types (parsed from C++ headers)
+    // ════════════════════════════════════════════════════════════════
+
+    internal sealed class ConstantsNode(string name)
+    {
+        public string Name { get; } = name;
+        public Dictionary<string, ConstantsNode> Children { get; } = new(StringComparer.Ordinal);
+        public List<CppEnumDef> Enums { get; } = [];
+        public List<CppConstField> Constants { get; } = [];
+
+        public ConstantsNode GetOrCreateChild(string childName)
+        {
+            if (!this.Children.TryGetValue(childName, out var child))
+            {
+                child = new ConstantsNode(childName);
+                this.Children[childName] = child;
+            }
+            return child;
+        }
+    }
+
+    internal sealed class CppEnumDef
+    {
+        public string? Name { get; set; } // null for anonymous enums
+        public string? UnderlyingType { get; set; } // e.g. "uint32_t", null → int
+        public List<CppEnumMember> Members { get; } = [];
+    }
+
+    internal sealed class CppEnumMember
+    {
+        public string Name { get; set; } = "";
+        public string? Value { get; set; }
+        public string? Comment { get; set; }
+    }
+
+    internal sealed class CppConstField
+    {
+        public string Name { get; set; } = "";
+        public string CppType { get; set; } = "int";
+        public string Value { get; set; } = "0";
+        public string? Comment { get; set; }
+    }
+}
