@@ -207,17 +207,17 @@ public static unsafe partial class GWCA
     // GWCA.GW.UI.AgentNameTagInfo: 15 fields [OK]
     // GWCA.GW.UI.ChatTemplate: 3 fields [OK]
     // GWCA.GW.UI.CompassPoint: 2 fields [OK]
-    // GWCA.GW.UI.CreateUIComponentPacket: 6 fields [SKIP: unresolved typedef in field event_callback: UI::UIInteractionCallback]
+    // GWCA.GW.UI.CreateUIComponentPacket: 6 fields [OK]
     // GWCA.GW.UI.DialogBodyInfo: 3 fields [OK]
     // GWCA.GW.UI.DialogButtonInfo: 4 fields [OK]
     // GWCA.GW.UI.FloatingWindow: 9 fields [OK]
     // GWCA.GW.UI.Frame: 86 fields [SKIP: unresolved typedef in field relation: FrameRelation]
-    // GWCA.GW.UI.FrameInteractionCallback: 3 fields [SKIP: unresolved typedef in field callback: UIInteractionCallback]
+    // GWCA.GW.UI.FrameInteractionCallback: 3 fields [OK]
     // GWCA.GW.UI.FramePosition: 17 fields [OK]
-    // GWCA.GW.UI.FrameRelation: 5 fields [SKIP: unresolved typedef in field parent: FrameRelation*]
+    // GWCA.GW.UI.FrameRelation: 5 fields [SKIP: complex template in field siblings: TList<FrameRelation>]
     // GWCA.GW.UI.InteractionMessage: 3 fields [OK]
     // GWCA.GW.UI.MapEntryMessage: 2 fields [OK]
-    // GWCA.GW.UI.TooltipInfo: 8 fields [SKIP: unresolved typedef in field render: GW::UI::UIInteractionCallback*]
+    // GWCA.GW.UI.TooltipInfo: 8 fields [OK]
     // GWCA.GW.UI.UIChatMessage: 3 fields [OK]
     // GWCA.GW.UI.UIPacket.kAgentSkillPacket: 2 fields [OK]
     // GWCA.GW.UI.UIPacket.kAgentSkillStartedCast: 4 fields [OK]
@@ -2504,9 +2504,9 @@ public static unsafe partial class GWCA
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool GetCommandLinePref(ushort* ptr1, void* ptr2);
 
-            // GW::UI::GetCurrentTooltip | returns TODO: map struct GW::UI::TooltipInfo
-            // [LibraryImport(DllName, EntryPoint = "?GetCurrentTooltip@UI@GW@@YAPAUTooltipInfo@12@XZ")]
-            // public static partial TooltipInfo* GetCurrentTooltip();
+            // GW::UI::GetCurrentTooltip
+            [LibraryImport(DllName, EntryPoint = "?GetCurrentTooltip@UI@GW@@YAPAUTooltipInfo@12@XZ")]
+            public static partial global::Daybreak.API.Interop.GuildWars.TooltipInfo* GetCurrentTooltip();
 
             // GW::UI::GetFrameById | returns TODO: map struct GW::UI::Frame
             // [LibraryImport(DllName, EntryPoint = "?GetFrameById@UI@GW@@YAPAUFrame@12@I@Z")]
@@ -18044,6 +18044,17 @@ namespace Daybreak.API.Interop.GuildWars
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct CreateUIComponentPacket
+    {
+        public uint FrameId;
+        public uint ComponentFlags;
+        public uint TabIndex;
+        public nint EventCallback;
+        public nint Wparam;
+        public nint ComponentLabel;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
     public unsafe struct DialogBodyInfo
     {
         public uint Type;
@@ -18072,6 +18083,14 @@ namespace Daybreak.API.Interop.GuildWars
         public uint Unk5;
         public uint Unk6;
         public uint WindowId; // Maps to window array
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct FrameInteractionCallback
+    {
+        public nint Callback;
+        public nint UictlContext;
+        public uint H0008;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
@@ -18109,6 +18128,19 @@ namespace Daybreak.API.Interop.GuildWars
     {
         public nint Title;
         public nint Subtitle;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct TooltipInfo
+    {
+        public uint BitField;
+        public nint* Render; // Function that the game uses to draw the content
+        public uint* Payload; // uint32_t* for skill or item, wchar_t* for encoded string
+        public uint PayloadLen; // Length in bytes of the payload
+        public uint Unk1;
+        public uint Unk2;
+        public uint Unk3;
+        public uint Unk4;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]

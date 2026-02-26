@@ -42,6 +42,10 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         {
             ["Vec2f"] = "global::System.Numerics.Vector2",
             ["Vec3f"] = "global::System.Numerics.Vector3",
+            // UIInteractionCallback is a typedef for a function pointer - map to nint
+            ["UIInteractionCallback"] = "nint",
+            ["UI::UIInteractionCallback"] = "nint",
+            ["GW::UI::UIInteractionCallback"] = "nint",
         };
 
     // ════════════════════════════════════════════════════════════════
@@ -748,11 +752,15 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
                 cppType.Contains("BaseArray<"))
                 return (false, $"complex template in field {field.Name}: {cppType}");
             // Skip if field type contains unresolved typedef names
-            if (cppType.Contains("UIInteractionCallback") || cppType.Contains("FriendsListArray") ||
+            // Note: UIInteractionCallback is now mapped to nint in BuiltInTypeMappings
+            // Note: FrameRelation* (pointer) maps to nint automatically, but embedded FrameRelation
+            //       is a problem because the struct itself is skipped (contains TList<FrameRelation>)
+            if (cppType.Contains("FriendsListArray") ||
                 cppType.Contains("PathNodeArray") || cppType.Contains("PathingMapArray") ||
                 cppType.Contains("BlockedPlaneArray") || cppType.Contains("AgentSummaryInfoSub") ||
-                cppType.Contains("FrameRelation") || cppType.Contains("EffectData") ||
-                cppType.Contains("SkillbarSkillData") || cppType.Contains("SkillbarData"))
+                cppType.Contains("EffectData") ||
+                cppType.Contains("SkillbarSkillData") || cppType.Contains("SkillbarData") ||
+                cppType == "FrameRelation") // Embedded FrameRelation - struct is skipped due to TList<>
                 return (false, $"unresolved typedef in field {field.Name}: {cppType}");
             // Skip structs with function pointer fields (complex vtable types)
             if (cppType.Contains("__fastcall") || cppType.Contains("__stdcall") ||
