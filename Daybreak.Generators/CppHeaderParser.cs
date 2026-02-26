@@ -254,9 +254,26 @@ internal static class CppHeaderParser
                     continue;
                 }
 
-                // Skip nested blocks (unions, nested structs inside the struct)
+                // Skip nested named structs (e.g., "struct Foo {") but NOT anonymous unions/structs
+                // We want to parse fields inside unions because they map to overlapping [FieldOffset] in C#
+                // Only skip if we're inside a named nested struct (not an anonymous union/struct block)
                 if (structBraceDepth > 1)
+                {
+                    // Still try to parse fields with explicit offsets inside unions
+                    // These are perfectly valid - they become overlapping fields in C# explicit layout
+                    var fieldOffsetMatchNested = FieldWithOffsetRegex.Match(trimmed);
+                    if (fieldOffsetMatchNested.Success)
+                    {
+                        var offset = Convert.ToInt32(fieldOffsetMatchNested.Groups[1].Value, 16);
+                        var typeAndName = fieldOffsetMatchNested.Groups[2].Value;
+                        var comment = fieldOffsetMatchNested.Groups[3].Success ? fieldOffsetMatchNested.Groups[3].Value.Trim() : null;
+
+                        var field = ParseFieldTypeAndName(typeAndName, offset, comment);
+                        if (field is not null)
+                            currentStruct.Fields.Add(field);
+                    }
                     continue;
+                }
 
                 // Skip comment-only lines
                 if (trimmed.StartsWith("//"))

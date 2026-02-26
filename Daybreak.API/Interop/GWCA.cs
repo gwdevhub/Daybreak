@@ -66,7 +66,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.AccountInfo: 7 fields [OK]
     // GWCA.GW.AccountUnlockedCount: 3 fields [OK]
     // GWCA.GW.AccountUnlockedItemInfo: 3 fields [OK]
-    // GWCA.GW.Agent: 29 fields [OK]
+    // GWCA.GW.Agent: 36 fields [OK]
     // GWCA.GW.AgentContext: 27 fields [OK]
     // GWCA.GW.AgentEffects: 3 fields [OK]
     // GWCA.GW.AgentGadget: 5 fields [OK]
@@ -74,7 +74,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.AgentItem: 4 fields [OK]
     // GWCA.GW.AgentLiving: 52 fields [OK]
     // GWCA.GW.AgentMovement: 12 fields [OK]
-    // GWCA.GW.AgentSummaryInfo: 3 fields [SKIP: unresolved typedef in field extra_info_sub: AgentSummaryInfoSub*]
+    // GWCA.GW.AgentSummaryInfo: 10 fields [SKIP: mixed offset fields]
     // GWCA.GW.AreaInfo: 31 fields [OK]
     // GWCA.GW.Attribute: 4 fields [OK]
     // GWCA.GW.AttributeInfo: 5 fields [OK]
@@ -114,7 +114,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.HeroFlag: 8 fields [OK]
     // GWCA.GW.HeroInfo: 30 fields [OK]
     // GWCA.GW.HeroPartyMember: 6 fields [OK]
-    // GWCA.GW.Inventory: 6 fields [OK]
+    // GWCA.GW.Inventory: 39 fields [OK]
     // GWCA.GW.Item: 25 fields [OK]
     // GWCA.GW.ItemContext: 12 fields [OK]
     // GWCA.GW.ItemData: 4 fields [OK]
@@ -139,7 +139,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.Node: 2 fields [OK]
     // GWCA.GW.NodeCache: 3 fields [SKIP: complex template in field buffer: BaseArray<uint32_t>]
     // GWCA.GW.NPC: 12 fields [OK]
-    // GWCA.GW.NPCEquipment: 16 fields [SKIP: vtable in field vtable: EquipmentVTable*]
+    // GWCA.GW.NPCEquipment: 36 fields [SKIP: vtable in field vtable: EquipmentVTable*]
     // GWCA.GW.ObjectPool: 3 fields [OK]
     // GWCA.GW.ObjectPoolBlock: 2 fields [OK]
     // GWCA.GW.ObserverMatch: 11 fields [OK]
@@ -156,7 +156,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.PathContext: 15 fields [SKIP: unresolved typedef in field blockedPlanes: BlockedPlaneArray]
     // GWCA.GW.PathEngineContext: 6 fields [OK]
     // GWCA.GW.PathingMap: 19 fields [SKIP: complex template in field dat_vectors: BaseArray<Vec2f>]
-    // GWCA.GW.PathingTrapezoid: 9 fields [OK]
+    // GWCA.GW.PathingTrapezoid: 14 fields [OK]
     // GWCA.GW.PathNode: 6 fields [SKIP: complex template in field priority: PrioQLink<PathNode*>]
     // GWCA.GW.PathWaypoint: 6 fields [OK]
     // GWCA.GW.PetInfo: 7 fields [OK]
@@ -8605,6 +8605,15 @@ namespace Daybreak.API.Interop.GuildWars
     }
 
     /// <summary>
+    /// Inline array of 23 BagPtr elements.
+    /// </summary>
+    [global::System.Runtime.CompilerServices.InlineArray(23)]
+    public unsafe struct BagPtrArray23
+    {
+        private global::Daybreak.API.Interop.GuildWars.Bag* _element0;
+    }
+
+    /// <summary>
     /// Inline array of 1 ChatMessagePtr elements.
     /// </summary>
     [global::System.Runtime.CompilerServices.InlineArray(1)]
@@ -8623,12 +8632,30 @@ namespace Daybreak.API.Interop.GuildWars
     }
 
     /// <summary>
+    /// Inline array of 4 PathingTrapezoidPtr elements.
+    /// </summary>
+    [global::System.Runtime.CompilerServices.InlineArray(4)]
+    public unsafe struct PathingTrapezoidPtrArray4
+    {
+        private global::Daybreak.API.Interop.GuildWars.PathingTrapezoid* _element0;
+    }
+
+    /// <summary>
     /// Inline array of 8 SkillbarSkillData elements.
     /// </summary>
     [global::System.Runtime.CompilerServices.InlineArray(8)]
     public unsafe struct SkillbarSkillDataArray8
     {
         private global::Daybreak.API.Interop.GuildWars.SkillbarSkillData _element0;
+    }
+
+    /// <summary>
+    /// Inline array of 4 WeaponSet elements.
+    /// </summary>
+    [global::System.Runtime.CompilerServices.InlineArray(4)]
+    public unsafe struct WeaponSetArray4
+    {
+        private global::Daybreak.API.Interop.GuildWars.WeaponSet _element0;
     }
 
     /// <summary>
@@ -14239,6 +14266,14 @@ namespace Daybreak.API.Interop.GuildWars
         public global::System.Numerics.Vector3 TerrainNormal;
         [global::System.Runtime.InteropServices.FieldOffset(0x0070)]
         public fixed byte H0070[4];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0074)]
+        public float X;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0078)]
+        public float Y;
+        [global::System.Runtime.InteropServices.FieldOffset(0x007C)]
+        public uint Plane;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0074)]
+        public global::Daybreak.API.Interop.GuildWars.GamePos Pos;
         [global::System.Runtime.InteropServices.FieldOffset(0x0080)]
         public fixed byte H0080[4];
         [global::System.Runtime.InteropServices.FieldOffset(0x0084)]
@@ -14253,6 +14288,12 @@ namespace Daybreak.API.Interop.GuildWars
         public fixed uint H0094[2];
         [global::System.Runtime.InteropServices.FieldOffset(0x009C)]
         public uint Type; // Livings = 0xDB, Gadgets = 0x200, Items = 0x400.
+        [global::System.Runtime.InteropServices.FieldOffset(0x00A0)]
+        public float MoveX; // If moving, how much on the X axis per second
+        [global::System.Runtime.InteropServices.FieldOffset(0x00A4)]
+        public float MoveY; // If moving, how much on the Y axis per second
+        [global::System.Runtime.InteropServices.FieldOffset(0x00A0)]
+        public global::System.Numerics.Vector2 Velocity;
         [global::System.Runtime.InteropServices.FieldOffset(0x00A8)]
         public uint H00A8; // always 0?
         [global::System.Runtime.InteropServices.FieldOffset(0x00AC)]
@@ -15259,10 +15300,76 @@ namespace Daybreak.API.Interop.GuildWars
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x98)]
     public unsafe struct Inventory
     {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public BagPtrArray23 Bags;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public global::Daybreak.API.Interop.GuildWars.Bag* UnusedBag;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public global::Daybreak.API.Interop.GuildWars.Bag* Backpack;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public global::Daybreak.API.Interop.GuildWars.Bag* BeltPouch;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public global::Daybreak.API.Interop.GuildWars.Bag* Bag1;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public global::Daybreak.API.Interop.GuildWars.Bag* Bag2;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public global::Daybreak.API.Interop.GuildWars.Bag* EquipmentPack;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public global::Daybreak.API.Interop.GuildWars.Bag* MaterialStorage;
+        [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
+        public global::Daybreak.API.Interop.GuildWars.Bag* UnclaimedItems;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
+        public global::Daybreak.API.Interop.GuildWars.Bag* Storage1;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
+        public global::Daybreak.API.Interop.GuildWars.Bag* Storage2;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
+        public global::Daybreak.API.Interop.GuildWars.Bag* Storage3;
+        [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
+        public global::Daybreak.API.Interop.GuildWars.Bag* Storage4;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
+        public global::Daybreak.API.Interop.GuildWars.Bag* Storage5;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
+        public global::Daybreak.API.Interop.GuildWars.Bag* Storage6;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0038)]
+        public global::Daybreak.API.Interop.GuildWars.Bag* Storage7;
+        [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
+        public global::Daybreak.API.Interop.GuildWars.Bag* Storage8;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
+        public global::Daybreak.API.Interop.GuildWars.Bag* Storage9;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0044)]
+        public global::Daybreak.API.Interop.GuildWars.Bag* Storage10;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0048)]
+        public global::Daybreak.API.Interop.GuildWars.Bag* Storage11;
+        [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
+        public global::Daybreak.API.Interop.GuildWars.Bag* Storage12;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0050)]
+        public global::Daybreak.API.Interop.GuildWars.Bag* Storage13;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0054)]
+        public global::Daybreak.API.Interop.GuildWars.Bag* Storage14;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0058)]
+        public global::Daybreak.API.Interop.GuildWars.Bag* EquippedItems;
         [global::System.Runtime.InteropServices.FieldOffset(0x005C)]
         public global::Daybreak.API.Interop.GuildWars.ItemStruct* Bundle;
         [global::System.Runtime.InteropServices.FieldOffset(0x0060)]
         public uint StoragePanesUnlocked;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0064)]
+        public WeaponSetArray4 WeaponSets;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0064)]
+        public global::Daybreak.API.Interop.GuildWars.ItemStruct* WeaponSet0;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0068)]
+        public global::Daybreak.API.Interop.GuildWars.ItemStruct* OffhandSet0;
+        [global::System.Runtime.InteropServices.FieldOffset(0x006C)]
+        public global::Daybreak.API.Interop.GuildWars.ItemStruct* WeaponSet1;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0070)]
+        public global::Daybreak.API.Interop.GuildWars.ItemStruct* OffhandSet1;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0074)]
+        public global::Daybreak.API.Interop.GuildWars.ItemStruct* WeaponSet2;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0078)]
+        public global::Daybreak.API.Interop.GuildWars.ItemStruct* OffhandSet2;
+        [global::System.Runtime.InteropServices.FieldOffset(0x007C)]
+        public global::Daybreak.API.Interop.GuildWars.ItemStruct* WeaponSet3;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0080)]
+        public global::Daybreak.API.Interop.GuildWars.ItemStruct* OffhandSet3;
         [global::System.Runtime.InteropServices.FieldOffset(0x0084)]
         public uint ActiveWeaponSet;
         [global::System.Runtime.InteropServices.FieldOffset(0x0088)]
@@ -15917,6 +16024,16 @@ namespace Daybreak.API.Interop.GuildWars
     {
         [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
         public uint Id;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public PathingTrapezoidPtrArray4 Adjacent;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public global::Daybreak.API.Interop.GuildWars.PathingTrapezoid* TopLeft;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public global::Daybreak.API.Interop.GuildWars.PathingTrapezoid* TopRight;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public global::Daybreak.API.Interop.GuildWars.PathingTrapezoid* BottomLeft;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public global::Daybreak.API.Interop.GuildWars.PathingTrapezoid* BottomRight;
         [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
         public ushort PortalLeft;
         [global::System.Runtime.InteropServices.FieldOffset(0x0016)]
