@@ -1,6 +1,5 @@
 ﻿using Daybreak.API.Interop;
 using Daybreak.API.Interop.GuildWars;
-using Daybreak.API.Models;
 using System.Collections.Concurrent;
 using System.Core.Extensions;
 using System.Extensions.Core;
@@ -23,21 +22,7 @@ public sealed class UIContextService(ILogger<UIContextService> logger)
     public unsafe WrappedPointer<T> GetFrameContext<T>(WrappedPointer<Frame> frame)
         where T : unmanaged
     {
-        if (frame.IsNull || frame.Pointer->FrameCallbacks.Size == 0)
-        {
-            return null;
-        }
-
-        for (uint i = 0; i < frame.Pointer->FrameCallbacks.Size; i++)
-        {
-            var callback = frame.Pointer->FrameCallbacks.Buffer[i];
-            if (callback.UiCtl_Context != null)
-            {
-                return new WrappedPointer<T>((T*)callback.UiCtl_Context);
-            }
-        }
-
-        return null;
+        return (T*)GWCA.GW.UI.GetFrameContext(frame.Pointer);
     }
 
     public unsafe WrappedPointer<Frame> GetChildFrame(WrappedPointer<Frame> parent, uint childOffset)
@@ -66,16 +51,16 @@ public sealed class UIContextService(ILogger<UIContextService> logger)
             return false;
         }
 
-        return GWCA.GW.UI.SendFrameUIMessage(frame, messageId, arg1, (nint)arg2);
+        return GWCA.GW.UI.SendFrameUIMessage(frame, (GWCA.GW.UI.UIMessage)messageId, arg1, (nint)arg2);
     }
 
     public unsafe bool SetFrameDisabled(WrappedPointer<Frame> frame, bool disabled) => GWCA.GW.UI.SetFrameDisabled(frame, disabled);
 
     public unsafe bool SetFrameVisible(WrappedPointer<Frame> frame, bool visible) => GWCA.GW.UI.SetFrameVisible(frame, visible);
 
-    public unsafe bool KeyDown(ControlAction action, WrappedPointer<Frame> frame) => GWCA.GW.UI.Keydown(action, frame);
+    public unsafe bool KeyDown(GWCA.GW.UI.ControlAction action, WrappedPointer<Frame> frame) => GWCA.GW.UI.Keydown(action, frame);
 
-    public unsafe bool KeyUp(ControlAction action, WrappedPointer<Frame> frame) => GWCA.GW.UI.Keyup(action, frame);
+    public unsafe bool KeyUp(GWCA.GW.UI.ControlAction action, WrappedPointer<Frame> frame) => GWCA.GW.UI.Keyup(action, frame);
 
     public unsafe WrappedPointer<Frame> GetFrameByLabel(string label)
     {
@@ -107,9 +92,9 @@ public sealed class UIContextService(ILogger<UIContextService> logger)
         return GWCA.GW.UI.ButtonClick(frame);
     }
 
-    public unsafe void SendMessage(UIMessage message, nuint wParam, nuint lParam) => GWCA.GW.UI.SendUIMessage(message, (void*)wParam, (nint)lParam);
+    public unsafe void SendMessage(UIMessage message, nuint wParam, nuint lParam) => GWCA.GW.UI.SendUIMessage((GWCA.GW.UI.UIMessage)message, (void*)wParam, (nint)lParam);
 
-    public unsafe Task<string> AsyncDecodeStringAsync(ushort* encodedString, Language language = Language.Unknown, CancellationToken cancellationToken = default)
+    public unsafe Task<string> AsyncDecodeStringAsync(ushort* encodedString, GWCA.GW.Constants.Language language = GWCA.GW.Constants.Language.Unknown, CancellationToken cancellationToken = default)
     {
         var taskCompletionSource = new TaskCompletionSource<string>();
         cancellationToken.Register(() => taskCompletionSource.TrySetCanceled(cancellationToken));
@@ -150,7 +135,7 @@ public sealed class UIContextService(ILogger<UIContextService> logger)
         return taskCompletionSource.Task;
     }
 
-    public unsafe Task<string> AsyncDecodeStringAsync(string encodedString, Language language = Language.Unknown, CancellationToken cancellationToken = default)
+    public unsafe Task<string> AsyncDecodeStringAsync(string encodedString, GWCA.GW.Constants.Language language = GWCA.GW.Constants.Language.Unknown, CancellationToken cancellationToken = default)
     {
         // Pin the string and convert to ushort*
         fixed (char* encodedPtr = encodedString)

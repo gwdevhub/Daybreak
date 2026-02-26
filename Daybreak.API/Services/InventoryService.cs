@@ -1,8 +1,10 @@
+using Daybreak.API.Interop;
 using Daybreak.API.Interop.GuildWars;
 using Daybreak.API.Services.Interop;
 using Daybreak.Shared.Models.Api;
 using Daybreak.Shared.Models.Guildwars;
 using System.Extensions.Core;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Daybreak.API.Services;
@@ -32,45 +34,48 @@ public sealed class InventoryService(
                     return default;
                 }
 
-                var inventory = gameContext.Pointer->ItemContext->Inventory;
-                if (inventory.IsNull)
+                var inventory = gameContext.Pointer->Items->Inventory;
+                if (inventory is null)
                 {
                     scopedLogger.LogError("Inventory is null");
                     return default;
                 }
 
-                var itemTuples = new List<(BagType Type, List<(uint ModelId, string EncodedCompleteName, string EncodedSingleName, string EncodedName, bool Inscribable, int Quantity, uint[] Modifiers, ItemType ItemType, uint Interaction, uint ModelFileId)>)>();
-                foreach (var bag in inventory.Pointer->Bags)
+                var itemTuples = new List<(GWCA.GW.Constants.BagType Type, List<(uint ModelId, string EncodedCompleteName, string EncodedSingleName, string EncodedName, bool Inscribable, int Quantity, uint[] Modifiers, ItemType ItemType, uint Interaction, uint ModelFileId)>)>();
+                var bags = (BagStruct**)Unsafe.AsPointer(ref inventory->Bags);
+                for (var i = 0; i < 23; i++)
                 {
+                    var bag = bags[i];
                     if (bag is null)
                     {
                         continue;
                     }
 
                     var retBag = new List<(uint ModelId, string EncodedCompleteName, string EncodedSingleName, string EncodedName, bool Inscribable, int Quantity, uint[] Modifiers, ItemType ItemType, uint Interaction, uint ModelFileId)>();
-                    itemTuples.Add((bag->Type, retBag));
+                    itemTuples.Add((bag->BagType, retBag));
                     if (bag->ItemsCount is 0)
                     {
                         continue;
                     }
 
-                    foreach (var item in bag->Items)
+                    foreach (var itemPtr in bag->Items.Value)
                     {
-                        if (item.IsNull)
+                        if (itemPtr is 0)
                         {
                             continue;
                         }
 
-                        var singleItemName = new string(item.Pointer->SingleItemName);
-                        var nameEncoded = new string(item.Pointer->NameEncoded);
-                        var completeNameEncoded = new string(item.Pointer->CompleteNameEncoded);
-                        var modifiers = new uint[item.Pointer->ModifiersCount];
-                        for (var j = 0; j < item.Pointer->ModifiersCount; j++)
+                        var item = (ItemStruct*)itemPtr;
+                        var singleItemName = new string((char*)item->SingleItemName);
+                        var nameEncoded = new string((char*)item->NameEnc);
+                        var completeNameEncoded = new string((char*)item->CompleteNameEnc);
+                        var modifiers = new uint[item->ModStructSize];
+                        for (var j = 0; j < item->ModStructSize; j++)
                         {
-                            modifiers[j] = item.Pointer->Modifiers[j].Mod;
+                            modifiers[j] = item->ModStruct[j].Mod;
                         }
 
-                        retBag.Add((item.Pointer->ModelId, completeNameEncoded, singleItemName, nameEncoded, item.Pointer->Inscribable, item.Pointer->Quantity, modifiers, item.Pointer->Type, item.Pointer->Interaction, item.Pointer->ModelFileId));
+                        retBag.Add((item->ModelId, completeNameEncoded, singleItemName, nameEncoded, (item->Interaction & 0x08000000) != 0, item->Quantity, modifiers, (ItemType)item->Type, item->Interaction, item->ModelFileId));
                     }
                 }
 
@@ -85,17 +90,18 @@ public sealed class InventoryService(
 
         // Decode strings sequentially to avoid race conditions with the game's TextParser language field.
         // Parallel decoding causes crashes because multiple operations race to set/restore the language.
-        var decodedItemTuples = new List<(BagType Type, List<(uint ModelId, string EncodedName, string? DecodedName, string EncodedSingleName, string? DecodedSingleName, string EncodedCompleteName, string? DecodedCompleteName, bool Inscribable, int Quantity, uint[] Modifiers, ItemType ItemType, uint Interaction, uint ModelFileId)> Items)>();
+        var decodedItemTuples = new List<(GWCA.GW.Constants.BagType Type, List<(uint ModelId, string EncodedName, string? DecodedName, string EncodedSingleName, string? DecodedSingleName, string EncodedCompleteName, string? DecodedCompleteName, bool Inscribable, int Quantity, uint[] Modifiers, ItemType ItemType, uint Interaction, uint ModelFileId)> Items)>();
         foreach (var tuple in itemTuples)
         {
             var decodedItems = new List<(uint ModelId, string EncodedName, string? DecodedName, string EncodedSingleName, string? DecodedSingleName, string EncodedCompleteName, string? DecodedCompleteName, bool Inscribable, int Quantity, uint[] Modifiers, ItemType ItemType, uint Interaction, uint ModelFileId)>();
             foreach (var item in tuple.Item2)
             {
-                var decodedName = await this.uIService.DecodeString(item.EncodedName, Language.English, cancellationToken);
-                var decodedCompleteName = await this.uIService.DecodeString(item.EncodedCompleteName, Language.English, cancellationToken);
-                var decodedSingleName = await this.uIService.DecodeString(item.EncodedSingleName, Language.English, cancellationToken);
+                var decodedName = await this.uIService.DecodeString(item.EncodedName, (GWCA.GW.Constants.Language)Language.English, cancellationToken);
+                var decodedCompleteName = await this.uIService.DecodeString(item.EncodedCompleteName, (GWCA.GW.Constants.Language)Language.English, cancellationToken);
+                var decodedSingleName = await this.uIService.DecodeString(item.EncodedSingleName, (GWCA.GW.Constants.Language)Language.English, cancellationToken);
                 decodedItems.Add((item.ModelId, item.EncodedName, decodedName, item.EncodedSingleName, decodedSingleName, item.EncodedCompleteName, decodedCompleteName, item.Inscribable, item.Quantity, item.Modifiers, item.ItemType, item.Interaction, item.ModelFileId));
             }
+
             decodedItemTuples.Add((tuple.Type, decodedItems));
         }
 

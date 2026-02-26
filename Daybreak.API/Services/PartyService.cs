@@ -1,4 +1,5 @@
 ﻿using Daybreak.API.Extensions;
+using Daybreak.API.Interop;
 using Daybreak.API.Interop.GuildWars;
 using Daybreak.API.Models;
 using Daybreak.API.Services.Interop;
@@ -9,6 +10,7 @@ using Daybreak.Shared.Services.BuildTemplates;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
+using System.Runtime.CompilerServices;
 using ZLinq;
 using InstanceType = Daybreak.API.Interop.GuildWars.InstanceType;
 
@@ -46,21 +48,21 @@ public sealed class PartyService(
         if (!await this.IsInValidOutpost(cancellationToken))
         {
             scopedLogger.LogError("Could not set party loadout. Not in a valid outpost");
-            await this.chatService.AddMessageAsync("Cannot set party loadout. Not in a valid outpost.", "Daybreak.API", Channel.Moderator, cancellationToken);
+            await this.chatService.AddMessageAsync("Cannot set party loadout. Not in a valid outpost.", "Daybreak.API", Channel.CHANNEL_MODERATOR, cancellationToken);
             return false;
         }
 
         if (!await this.KickAllHeroes(cancellationToken))
         {
             scopedLogger.LogError("Could not set party loadout. Could not leave party");
-            await this.chatService.AddMessageAsync("Cannot set party loadout. Could not leave party.", "Daybreak.API", Channel.Moderator, cancellationToken);
+            await this.chatService.AddMessageAsync("Cannot set party loadout. Could not leave party.", "Daybreak.API", Channel.CHANNEL_MODERATOR, cancellationToken);
             return false;
         }
 
         if (!await this.gameThreadService.QueueOnGameThread(() => this.SpawnHeroes(partyLoadout), cancellationToken))
         {
             scopedLogger.LogError("Could not set party loadout. Could not spawn heroes");
-            await this.chatService.AddMessageAsync("Cannot set party loadout. Could not spawn heroes.", "Daybreak.API", Channel.Moderator, cancellationToken);
+            await this.chatService.AddMessageAsync("Cannot set party loadout. Could not spawn heroes.", "Daybreak.API", Channel.CHANNEL_MODERATOR, cancellationToken);
             return false;
         }
 
@@ -69,21 +71,21 @@ public sealed class PartyService(
         if (!await this.gameThreadService.QueueOnGameThread(() => this.ApplyBuilds(partyLoadout), cancellationToken))
         {
             scopedLogger.LogError("Could not set party loadout. Could not apply builds");
-            await this.chatService.AddMessageAsync("Cannot set party loadout. Could not apply builds.", "Daybreak.API", Channel.Moderator, cancellationToken);
+            await this.chatService.AddMessageAsync("Cannot set party loadout. Could not apply builds.", "Daybreak.API", Channel.CHANNEL_MODERATOR, cancellationToken);
             return false;
         }
 
         var heroBehaviorSetup = await this.gameThreadService.QueueOnGameThread(() => this.GetHeroBehaviorSetup(partyLoadout), cancellationToken);
-        foreach (var heroBehaviorEntry in heroBehaviorSetup ?? [])
+        foreach (var (AgentId, Behavior) in heroBehaviorSetup ?? [])
         {
-            if (!await this.SetHeroBehavior(heroBehaviorEntry.AgentId, heroBehaviorEntry.Behavior, cancellationToken))
+            if (!await this.SetHeroBehavior(AgentId, Behavior, cancellationToken))
             {
-                scopedLogger.LogWarning("Could not set hero behavior for agent {agentId} to {behavior}", heroBehaviorEntry.AgentId, heroBehaviorEntry.Behavior);
-                await this.chatService.AddMessageAsync($"Cannot set party loadout. Could not set behavior {heroBehaviorEntry.Behavior} for agent {heroBehaviorEntry.AgentId}.", "Daybreak.API", Channel.Moderator, cancellationToken);
+                scopedLogger.LogWarning("Could not set hero behavior for agent {agentId} to {behavior}", AgentId, Behavior);
+                await this.chatService.AddMessageAsync($"Cannot set party loadout. Could not set behavior {Behavior} for agent {AgentId}.", "Daybreak.API", Channel.CHANNEL_MODERATOR, cancellationToken);
             }
         }
 
-        await this.chatService.AddMessageAsync("Party loadout set.", "Daybreak.API", Channel.Moderator, cancellationToken);
+        await this.chatService.AddMessageAsync("Party loadout set.", "Daybreak.API", Channel.CHANNEL_MODERATOR, cancellationToken);
         return true;
     }
 
@@ -126,9 +128,9 @@ public sealed class PartyService(
 
                 var buildTuples = professions.Value.AsValueEnumerable()
                     .Select(p => (p.AgentId, p, attributes.Value.FirstOrDefault(a => a.AgentId == p.AgentId), skillbars.Value.FirstOrDefault(s => s.AgentId == p.AgentId), heroFlags.Value.FirstOrDefault(f => f.AgentId == p.AgentId)))
-                    .Select(t => (t.AgentId, GetBuildEntryById(t.p, t.Item4, t.Item3), t.Item5.Behavior))
+                    .Select(t => (t.AgentId, GetBuildEntryById(t.p, t.Item4, t.Item3), t.Item5.HeroBehavior))
                     .Where(t => t.Item2 is not null)
-                    .OfType<(uint AgentId, BuildEntry BuildEntry, Behavior Behavior)>()
+                    .OfType<(uint AgentId, BuildEntry BuildEntry, API.Interop.GWCA.GW.HeroBehavior Behavior)>()
                     .ToList();
 
                 return new PartyLoadout(
@@ -136,16 +138,17 @@ public sealed class PartyService(
                     {
                         if (t.AgentId == playerId)
                         {
-                            return new PartyLoadoutEntry(0, HeroBehavior.Undefined, t.BuildEntry);
+                            return new PartyLoadoutEntry(0, Shared.Models.Api.HeroBehavior.Undefined, t.BuildEntry);
                         }
                         else if (heroes.Value.FirstOrDefault(h => h.AgentId == t.AgentId) is HeroPartyMember hero &&
                                 hero.AgentId == t.AgentId)
                         {
-                            return new PartyLoadoutEntry((int)hero.HeroId, (HeroBehavior)t.Behavior, t.BuildEntry);
+                            return new PartyLoadoutEntry((int)hero.HeroId, (Shared.Models.Api.HeroBehavior)t.Behavior, t.BuildEntry);
                         }
 
                         return default;
                     })
+                    .Where(t => t is not null)
                     .OfType<PartyLoadoutEntry>()]);
             }
         }, cancellationToken);
@@ -179,7 +182,7 @@ public sealed class PartyService(
         }, cancellationToken);
     }
 
-    public async Task<bool> SetHeroBehavior(uint heroAgentId, HeroBehavior behavior, CancellationToken cancellationToken)
+    public async Task<bool> SetHeroBehavior(uint heroAgentId, Shared.Models.Api.HeroBehavior behavior, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
 
@@ -209,14 +212,14 @@ public sealed class PartyService(
             unsafe
             {
                 var btn = this.uIContextService.GetChildFrame(frame.Frame, (uint)behavior);
-                var packet = new UIPackets.MouseClick(UIPackets.MouseButtons.Left, 0, 0);
+                var packet = new kMouseClick { MouseButton = 0, IsDoubleclick = 0 };
                 if (btn.IsNull)
                 {
                     scopedLogger.LogError("Could not set hero behavior. Could not find button for behavior {behavior} in frame {frameLabel}", behavior, heroCommanderFrameLabel);
                     return false;
                 }
 
-                return this.uIContextService.SendFrameUIMessage(btn, UIMessage.MouseClick, &packet);
+                return this.uIContextService.SendFrameUIMessage(btn, UIMessage.kMouseClick, &packet);
             }
         }, cancellationToken);
 
@@ -305,7 +308,7 @@ public sealed class PartyService(
                 }
                 else
                 {
-                    var hero = heroes.Value.AsValueEnumerable().FirstOrDefault(h => h.HeroId == entry.HeroId);
+                    var hero = heroes.Value.AsValueEnumerable().FirstOrDefault(h => (int)h.HeroId == entry.HeroId);
                     return (entry, hero.AgentId);
                 }
             })
@@ -317,7 +320,7 @@ public sealed class PartyService(
                     : accountContext.Pointer->UnlockedAccountSkills;
 
                 var unlockedProfessionsFlags = t.playerId == playerId
-                    ? playerProfessionContext.UnlockedProfessionsFlags
+                    ? playerProfessionContext.UnlockedProfessions
                     : uint.MaxValue;
 
                 if (!this.buildTemplateManager.CanTemplateApply(
@@ -325,7 +328,7 @@ public sealed class PartyService(
                         (uint)t.entry.Build.Primary,
                         (uint)t.entry.Build.Secondary,
                         [.. t.entry.Build.Skills],
-                        (uint)t.Item3.CurrentPrimary,
+                        (uint)t.Item3.Primary,
                         unlockedProfessionsFlags,
                         [.. validSkills])))
                 {
@@ -358,28 +361,29 @@ public sealed class PartyService(
                 continue;
             }
 
-            var attributeIds = new Array12Uint();
+            var attributeIds = new AttributeArray12();
             var attributeValues = new Array12Uint();
             for (var i = 0; i < entry.Build.Attributes.Count && i < 12; i++)
             {
-                attributeIds[i] = (uint)entry.Build.Attributes[i].Id;
+                attributeIds[i] = (GWCA.GW.Constants.Attribute)entry.Build.Attributes[i].Id;
                 attributeValues[i] = (uint)entry.Build.Attributes[i].BasePoints;
             }
 
-            var skills = new Array8Uint();
+            var skills = new SkillIDArray8();
             for (var i = 0; i < entry.Build.Skills.Count && i < 8; i++)
             {
-                skills[i] = entry.Build.Skills[i];
+                skills[i] = (GWCA.GW.Constants.SkillID)entry.Build.Skills[i];
             }
 
-            var skillTemplate = new SkillTemplate(
-                (uint)entry.Build.Primary,
-                (uint)entry.Build.Secondary,
-                (uint)entry.Build.Attributes.Count,
-                attributeIds,
-                attributeValues,
-                skills);
-
+            var skillTemplate = new SkillTemplate
+            {
+                Primary = (GWCA.GW.Constants.Profession)entry.Build.Primary,
+                Secondary = (GWCA.GW.Constants.Profession)entry.Build.Secondary,
+                AttributesCount = (uint)entry.Build.Attributes.Count,
+                AttributeIds = attributeIds,
+                Skills = skills
+            };
+            Unsafe.CopyBlock(skillTemplate.AttributeValues, Unsafe.AsPointer(ref attributeValues), (uint)(12 * sizeof(uint)));
             scopedLogger.LogInformation("Applying build for agent {agentId} with primary {primary} and secondary {secondary}", agentId, entry.Build.Primary, entry.Build.Secondary);
             this.skillbarContextService.LoadBuild(agentId, &skillTemplate);
         }
@@ -387,7 +391,7 @@ public sealed class PartyService(
         return true;
     }
 
-    private unsafe List<(uint AgentId, HeroBehavior Behavior)>? GetHeroBehaviorSetup(PartyLoadout partyLoadout)
+    private unsafe List<(uint AgentId, Shared.Models.Api.HeroBehavior Behavior)>? GetHeroBehaviorSetup(PartyLoadout partyLoadout)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         scopedLogger.LogDebug("Getting hero behavior setup");
@@ -402,12 +406,12 @@ public sealed class PartyService(
         return heroes.Value.AsValueEnumerable()
             .Select(h =>
             {
-                if (h.HeroId is 0)
+                if (h.HeroId is API.Interop.GWCA.GW.Constants.HeroID.NoHero)
                 {
                     return default;
                 }
 
-                var entry = partyLoadout.Entries.AsValueEnumerable().FirstOrDefault(e => (uint)e.HeroId == h.HeroId);
+                var entry = partyLoadout.Entries.AsValueEnumerable().FirstOrDefault(e => e.HeroId == (int)h.HeroId);
                 if (entry is null)
                 {
                     scopedLogger.LogWarning("No entry found for hero {heroId}", h.HeroId);
@@ -455,21 +459,14 @@ public sealed class PartyService(
                     return -1;
                 }
 
-                var partyContext = gameContext.Pointer->PartyContext;
-                if (partyContext is null)
-                {
-                    scopedLogger.LogError("Party context is null");
-                    return -1;
-                }
-
-                var charContext = gameContext.Pointer->CharContext;
+                var charContext = gameContext.Pointer->Character;
                 if (charContext is null)
                 {
                     scopedLogger.LogError("Char context is null");
                     return -1;
                 }
 
-                var playerParty = partyContext->PlayerParty;
+                var playerParty = GWCA.GW.PartyMgr.GetPartyInfo(0);
                 var playerId = charContext->PlayerNumber;
                 var offset = 0;
                 foreach(var hero in playerParty->Heroes)
@@ -492,22 +489,22 @@ public sealed class PartyService(
         return heroNumber is -1 ? default : (uint)heroNumber;
     }
 
-    private static BuildEntry? GetBuildEntryById(ProfessionsContext professionContext, SkillbarContext skillbar, PartyAttribute attributes)
+    private static BuildEntry? GetBuildEntryById(ProfessionState professionContext, SkillbarData skillbar, PartyAttribute attributes)
     {
         return new BuildEntry(
-            Primary: (int)professionContext.CurrentPrimary,
-            Secondary: (int)professionContext.CurrentSecondary,
-            Attributes: attributes.Attributes.GetAttributeEntryList(),
+            Primary: (int)professionContext.Primary,
+            Secondary: (int)professionContext.Secondary,
+            Attributes: attributes.Attribute.GetAttributeEntryList().ToList(),
             Skills:
             [
-                skillbar.Skill0.Id,
-                skillbar.Skill1.Id,
-                skillbar.Skill2.Id,
-                skillbar.Skill3.Id,
-                skillbar.Skill4.Id,
-                skillbar.Skill5.Id,
-                skillbar.Skill6.Id,
-                skillbar.Skill7.Id
+                (uint)skillbar.Skills[0].SkillId,
+                (uint)skillbar.Skills[1].SkillId,
+                (uint)skillbar.Skills[2].SkillId,
+                (uint)skillbar.Skills[3].SkillId,
+                (uint)skillbar.Skills[4].SkillId,
+                (uint)skillbar.Skills[5].SkillId,
+                (uint)skillbar.Skills[6].SkillId,
+                (uint)skillbar.Skills[7].SkillId
             ]);
     }
 }

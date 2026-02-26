@@ -22,16 +22,14 @@ public sealed class LoginService(
             unsafe
             {
                 var gameContext = this.gameContextService.GetGameContext();
-                if (gameContext.IsNull || gameContext.Pointer->CharContext is null)
+                if (gameContext.IsNull || gameContext.Pointer->Character is null)
                 {
                     scopedLogger.LogError("Game context is not initialized");
                     return default;
                 }
 
-                var playerNameSpan = gameContext.Pointer->CharContext->PlayerName.AsSpan();
-                var playerName = new string(playerNameSpan[..playerNameSpan.IndexOf('\0')]);
-                var emailSpan = gameContext.Pointer->CharContext->PlayerEmail.AsSpan();
-                var email = new string(emailSpan[..emailSpan.IndexOf('\0')]);
+                var playerName = new string(gameContext.Pointer->Character->PlayerName);
+                var email = new string(gameContext.Pointer->Character->PlayerEmail);
                 return new LoginInfo(email, playerName);
             }
         }, cancellationToken);

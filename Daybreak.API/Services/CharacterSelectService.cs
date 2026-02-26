@@ -1,8 +1,11 @@
-﻿using Daybreak.API.Interop.GuildWars;
+﻿using Daybreak.API.Extensions;
+using Daybreak.API.Interop;
+using Daybreak.API.Interop.GuildWars;
 using Daybreak.API.Models;
 using Daybreak.API.Services.Interop;
 using Daybreak.Shared.Models.Api;
 using System.Core.Extensions;
+using System.Extensions;
 using System.Extensions.Core;
 using System.Runtime.InteropServices;
 using ZLinq;
@@ -18,13 +21,6 @@ public sealed class CharacterSelectService(
     PreferencesService preferencesService,
     ILogger<CharacterSelectService> logger)
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    private readonly struct LogOutMessage(uint unknown, uint characterSelect)
-    {
-        public readonly uint Unknown = unknown;
-        public readonly uint CharacterSelect = characterSelect;
-    }
-
     private readonly InstanceContextService instanceContextService = instanceContextService.ThrowIfNull();
     private readonly PlatformContextService platformContextService = platformContextService.ThrowIfNull();
     private readonly UIContextService uiContextService = uiContextService.ThrowIfNull();
@@ -42,7 +38,7 @@ public sealed class CharacterSelectService(
             {
                 var gameContext = this.gameContextService.GetGameContext();
                 if (gameContext.IsNull ||
-                    gameContext.Pointer->WorldContext is null)
+                    gameContext.Pointer->World is null)
                 {
                     scopedLogger.LogError("Game context is not initialized");
                     return default;
@@ -55,21 +51,20 @@ public sealed class CharacterSelectService(
                     return default;
                 }
 
-                var currentUuid = gameContext.Pointer->CharContext->PlayerUuid.ToString();
+                var currentUuid = (*(Uuid*)gameContext.Pointer->Character->PlayerUuid).ToString();
                 var availableChars = new List<CharacterSelectEntry>((int)availableCharsContext.Pointer->Size);
                 foreach (var charContext in *availableCharsContext.Pointer)
                 {
-                    var nameSpan = charContext.Name.AsSpan();
-                    var name = new string(nameSpan[..nameSpan.IndexOf('\0')]);
+                    var name = new string(charContext.Name);
                     availableChars.Add(new CharacterSelectEntry(
-                        charContext.Uuid.ToString(),
+                        (*(Uuid*)charContext.Uuid).ToString(),
                         name,
-                        charContext.Primary,
-                        charContext.Secondary,
-                        charContext.Campaign,
-                        charContext.MapId,
-                        charContext.Level,
-                        charContext.IsPvp));
+                        (uint)charContext.GetPrimaryProfession(),
+                        (uint)charContext.GetSecondaryProfession(),
+                        (uint)charContext.GetCampaign(),
+                        (uint)charContext.GetMapId(),
+                        (uint)charContext.GetLevel(),
+                        charContext.IsPvP()));
                 }
 
                 // TODO: Reforged sometimes returns Zero UUID even when in-game, need to investigate why
@@ -143,6 +138,26 @@ public sealed class CharacterSelectService(
         public uint Play;
     }
 
+    [StructLayout(LayoutKind.Explicit, Pack = 1)]
+    private readonly unsafe struct CharSelectorContext
+    {
+        [FieldOffset(0x0000)]
+        public readonly uint Vtable;
+
+        [FieldOffset(0x0004)]
+        public readonly uint FrameId;
+
+        [FieldOffset(0x0008)]
+        public readonly GuildWarsArray<WrappedPointer<CharSelectorChar>> Chars;
+    }
+
+    [StructLayout(LayoutKind.Explicit, Pack = 1)]
+    private readonly struct CharSelectorChar
+    {
+        [FieldOffset(0x0020)]
+        public readonly Array20Char Name;
+    }
+
     private async Task<bool> SelectCharacterToPlay(string characterName, bool play, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
@@ -173,7 +188,7 @@ public sealed class CharacterSelectService(
 
                 // Get current selected index
                 uint selectedIdx = 0;
-                this.uiContextService.SendFrameUIMessage(panesFrame, UIMessage.FrameMessage_QuerySelectedIndex, null, &selectedIdx);
+                this.uiContextService.SendFrameUIMessage(panesFrame, UIMessage.kFrameMessage_0x4a, null, &selectedIdx);
 
                 // Find target character index
                 uint targetIdx = 0xFFFF;
@@ -234,19 +249,21 @@ public sealed class CharacterSelectService(
                             Play = 0
                         };
 
-                        var action = new UIPackets.MouseAction(
-                            selectorFrame->FrameId,
-                            selectorFrame->ChildOffsetId,
-                            UIPackets.ActionState.MouseClick,
-                            (nuint)(&buttonParam));
+                        var action = new kMouseAction
+                        {
+                            FrameId = selectorFrame->FrameId,
+                            ChildOffsetId = selectorFrame->ChildOffsetId,
+                            CurrentState = GWCA.GW.UI.UIPacket.ActionState.MouseClick,
+                            Wparam = (nint)(&buttonParam)
+                        };
 
-                        if (!this.uiContextService.SendFrameUIMessage(parentFrame, UIMessage.MouseClick2, &action))
+                        if (!this.uiContextService.SendFrameUIMessage(parentFrame, UIMessage.kMouseClick2, &action))
                         {
                             return false;
                         }
 
                         uint newSelectedIdx = 0;
-                        this.uiContextService.SendFrameUIMessage(panesFrame, UIMessage.FrameMessage_QuerySelectedIndex, null, &newSelectedIdx);
+                        this.uiContextService.SendFrameUIMessage(panesFrame, UIMessage.kFrameMessage_0x4a, null, &newSelectedIdx);
                         return newSelectedIdx == idx;
                     }
                 }
@@ -380,13 +397,12 @@ public sealed class CharacterSelectService(
 
                 foreach (var charContext in *availableCharsContext.Pointer)
                 {
-                    if (charContext.Uuid.ToString() != uuid)
+                    if ((*(Uuid*)charContext.Uuid).ToString() != uuid)
                     {
                         continue;
                     }
 
-                    var nameSpan = charContext.Name.AsSpan();
-                    var name = new string(nameSpan[..nameSpan.IndexOf('\0')]);
+                    var name = new string(charContext.Name);
                     return name;
                 }
 
@@ -399,10 +415,10 @@ public sealed class CharacterSelectService(
     {
         await this.gameThreadService.QueueOnGameThread(() =>
         {
-            var logoutMessage = new LogOutMessage(0, 1); // Changed to 1 for character select
+            var logoutMessage = new kLogout { Unknown = 0, CharacterSelect = 1 };
             unsafe
             {
-                this.uiContextService.SendMessage(UIMessage.Logout, (uint)&logoutMessage, 0);
+                this.uiContextService.SendMessage(UIMessage.kLogout, (uint)&logoutMessage, 0);
             }
         }, cancellationToken);
     }
