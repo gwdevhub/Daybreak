@@ -176,14 +176,31 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
             node.Functions.Add(new ExportEntry(mangledName, info));
         }
 
-        // ── Parse C++ headers for enums and constexpr ──────────────
+        // ── Parse C++ headers for enums, constexpr, and structs ───
         var headerRoot = new ConstantsNode("GWCA");
         var dllDir = Path.GetDirectoryName(dllPath)!;
-        var includeDir = Path.Combine(dllDir, "Include", "GWCA", "Constants");
+        var gwcaIncludeDir = Path.Combine(dllDir, "Include", "GWCA");
 #pragma warning disable RS1035
-        if (Directory.Exists(includeDir))
+        if (Directory.Exists(gwcaIncludeDir))
         {
-            foreach (var headerFile in Directory.GetFiles(includeDir, "*.h"))
+            // Scan all subdirectories: Constants, GameEntities, GameContainers, Context, Managers, Packets
+            foreach (var subDir in Directory.GetDirectories(gwcaIncludeDir))
+            {
+                foreach (var headerFile in Directory.GetFiles(subDir, "*.h"))
+                {
+                    try
+                    {
+                        var headerText = File.ReadAllText(headerFile);
+                        CppHeaderParser.Parse(headerText, headerRoot);
+                    }
+                    catch
+                    {
+                        // Skip headers that fail to parse
+                    }
+                }
+            }
+            // Also scan root GWCA headers
+            foreach (var headerFile in Directory.GetFiles(gwcaIncludeDir, "*.h"))
             {
                 try
                 {
@@ -198,14 +215,33 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         }
 #pragma warning restore RS1035
 
+        // Collect names of all namespace classes from the export tree
+        // These will be skipped when emitting structs to avoid name collisions
+        var namespaceClassNames = new HashSet<string>(StringComparer.Ordinal);
+        CollectNamespaceClassNames(root, namespaceClassNames);
+
         // Register generated enums in the typeMap so demangled signatures
         // resolve to the generated C# enum types instead of falling back
         // to int/uint.  GWCAEquivalent entries take priority (already in map).
-        CollectGeneratedEnumMappings(headerRoot, "GWCA", typeMap);
+        CollectGeneratedEnumMappings(headerRoot, "GWCA", typeMap, namespaceClassNames);
+
+        // Collect diagnostic info about parsed structs
+        var structDiagnostics = new List<string>();
+        CollectStructDiagnostics(headerRoot, "", structDiagnostics);
 
         // Emit
         var sb = new StringBuilder(65536);
         EmitHeader(sb, totalExports, skippedExports);
+        
+        // Add diagnostic comment about parsed structs
+        sb.AppendLine("    // ═══════════════════════════════════════════════════");
+        sb.AppendLine("    // Parsed structs diagnostic:");
+        foreach (var diag in structDiagnostics.OrderBy(d => d))
+        {
+            sb.AppendLine($"    // {diag}");
+        }
+        sb.AppendLine("    // ═══════════════════════════════════════════════════");
+        sb.AppendLine();
 
         // Emit the tree recursively (starting from GWCA's children)
         foreach (var child in root.Children.Values.OrderBy(c => c.Name, StringComparer.Ordinal))
@@ -217,9 +253,20 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         // The headerRoot is "GWCA" → children are "GW", etc.
         // Each node emits as a partial class, which C# merges with the
         // identically-named class already emitted by the export tree.
+        // Skip any child named "GWCA" - its content should go at root level, not nested.
         foreach (var child in headerRoot.Children.Values.OrderBy(c => c.Name, StringComparer.Ordinal))
         {
-            EmitConstantsNode(sb, child, 4);
+            if (child.Name == "GWCA")
+            {
+                // Emit GWCA namespace content directly at root level (not as nested class)
+                // But first emit its children normally
+                foreach (var grandchild in child.Children.Values.OrderBy(c => c.Name, StringComparer.Ordinal))
+                {
+                    EmitConstantsNode(sb, grandchild, typeMap, namespaceClassNames, 4);
+                }
+                continue;
+            }
+            EmitConstantsNode(sb, child, typeMap, namespaceClassNames, 4);
         }
 
         sb.AppendLine("}");
@@ -419,6 +466,8 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
     private static void EmitConstantsNode(
         StringBuilder sb,
         ConstantsNode node,
+        Dictionary<string, string> typeMap,
+        HashSet<string> namespaceClassNames,
         int indent)
     {
         var pad = new string(' ', indent);
@@ -477,10 +526,29 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
             sb.AppendLine($"{innerPad}internal const {csType} {SanitizeIdentifier(field.Name)} = {value};{comment}");
         }
 
+        // Emit structs (skip those already defined via [GWCAEquivalent])
+        foreach (var structDef in node.Structs.OrderBy(s => s.Name, StringComparer.Ordinal))
+        {
+            // Determine the C# struct name (suffix if collides with namespace class)
+            var csStructName = SanitizeIdentifier(structDef.Name);
+            if (namespaceClassNames.Contains(structDef.Name))
+                csStructName += "Data";
+
+            // Skip if already mapped (manually defined with [GWCAEquivalent])
+            if (typeMap.ContainsKey(structDef.Name))
+            {
+                // Check if it's our generated type or a manual one
+                var mapped = typeMap[structDef.Name];
+                if (!mapped.Contains("Daybreak.API.Interop.GWCA."))
+                    continue; // Skip - it's a manually defined type
+            }
+            EmitStruct(sb, structDef, typeMap, innerIndent, csStructName);
+        }
+
         // Emit children
         foreach (var child in node.Children.Values.OrderBy(c => c.Name, StringComparer.Ordinal))
         {
-            EmitConstantsNode(sb, child, innerIndent);
+            EmitConstantsNode(sb, child, typeMap, namespaceClassNames, innerIndent);
         }
 
         sb.AppendLine($"{pad}}}");
@@ -488,7 +556,7 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
 
     private static bool HasAnyContent(ConstantsNode node)
     {
-        if (node.Enums.Count > 0 || node.Constants.Count > 0)
+        if (node.Enums.Count > 0 || node.Constants.Count > 0 || node.Structs.Count > 0)
             return true;
         return node.Children.Values.Any(HasAnyContent);
     }
@@ -502,7 +570,8 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
     private static void CollectGeneratedEnumMappings(
         ConstantsNode node,
         string csPath,
-        Dictionary<string, string> typeMap)
+        Dictionary<string, string> typeMap,
+        HashSet<string> namespaceClassNames)
     {
         foreach (var enumDef in node.Enums)
         {
@@ -513,10 +582,319 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
                 typeMap[enumDef.Name] = "global::Daybreak.API.Interop." + csPath + "." + SanitizeIdentifier(enumDef.Name);
         }
 
+        foreach (var structDef in node.Structs)
+        {
+            // Only add structs that can actually be emitted
+            if (CanEmitStruct(structDef) && !typeMap.ContainsKey(structDef.Name))
+            {
+                // If name collides with a namespace class, use a suffixed name
+                var csName = SanitizeIdentifier(structDef.Name);
+                if (namespaceClassNames.Contains(structDef.Name))
+                    csName += "Data";
+                typeMap[structDef.Name] = "global::Daybreak.API.Interop." + csPath + "." + csName;
+            }
+        }
+
         foreach (var child in node.Children.Values)
         {
-            CollectGeneratedEnumMappings(child, csPath + "." + SanitizeIdentifier(child.Name), typeMap);
+            CollectGeneratedEnumMappings(child, csPath + "." + SanitizeIdentifier(child.Name), typeMap, namespaceClassNames);
         }
+    }
+
+    /// <summary>
+    /// Collects all namespace class names from the export tree recursively.
+    /// Used to avoid name collisions when emitting structs.
+    /// </summary>
+    private static void CollectNamespaceClassNames(NamespaceNode node, HashSet<string> names)
+    {
+        names.Add(node.Name);
+        foreach (var child in node.Children.Values)
+        {
+            CollectNamespaceClassNames(child, names);
+        }
+    }
+
+    /// <summary>
+    /// Collects diagnostic information about parsed structs.
+    /// </summary>
+    private static void CollectStructDiagnostics(ConstantsNode node, string path, List<string> diagnostics)
+    {
+        var currentPath = string.IsNullOrEmpty(path) ? node.Name : path + "." + node.Name;
+        
+        // Show namespace pop line info
+        if (node.DebugPopLine > 0)
+        {
+            diagnostics.Add($"[NAMESPACE] {currentPath} popped at line {node.DebugPopLine}");
+        }
+        
+        foreach (var structDef in node.Structs)
+        {
+            var fieldTypes = string.Join(", ", structDef.Fields.Take(3).Select(f => f.CppType));
+            if (structDef.Fields.Count > 3) fieldTypes += ", ...";
+            diagnostics.Add($"{currentPath}.{structDef.Name}: {structDef.Fields.Count} fields (nsPath={structDef.DebugNamespacePath})");
+        }
+        foreach (var child in node.Children.Values)
+        {
+            CollectStructDiagnostics(child, currentPath, diagnostics);
+        }
+    }
+
+    /// <summary>
+    /// Checks if a struct can be emitted (has no complex template fields or unresolved types).
+    /// </summary>
+    private static bool CanEmitStruct(CppStructDef structDef)
+    {
+        // Skip structs with no fields (usually forward declarations that got parsed)
+        if (structDef.Fields.Count == 0)
+            return false;
+
+        // Check for unresolvable fields (template types, missing types)
+        foreach (var field in structDef.Fields)
+        {
+            var cppType = field.CppType;
+            // Skip structs with template type parameters (T, etc.)
+            if (Regex.IsMatch(cppType, @"\bT\b") && !cppType.Contains("Array"))
+                return false;
+            // Skip structs with complex template containers we can't represent
+            if (cppType.Contains("TList<") || cppType.Contains("TLink<") || 
+                cppType.Contains("PrioQ<") || cppType.Contains("PrioQLink<") ||
+                cppType.Contains("BaseArray<"))
+                return false;
+            // Skip if field type contains unresolved typedef names
+            if (cppType.Contains("UIInteractionCallback") || cppType.Contains("FriendsListArray") ||
+                cppType.Contains("PathNodeArray") || cppType.Contains("PathingMapArray") ||
+                cppType.Contains("BlockedPlaneArray") || cppType.Contains("AgentSummaryInfoSub"))
+                return false;
+            // Skip structs with function pointer fields (complex vtable types)
+            if (cppType.Contains("__fastcall") || cppType.Contains("__stdcall") ||
+                cppType.Contains("(__cdecl") || Regex.IsMatch(cppType, @"\(\s*\*\s*\w+\s*\)"))
+                return false;
+            // Skip structs with inline initializers in field declarations (e.g., "uint32_t k[4]{}")
+            if (cppType.Contains("{}"))
+                return false;
+            // Skip fields referencing complex struct types we can't emit
+            // These are structs that have vtables, function pointers, or complex layouts
+            if (cppType.Contains("GHKey") || cppType.Contains("EquipmentVTable") ||
+                cppType.Contains("VTable"))
+                return false;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Emits a C# struct from a parsed C++ struct definition.
+    /// </summary>
+    private static void EmitStruct(StringBuilder sb, CppStructDef structDef, Dictionary<string, string> typeMap, int indent, string? csStructName = null)
+    {
+        var pad = new string(' ', indent);
+
+        // Skip structs that can't be emitted
+        if (!CanEmitStruct(structDef))
+            return;
+
+        // Use provided name or default to sanitized original name
+        var structName = csStructName ?? SanitizeIdentifier(structDef.Name);
+
+        sb.AppendLine();
+
+        // Determine layout strategy based on whether we have offsets
+        bool hasOffsets = structDef.Fields.Any(f => f.Offset.HasValue);
+        var layoutKind = hasOffsets ? "Explicit" : "Sequential";
+
+        // Build the struct attributes
+        if (structDef.Size.HasValue)
+            sb.AppendLine($"{pad}[global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.{layoutKind}, Pack = 1, Size = 0x{structDef.Size.Value:X})]");
+        else
+            sb.AppendLine($"{pad}[global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.{layoutKind}, Pack = 1)]");
+
+        sb.AppendLine($"{pad}public unsafe struct {structName}");
+        sb.AppendLine($"{pad}{{");
+
+        var innerPad = new string(' ', indent + 4);
+
+        foreach (var field in structDef.Fields)
+        {
+            var csType = MapCppFieldTypeToCs(field.CppType, typeMap);
+            var fieldName = SanitizeIdentifier(ToPascalCase(field.Name));
+            var comment = field.Comment is not null ? $" // {field.Comment}" : "";
+
+            // Emit FieldOffset if we have explicit layout
+            if (hasOffsets && field.Offset.HasValue)
+                sb.AppendLine($"{innerPad}[global::System.Runtime.InteropServices.FieldOffset(0x{field.Offset.Value:X4})]");
+
+            // Handle fixed-size arrays
+            if (field.ArraySize is not null)
+            {
+                var size = ParseArraySize(field.ArraySize);
+                // Skip zero-length arrays (flexible array members in C++) - just add a comment
+                if (size <= 0)
+                {
+                    sb.AppendLine($"{innerPad}// Flexible array member: {csType} {fieldName}[0]");
+                    continue;
+                }
+                // For fixed arrays, we need a fixed buffer or explicit FieldOffset per element
+                // Use fixed buffer for blittable types
+                if (IsBlittableForFixed(csType))
+                {
+                    sb.AppendLine($"{innerPad}public fixed {csType} {fieldName}[{size}];{comment}");
+                }
+                else
+                {
+                    // For non-blittable types in fixed arrays, just use the first element
+                    // and note the array in comments
+                    sb.AppendLine($"{innerPad}public {csType} {fieldName}; // [{field.ArraySize}]{comment}");
+                }
+            }
+            else
+            {
+                sb.AppendLine($"{innerPad}public {csType} {fieldName};{comment}");
+            }
+        }
+
+        sb.AppendLine($"{pad}}}");
+    }
+
+    /// <summary>
+    /// Maps a C++ field type to a C# type for struct fields.
+    /// Handles pointers, qualified types, etc.
+    /// </summary>
+    private static string MapCppFieldTypeToCs(string cppType, Dictionary<string, string> typeMap)
+    {
+        cppType = cppType.Trim();
+
+        // Strip leading 'const' keyword
+        if (cppType.StartsWith("const "))
+            cppType = cppType.Substring(6).Trim();
+
+        // Strip leading 'struct' keyword (C++ forward decl style)
+        if (cppType.StartsWith("struct "))
+            cppType = cppType.Substring(7).Trim();
+
+        // Handle 'struct' inside template arguments (e.g., Array<struct Node*>)
+        cppType = Regex.Replace(cppType, @"<\s*struct\s+", "<");
+
+        // Strip namespace prefix before template detection (GW::Array<> -> Array<>)
+        // But preserve the inner type for recursive processing
+        if (cppType.StartsWith("GW::"))
+            cppType = cppType.Substring(4);
+
+        // Handle Array<T> and similar template containers - convert to fixed-size inline struct
+        // These are GWCA's Array template which is a {T* data, uint size, uint capacity}
+        if (cppType.StartsWith("Array<"))
+        {
+            // For struct fields, Array<T> is 12 bytes (pointer + 2 uints), represent as placeholder
+            return "nint"; // Simplified: just use nint, actual layout needs manual handling
+        }
+
+        // Handle pointers
+        bool isPointer = cppType.EndsWith("*");
+        if (isPointer)
+        {
+            var inner = cppType.TrimEnd('*').Trim();
+            var csInner = MapCppFieldTypeToCs(inner, typeMap);
+            // Special case: void* and char* and wchar_t* map to nint
+            if (csInner is "void" or "char" or "byte")
+                return "nint";
+            return csInner + "*";
+        }
+
+        // Strip namespace qualifiers (GW::, GW::Constants::, etc.)
+        if (cppType.Contains("::"))
+        {
+            var parts = cppType.Split(new[] { "::" }, StringSplitOptions.RemoveEmptyEntries);
+            cppType = parts[parts.Length - 1];
+        }
+
+        // Check if this type is in our generated enums/structs map
+        if (typeMap.TryGetValue(cppType, out var mapped))
+            return mapped;
+
+        // Handle common C++ types
+        return cppType switch
+        {
+            "uint32_t" => "uint",
+            "int32_t" => "int",
+            "uint16_t" => "ushort",
+            "int16_t" => "short",
+            "uint8_t" => "byte",
+            "int8_t" => "sbyte",
+            "uint64_t" => "ulong",
+            "int64_t" => "long",
+            "size_t" => "nuint",
+            "int" => "int",
+            "unsigned" => "uint",
+            "unsigned int" => "uint",
+            "short" => "short",
+            "unsigned short" => "ushort",
+            "long" => "int",
+            "unsigned long" => "uint",
+            "float" => "float",
+            "double" => "double",
+            "bool" => "byte", // C++ bool is 1 byte
+            "wchar_t" => "char",
+            "char" => "byte",
+            "void" => "void",
+            "DWORD" => "uint",
+            "FILETIME" => "ulong", // FILETIME is two DWORDs
+            "HMODULE" => "nint",
+            "HANDLE" => "nint",
+            "HWND" => "nint",
+            "uintptr_t" => "nuint",
+            "intptr_t" => "nint",
+            "Vec2f" => "global::System.Numerics.Vector2",
+            "Vec3f" => "global::System.Numerics.Vector3",
+            "Color" => "uint", // GWCA Color is usually uint32
+            // Known GWCA types that are typedefs to uint32_t (not enums)
+            "AgentID" => "uint",
+            "PlayerNumber" => "uint",
+            "ItemID" => "uint",
+            "PlayerID" => "uint",
+            // Everything else: assume it's a struct/enum name we'll reference directly
+            _ => cppType,
+        };
+    }
+
+    private static bool IsBlittableForFixed(string csType)
+    {
+        return csType is "byte" or "sbyte" or "short" or "ushort" or "int" or "uint"
+            or "long" or "ulong" or "float" or "double" or "char" or "nint" or "nuint";
+    }
+
+    private static int ParseArraySize(string sizeExpr)
+    {
+        sizeExpr = sizeExpr.Trim();
+        if (sizeExpr.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+            return Convert.ToInt32(sizeExpr, 16);
+        if (int.TryParse(sizeExpr, out var size))
+            return size;
+        // If it's a named constant or expression, default to 1
+        return 1;
+    }
+
+    private static string ToPascalCase(string name)
+    {
+        if (string.IsNullOrEmpty(name))
+            return name;
+
+        // Handle snake_case: split by underscores and capitalize each part
+        if (name.Contains("_"))
+        {
+            var parts = name.Split('_');
+            var result = new StringBuilder();
+            foreach (var part in parts)
+            {
+                if (part.Length > 0)
+                {
+                    result.Append(char.ToUpperInvariant(part[0]));
+                    if (part.Length > 1)
+                        result.Append(part.Substring(1));
+                }
+            }
+            return result.ToString();
+        }
+
+        // Just capitalize first letter
+        return char.ToUpperInvariant(name[0]) + name.Substring(1);
     }
 
     private static string MapCppTypeToCs(string? cppType)
@@ -561,8 +939,13 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
 
     private static string SanitizeIdentifier(string name)
     {
+        if (string.IsNullOrEmpty(name))
+            return "_";
         if (CsKeywords.Contains(name))
             return "@" + name;
+        // If identifier starts with a digit, prefix with underscore
+        if (char.IsDigit(name[0]))
+            return "_" + name;
         return name;
     }
 
@@ -862,6 +1245,8 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         public Dictionary<string, ConstantsNode> Children { get; } = new(StringComparer.Ordinal);
         public List<CppEnumDef> Enums { get; } = [];
         public List<CppConstField> Constants { get; } = [];
+        public List<CppStructDef> Structs { get; } = [];
+        public int DebugPopLine { get; set; } // Debug: line number where this namespace was popped
 
         public ConstantsNode GetOrCreateChild(string childName)
         {
@@ -893,6 +1278,24 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         public string Name { get; set; } = "";
         public string CppType { get; set; } = "int";
         public string Value { get; set; } = "0";
+        public string? Comment { get; set; }
+    }
+
+    internal sealed class CppStructDef
+    {
+        public string Name { get; set; } = "";
+        public string? BaseType { get; set; }
+        public int? Size { get; set; } // from static_assert(sizeof(...))
+        public List<CppStructField> Fields { get; } = [];
+        public string DebugNamespacePath { get; set; } = ""; // Debug: namespace path when parsed
+    }
+
+    internal sealed class CppStructField
+    {
+        public string Name { get; set; } = "";
+        public string CppType { get; set; } = "int";
+        public int? Offset { get; set; }
+        public string? ArraySize { get; set; } // e.g., "7", "0x10", "20"
         public string? Comment { get; set; }
     }
 }
