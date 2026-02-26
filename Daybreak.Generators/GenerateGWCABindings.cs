@@ -540,27 +540,8 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
             sb.AppendLine($"{innerPad}internal const {csType} {SanitizeIdentifier(field.Name)} = {value};{comment}");
         }
 
-        // Emit type aliases (typedef Array<T> AliasName;)
-        // Deduplicate by alias name - same typedef may appear in multiple headers
-        var emittedAliases = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var alias in node.TypeAliases.OrderBy(a => a.AliasName, StringComparer.Ordinal))
-        {
-            // Skip duplicates
-            if (!emittedAliases.Add(alias.AliasName))
-                continue;
-
-            // Only emit Array<T> aliases as GuildWarsArray<T>
-            if (alias.SourceType == "Array" && alias.TemplateArg is not null)
-            {
-                var innerType = alias.TemplateArg.Replace("::", ".").Trim();
-                // Handle pointer types (e.g., "Item *" -> "nint")
-                if (innerType.EndsWith("*"))
-                    innerType = "nint";
-                else if (typeMap.TryGetValue(innerType, out var mapped))
-                    innerType = mapped;
-                sb.AppendLine($"{innerPad}public unsafe struct {alias.AliasName} {{ public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<{innerType}> Value; }}");
-            }
-        }
+        // Type aliases are now emitted to GuildWars namespace, not nested GWCA classes
+        // Skip type alias emission here - see EmitTypeAliasesToGuildWarsNamespace
 
         // Structs are now emitted to GuildWars namespace, not nested classes
         // Skip struct emission here - see EmitStructsToGuildWarsNamespace
@@ -576,7 +557,8 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
 
     private static bool HasAnyContent(ConstantsNode node)
     {
-        if (node.Enums.Count > 0 || node.Constants.Count > 0 || node.Structs.Count > 0 || node.TypeAliases.Count > 0)
+        // Note: TypeAliases and Structs are emitted to GuildWars namespace, not counted here
+        if (node.Enums.Count > 0 || node.Constants.Count > 0)
             return true;
         return node.Children.Values.Any(HasAnyContent);
     }
@@ -679,6 +661,12 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         // Skip structs with no fields (usually forward declarations that got parsed)
         if (structDef.Fields.Count == 0)
             return (false, "no fields");
+        
+        // Check for mixed offset/no-offset fields (can't use Explicit layout if not all have offsets)
+        bool hasAnyOffset = structDef.Fields.Any(f => f.Offset.HasValue);
+        bool allHaveOffsets = structDef.Fields.All(f => f.Offset.HasValue);
+        if (hasAnyOffset && !allHaveOffsets)
+            return (false, "mixed offset fields");
 
         // Check for unresolvable fields (template types, missing types)
         foreach (var field in structDef.Fields)
@@ -695,7 +683,9 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
             // Skip if field type contains unresolved typedef names
             if (cppType.Contains("UIInteractionCallback") || cppType.Contains("FriendsListArray") ||
                 cppType.Contains("PathNodeArray") || cppType.Contains("PathingMapArray") ||
-                cppType.Contains("BlockedPlaneArray") || cppType.Contains("AgentSummaryInfoSub"))
+                cppType.Contains("BlockedPlaneArray") || cppType.Contains("AgentSummaryInfoSub") ||
+                cppType.Contains("FrameRelation") || cppType.Contains("EffectData") ||
+                cppType.Contains("SkillbarSkillData") || cppType.Contains("SkillbarData"))
                 return (false, $"unresolved typedef in field {field.Name}: {cppType}");
             // Skip structs with function pointer fields (complex vtable types)
             if (cppType.Contains("__fastcall") || cppType.Contains("__stdcall") ||
@@ -904,6 +894,16 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
                 innerType = "nint";
             else if (typeMap.TryGetValue(innerType, out var mapped))
                 innerType = mapped;
+            else
+            {
+                // Try primitive type mapping
+                var primitiveMapping = MapPrimitiveType(innerType);
+                if (primitiveMapping != innerType)
+                    innerType = primitiveMapping;
+                else
+                    // Unmapped struct type - use nint as fallback
+                    innerType = "nint";
+            }
             
             sb.AppendLine($"{pad}public unsafe struct {alias.AliasName} {{ public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<{innerType}> Value; }}");
         }
@@ -1050,8 +1050,9 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
 
     private static bool IsBlittableForFixed(string csType)
     {
+        // Note: nint and nuint are NOT valid for fixed buffers in C#
         return csType is "byte" or "sbyte" or "short" or "ushort" or "int" or "uint"
-            or "long" or "ulong" or "float" or "double" or "char" or "nint" or "nuint";
+            or "long" or "ulong" or "float" or "double" or "char";
     }
 
     private static int ParseArraySize(string sizeExpr)
@@ -1295,11 +1296,46 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
     {
         return arg.Kind switch
         {
-            TypeKind.Primitive => arg.Name,
+            TypeKind.Primitive => MapPrimitiveType(arg.Name),
             TypeKind.Enum => typeMap.TryGetValue(arg.Name, out var e) ? e : arg.Name,
-            TypeKind.Struct => typeMap.TryGetValue(arg.Name, out var s) ? s : arg.Name,
+            TypeKind.Struct => typeMap.TryGetValue(arg.Name, out var s) ? s : "nint", // unmapped struct -> nint
             TypeKind.Pointer => "nint", // pointer types cannot be generic type arguments
             _ => "nint",
+        };
+    }
+    
+    /// <summary>
+    /// Maps C/C++ primitive type names to C# primitive types.
+    /// </summary>
+    private static string MapPrimitiveType(string cppType)
+    {
+        return cppType switch
+        {
+            "uint32_t" => "uint",
+            "int32_t" => "int",
+            "uint16_t" => "ushort",
+            "int16_t" => "short",
+            "uint8_t" => "byte",
+            "int8_t" => "sbyte",
+            "uint64_t" => "ulong",
+            "int64_t" => "long",
+            "size_t" => "nuint",
+            "uintptr_t" => "nuint",
+            "intptr_t" => "nint",
+            "unsigned int" or "unsigned" => "uint",
+            "unsigned short" => "ushort",
+            "unsigned long" => "uint",
+            "unsigned char" => "byte",
+            "char" => "byte",
+            "wchar_t" => "char",
+            "bool" => "byte",
+            // GWCA-specific typedefs 
+            "AgentID" => "uint",
+            "PlayerNumber" => "uint",
+            "ItemID" => "uint",
+            "PlayerID" => "uint",
+            "Color" => "uint",
+            _ => cppType, // pass through already-correct types like int, uint, etc
         };
     }
 
