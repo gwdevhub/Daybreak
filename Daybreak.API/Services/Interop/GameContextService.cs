@@ -10,7 +10,7 @@ public unsafe sealed class GameContextService
 
     public WrappedPointer<PreGameContext> GetPreGameContext() => GWCA.GW.GetPreGameContext();
 
-    public WrappedPointer<GuildWarsArray<CharInfoContext>> GetAvailableChars() => GWCA.GW.GetAvailableChars();
+    public WrappedPointer<GuildWarsArray<CharacterInformation>> GetAvailableChars() => GWCA.GW.GetAvailableChars();
 
     public bool IsMapLoaded() => GWCA.GW.Map.GetIsMapLoaded();
 }
