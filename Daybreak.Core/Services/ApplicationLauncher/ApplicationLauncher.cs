@@ -167,9 +167,8 @@ internal sealed class ApplicationLauncher(
 
         args.AddRange(PopulateCommandLineArgs("-email", email) ?? []);
         args.AddRange(PopulateCommandLineArgs("-password", password) ?? []);
-        args.AddRange(PopulateCommandLineArgs("-character", "Daybreak") ?? []);
 
-        foreach (var arg in launchConfigurationWithCredentials.Arguments?.Split(" ") ?? [])
+        foreach (var arg in SplitArguments(launchConfigurationWithCredentials.Arguments))
         {
             args.Add(arg);
         }
@@ -213,6 +212,11 @@ internal sealed class ApplicationLauncher(
         foreach (var mod in enabledMods)
         {
             args.AddRange(mod.GetCustomArguments());
+        }
+
+        if (!args.Any(a => a.StartsWith("-character")))
+        {
+            args.AddRange(PopulateCommandLineArgs("-character", "Daybreak") ?? []);
         }
 
         var process = new Process()
@@ -693,6 +697,44 @@ internal sealed class ApplicationLauncher(
         }
 
         return true;
+    }
+
+    private static IEnumerable<string> SplitArguments(string? arguments)
+    {
+        if (string.IsNullOrWhiteSpace(arguments))
+        {
+            yield break;
+        }
+
+        var current = new System.Text.StringBuilder();
+        var inQuotes = false;
+
+        for (var i = 0; i < arguments.Length; i++)
+        {
+            var c = arguments[i];
+            if (c == '"')
+            {
+                inQuotes = !inQuotes;
+                current.Append(c);
+            }
+            else if (c == ' ' && !inQuotes)
+            {
+                if (current.Length > 0)
+                {
+                    yield return current.ToString();
+                    current.Clear();
+                }
+            }
+            else
+            {
+                current.Append(c);
+            }
+        }
+
+        if (current.Length > 0)
+        {
+            yield return current.ToString();
+        }
     }
 
     private static string[]? PopulateCommandLineArgs(string argName, string? argValue)
