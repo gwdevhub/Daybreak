@@ -198,7 +198,13 @@ internal static class CppHeaderParser
                 if (trimmed.StartsWith("//"))
                     continue;
 
-                var closeBraceIdx = trimmed.IndexOf('}');
+                // Strip comments before checking for closing brace - comments can contain braces like "{ wchar_t* title }"
+                var trimmedWithoutComment = trimmed;
+                var commentIdx = trimmed.IndexOf("//");
+                if (commentIdx >= 0)
+                    trimmedWithoutComment = trimmed.Substring(0, commentIdx).TrimEnd();
+
+                var closeBraceIdx = trimmedWithoutComment.IndexOf('}');
                 if (closeBraceIdx >= 0)
                 {
                     if (closeBraceIdx > 0)

@@ -60,7 +60,6 @@ public static unsafe partial class GWCA
     // [NAMESPACE] GWCA.GW.Trade popped at line 22
     // [NAMESPACE] GWCA.GW.UI popped at line 774
     // [NAMESPACE] GWCA.GW.UI.UIPacket popped at line 29
-    // [NAMESPACE] GWCA.GW.UIPacket popped at line 966
     // [NAMESPACE] GWCA.GWCA popped at line 15
     // GWCA.GW.AccountContext: 9 fields [OK]
     // GWCA.GW.AccountInfo: 7 fields [OK]
@@ -220,69 +219,69 @@ public static unsafe partial class GWCA
     // GWCA.GW.UI.MapEntryMessage: 2 fields [OK]
     // GWCA.GW.UI.TooltipInfo: 8 fields [SKIP: unresolved typedef in field render: GW::UI::UIInteractionCallback*]
     // GWCA.GW.UI.UIChatMessage: 3 fields [OK]
+    // GWCA.GW.UI.UIPacket.kAgentSkillPacket: 2 fields [OK]
+    // GWCA.GW.UI.UIPacket.kAgentSkillStartedCast: 4 fields [OK]
+    // GWCA.GW.UI.UIPacket.kAgentSpeechBubble: 4 fields [OK]
+    // GWCA.GW.UI.UIPacket.kAllyOrGuildMessage: 4 fields [OK]
+    // GWCA.GW.UI.UIPacket.kChangeTarget: 6 fields [OK]
+    // GWCA.GW.UI.UIPacket.kCompassDraw: 4 fields [OK]
+    // GWCA.GW.UI.UIPacket.kDialogueMessage: 5 fields [OK]
+    // GWCA.GW.UI.UIPacket.kEffectAdd: 2 fields [OK]
+    // GWCA.GW.UI.UIPacket.kErrorMessage: 2 fields [OK]
+    // GWCA.GW.UI.UIPacket.kGetColor: 2 fields [OK]
+    // GWCA.GW.UI.UIPacket.kInteractAgent: 2 fields [OK]
+    // GWCA.GW.UI.UIPacket.kInventorySlotUpdated: 4 fields [OK]
+    // GWCA.GW.UI.UIPacket.kItemUpdated: 14 fields [OK]
+    // GWCA.GW.UI.UIPacket.kKeyAction: 3 fields [OK]
+    // GWCA.GW.UI.UIPacket.kLoadMapContext: 7 fields [OK]
+    // GWCA.GW.UI.UIPacket.kLogChatMessage: 2 fields [OK]
+    // GWCA.GW.UI.UIPacket.kLogout: 2 fields [OK]
+    // GWCA.GW.UI.UIPacket.kMeasureContent: 4 fields [OK]
+    // GWCA.GW.UI.UIPacket.kMouseAction: 5 fields [OK]
+    // GWCA.GW.UI.UIPacket.kMouseClick: 5 fields [OK]
+    // GWCA.GW.UI.UIPacket.kMouseCoordsClick: 6 fields [OK]
+    // GWCA.GW.UI.UIPacket.kMoveItem: 4 fields [OK]
+    // GWCA.GW.UI.UIPacket.kObjectiveAdd: 3 fields [OK]
+    // GWCA.GW.UI.UIPacket.kObjectiveComplete: 1 fields [OK]
+    // GWCA.GW.UI.UIPacket.kObjectiveUpdated: 1 fields [OK]
+    // GWCA.GW.UI.UIPacket.kPartySearchInvite: 2 fields [OK]
+    // GWCA.GW.UI.UIPacket.kPartyShowConfirmDialog: 3 fields [OK]
+    // GWCA.GW.UI.UIPacket.kPlayerChatMessage: 3 fields [OK]
+    // GWCA.GW.UI.UIPacket.kPostProcessingEffect: 2 fields [OK]
+    // GWCA.GW.UI.UIPacket.kPreferenceEnumChanged: 2 fields [OK]
+    // GWCA.GW.UI.UIPacket.kPreferenceFlagChanged: 2 fields [OK]
+    // GWCA.GW.UI.UIPacket.kPreferenceValueChanged: 2 fields [OK]
+    // GWCA.GW.UI.UIPacket.kPreStartSalvage: 2 fields [OK]
+    // GWCA.GW.UI.UIPacket.kPrintChatMessage: 4 fields [OK]
+    // GWCA.GW.UI.UIPacket.kRecvWhisper: 3 fields [OK]
+    // GWCA.GW.UI.UIPacket.kResize: 9 fields [OK]
+    // GWCA.GW.UI.UIPacket.kSendCallTarget: 2 fields [OK]
+    // GWCA.GW.UI.UIPacket.kSendChangeTarget: 2 fields [OK]
+    // GWCA.GW.UI.UIPacket.kSendChatMessage: 2 fields [OK]
+    // GWCA.GW.UI.UIPacket.kSendLoadSkillTemplate: 2 fields [OK]
+    // GWCA.GW.UI.UIPacket.kSendMerchantRequestQuote: 2 fields [OK]
+    // GWCA.GW.UI.UIPacket.kSendMerchantTransactItem: 5 fields [OK]
+    // GWCA.GW.UI.UIPacket.kSendMoveItem: 4 fields [OK]
+    // GWCA.GW.UI.UIPacket.kSendPingWeaponSet: 3 fields [OK]
+    // GWCA.GW.UI.UIPacket.kSendUseItem: 2 fields [OK]
+    // GWCA.GW.UI.UIPacket.kSendWorldAction: 3 fields [OK]
+    // GWCA.GW.UI.UIPacket.kServerActiveQuestChanged: 5 fields [OK]
+    // GWCA.GW.UI.UIPacket.kSetAgentProfession: 3 fields [OK]
+    // GWCA.GW.UI.UIPacket.kSetLayout: 6 fields [OK]
+    // GWCA.GW.UI.UIPacket.kSetRendererValue: 3 fields [OK]
+    // GWCA.GW.UI.UIPacket.kShowXunlaiChest: 3 fields [OK]
+    // GWCA.GW.UI.UIPacket.kStartWhisper: 1 fields [OK]
+    // GWCA.GW.UI.UIPacket.kTomeSkillSelection: 3 fields [OK]
+    // GWCA.GW.UI.UIPacket.kUIPositionChanged: 2 fields [OK]
+    // GWCA.GW.UI.UIPacket.kUseKitOnItem: 2 fields [OK]
+    // GWCA.GW.UI.UIPacket.kVendorItems: 4 fields [OK]
+    // GWCA.GW.UI.UIPacket.kVendorQuote: 2 fields [OK]
+    // GWCA.GW.UI.UIPacket.kVendorWindow: 4 fields [OK]
+    // GWCA.GW.UI.UIPacket.kWeaponSetChanged: 4 fields [OK]
+    // GWCA.GW.UI.UIPacket.kWeaponSwap: 2 fields [OK]
+    // GWCA.GW.UI.UIPacket.kWriteToChatLog: 3 fields [OK]
+    // GWCA.GW.UI.UIPacket.kWriteToChatLogWithSender: 3 fields [OK]
     // GWCA.GW.UI.WindowPosition: 3 fields [OK]
-    // GWCA.GW.UIPacket.kAgentSkillPacket: 2 fields [OK]
-    // GWCA.GW.UIPacket.kAgentSkillStartedCast: 4 fields [OK]
-    // GWCA.GW.UIPacket.kAgentSpeechBubble: 4 fields [OK]
-    // GWCA.GW.UIPacket.kAllyOrGuildMessage: 4 fields [OK]
-    // GWCA.GW.UIPacket.kChangeTarget: 6 fields [OK]
-    // GWCA.GW.UIPacket.kCompassDraw: 4 fields [OK]
-    // GWCA.GW.UIPacket.kDialogueMessage: 5 fields [OK]
-    // GWCA.GW.UIPacket.kEffectAdd: 2 fields [OK]
-    // GWCA.GW.UIPacket.kErrorMessage: 2 fields [OK]
-    // GWCA.GW.UIPacket.kGetColor: 2 fields [OK]
-    // GWCA.GW.UIPacket.kInteractAgent: 2 fields [OK]
-    // GWCA.GW.UIPacket.kInventorySlotUpdated: 4 fields [OK]
-    // GWCA.GW.UIPacket.kItemUpdated: 14 fields [OK]
-    // GWCA.GW.UIPacket.kKeyAction: 3 fields [OK]
-    // GWCA.GW.UIPacket.kLoadMapContext: 7 fields [OK]
-    // GWCA.GW.UIPacket.kLogChatMessage: 2 fields [OK]
-    // GWCA.GW.UIPacket.kLogout: 2 fields [OK]
-    // GWCA.GW.UIPacket.kMeasureContent: 4 fields [OK]
-    // GWCA.GW.UIPacket.kMouseAction: 5 fields [OK]
-    // GWCA.GW.UIPacket.kMouseClick: 5 fields [OK]
-    // GWCA.GW.UIPacket.kMouseCoordsClick: 6 fields [OK]
-    // GWCA.GW.UIPacket.kMoveItem: 4 fields [OK]
-    // GWCA.GW.UIPacket.kObjectiveAdd: 3 fields [OK]
-    // GWCA.GW.UIPacket.kObjectiveComplete: 1 fields [OK]
-    // GWCA.GW.UIPacket.kObjectiveUpdated: 1 fields [OK]
-    // GWCA.GW.UIPacket.kPartySearchInvite: 2 fields [OK]
-    // GWCA.GW.UIPacket.kPartyShowConfirmDialog: 3 fields [OK]
-    // GWCA.GW.UIPacket.kPlayerChatMessage: 3 fields [OK]
-    // GWCA.GW.UIPacket.kPostProcessingEffect: 2 fields [OK]
-    // GWCA.GW.UIPacket.kPreferenceEnumChanged: 2 fields [OK]
-    // GWCA.GW.UIPacket.kPreferenceFlagChanged: 2 fields [OK]
-    // GWCA.GW.UIPacket.kPreferenceValueChanged: 2 fields [OK]
-    // GWCA.GW.UIPacket.kPreStartSalvage: 2 fields [OK]
-    // GWCA.GW.UIPacket.kPrintChatMessage: 4 fields [OK]
-    // GWCA.GW.UIPacket.kRecvWhisper: 3 fields [OK]
-    // GWCA.GW.UIPacket.kResize: 9 fields [OK]
-    // GWCA.GW.UIPacket.kSendCallTarget: 2 fields [OK]
-    // GWCA.GW.UIPacket.kSendChangeTarget: 2 fields [OK]
-    // GWCA.GW.UIPacket.kSendChatMessage: 2 fields [OK]
-    // GWCA.GW.UIPacket.kSendLoadSkillTemplate: 2 fields [OK]
-    // GWCA.GW.UIPacket.kSendMerchantRequestQuote: 2 fields [OK]
-    // GWCA.GW.UIPacket.kSendMerchantTransactItem: 5 fields [OK]
-    // GWCA.GW.UIPacket.kSendMoveItem: 4 fields [OK]
-    // GWCA.GW.UIPacket.kSendPingWeaponSet: 3 fields [OK]
-    // GWCA.GW.UIPacket.kSendUseItem: 2 fields [OK]
-    // GWCA.GW.UIPacket.kSendWorldAction: 3 fields [OK]
-    // GWCA.GW.UIPacket.kServerActiveQuestChanged: 5 fields [OK]
-    // GWCA.GW.UIPacket.kSetAgentProfession: 3 fields [OK]
-    // GWCA.GW.UIPacket.kSetLayout: 6 fields [OK]
-    // GWCA.GW.UIPacket.kSetRendererValue: 3 fields [OK]
-    // GWCA.GW.UIPacket.kShowXunlaiChest: 3 fields [OK]
-    // GWCA.GW.UIPacket.kStartWhisper: 1 fields [OK]
-    // GWCA.GW.UIPacket.kTomeSkillSelection: 3 fields [OK]
-    // GWCA.GW.UIPacket.kUIPositionChanged: 2 fields [OK]
-    // GWCA.GW.UIPacket.kUseKitOnItem: 2 fields [OK]
-    // GWCA.GW.UIPacket.kVendorItems: 4 fields [OK]
-    // GWCA.GW.UIPacket.kVendorQuote: 2 fields [OK]
-    // GWCA.GW.UIPacket.kVendorWindow: 4 fields [OK]
-    // GWCA.GW.UIPacket.kWeaponSetChanged: 4 fields [OK]
-    // GWCA.GW.UIPacket.kWeaponSwap: 2 fields [OK]
-    // GWCA.GW.UIPacket.kWriteToChatLog: 3 fields [OK]
-    // GWCA.GW.UIPacket.kWriteToChatLogWithSender: 3 fields [OK]
     // GWCA.GW.Vec2f: 2 fields [OK]
     // GWCA.GW.Vec3f: 3 fields [OK]
     // GWCA.GW.VisibleEffect: 3 fields [OK]
@@ -568,7 +567,7 @@ public static unsafe partial class GWCA
             // GW::ButtonFrame::MouseAction
             [LibraryImport(DllName, EntryPoint = "?MouseAction@ButtonFrame@GW@@QAE_NW4ActionState@UIPacket@UI@2@@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double MouseAction(nint self, global::Daybreak.API.Interop.GWCA.GW.UIPacket.ActionState actionState2);
+            public static partial double MouseAction(nint self, global::Daybreak.API.Interop.GWCA.GW.UI.UIPacket.ActionState actionState2);
 
             // GW::ButtonFrame::SetLabel
             [LibraryImport(DllName, EntryPoint = "?SetLabel@ButtonFrame@GW@@QAE_NPB_W@Z")]
@@ -8500,7 +8499,440 @@ public static unsafe partial class GWCA
                 kAgentSkillCancelled, // 0x10000026, kAgentSkillPacket
                 kAgentSkillStartedCast, // 0x10000027, wparam = UIPacket::kAgentStartCasting*
                 kMessage_0x10000028,
-                kShowMapEntryMessage, // 0x10000029, wparam = { wchar_t* title, wchar_t* subtitle
+                kShowMapEntryMessage, // 0x10000029, wparam = { wchar_t* title, wchar_t* subtitle }
+                kSetCurrentPlayerData, // 0x1000002A, fired after setting the worldcontext player name
+                kMessage_0x1000002b,
+                kMessage_0x1000002c,
+                kMessage_0x1000002d,
+                kMessage_0x1000002e,
+                kMessage_0x1000002f,
+                kMessage_0x10000030,
+                kMessage_0x10000031,
+                kMessage_0x10000032,
+                kMessage_0x10000033,
+                kPostProcessingEffect, // 0x10000034, Triggered when drunk. wparam = UIPacket::kPostProcessingEffect
+                kMessage_0x10000035,
+                kMessage_0x10000036,
+                kMessage_0x10000037,
+                kHeroAgentAdded, // 0x10000038, hero assigned to agent/inventory/ai mode
+                kHeroDataAdded, // 0x10000039, hero info received from server (name, level etc)
+                kMessage_0x1000003a,
+                kMessage_0x1000003b,
+                kMessage_0x1000003c,
+                kMessage_0x1000003d,
+                kMessage_0x1000003e,
+                kMessage_0x1000003f,
+                kShowXunlaiChest, // 0x10000040
+                kMessage_0x10000041,
+                kMessage_0x10000042,
+                kMessage_0x10000043,
+                kMessage_0x10000044,
+                kMessage_0x10000045,
+                kMinionCountUpdated, // 0x10000046
+                kMoraleChange, // 0x10000047, wparam = {agent id, morale percent }
+                kMessage_0x10000048,
+                kMessage_0x10000049,
+                kMessage_0x1000004a,
+                kMessage_0x1000004b,
+                kMessage_0x1000004c,
+                kMessage_0x1000004d,
+                kMessage_0x1000004e,
+                kMessage_0x1000004f,
+                kLoginStateChanged, // 0x10000050, wparam = {bool is_logged_in, bool unk }
+                kMessage_0x10000051,
+                kMessage_0x10000052,
+                kMessage_0x10000053,
+                kMessage_0x10000054,
+                kEffectAdd, // 0x10000055, wparam = {agent_id, GW::Effect*}
+                kEffectRenew, // 0x10000056, wparam = GW::Effect*
+                kEffectRemove, // 0x10000057, wparam = effect id
+                kMessage_0x10000058,
+                kMessage_0x10000059,
+                kMessage_0x1000005a,
+                kSkillActivated, // 0x1000005b, wparam ={ uint32_t agent_id , uint32_t skill_id }
+                kMessage_0x1000005c,
+                kMessage_0x1000005d,
+                kUpdateSkillbar, // 0x1000005E, wparam ={ uint32_t agent_id , ... }
+                kUpdateSkillsAvailable, // 0x1000005f, Triggered on a skill unlock, profession change or map load
+                kMessage_0x10000060,
+                kMessage_0x10000061,
+                kMessage_0x10000062,
+                kMessage_0x10000063,
+                kPlayerTitleChanged, // 0x10000064, wparam = { uint32_t player_id, uint32_t title_id }
+                kTitleProgressUpdated, // 0x10000065, wparam = title_id
+                kExperienceGained, // 0x10000066, wparam = experience amount
+                kMessage_0x10000067,
+                kMessage_0x10000068,
+                kMessage_0x10000069,
+                kMessage_0x1000006a,
+                kMessage_0x1000006b,
+                kMessage_0x1000006c,
+                kMessage_0x1000006d,
+                kMessage_0x1000006e,
+                kMessage_0x1000006f,
+                kMessage_0x10000070,
+                kMessage_0x10000071,
+                kMessage_0x10000072,
+                kMessage_0x10000073,
+                kMessage_0x10000074,
+                kMessage_0x10000075,
+                kMessage_0x10000076,
+                kMessage_0x10000077,
+                kMessage_0x10000078,
+                kMessage_0x10000079,
+                kMessage_0x1000007a,
+                kMessage_0x1000007b,
+                kMessage_0x1000007c,
+                kMessage_0x1000007d,
+                kMessage_0x1000007e,
+                kWriteToChatLog, // 0x1000007F, wparam = UIPacket::kWriteToChatLog*
+                kWriteToChatLogWithSender, // 0x10000080, wparam = UIPacket::kWriteToChatLogWithSender*
+                kAllyOrGuildMessage, // 0x10000081, wparam = UIPacket::kAllyOrGuildMessage*
+                kPlayerChatMessage, // 0x10000082, wparam = UIPacket::kPlayerChatMessage*
+                kMessage_0x10000083,
+                kFloatingWindowMoved, // 0x10000084, wparam = frame_id
+                kMessage_0x10000085,
+                kMessage_0x10000086,
+                kMessage_0x10000087,
+                kMessage_0x10000088,
+                kMessage_0x10000089,
+                kMessage_0x1000008a,
+                kFriendUpdated, // 0x1000008B, wparam = { GW::Friend*, ... }
+                kMapLoaded, // 0x1000008C
+                kMessage_0x1000008d,
+                kMessage_0x1000008e,
+                kMessage_0x1000008f,
+                kMessage_0x10000090,
+                kMessage_0x10000091,
+                kOpenWhisper, // 0x10000092, wparam = wchar* name
+                kMessage_0x10000093,
+                kMessage_0x10000094,
+                kMessage_0x10000095,
+                kMessage_0x10000096,
+                kMessage_0x10000097,
+                kLoadMapContext, // 0x10000098, wparam = UIPacket::kLoadMapContext
+                kMessage_0x10000099,
+                kMessage_0x1000009a,
+                kMessage_0x1000009b,
+                kDialogueMessageUpdated, // 0x1000009c
+                kLogout, // 0x1000009D, wparam = { bool unknown, bool character_select }
+                kCompassDraw, // 0x1000009E, wparam = UIPacket::kCompassDraw*
+                kMessage_0x1000009f,
+                kMessage_0x100000a0,
+                kMessage_0x100000a1,
+                kOnScreenMessage, // 0x100000A2, wparam = wchar_** encoded_string
+                kDialogButton, // 0x100000A3, wparam = DialogButtonInfo*
+                kMessage_0x100000a4,
+                kMessage_0x100000a5,
+                kDialogBody, // 0x100000A6, wparam = DialogBodyInfo*
+                kMessage_0x100000a7,
+                kMessage_0x100000a8,
+                kMessage_0x100000a9,
+                kMessage_0x100000aa,
+                kMessage_0x100000ab,
+                kMessage_0x100000ac,
+                kMessage_0x100000ad,
+                kMessage_0x100000ae,
+                kMessage_0x100000af,
+                kMessage_0x100000b0,
+                kMessage_0x100000b1,
+                kMessage_0x100000b2,
+                kTargetNPCPartyMember, // 0x100000B3, wparam = { uint32_t unk, uint32_t agent_id }
+                kTargetPlayerPartyMember, // 0x100000B4, wparam = { uint32_t unk, uint32_t player_number }
+                kVendorWindow, // 0x100000B5, wparam = UIPacket::kVendorWindow
+                kMessage_0x100000b6,
+                kMessage_0x100000b7,
+                kMessage_0x100000b8,
+                kVendorItems, // 0x100000B9, wparam = UIPacket::kVendorItems
+                kMessage_0x100000ba,
+                kVendorTransComplete, // 0x100000BB, wparam = *TransactionType
+                kMessage_0x100000bc,
+                kVendorQuote, // 0x100000BD, wparam = UIPacket::kVendorQuote
+                kMessage_0x100000be,
+                kMessage_0x100000bf,
+                kMessage_0x100000c0,
+                kMessage_0x100000c1,
+                kStartMapLoad, // 0x100000C2, wparam = { uint32_t map_id, ...}
+                kMessage_0x100000c3,
+                kMessage_0x100000c4,
+                kMessage_0x100000c5,
+                kMessage_0x100000c6,
+                kWorldMapUpdated, // 0x100000C7, Triggered when an area in the world map has been discovered/updated
+                kMessage_0x100000c8,
+                kMessage_0x100000c9,
+                kMessage_0x100000ca,
+                kMessage_0x100000cb,
+                kMessage_0x100000cc,
+                kMessage_0x100000cd,
+                kMessage_0x100000ce,
+                kMessage_0x100000cf,
+                kMessage_0x100000d0,
+                kMessage_0x100000d1,
+                kMessage_0x100000d2,
+                kMessage_0x100000d3,
+                kMessage_0x100000d4,
+                kMessage_0x100000d5,
+                kMessage_0x100000d6,
+                kMessage_0x100000d7,
+                kMessage_0x100000d8,
+                kMessage_0x100000d9,
+                kGuildMemberUpdated, // 0x100000DA, wparam = { GuildPlayer::name_ptr }
+                kMessage_0x100000db,
+                kMessage_0x100000dc,
+                kMessage_0x100000dd,
+                kMessage_0x100000de,
+                kMessage_0x100000df,
+                kMessage_0x100000e0,
+                kShowHint, // 0x100000E1, wparam = { uint32_t icon_type, wchar_t* message_enc }
+                kMessage_0x100000e2,
+                kMessage_0x100000e3,
+                kMessage_0x100000e4,
+                kMessage_0x100000e5,
+                kMessage_0x100000e6,
+                kMessage_0x100000e7,
+                kMessage_0x100000e8,
+                kWeaponSetSwapComplete, // 0x100000E9, wparam = UIPacket::kWeaponSwap*
+                kWeaponSetSwapCancel, // 0x100000EA
+                kWeaponSetUpdated, // 0x100000EB
+                kUpdateGoldCharacter, // 0x100000EC, wparam = { uint32_t unk, uint32_t gold_character }
+                kUpdateGoldStorage, // 0x100000ED, wparam = { uint32_t unk, uint32_t gold_storage }
+                kInventorySlotUpdated, // 0x100000EE, Triggered when an item is moved into a slot
+                kEquipmentSlotUpdated, // 0x100000EF, Triggered when an item is moved into a slot
+                kMessage_0x100000f0,
+                kInventorySlotCleared, // 0x100000F1, Triggered when an item has been removed from a slot
+                kEquipmentSlotCleared, // 0x100000F2, Triggered when an item has been removed from a slot
+                kMessage_0x100000f3,
+                kMessage_0x100000f4,
+                kMessage_0x100000f5,
+                kMessage_0x100000f6,
+                kMessage_0x100000f7,
+                kMessage_0x100000f8,
+                kMessage_0x100000f9,
+                kPvPWindowContent, // 0x100000FA
+                kMessage_0x100000fb,
+                kMessage_0x100000fc,
+                kMessage_0x100000fd,
+                kMessage_0x100000fe,
+                kMessage_0x100000ff,
+                kMessage_0x10000100,
+                kMessage_0x10000101,
+                kPreStartSalvage, // 0x10000102, { uint32_t item_id, uint32_t kit_id }
+                kTomeSkillSelection, // 0x10000103, wparam = UIPacket::kTomeSkillSelection*
+                kMessage_0x10000104,
+                kTradePlayerUpdated, // 0x10000105, wparam = GW::TraderPlayer*
+                kItemUpdated, // 0x10000106, wparam = UIPacket::kItemUpdated*
+                kMessage_0x10000107,
+                kMessage_0x10000108,
+                kMessage_0x10000109,
+                kMessage_0x1000010a,
+                kMessage_0x1000010b,
+                kMessage_0x1000010c,
+                kMessage_0x1000010d,
+                kMessage_0x1000010e,
+                kMessage_0x1000010f,
+                kMessage_0x10000110,
+                kMapChange, // 0x10000111, wparam = map id
+                kMessage_0x10000112,
+                kMessage_0x10000113,
+                kMessage_0x10000114,
+                kCalledTargetChange, // 0x10000115, wparam = { player_number, target_id }
+                kMessage_0x10000116,
+                kMessage_0x10000117,
+                kMessage_0x10000118,
+                kErrorMessage, // 0x10000119, wparam = { int error_index, wchar_t* error_encoded_string }
+                kPartyHardModeChanged, // 0x1000011A, wparam = { int is_hard_mode }
+                kPartyAddHenchman, // 0x1000011B
+                kPartyRemoveHenchman, // 0x1000011C
+                kMessage_0x1000011d,
+                kPartyAddHero, // 0x1000011E
+                kPartyRemoveHero, // 0x1000011F
+                kMessage_0x10000120,
+                kMessage_0x10000121,
+                kMessage_0x10000122,
+                kMessage_0x10000123,
+                kPartyAddPlayer, // 0x10000124
+                kMessage_0x10000125,
+                kPartyRemovePlayer, // 0x10000126
+                kMessage_0x10000127,
+                kMessage_0x10000128,
+                kMessage_0x10000129,
+                kDisableEnterMissionBtn, // 0x1000012A, wparam = boolean (1 = disabled, 0 = enabled)
+                kMessage_0x1000012b,
+                kMessage_0x1000012c,
+                kShowCancelEnterMissionBtn, // 0x1000012D
+                kMessage_0x1000012e,
+                kPartyDefeated, // 0x1000012F
+                kMessage_0x10000130,
+                kMessage_0x10000131,
+                kMessage_0x10000132,
+                kPartySearchCreated, // 0x10000133, wparam = GW::PartySearch*
+                kPartySearchIdChanged, // 0x10000134, wparam = uint32_t* party_search_id
+                kPartySearchRemoved, // 0x10000135, wparam = uint32_t* party_search_id
+                kPartySearchUpdated, // 0x10000136, wparam = GW::PartySearch*
+                kPartySearchInviteReceived, // 0x10000137, wparam = UIPacket::kPartySearchInviteReceived*
+                kMessage_0x10000138,
+                kPartySearchInviteSent, // 0x10000139
+                kPartyShowConfirmDialog, // 0x1000013A, wparam = UIPacket::kPartyShowConfirmDialog
+                kMessage_0x1000013b,
+                kMessage_0x1000013c,
+                kMessage_0x1000013d,
+                kMessage_0x1000013e,
+                kMessage_0x1000013f,
+                kPreferenceEnumChanged, // 0x10000140, wparam = UiPacket::kPreferenceEnumChanged
+                kPreferenceFlagChanged, // 0x10000141, wparam = UiPacket::kPreferenceFlagChanged
+                kPreferenceValueChanged, // 0x10000142, wparam = UiPacket::kPreferenceValueChanged
+                kUIPositionChanged, // 0x10000143, wparam = UIPacket::kUIPositionChanged
+                kPreBuildLoginScene, // 0x10000144, Called with no args right before login scene is drawn
+                kMessage_0x10000145,
+                kMessage_0x10000146,
+                kMessage_0x10000147,
+                kMessage_0x10000148,
+                kMessage_0x10000149,
+                kMessage_0x1000014a,
+                kMessage_0x1000014b,
+                kMessage_0x1000014c,
+                kMessage_0x1000014d,
+                kQuestAdded, // 0x1000014E, wparam = { quest_id, ... }
+                kQuestDetailsChanged, // 0x1000014F, wparam = { quest_id, ... }
+                kQuestRemoved, // 0x10000150, wparam = { quest_id, ... }
+                kClientActiveQuestChanged, // 0x10000151, wparam = { quest_id, ... }. Triggered when the game requests the current quest to change
+                kMessage_0x10000152,
+                kServerActiveQuestChanged, // 0x10000153, wparam = UIPacket::kServerActiveQuestChanged*. Triggered when the server requests the current quest to change
+                kUnknownQuestRelated, // 0x10000154
+                kMessage_0x10000155,
+                kDungeonComplete, // 0x10000156
+                kMissionComplete, // 0x10000157
+                kMessage_0x10000158,
+                kVanquishComplete, // 0x10000159
+                kObjectiveAdd, // 0x1000015A, wparam = UIPacket::kObjectiveAdd*
+                kObjectiveComplete, // 0x1000015B, wparam = UIPacket::kObjectiveComplete*
+                kObjectiveUpdated, // 0x1000015C, wparam = UIPacket::kObjectiveUpdated*
+                kMessage_0x1000015d,
+                kMessage_0x1000015e,
+                kMessage_0x1000015f,
+                kMessage_0x10000160,
+                kMessage_0x10000161,
+                kMessage_0x10000162,
+                kMessage_0x10000163,
+                kMessage_0x10000164,
+                kTradeSessionStart, // 0x10000165, wparam = { trade_state, player_number }
+                kMessage_0x10000166,
+                kMessage_0x10000167,
+                kMessage_0x10000168,
+                kMessage_0x10000169,
+                kMessage_0x1000016a,
+                kTradeSessionUpdated, // 0x1000016b, no args
+                kMessage_0x1000016c,
+                kMessage_0x1000016d,
+                kMessage_0x1000016e,
+                kMessage_0x1000016f,
+                kMessage_0x10000170,
+                kMessage_0x10000171,
+                kMessage_0x10000172,
+                kMessage_0x10000173,
+                kMessage_0x10000174,
+                kCheckUIState, // 0x10000175
+                kMessage_0x10000176,
+                kMessage_0x10000177,
+                kMessage_0x10000178,
+                kMessage_0x10000178_1, // added to GW 2026-02-26
+                kMessage_0x10000178_2, // added to GW 2026-02-26
+                kMessage_0x10000178_3, // added to GW 2026-02-26
+                kDestroyUIPositionOverlay, // 0x10000179
+                kEnableUIPositionOverlay, // 0x1000017a, wparam = uint32_t enable
+                kMessage_0x1000017b,
+                kGuildHall, // 0x1000017C, wparam = gh key (uint32_t[4])
+                kMessage_0x1000017d,
+                kLeaveGuildHall, // 0x1000017E
+                kTravel, // 0x1000017F
+                kOpenWikiUrl, // 0x10000180, wparam = char* url
+                kMessage_0x10000181,
+                kMessage_0x10000182,
+                kSetPreGameContext_Value0, // wparam = uint32_t value
+                kMessage_0x10000184,
+                kGetPreGameContext_Value0, // lparam = *uint32_t value_out
+                kSetPreGameContext_Value1, // wparam = uint32_t value     , added to GW 2026-02-06
+                kGetPreGameContext_Value1, // lparam = *uint32_t value_out, added to GW 2026-02-06
+                kMessage_0x10000186,
+                kMessage_0x10000187,
+                kMessage_0x10000188,
+                kMessage_0x10000189,
+                kMessage_0x1000018a,
+                kMessage_0x1000018b,
+                kMessage_0x1000018c,
+                kMessage_0x1000018d,
+                kAppendMessageToChat, // 0x1000018E, wparam = wchar_t* message
+                kMessage_0x1000018f,
+                kMessage_0x10000190,
+                kMessage_0x10000191,
+                kMessage_0x10000192,
+                kMessage_0x10000193,
+                kMessage_0x10000194,
+                kMessage_0x10000195,
+                kMessage_0x10000196,
+                kMessage_0x10000197,
+                kMessage_0x10000198,
+                kMessage_0x10000199,
+                kMessage_0x1000019a,
+                kMessage_0x1000019b,
+                kHideHeroPanel, // 0x1000019C, wparam = hero_id
+                kShowHeroPanel, // 0x1000019D, wparam = hero_id
+                kMessage_0x1000019e,
+                kMessage_0x1000019f,
+                kMessage_0x100001a0,
+                kGetInventoryAgentId, // 0x100001A1, wparam = 0, lparam = uint32_t* agent_id_out. Used to fetch which agent is selected
+                kEquipItem, // 0x100001A2, wparam = { item_id, agent_id }
+                kMoveItem, // 0x100001A3, wparam = { item_id, to_bag, to_slot, bool prompt }
+                kMessage_0x100001a4,
+                kMessage_0x100001a5,
+                kInitiateTrade, // 0x100001A6
+                kMessage_0x100001a7,
+                kMessage_0x100001a8,
+                kMessage_0x100001a9,
+                kMessage_0x100001aa,
+                kMessage_0x100001ab,
+                kMessage_0x100001ac,
+                kMessage_0x100001ad,
+                kMessage_0x100001ae,
+                kMessage_0x100001af,
+                kMessage_0x100001b0,
+                kMessage_0x100001b1,
+                kMessage_0x100001b2,
+                kMessage_0x100001b3,
+                kMessage_0x100001b4,
+                kMessage_0x100001b5,
+                kInventoryAgentChanged, // 0x100001B6, Triggered when inventory needs updating due to agent change; no args
+                kMessage_0x100001b7,
+                kMessage_0x100001b8,
+                kMessage_0x100001b9,
+                kMessage_0x100001ba,
+                kMessage_0x100001bb,
+                kMessage_0x100001bc,
+                kMessage_0x100001bd,
+                kPromptSaveTemplate, // 0x100001be
+                kOpenTemplate, // 0x100001Bf, wparam = GW::UI::ChatTemplate*
+                kSendLoadSkillTemplate = 0x30000000 | 0x3, // wparam = SkillbarMgr::SkillTemplate*
+                kSendPingWeaponSet = 0x30000000 | 0x4, // wparam = UIPacket::kSendPingWeaponSet*
+                kSendMoveItem = 0x30000000 | 0x5, // wparam = UIPacket::kSendMoveItem*
+                kSendMerchantRequestQuote = 0x30000000 | 0x6, // wparam = UIPacket::kSendMerchantRequestQuote*
+                kSendMerchantTransactItem = 0x30000000 | 0x7, // wparam = UIPacket::kSendMerchantTransactItem*
+                kSendUseItem = 0x30000000 | 0x8, // wparam = UIPacket::kSendUseItem*
+                kSendSetActiveQuest = 0x30000000 | 0x9, // wparam = uint32_t quest_id
+                kSendAbandonQuest = 0x30000000 | 0xA, // wparam = uint32_t quest_id
+                kSendChangeTarget = 0x30000000 | 0xB, // wparam = UIPacket::kSendChangeTarget* // e.g. tell the gw client to focus on a different target
+                kSendCallTarget = 0x30000000 | 0x13, // wparam = { uint32_t call_type, uint32_t agent_id } // also used to broadcast morale, death penalty, "I'm following X", etc
+                kSendDialog = 0x30000000 | 0x16, // wparam = dialog_id // internal use
+                kStartWhisper = 0x30000000 | 0x17, // wparam = UIPacket::kStartWhisper*
+                kGetSenderColor = 0x30000000 | 0x18, // wparam = UIPacket::kGetColor* // Get chat sender color depending on channel, output object passed by reference
+                kGetMessageColor = 0x30000000 | 0x19, // wparam = UIPacket::kGetColor* // Get chat message color depending on channel, output object passed by reference
+                kSendChatMessage = 0x30000000 | 0x1B, // wparam = UIPacket::kSendChatMessage*
+                kLogChatMessage = 0x30000000 | 0x1D, // wparam = UIPacket::kLogChatMessage*. Triggered when a message wants to be added to the persistent chat log.
+                kRecvWhisper = 0x30000000 | 0x1E, // wparam = UIPacket::kRecvWhisper*
+                kPrintChatMessage = 0x30000000 | 0x1F, // wparam = UIPacket::kPrintChatMessage*. Triggered when a message wants to be added to the in-game chat window.
+                kSendWorldAction = 0x30000000 | 0x20, // wparam = UIPacket::kSendWorldAction*
+                kSetRendererValue = 0x30000000 | 0x21, // wparam = UIPacket::kSetRendererValue
+                kIdentifyItem = 0x30000000 | 0x22, // wparam = UIPacket::kUseKitOnItem
+                kSalvageItem = 0x30000000 | 0x23, // wparam = UIPacket::kUseKitOnItem
             }
 
             public enum WindowID : uint
@@ -8554,19 +8986,19 @@ public static unsafe partial class GWCA
                 WindowID_Hero7 = 0x61,
                 WindowID_Count = 0x69,
             }
-        }
 
-        public static partial class UIPacket
-        {
-
-            public enum ActionState : uint
+            public static partial class UIPacket
             {
-                MouseDown = 0x6,
-                MouseUp = 0x7,
-                MouseClick = 0x8,
-                MouseDoubleClick = 0x9,
-                DragRelease = 0xb,
-                KeyDown = 0xe,
+
+                public enum ActionState : uint
+                {
+                    MouseDown = 0x6,
+                    MouseUp = 0x7,
+                    MouseClick = 0x8,
+                    MouseDoubleClick = 0x9,
+                    DragRelease = 0xb,
+                    KeyDown = 0xe,
+                }
             }
         }
     }
@@ -14068,6 +14500,439 @@ namespace Daybreak.API.Interop.GuildWars
         kAgentSkillStartedCast,
         kMessage_0x10000028,
         kShowMapEntryMessage,
+        kSetCurrentPlayerData,
+        kMessage_0x1000002b,
+        kMessage_0x1000002c,
+        kMessage_0x1000002d,
+        kMessage_0x1000002e,
+        kMessage_0x1000002f,
+        kMessage_0x10000030,
+        kMessage_0x10000031,
+        kMessage_0x10000032,
+        kMessage_0x10000033,
+        kPostProcessingEffect,
+        kMessage_0x10000035,
+        kMessage_0x10000036,
+        kMessage_0x10000037,
+        kHeroAgentAdded,
+        kHeroDataAdded,
+        kMessage_0x1000003a,
+        kMessage_0x1000003b,
+        kMessage_0x1000003c,
+        kMessage_0x1000003d,
+        kMessage_0x1000003e,
+        kMessage_0x1000003f,
+        kShowXunlaiChest,
+        kMessage_0x10000041,
+        kMessage_0x10000042,
+        kMessage_0x10000043,
+        kMessage_0x10000044,
+        kMessage_0x10000045,
+        kMinionCountUpdated,
+        kMoraleChange,
+        kMessage_0x10000048,
+        kMessage_0x10000049,
+        kMessage_0x1000004a,
+        kMessage_0x1000004b,
+        kMessage_0x1000004c,
+        kMessage_0x1000004d,
+        kMessage_0x1000004e,
+        kMessage_0x1000004f,
+        kLoginStateChanged,
+        kMessage_0x10000051,
+        kMessage_0x10000052,
+        kMessage_0x10000053,
+        kMessage_0x10000054,
+        kEffectAdd,
+        kEffectRenew,
+        kEffectRemove,
+        kMessage_0x10000058,
+        kMessage_0x10000059,
+        kMessage_0x1000005a,
+        kSkillActivated,
+        kMessage_0x1000005c,
+        kMessage_0x1000005d,
+        kUpdateSkillbar,
+        kUpdateSkillsAvailable,
+        kMessage_0x10000060,
+        kMessage_0x10000061,
+        kMessage_0x10000062,
+        kMessage_0x10000063,
+        kPlayerTitleChanged,
+        kTitleProgressUpdated,
+        kExperienceGained,
+        kMessage_0x10000067,
+        kMessage_0x10000068,
+        kMessage_0x10000069,
+        kMessage_0x1000006a,
+        kMessage_0x1000006b,
+        kMessage_0x1000006c,
+        kMessage_0x1000006d,
+        kMessage_0x1000006e,
+        kMessage_0x1000006f,
+        kMessage_0x10000070,
+        kMessage_0x10000071,
+        kMessage_0x10000072,
+        kMessage_0x10000073,
+        kMessage_0x10000074,
+        kMessage_0x10000075,
+        kMessage_0x10000076,
+        kMessage_0x10000077,
+        kMessage_0x10000078,
+        kMessage_0x10000079,
+        kMessage_0x1000007a,
+        kMessage_0x1000007b,
+        kMessage_0x1000007c,
+        kMessage_0x1000007d,
+        kMessage_0x1000007e,
+        kWriteToChatLog,
+        kWriteToChatLogWithSender,
+        kAllyOrGuildMessage,
+        kPlayerChatMessage,
+        kMessage_0x10000083,
+        kFloatingWindowMoved,
+        kMessage_0x10000085,
+        kMessage_0x10000086,
+        kMessage_0x10000087,
+        kMessage_0x10000088,
+        kMessage_0x10000089,
+        kMessage_0x1000008a,
+        kFriendUpdated,
+        kMapLoaded,
+        kMessage_0x1000008d,
+        kMessage_0x1000008e,
+        kMessage_0x1000008f,
+        kMessage_0x10000090,
+        kMessage_0x10000091,
+        kOpenWhisper,
+        kMessage_0x10000093,
+        kMessage_0x10000094,
+        kMessage_0x10000095,
+        kMessage_0x10000096,
+        kMessage_0x10000097,
+        kLoadMapContext,
+        kMessage_0x10000099,
+        kMessage_0x1000009a,
+        kMessage_0x1000009b,
+        kDialogueMessageUpdated,
+        kLogout,
+        kCompassDraw,
+        kMessage_0x1000009f,
+        kMessage_0x100000a0,
+        kMessage_0x100000a1,
+        kOnScreenMessage,
+        kDialogButton,
+        kMessage_0x100000a4,
+        kMessage_0x100000a5,
+        kDialogBody,
+        kMessage_0x100000a7,
+        kMessage_0x100000a8,
+        kMessage_0x100000a9,
+        kMessage_0x100000aa,
+        kMessage_0x100000ab,
+        kMessage_0x100000ac,
+        kMessage_0x100000ad,
+        kMessage_0x100000ae,
+        kMessage_0x100000af,
+        kMessage_0x100000b0,
+        kMessage_0x100000b1,
+        kMessage_0x100000b2,
+        kTargetNPCPartyMember,
+        kTargetPlayerPartyMember,
+        kVendorWindow,
+        kMessage_0x100000b6,
+        kMessage_0x100000b7,
+        kMessage_0x100000b8,
+        kVendorItems,
+        kMessage_0x100000ba,
+        kVendorTransComplete,
+        kMessage_0x100000bc,
+        kVendorQuote,
+        kMessage_0x100000be,
+        kMessage_0x100000bf,
+        kMessage_0x100000c0,
+        kMessage_0x100000c1,
+        kStartMapLoad,
+        kMessage_0x100000c3,
+        kMessage_0x100000c4,
+        kMessage_0x100000c5,
+        kMessage_0x100000c6,
+        kWorldMapUpdated,
+        kMessage_0x100000c8,
+        kMessage_0x100000c9,
+        kMessage_0x100000ca,
+        kMessage_0x100000cb,
+        kMessage_0x100000cc,
+        kMessage_0x100000cd,
+        kMessage_0x100000ce,
+        kMessage_0x100000cf,
+        kMessage_0x100000d0,
+        kMessage_0x100000d1,
+        kMessage_0x100000d2,
+        kMessage_0x100000d3,
+        kMessage_0x100000d4,
+        kMessage_0x100000d5,
+        kMessage_0x100000d6,
+        kMessage_0x100000d7,
+        kMessage_0x100000d8,
+        kMessage_0x100000d9,
+        kGuildMemberUpdated,
+        kMessage_0x100000db,
+        kMessage_0x100000dc,
+        kMessage_0x100000dd,
+        kMessage_0x100000de,
+        kMessage_0x100000df,
+        kMessage_0x100000e0,
+        kShowHint,
+        kMessage_0x100000e2,
+        kMessage_0x100000e3,
+        kMessage_0x100000e4,
+        kMessage_0x100000e5,
+        kMessage_0x100000e6,
+        kMessage_0x100000e7,
+        kMessage_0x100000e8,
+        kWeaponSetSwapComplete,
+        kWeaponSetSwapCancel,
+        kWeaponSetUpdated,
+        kUpdateGoldCharacter,
+        kUpdateGoldStorage,
+        kInventorySlotUpdated,
+        kEquipmentSlotUpdated,
+        kMessage_0x100000f0,
+        kInventorySlotCleared,
+        kEquipmentSlotCleared,
+        kMessage_0x100000f3,
+        kMessage_0x100000f4,
+        kMessage_0x100000f5,
+        kMessage_0x100000f6,
+        kMessage_0x100000f7,
+        kMessage_0x100000f8,
+        kMessage_0x100000f9,
+        kPvPWindowContent,
+        kMessage_0x100000fb,
+        kMessage_0x100000fc,
+        kMessage_0x100000fd,
+        kMessage_0x100000fe,
+        kMessage_0x100000ff,
+        kMessage_0x10000100,
+        kMessage_0x10000101,
+        kPreStartSalvage,
+        kTomeSkillSelection,
+        kMessage_0x10000104,
+        kTradePlayerUpdated,
+        kItemUpdated,
+        kMessage_0x10000107,
+        kMessage_0x10000108,
+        kMessage_0x10000109,
+        kMessage_0x1000010a,
+        kMessage_0x1000010b,
+        kMessage_0x1000010c,
+        kMessage_0x1000010d,
+        kMessage_0x1000010e,
+        kMessage_0x1000010f,
+        kMessage_0x10000110,
+        kMapChange,
+        kMessage_0x10000112,
+        kMessage_0x10000113,
+        kMessage_0x10000114,
+        kCalledTargetChange,
+        kMessage_0x10000116,
+        kMessage_0x10000117,
+        kMessage_0x10000118,
+        kErrorMessage,
+        kPartyHardModeChanged,
+        kPartyAddHenchman,
+        kPartyRemoveHenchman,
+        kMessage_0x1000011d,
+        kPartyAddHero,
+        kPartyRemoveHero,
+        kMessage_0x10000120,
+        kMessage_0x10000121,
+        kMessage_0x10000122,
+        kMessage_0x10000123,
+        kPartyAddPlayer,
+        kMessage_0x10000125,
+        kPartyRemovePlayer,
+        kMessage_0x10000127,
+        kMessage_0x10000128,
+        kMessage_0x10000129,
+        kDisableEnterMissionBtn,
+        kMessage_0x1000012b,
+        kMessage_0x1000012c,
+        kShowCancelEnterMissionBtn,
+        kMessage_0x1000012e,
+        kPartyDefeated,
+        kMessage_0x10000130,
+        kMessage_0x10000131,
+        kMessage_0x10000132,
+        kPartySearchCreated,
+        kPartySearchIdChanged,
+        kPartySearchRemoved,
+        kPartySearchUpdated,
+        kPartySearchInviteReceived,
+        kMessage_0x10000138,
+        kPartySearchInviteSent,
+        kPartyShowConfirmDialog,
+        kMessage_0x1000013b,
+        kMessage_0x1000013c,
+        kMessage_0x1000013d,
+        kMessage_0x1000013e,
+        kMessage_0x1000013f,
+        kPreferenceEnumChanged,
+        kPreferenceFlagChanged,
+        kPreferenceValueChanged,
+        kUIPositionChanged,
+        kPreBuildLoginScene,
+        kMessage_0x10000145,
+        kMessage_0x10000146,
+        kMessage_0x10000147,
+        kMessage_0x10000148,
+        kMessage_0x10000149,
+        kMessage_0x1000014a,
+        kMessage_0x1000014b,
+        kMessage_0x1000014c,
+        kMessage_0x1000014d,
+        kQuestAdded,
+        kQuestDetailsChanged,
+        kQuestRemoved,
+        kClientActiveQuestChanged,
+        kMessage_0x10000152,
+        kServerActiveQuestChanged,
+        kUnknownQuestRelated,
+        kMessage_0x10000155,
+        kDungeonComplete,
+        kMissionComplete,
+        kMessage_0x10000158,
+        kVanquishComplete,
+        kObjectiveAdd,
+        kObjectiveComplete,
+        kObjectiveUpdated,
+        kMessage_0x1000015d,
+        kMessage_0x1000015e,
+        kMessage_0x1000015f,
+        kMessage_0x10000160,
+        kMessage_0x10000161,
+        kMessage_0x10000162,
+        kMessage_0x10000163,
+        kMessage_0x10000164,
+        kTradeSessionStart,
+        kMessage_0x10000166,
+        kMessage_0x10000167,
+        kMessage_0x10000168,
+        kMessage_0x10000169,
+        kMessage_0x1000016a,
+        kTradeSessionUpdated,
+        kMessage_0x1000016c,
+        kMessage_0x1000016d,
+        kMessage_0x1000016e,
+        kMessage_0x1000016f,
+        kMessage_0x10000170,
+        kMessage_0x10000171,
+        kMessage_0x10000172,
+        kMessage_0x10000173,
+        kMessage_0x10000174,
+        kCheckUIState,
+        kMessage_0x10000176,
+        kMessage_0x10000177,
+        kMessage_0x10000178,
+        kMessage_0x10000178_1,
+        kMessage_0x10000178_2,
+        kMessage_0x10000178_3,
+        kDestroyUIPositionOverlay,
+        kEnableUIPositionOverlay,
+        kMessage_0x1000017b,
+        kGuildHall,
+        kMessage_0x1000017d,
+        kLeaveGuildHall,
+        kTravel,
+        kOpenWikiUrl,
+        kMessage_0x10000181,
+        kMessage_0x10000182,
+        kSetPreGameContext_Value0,
+        kMessage_0x10000184,
+        kGetPreGameContext_Value0,
+        kSetPreGameContext_Value1,
+        kGetPreGameContext_Value1,
+        kMessage_0x10000186,
+        kMessage_0x10000187,
+        kMessage_0x10000188,
+        kMessage_0x10000189,
+        kMessage_0x1000018a,
+        kMessage_0x1000018b,
+        kMessage_0x1000018c,
+        kMessage_0x1000018d,
+        kAppendMessageToChat,
+        kMessage_0x1000018f,
+        kMessage_0x10000190,
+        kMessage_0x10000191,
+        kMessage_0x10000192,
+        kMessage_0x10000193,
+        kMessage_0x10000194,
+        kMessage_0x10000195,
+        kMessage_0x10000196,
+        kMessage_0x10000197,
+        kMessage_0x10000198,
+        kMessage_0x10000199,
+        kMessage_0x1000019a,
+        kMessage_0x1000019b,
+        kHideHeroPanel,
+        kShowHeroPanel,
+        kMessage_0x1000019e,
+        kMessage_0x1000019f,
+        kMessage_0x100001a0,
+        kGetInventoryAgentId,
+        kEquipItem,
+        kMoveItem,
+        kMessage_0x100001a4,
+        kMessage_0x100001a5,
+        kInitiateTrade,
+        kMessage_0x100001a7,
+        kMessage_0x100001a8,
+        kMessage_0x100001a9,
+        kMessage_0x100001aa,
+        kMessage_0x100001ab,
+        kMessage_0x100001ac,
+        kMessage_0x100001ad,
+        kMessage_0x100001ae,
+        kMessage_0x100001af,
+        kMessage_0x100001b0,
+        kMessage_0x100001b1,
+        kMessage_0x100001b2,
+        kMessage_0x100001b3,
+        kMessage_0x100001b4,
+        kMessage_0x100001b5,
+        kInventoryAgentChanged,
+        kMessage_0x100001b7,
+        kMessage_0x100001b8,
+        kMessage_0x100001b9,
+        kMessage_0x100001ba,
+        kMessage_0x100001bb,
+        kMessage_0x100001bc,
+        kMessage_0x100001bd,
+        kPromptSaveTemplate,
+        kOpenTemplate,
+        kSendLoadSkillTemplate = 0x30000000 | 0x3,
+        kSendPingWeaponSet = 0x30000000 | 0x4,
+        kSendMoveItem = 0x30000000 | 0x5,
+        kSendMerchantRequestQuote = 0x30000000 | 0x6,
+        kSendMerchantTransactItem = 0x30000000 | 0x7,
+        kSendUseItem = 0x30000000 | 0x8,
+        kSendSetActiveQuest = 0x30000000 | 0x9,
+        kSendAbandonQuest = 0x30000000 | 0xA,
+        kSendChangeTarget = 0x30000000 | 0xB,
+        kSendCallTarget = 0x30000000 | 0x13,
+        kSendDialog = 0x30000000 | 0x16,
+        kStartWhisper = 0x30000000 | 0x17,
+        kGetSenderColor = 0x30000000 | 0x18,
+        kGetMessageColor = 0x30000000 | 0x19,
+        kSendChatMessage = 0x30000000 | 0x1B,
+        kLogChatMessage = 0x30000000 | 0x1D,
+        kRecvWhisper = 0x30000000 | 0x1E,
+        kPrintChatMessage = 0x30000000 | 0x1F,
+        kSendWorldAction = 0x30000000 | 0x20,
+        kSetRendererValue = 0x30000000 | 0x21,
+        kIdentifyItem = 0x30000000 | 0x22,
+        kSalvageItem = 0x30000000 | 0x23,
     }
 
     public enum WindowID : uint
@@ -17430,7 +18295,7 @@ namespace Daybreak.API.Interop.GuildWars
     {
         public uint FrameId;
         public uint ChildOffsetId;
-        public global::Daybreak.API.Interop.GWCA.GW.UIPacket.ActionState CurrentState;
+        public global::Daybreak.API.Interop.GWCA.GW.UI.UIPacket.ActionState CurrentState;
         public nint Wparam;
         public nint Lparam;
     }
@@ -17821,527 +18686,3 @@ namespace Daybreak.API.Interop.GuildWars
     public unsafe struct VisibleEffectList { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.VisibleEffect> Value; }
     public unsafe struct PacketCallback { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Value; }
 }
-
-// ═══════════ PARSER DEBUG LINES ═══════════
-// [STRUCT-START] line 614: kDialogueMessage (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 620: kDialogueMessage with 5 fields
-// [STRUCT-START] line 621: kErrorMessage (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 624: kErrorMessage with 2 fields
-// [STRUCT-START] line 625: kAgentSkillPacket (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 628: kAgentSkillPacket with 2 fields
-// [STRUCT-START] line 629: kLoadMapContext (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 637: kLoadMapContext with 7 fields
-// [STRUCT-START] line 639: kMouseCoordsClick (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 646: kMouseCoordsClick with 6 fields
-// [STRUCT-START] line 647: kUseKitOnItem (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 650: kUseKitOnItem with 2 fields
-// [STRUCT-START] line 651: kShowXunlaiChest (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 655: kShowXunlaiChest with 3 fields
-// [STRUCT-START] line 656: kMoveItem (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 661: kMoveItem with 4 fields
-// [STRUCT-START] line 662: kResize (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 673: kResize with 9 fields
-// [STRUCT-START] line 674: kTomeSkillSelection (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 678: kTomeSkillSelection with 3 fields
-// [STRUCT-START] line 679: kMeasureContent (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 684: kMeasureContent with 4 fields
-// [STRUCT-START] line 685: kSetLayout (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 692: kSetLayout with 6 fields
-// [STRUCT-START] line 693: kSetAgentProfession (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 697: kSetAgentProfession with 3 fields
-// [STRUCT-START] line 698: kWeaponSwap (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 701: kWeaponSwap with 2 fields
-// [STRUCT-START] line 702: kWeaponSetChanged (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 707: kWeaponSetChanged with 4 fields
-// [STRUCT-START] line 708: kChangeTarget (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 715: kChangeTarget with 6 fields
-// [STRUCT-START] line 716: kSendLoadSkillTemplate (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 719: kSendLoadSkillTemplate with 2 fields
-// [STRUCT-START] line 720: kVendorWindow (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 725: kVendorWindow with 4 fields
-// [STRUCT-START] line 726: kVendorQuote (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 729: kVendorQuote with 2 fields
-// [STRUCT-START] line 730: kVendorItems (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 735: kVendorItems with 4 fields
-// [STRUCT-START] line 736: kSetRendererValue (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 740: kSetRendererValue with 3 fields
-// [STRUCT-START] line 741: kEffectAdd (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 744: kEffectAdd with 2 fields
-// [STRUCT-START] line 745: kAgentSpeechBubble (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 750: kAgentSpeechBubble with 4 fields
-// [STRUCT-START] line 751: kAgentSkillStartedCast (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 756: kAgentSkillStartedCast with 4 fields
-// [STRUCT-START] line 757: kPreStartSalvage (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 760: kPreStartSalvage with 2 fields
-// [STRUCT-START] line 761: kServerActiveQuestChanged (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 767: kServerActiveQuestChanged with 5 fields
-// [STRUCT-START] line 768: kPrintChatMessage (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 773: kPrintChatMessage with 4 fields
-// [STRUCT-START] line 774: kPartyShowConfirmDialog (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 778: kPartyShowConfirmDialog with 3 fields
-// [STRUCT-START] line 779: kUIPositionChanged (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 782: kUIPositionChanged with 2 fields
-// [STRUCT-START] line 783: kPreferenceFlagChanged (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 786: kPreferenceFlagChanged with 2 fields
-// [STRUCT-START] line 787: kPreferenceValueChanged (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 790: kPreferenceValueChanged with 2 fields
-// [STRUCT-START] line 791: kPreferenceEnumChanged (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 794: kPreferenceEnumChanged with 2 fields
-// [STRUCT-START] line 795: kPartySearchInvite (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 798: kPartySearchInvite with 2 fields
-// [STRUCT-START] line 799: kPostProcessingEffect (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 802: kPostProcessingEffect with 2 fields
-// [STRUCT-START] line 803: kLogout (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 806: kLogout with 2 fields
-// [STRUCT-START] line 809: kKeyAction (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 813: kKeyAction with 3 fields
-// [STRUCT-START] line 814: kMouseClick (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 820: kMouseClick with 5 fields
-// [STRUCT-START] line 829: kMouseAction (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 835: kMouseAction with 5 fields
-// [STRUCT-START] line 836: kWriteToChatLog (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 840: kWriteToChatLog with 3 fields
-// [STRUCT-START] line 841: kPlayerChatMessage (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 845: kPlayerChatMessage with 3 fields
-// [STRUCT-START] line 847: kInteractAgent (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 850: kInteractAgent with 2 fields
-// [STRUCT-START] line 852: kSendChangeTarget (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 855: kSendChangeTarget with 2 fields
-// [STRUCT-START] line 857: kSendCallTarget (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 860: kSendCallTarget with 2 fields
-// [STRUCT-START] line 862: kGetColor (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 865: kGetColor with 2 fields
-// [STRUCT-START] line 867: kWriteToChatLogWithSender (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 871: kWriteToChatLogWithSender with 3 fields
-// [STRUCT-START] line 873: kSendPingWeaponSet (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 877: kSendPingWeaponSet with 3 fields
-// [STRUCT-START] line 878: kSendMoveItem (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 883: kSendMoveItem with 4 fields
-// [STRUCT-START] line 884: kSendMerchantRequestQuote (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 887: kSendMerchantRequestQuote with 2 fields
-// [STRUCT-START] line 888: kSendMerchantTransactItem (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 894: kSendMerchantTransactItem with 5 fields
-// [STRUCT-START] line 895: kSendUseItem (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 898: kSendUseItem with 2 fields
-// [STRUCT-START] line 899: kSendChatMessage (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 902: kSendChatMessage with 2 fields
-// [STRUCT-START] line 903: kLogChatMessage (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 906: kLogChatMessage with 2 fields
-// [STRUCT-START] line 907: kRecvWhisper (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 911: kRecvWhisper with 3 fields
-// [STRUCT-START] line 912: kStartWhisper (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 914: kStartWhisper with 1 fields
-// [STRUCT-START] line 915: kCompassDraw (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 920: kCompassDraw with 4 fields
-// [STRUCT-START] line 921: kObjectiveAdd (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 925: kObjectiveAdd with 3 fields
-// [STRUCT-START] line 926: kObjectiveComplete (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 928: kObjectiveComplete with 1 fields
-// [STRUCT-START] line 929: kObjectiveUpdated (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 931: kObjectiveUpdated with 1 fields
-// [STRUCT-START] line 933: kItemUpdated (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 948: kItemUpdated with 14 fields
-// [STRUCT-START] line 949: kInventorySlotUpdated (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 954: kInventorySlotUpdated with 4 fields
-// [STRUCT-START] line 955: kSendWorldAction (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 959: kSendWorldAction with 3 fields
-// [STRUCT-START] line 960: kAllyOrGuildMessage (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 965: kAllyOrGuildMessage with 4 fields
-// [STRUCT-START] line 10: AccountUnlockedCount (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 14: AccountUnlockedCount with 3 fields
-// [STRUCT-START] line 16: AccountUnlockedItemInfo (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 20: AccountUnlockedItemInfo with 3 fields
-// [STRUCT-START] line 22: AccountContext (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 32: AccountContext with 9 fields
-// [STRUCT-START] line 13: AgentSummaryInfo (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 27: AgentSummaryInfo with 10 fields
-// [STRUCT-START] line 29: AgentContext (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 58: AgentContext with 27 fields
-// [STRUCT-START] line 17: ProgressBarContext (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 24: ProgressBarContext with 5 fields
-// [STRUCT-START] line 26: CharContext (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 61: CharContext with 34 fields
-// [STRUCT-START] line 4: Cinematic (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 8: Cinematic with 2 fields
-// [STRUCT-START] line 6: GadgetInfo (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 11: GadgetInfo with 4 fields
-// [STRUCT-START] line 13: GadgetContext (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 16: GadgetContext with 1 fields
-// [STRUCT-START] line 22: GameContext (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 46: GameContext with 23 fields
-// [STRUCT-START] line 10: GameplayContext (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 14: GameplayContext with 3 fields
-// [STRUCT-START] line 15: GuildContext (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 51: GuildContext with 34 fields
-// [STRUCT-START] line 14: ItemContext (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 27: ItemContext with 12 fields
-// [STRUCT-START] line 20: PropsContext (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 27: PropsContext with 6 fields
-// [STRUCT-START] line 30: MapStaticData (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 68: MapStaticData with 37 fields
-// [STRUCT-START] line 77: PathNode (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 84: PathNode with 6 fields
-// [STRUCT-START] line 90: NodeCache (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 94: NodeCache with 3 fields
-// [STRUCT-START] line 97: PathWaypoint (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 104: PathWaypoint with 6 fields
-// [STRUCT-START] line 107: PathContext (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 123: PathContext with 15 fields
-// [STRUCT-START] line 129: PathEngineContext (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 136: PathEngineContext with 6 fields
-// [STRUCT-START] line 139: MapContext (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 197: MapContext with 57 fields
-// [STRUCT-START] line 14: PartySearchContext (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 20: PartySearchContext with 5 fields
-// [STRUCT-START] line 22: PartyContext (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 43: PartyContext with 16 fields
-// [STRUCT-START] line 12: LoginCharacter (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 15: LoginCharacter with 2 fields
-// [STRUCT-START] line 18: CharacterInformation (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 30: CharacterInformation with 4 fields
-// [STRUCT-START] line 31: PreGameContext (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 39: PreGameContext with 7 fields
-// [STRUCT-START] line 9: TextCache (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 11: TextCache with 1 fields
-// [STRUCT-START] line 13: SubStruct1 (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 15: SubStruct1 with 1 fields
-// [STRUCT-START] line 18: SubStructUnk (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 28: SubStructUnk with 9 fields
-// [STRUCT-START] line 30: TextParser (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 45: TextParser with 14 fields
-// [STRUCT-START] line 10: TradeItem (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 13: TradeItem with 2 fields
-// [STRUCT-START] line 14: TradePlayer (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 17: TradePlayer with 2 fields
-// [STRUCT-START] line 19: TradeContext (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 38: TradeContext with 4 fields
-// [STRUCT-START] line 48: PartyAlly (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 52: PartyAlly with 3 fields
-// [STRUCT-START] line 59: ControlledMinions (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 62: ControlledMinions with 2 fields
-// [STRUCT-START] line 63: DupeSkill (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 66: DupeSkill with 2 fields
-// [STRUCT-START] line 67: ProfessionState (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 77: ProfessionState with 5 fields
-// [STRUCT-START] line 80: AccountInfo (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 88: AccountInfo with 7 fields
-// [STRUCT-START] line 91: PartyMemberMoraleInfo (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 97: PartyMemberMoraleInfo with 4 fields
-// [STRUCT-START] line 99: PartyMoraleLink (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 103: PartyMoraleLink with 3 fields
-// [STRUCT-START] line 106: PetInfo (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 115: PetInfo with 7 fields
-// [STRUCT-START] line 118: PlayerControlledCharacter (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 196: PlayerControlledCharacter with 77 fields
-// [STRUCT-START] line 200: WorldContext (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 309: WorldContext with 107 fields
-// [STRUCT-END] line 19: Mat4x3f with 13 fields
-// [STRUCT-START] line 21: Vec2f (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 37: Vec2f with 2 fields
-// [STRUCT-START] line 39: Vec3f (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 62: Vec3f with 3 fields
-// [STRUCT-START] line 245: GamePos (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 267: GamePos with 3 fields
-// [STRUCT-START] line 16: THash (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 22: THash with 5 fields
-// [STRUCT-END] line 33: THashLink with 6 fields
-// [STRUCT-START] line 6: TLink (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 49: TLink with 2 fields
-// [STRUCT-START] line 52: TList (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 121: TList with 2 fields
-// [STRUCT-START] line 4: ObjectPoolBlock (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 7: ObjectPoolBlock with 2 fields
-// [STRUCT-START] line 10: ObjectPool (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 14: ObjectPool with 3 fields
-// [STRUCT-START] line 5: PrioQ (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 8: PrioQ with 2 fields
-// [STRUCT-START] line 12: PrioQLink (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 18: PrioQLink with 4 fields
-// [STRUCT-START] line 22: VisibleEffect (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 26: VisibleEffect with 3 fields
-// [STRUCT-START] line 31: EquipmentVTable (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 40: EquipmentVTable with 0 fields
-// [STRUCT-START] line 42: NPCEquipment (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 104: NPCEquipment with 39 fields
-// [STRUCT-START] line 107: PlayerEquipment (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 130: PlayerEquipment with 7 fields
-// [STRUCT-START] line 134: TagInfo (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 140: TagInfo with 4 fields
-// [STRUCT-START] line 146: Agent (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 211: Agent with 43 fields
-// [STRUCT-START] line 213: AgentItem (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 218: AgentItem with 4 fields
-// [STRUCT-START] line 222: AgentGadget (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 228: AgentGadget with 5 fields
-// [STRUCT-START] line 232: AgentLiving (inSkip=False, freeBrace=0)
-// [BRACE] line 292: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 293: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 294: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 295: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 296: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 297: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 298: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 299: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 300: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 301: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 302: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 305: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 306: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 307: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 308: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 309: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 310: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 311: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 312: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 313: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 316: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 317: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 318: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 319: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 320: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 323: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 325: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 326: AgentLiving depth 1->1 (open=1, close=1)
-// [BRACE] line 327: AgentLiving depth 1->0 (open=0, close=1)
-// [STRUCT-END] line 327: AgentLiving with 56 fields
-// [OUT-OF-LINE] line 331: AgentItem* Agent::GetAsAgentItem() {... braces=1
-// [OUT-OF-LINE] line 338: AgentGadget* Agent::GetAsAgentGadget() {... braces=1
-// [OUT-OF-LINE] line 345: AgentLiving* Agent::GetAsAgentLiving() {... braces=1
-// [OUT-OF-LINE] line 352: const AgentItem* Agent::GetAsAgentItem() const {... braces=1
-// [OUT-OF-LINE] line 359: const AgentGadget* Agent::GetAsAgentGadget() const... braces=1
-// [OUT-OF-LINE] line 366: const AgentLiving* Agent::GetAsAgentLiving() const... braces=1
-// [STRUCT-START] line 373: MapAgent (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 399: MapAgent with 13 fields
-// [STRUCT-START] line 401: AgentMovement (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 414: AgentMovement with 12 fields
-// [STRUCT-START] line 416: AgentInfo (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 419: AgentInfo with 1 fields
-// [STRUCT-START] line 11: Attribute (inSkip=False, freeBrace=0)
-// [ATTR-CHECK] line 12: "/* +h0000 */ Constants::Attribute id; // ID of attribute..."
-// [ATTR-LINE] line 12: depth=1, trimmed="/* +h0000 */ Constants::Attribute id; // ID of attribute..."
-// [ATTR-MATCH] line 12: offset=0000, typeAndName="Constants::Attribute id"
-// [ATTR-CHECK] line 13: "/* +h0004 */ uint32_t level_base; // Level of attribute with..."
-// [ATTR-LINE] line 13: depth=1, trimmed="/* +h0004 */ uint32_t level_base; // Level of attribute with..."
-// [ATTR-MATCH] line 13: offset=0004, typeAndName="uint32_t level_base"
-// [ATTR-CHECK] line 14: "/* +h0008 */ uint32_t level; // Level with modifiers..."
-// [ATTR-LINE] line 14: depth=1, trimmed="/* +h0008 */ uint32_t level; // Level with modifiers..."
-// [ATTR-MATCH] line 14: offset=0008, typeAndName="uint32_t level"
-// [ATTR-CHECK] line 15: "/* +h000C */ uint32_t decrement_points; // Points that you w..."
-// [ATTR-LINE] line 15: depth=1, trimmed="/* +h000C */ uint32_t decrement_points; // Points that you w..."
-// [ATTR-MATCH] line 15: offset=000C, typeAndName="uint32_t decrement_points"
-// [ATTR-CHECK] line 16: "/* +h0010 */ uint32_t increment_points; // Points you will n..."
-// [ATTR-LINE] line 16: depth=1, trimmed="/* +h0010 */ uint32_t increment_points; // Points you will n..."
-// [ATTR-MATCH] line 16: offset=0010, typeAndName="uint32_t increment_points"
-// [STRUCT-END] line 17: Attribute with 5 fields
-// [STRUCT-START] line 19: AttributeInfo (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 25: AttributeInfo with 5 fields
-// [STRUCT-START] line 29: PartyAttribute (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 32: PartyAttribute with 2 fields
-// [STRUCT-START] line 6: Camera (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 112: Camera with 56 fields
-// [STRUCT-START] line 19: ButtonFrame (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 26: ButtonFrame with 0 fields
-// [STRUCT-START] line 28: TabsFrame (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 42: TabsFrame with 0 fields
-// [STRUCT-START] line 43: ScrollableFrame (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 76: ScrollableFrame with 0 fields
-// [STRUCT-START] line 79: FrameWithValue (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 89: FrameWithValue with 0 fields
-// [STRUCT-START] line 91: EditableTextFrame (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 97: EditableTextFrame with 0 fields
-// [STRUCT-START] line 148: TextLabelFrame (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 154: TextLabelFrame with 0 fields
-// [STRUCT-START] line 22: Friend (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 30: Friend with 7 fields
-// [STRUCT-START] line 34: FriendList (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 43: FriendList with 8 fields
-// [STRUCT-START] line 10: GHKey (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 16: GHKey with 1 fields
-// [STRUCT-START] line 17: GuildPlayer (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 30: GuildPlayer with 12 fields
-// [STRUCT-START] line 35: GuildHistoryEvent (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 39: GuildHistoryEvent with 3 fields
-// [STRUCT-START] line 44: CapeDesign (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 52: CapeDesign with 7 fields
-// [STRUCT-START] line 55: Guild (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 68: Guild with 12 fields
-// [STRUCT-START] line 73: TownAlliance (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 82: TownAlliance with 8 fields
-// [STRUCT-START] line 16: HeroFlag (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 25: HeroFlag with 8 fields
-// [STRUCT-START] line 28: HeroInfo (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 59: HeroInfo with 30 fields
-// [STRUCT-START] line 62: HeroConstData (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 69: HeroConstData with 6 fields
-// [STRUCT-START] line 42: DyeInfo (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 48: DyeInfo with 1 fields
-// [STRUCT-START] line 51: ItemData (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 57: ItemData with 4 fields
-// [STRUCT-START] line 60: MaterialCost (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 65: MaterialCost with 4 fields
-// [STRUCT-START] line 68: ItemFormula (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 74: ItemFormula with 5 fields
-// [STRUCT-START] line 77: Bag (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 101: Bag with 7 fields
-// [STRUCT-START] line 104: ItemModifier (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 112: ItemModifier with 1 fields
-// [STRUCT-START] line 114: Item (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 153: Item with 26 fields
-// [STRUCT-START] line 156: WeaponSet (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 159: WeaponSet with 2 fields
-// [STRUCT-START] line 162: Inventory (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 210: Inventory with 39 fields
-// [STRUCT-START] line 214: PvPItemUpgradeInfo (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 225: PvPItemUpgradeInfo with 10 fields
-// [STRUCT-START] line 228: PvPItemInfo (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 230: PvPItemInfo with 1 fields
-// [STRUCT-START] line 233: CompositeModelInfo (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 236: CompositeModelInfo with 2 fields
-// [STRUCT-START] line 240: SalvageSessionInfo (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 250: SalvageSessionInfo with 9 fields
-// [STRUCT-START] line 9: MissionMapIcon (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 20: MissionMapIcon with 10 fields
-// [STRUCT-START] line 91: AreaInfo (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 135: AreaInfo with 31 fields
-// [STRUCT-START] line 24: ObserverMatchTeam (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 30: ObserverMatchTeam with 5 fields
-// [STRUCT-START] line 33: ObserverMatch (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 45: ObserverMatch with 11 fields
-// [STRUCT-START] line 11: CharAdjustment (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 16: CharAdjustment with 4 fields
-// [STRUCT-START] line 18: NPC (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 40: NPC with 12 fields
-// [STRUCT-START] line 14: PlayerPartyMember (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 21: PlayerPartyMember with 3 fields
-// [STRUCT-START] line 24: HeroPartyMember (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 31: HeroPartyMember with 6 fields
-// [STRUCT-START] line 34: HenchmanPartyMember (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 39: HenchmanPartyMember with 4 fields
-// [STRUCT-START] line 46: PartyInfo (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 59: PartyInfo with 7 fields
-// [STRUCT-START] line 70: PartySearch (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 84: PartySearch with 13 fields
-// [STRUCT-START] line 6: PathingTrapezoid (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 25: PathingTrapezoid with 14 fields
-// [STRUCT-START] line 28: Node (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 31: Node with 2 fields
-// [STRUCT-START] line 33: XNode (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 38: XNode with 4 fields
-// [STRUCT-START] line 41: YNode (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 45: YNode with 3 fields
-// [STRUCT-START] line 48: SinkNode (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 50: SinkNode with 1 fields
-// [STRUCT-START] line 53: Portal (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 60: Portal with 6 fields
-// [STRUCT-START] line 63: PathingMap (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 83: PathingMap with 19 fields
-// [STRUCT-START] line 86: PropByType (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 89: PropByType with 2 fields
-// [STRUCT-START] line 91: PropModelInfo (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 98: PropModelInfo with 6 fields
-// [STRUCT-START] line 101: RecObject (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 111: RecObject with 9 fields
-// [STRUCT-START] line 114: MapProp (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 133: MapProp with 18 fields
-// [STRUCT-START] line 8: Player (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 29: Player with 15 fields
-// [STRUCT-START] line 12: Quest (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 29: Quest with 11 fields
-// [STRUCT-START] line 32: MissionObjective (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 36: MissionObjective with 3 fields
-// [STRUCT-START] line 14: Skill (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 86: Skill with 48 fields
-// [STRUCT-START] line 89: SkillbarSkill (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 97: SkillbarSkill with 5 fields
-// [STRUCT-START] line 100: SkillbarCast (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 104: SkillbarCast with 3 fields
-// [STRUCT-START] line 108: Skillbar (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 118: Skillbar with 5 fields
-// [STRUCT-START] line 123: Effect (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 133: Effect with 6 fields
-// [STRUCT-START] line 136: Buff (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 141: Buff with 4 fields
-// [STRUCT-START] line 147: AgentEffects (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 151: AgentEffects with 3 fields
-// [STRUCT-START] line 11: Title (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 27: Title with 11 fields
-// [STRUCT-START] line 30: TitleTier (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 35: TitleTier with 3 fields
-// [STRUCT-START] line 38: TitleClientData (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 42: TitleClientData with 3 fields
-// [STRUCT-START] line 16: ChatMessage (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 21: ChatMessage with 4 fields
-// [STRUCT-START] line 25: ChatBuffer (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 30: ChatBuffer with 4 fields
-// [STRUCT-START] line 29: MapTypeInstanceInfo (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 33: MapTypeInstanceInfo with 3 fields
-// [STRUCT-START] line 36: MissionMapSubContext (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 38: MissionMapSubContext with 1 fields
-// [STRUCT-START] line 39: MissionMapSubContext2 (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 49: MissionMapSubContext2 with 9 fields
-// [STRUCT-START] line 52: MissionMapContext (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 65: MissionMapContext with 12 fields
-// [STRUCT-START] line 68: WorldMapContext (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 90: WorldMapContext with 21 fields
-// [STRUCT-START] line 18: TransactionInfo (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 22: TransactionInfo with 1 fields
-// [STRUCT-START] line 24: QuoteInfo (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 28: QuoteInfo with 2 fields
-// [STRUCT-START] line 4: Module (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 15: Module with 0 fields
-// [STRUCT-END] line 37: Mat4x3f with 13 fields
-// [STRUCT-START] line 24: Attribute (inSkip=False, freeBrace=0)
-// [ATTR-CHECK] line 25: "Constants::Attribute attribute = (Constants::Attribute)0xFF;..."
-// [ATTR-SKIP-FUNC] line 25
-// [ATTR-CHECK] line 26: "uint32_t points{};..."
-// [ATTR-LINE] line 26: depth=1, trimmed="uint32_t points{};..."
-// [STRUCT-END] line 27: Attribute with 1 fields
-// [STRUCT-START] line 28: SkillTemplate (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 35: SkillTemplate with 6 fields
-// [UNMATCHED-METHOD] line 47: [handler](HookStatus *status, Packet::StoC::PacketBase *pak)
-// [UNMATCHED-METHOD] line 58: [handler](HookStatus* status, Packet::StoC::PacketBase* pak)
-// [UNMATCHED-METHOD] line 84: bool EmulatePacket(Packet::StoC::Packet<T> *packet) {
-// [STRUCT-START] line 46: CompassPoint (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 51: CompassPoint with 2 fields
-// [STRUCT-START] line 55: ChatTemplate (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 60: ChatTemplate with 3 fields
-// [STRUCT-START] line 62: UIChatMessage (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 66: UIChatMessage with 3 fields
-// [STRUCT-START] line 68: InteractionMessage (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 72: InteractionMessage with 3 fields
-// [STRUCT-START] line 79: FrameRelation (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 87: FrameRelation with 5 fields
-// [STRUCT-START] line 91: FramePosition (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 119: FramePosition with 17 fields
-// [STRUCT-START] line 121: FrameInteractionCallback (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 125: FrameInteractionCallback with 3 fields
-// [STRUCT-START] line 127: Frame (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 227: Frame with 86 fields
-// [STRUCT-START] line 232: AgentNameTagInfo (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 248: AgentNameTagInfo with 15 fields
-// [STRUCT-START] line 251: WindowPosition (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 266: WindowPosition with 3 fields
-// [STRUCT-START] line 268: MapEntryMessage (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 271: MapEntryMessage with 2 fields
-// [STRUCT-START] line 273: DialogBodyInfo (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 277: DialogBodyInfo with 3 fields
-// [STRUCT-START] line 278: DialogButtonInfo (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 283: DialogButtonInfo with 4 fields
-// [STRUCT-START] line 708: FloatingWindow (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 718: FloatingWindow with 9 fields
-// [STRUCT-START] line 733: TooltipInfo (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 742: TooltipInfo with 8 fields
-// [STRUCT-START] line 744: CreateUIComponentPacket (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 751: CreateUIComponentPacket with 6 fields
-// [STRUCT-START] line 28: PacketBase (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 30: PacketBase with 1 fields
-// [STRUCT-START] line 102: Packet (inSkip=False, freeBrace=0)
-// [STRUCT-START] line 990: ItemGeneral_ReuseID (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 1098: ItemGeneral_ReuseID with 0 fields
-// [STRUCT-START] line 7: HookEntry (inSkip=False, freeBrace=1)
-// [STRUCT-END] line 16: HookEntry with 0 fields
-// [UNMATCHED-METHOD] line 23: return [=]<typename... Args>(Args&&... args) { return (c->*m
-// [UNMATCHED-METHOD] line 30: return [=]<typename... Args>(Args&&... args) { return (c->*m
-// [STRUCT-START] line 12: ScannerSectionOffset (inSkip=False, freeBrace=0)
-// [STRUCT-END] line 15: ScannerSectionOffset with 2 fields
-// ═══════════ END DEBUG LINES ═══════════
