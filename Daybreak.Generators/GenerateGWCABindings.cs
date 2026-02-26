@@ -269,6 +269,19 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
             EmitConstantsNode(sb, child, typeMap, namespaceClassNames, 4);
         }
 
+        sb.AppendLine("}"); // Close GWCA class
+        sb.AppendLine("}"); // Close Daybreak.API.Interop namespace
+        
+        // Emit structs and enums into GuildWars namespace for consumer code compatibility
+        // Consumer code uses `using Daybreak.API.Interop.GuildWars;` to access types
+        sb.AppendLine();
+        sb.AppendLine("namespace Daybreak.API.Interop.GuildWars");
+        sb.AppendLine("{");
+        var emittedNames = new HashSet<string>(StringComparer.Ordinal);
+        // Emit enums first - they're often referenced by structs (e.g. Attribute enum vs Attribute struct)
+        EmitEnumsToGuildWarsNamespace(sb, headerRoot, 4, emittedNames);
+        EmitStructsToGuildWarsNamespace(sb, headerRoot, typeMap, 4, emittedNames);
+        EmitTypeAliasesToGuildWarsNamespace(sb, headerRoot, typeMap, 4, emittedNames);
         sb.AppendLine("}");
 
         // Write to Daybreak.API/Interop/GWCA.cs so LibraryImport generator can process it
@@ -295,14 +308,15 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         sb.AppendLine("using System.Runtime.InteropServices;");
         sb.AppendLine("using System.Runtime.InteropServices.Marshalling;");
         sb.AppendLine();
-        sb.AppendLine("namespace Daybreak.API.Interop;");
+        sb.AppendLine("namespace Daybreak.API.Interop");
+        sb.AppendLine("{");
         sb.AppendLine();
         sb.AppendLine("/// <summary>");
         sb.AppendLine($"/// P/Invoke bindings for {exportCount} C++ exports from gwca.dll ({skippedCount} skipped).");
         sb.AppendLine("/// Nested classes mirror the C++ namespace hierarchy (e.g. GW::Agents → GWCA.GW.Agents).");
         sb.AppendLine("/// Types annotated with [GWCAEquivalent] are used in signatures where available.");
         sb.AppendLine("/// </summary>");
-        sb.AppendLine("internal static unsafe partial class GWCA");
+        sb.AppendLine("public static unsafe partial class GWCA");
         sb.AppendLine("{");
         sb.AppendLine("    private const string DllName = \"gwca.dll\";");
     }
@@ -319,7 +333,7 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         var pad = new string(' ', indent);
 
         sb.AppendLine();
-        sb.AppendLine($"{pad}internal static partial class {SanitizeIdentifier(node.Name)}");
+        sb.AppendLine($"{pad}public static partial class {SanitizeIdentifier(node.Name)}");
         sb.AppendLine($"{pad}{{");
 
         // Emit functions in this namespace, disambiguating overloads that
@@ -451,7 +465,7 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
             sb.AppendLine($"{pad}{prefix}{conventionAttr}");
         if (retAttr.Length > 0)
             sb.AppendLine($"{pad}{prefix}{retAttr}");
-        sb.AppendLine($"{pad}{prefix}internal static partial {csRet} {methodName}({paramStr});");
+        sb.AppendLine($"{pad}{prefix}public static partial {csRet} {methodName}({paramStr});");
     }
 
     // ════════════════════════════════════════════════════════════════
@@ -480,7 +494,7 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         // declarations for the same nested class, so this merges cleanly
         // with any class already emitted by the export tree.
         sb.AppendLine();
-        sb.AppendLine($"{pad}internal static partial class {SanitizeIdentifier(node.Name)}");
+        sb.AppendLine($"{pad}public static partial class {SanitizeIdentifier(node.Name)}");
         sb.AppendLine($"{pad}{{");
 
         var innerIndent = indent + 4;
@@ -493,7 +507,7 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
             if (enumDef.Name is not null)
             {
                 var baseType = MapCppTypeToCs(enumDef.UnderlyingType);
-                sb.AppendLine($"{innerPad}internal enum {SanitizeIdentifier(enumDef.Name)} : {baseType}");
+                sb.AppendLine($"{innerPad}public enum {SanitizeIdentifier(enumDef.Name)} : {baseType}");
                 sb.AppendLine($"{innerPad}{{");
                 foreach (var member in enumDef.Members)
                 {
@@ -526,24 +540,30 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
             sb.AppendLine($"{innerPad}internal const {csType} {SanitizeIdentifier(field.Name)} = {value};{comment}");
         }
 
-        // Emit structs (skip those already defined via [GWCAEquivalent])
-        foreach (var structDef in node.Structs.OrderBy(s => s.Name, StringComparer.Ordinal))
+        // Emit type aliases (typedef Array<T> AliasName;)
+        // Deduplicate by alias name - same typedef may appear in multiple headers
+        var emittedAliases = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var alias in node.TypeAliases.OrderBy(a => a.AliasName, StringComparer.Ordinal))
         {
-            // Determine the C# struct name (suffix if collides with namespace class)
-            var csStructName = SanitizeIdentifier(structDef.Name);
-            if (namespaceClassNames.Contains(structDef.Name))
-                csStructName += "Data";
+            // Skip duplicates
+            if (!emittedAliases.Add(alias.AliasName))
+                continue;
 
-            // Skip if already mapped (manually defined with [GWCAEquivalent])
-            if (typeMap.ContainsKey(structDef.Name))
+            // Only emit Array<T> aliases as GuildWarsArray<T>
+            if (alias.SourceType == "Array" && alias.TemplateArg is not null)
             {
-                // Check if it's our generated type or a manual one
-                var mapped = typeMap[structDef.Name];
-                if (!mapped.Contains("Daybreak.API.Interop.GWCA."))
-                    continue; // Skip - it's a manually defined type
+                var innerType = alias.TemplateArg.Replace("::", ".").Trim();
+                // Handle pointer types (e.g., "Item *" -> "nint")
+                if (innerType.EndsWith("*"))
+                    innerType = "nint";
+                else if (typeMap.TryGetValue(innerType, out var mapped))
+                    innerType = mapped;
+                sb.AppendLine($"{innerPad}public unsafe struct {alias.AliasName} {{ public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<{innerType}> Value; }}");
             }
-            EmitStruct(sb, structDef, typeMap, innerIndent, csStructName);
         }
+
+        // Structs are now emitted to GuildWars namespace, not nested classes
+        // Skip struct emission here - see EmitStructsToGuildWarsNamespace
 
         // Emit children
         foreach (var child in node.Children.Values.OrderBy(c => c.Name, StringComparer.Ordinal))
@@ -556,7 +576,7 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
 
     private static bool HasAnyContent(ConstantsNode node)
     {
-        if (node.Enums.Count > 0 || node.Constants.Count > 0 || node.Structs.Count > 0)
+        if (node.Enums.Count > 0 || node.Constants.Count > 0 || node.Structs.Count > 0 || node.TypeAliases.Count > 0)
             return true;
         return node.Children.Values.Any(HasAnyContent);
     }
@@ -582,6 +602,9 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
                 typeMap[enumDef.Name] = "global::Daybreak.API.Interop." + csPath + "." + SanitizeIdentifier(enumDef.Name);
         }
 
+        // First, collect all struct names in this node to avoid collisions
+        var structNamesInNode = new HashSet<string>(node.Structs.Select(s => s.Name), StringComparer.Ordinal);
+
         foreach (var structDef in node.Structs)
         {
             // Only add structs that can actually be emitted
@@ -590,8 +613,17 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
                 // If name collides with a namespace class, use a suffixed name
                 var csName = SanitizeIdentifier(structDef.Name);
                 if (namespaceClassNames.Contains(structDef.Name))
-                    csName += "Data";
-                typeMap[structDef.Name] = "global::Daybreak.API.Interop." + csPath + "." + csName;
+                {
+                    // Try "Data" suffix first, then "Struct" if that also collides
+                    if (!structNamesInNode.Contains(structDef.Name + "Data"))
+                        csName += "Data";
+                    else if (!structNamesInNode.Contains(structDef.Name + "Struct"))
+                        csName += "Struct";
+                    else
+                        csName += "_"; // Last resort
+                }
+                // Structs go into GuildWars namespace (flat), not nested GWCA classes
+                typeMap[structDef.Name] = "global::Daybreak.API.Interop.GuildWars." + csName;
             }
         }
 
@@ -629,9 +661,9 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         
         foreach (var structDef in node.Structs)
         {
-            var fieldTypes = string.Join(", ", structDef.Fields.Take(3).Select(f => f.CppType));
-            if (structDef.Fields.Count > 3) fieldTypes += ", ...";
-            diagnostics.Add($"{currentPath}.{structDef.Name}: {structDef.Fields.Count} fields (nsPath={structDef.DebugNamespacePath})");
+            var (canEmit, reason) = CanEmitStructWithReason(structDef);
+            var status = canEmit ? "OK" : $"SKIP: {reason}";
+            diagnostics.Add($"{currentPath}.{structDef.Name}: {structDef.Fields.Count} fields [{status}]");
         }
         foreach (var child in node.Children.Values)
         {
@@ -642,11 +674,11 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
     /// <summary>
     /// Checks if a struct can be emitted (has no complex template fields or unresolved types).
     /// </summary>
-    private static bool CanEmitStruct(CppStructDef structDef)
+    private static (bool canEmit, string? reason) CanEmitStructWithReason(CppStructDef structDef)
     {
         // Skip structs with no fields (usually forward declarations that got parsed)
         if (structDef.Fields.Count == 0)
-            return false;
+            return (false, "no fields");
 
         // Check for unresolvable fields (template types, missing types)
         foreach (var field in structDef.Fields)
@@ -654,32 +686,33 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
             var cppType = field.CppType;
             // Skip structs with template type parameters (T, etc.)
             if (Regex.IsMatch(cppType, @"\bT\b") && !cppType.Contains("Array"))
-                return false;
+                return (false, $"template param T in field {field.Name}");
             // Skip structs with complex template containers we can't represent
             if (cppType.Contains("TList<") || cppType.Contains("TLink<") || 
                 cppType.Contains("PrioQ<") || cppType.Contains("PrioQLink<") ||
                 cppType.Contains("BaseArray<"))
-                return false;
+                return (false, $"complex template in field {field.Name}: {cppType}");
             // Skip if field type contains unresolved typedef names
             if (cppType.Contains("UIInteractionCallback") || cppType.Contains("FriendsListArray") ||
                 cppType.Contains("PathNodeArray") || cppType.Contains("PathingMapArray") ||
                 cppType.Contains("BlockedPlaneArray") || cppType.Contains("AgentSummaryInfoSub"))
-                return false;
+                return (false, $"unresolved typedef in field {field.Name}: {cppType}");
             // Skip structs with function pointer fields (complex vtable types)
             if (cppType.Contains("__fastcall") || cppType.Contains("__stdcall") ||
                 cppType.Contains("(__cdecl") || Regex.IsMatch(cppType, @"\(\s*\*\s*\w+\s*\)"))
-                return false;
+                return (false, $"function pointer in field {field.Name}: {cppType}");
             // Skip structs with inline initializers in field declarations (e.g., "uint32_t k[4]{}")
             if (cppType.Contains("{}"))
-                return false;
+                return (false, $"inline initializer in field {field.Name}: {cppType}");
             // Skip fields referencing complex struct types we can't emit
             // These are structs that have vtables, function pointers, or complex layouts
-            if (cppType.Contains("GHKey") || cppType.Contains("EquipmentVTable") ||
-                cppType.Contains("VTable"))
-                return false;
+            if (cppType.Contains("EquipmentVTable") || cppType.Contains("VTable"))
+                return (false, $"vtable in field {field.Name}: {cppType}");
         }
-        return true;
+        return (true, null);
     }
+    
+    private static bool CanEmitStruct(CppStructDef structDef) => CanEmitStructWithReason(structDef).canEmit;
 
     /// <summary>
     /// Emits a C# struct from a parsed C++ struct definition.
@@ -755,6 +788,153 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
     }
 
     /// <summary>
+    /// Emits all emittable structs from the constants tree into the GuildWars namespace.
+    /// This provides compatibility for consumer code that uses `using Daybreak.API.Interop.GuildWars;`
+    /// </summary>
+    private static void EmitStructsToGuildWarsNamespace(StringBuilder sb, ConstantsNode node, Dictionary<string, string> typeMap, int indent, HashSet<string> emittedNames)
+    {
+        EmitStructsRecursive(sb, node, typeMap, indent, emittedNames);
+    }
+    
+    private static void EmitStructsRecursive(StringBuilder sb, ConstantsNode node, Dictionary<string, string> typeMap, int indent, HashSet<string> emittedNames)
+    {
+        foreach (var structDef in node.Structs.OrderBy(s => s.Name, StringComparer.Ordinal))
+        {
+            // Skip structs that can't be emitted
+            if (!CanEmitStruct(structDef))
+                continue;
+            
+            // Get the C# name from typeMap (which includes collision-resolution suffixes like "Struct")
+            // If not in typeMap, the struct wasn't registered (shouldn't happen for emittable structs)
+            if (!typeMap.TryGetValue(structDef.Name, out var fqCsName))
+                continue;
+                
+            // Extract just the struct name from the fully-qualified name
+            // e.g. "global::Daybreak.API.Interop.GuildWars.ItemStruct" -> "ItemStruct"
+            var csName = fqCsName.Substring(fqCsName.LastIndexOf('.') + 1);
+            
+            // Skip duplicates (including if an enum with the same name was emitted)
+            if (emittedNames.Contains(csName))
+                continue;
+                
+            emittedNames.Add(csName);
+            EmitStruct(sb, structDef, typeMap, indent, csName);
+        }
+        
+        // Recurse into children
+        foreach (var child in node.Children.Values)
+        {
+            EmitStructsRecursive(sb, child, typeMap, indent, emittedNames);
+        }
+    }
+
+    /// <summary>
+    /// Emits all enums from the constants tree into the GuildWars namespace.
+    /// This provides compatibility for consumer code that uses `using Daybreak.API.Interop.GuildWars;`
+    /// </summary>
+    private static void EmitEnumsToGuildWarsNamespace(StringBuilder sb, ConstantsNode node, int indent, HashSet<string> emittedNames)
+    {
+        EmitEnumsRecursive(sb, node, indent, emittedNames);
+    }
+    
+    private static void EmitEnumsRecursive(StringBuilder sb, ConstantsNode node, int indent, HashSet<string> emittedNames)
+    {
+        var pad = new string(' ', indent);
+        
+        foreach (var enumDef in node.Enums.OrderBy(e => e.Name, StringComparer.Ordinal))
+        {
+            // Skip anonymous enums
+            if (enumDef.Name is null)
+                continue;
+            
+            // Skip duplicates (including if a struct with the same name was emitted)
+            if (emittedNames.Contains(enumDef.Name))
+                continue;
+                
+            emittedNames.Add(enumDef.Name);
+            
+            // Determine base type and map C++ types to C#
+            var baseType = MapCppEnumBaseType(enumDef.UnderlyingType ?? "int");
+            
+            sb.AppendLine();
+            sb.AppendLine($"{pad}public enum {SanitizeIdentifier(enumDef.Name)} : {baseType}");
+            sb.AppendLine($"{pad}{{");
+            
+            var innerPad = new string(' ', indent + 4);
+            foreach (var member in enumDef.Members)
+            {
+                if (member.Value is not null)
+                    sb.AppendLine($"{innerPad}{SanitizeIdentifier(member.Name)} = {member.Value},");
+                else
+                    sb.AppendLine($"{innerPad}{SanitizeIdentifier(member.Name)},");
+            }
+            sb.AppendLine($"{pad}}}");
+        }
+        
+        // Recurse into children
+        foreach (var child in node.Children.Values)
+        {
+            EmitEnumsRecursive(sb, child, indent, emittedNames);
+        }
+    }
+
+    /// <summary>
+    /// Emits all type aliases (typedef Array<T>) from the constants tree into the GuildWars namespace.
+    /// </summary>
+    private static void EmitTypeAliasesToGuildWarsNamespace(StringBuilder sb, ConstantsNode node, Dictionary<string, string> typeMap, int indent, HashSet<string> emittedNames)
+    {
+        EmitTypeAliasesRecursive(sb, node, typeMap, indent, emittedNames);
+    }
+    
+    private static void EmitTypeAliasesRecursive(StringBuilder sb, ConstantsNode node, Dictionary<string, string> typeMap, int indent, HashSet<string> emittedNames)
+    {
+        var pad = new string(' ', indent);
+        
+        foreach (var alias in node.TypeAliases.OrderBy(a => a.AliasName, StringComparer.Ordinal))
+        {
+            // Skip duplicates
+            if (emittedNames.Contains(alias.AliasName))
+                continue;
+                
+            emittedNames.Add(alias.AliasName);
+            
+            var innerType = alias.TemplateArg.Replace("::", ".").Trim();
+            // Handle pointer types (e.g., "Item *" -> "nint")
+            if (innerType.EndsWith("*"))
+                innerType = "nint";
+            else if (typeMap.TryGetValue(innerType, out var mapped))
+                innerType = mapped;
+            
+            sb.AppendLine($"{pad}public unsafe struct {alias.AliasName} {{ public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<{innerType}> Value; }}");
+        }
+        
+        // Recurse into children
+        foreach (var child in node.Children.Values)
+        {
+            EmitTypeAliasesRecursive(sb, child, typeMap, indent, emittedNames);
+        }
+    }
+
+    /// <summary>
+    /// Maps a C++ enum underlying type to C# type.
+    /// </summary>
+    private static string MapCppEnumBaseType(string cppType)
+    {
+        return cppType switch
+        {
+            "uint8_t" or "unsigned char" => "byte",
+            "int8_t" or "char" or "signed char" => "sbyte",
+            "uint16_t" or "unsigned short" => "ushort",
+            "int16_t" or "short" => "short",
+            "uint32_t" or "unsigned int" or "unsigned long" => "uint",
+            "int32_t" or "int" or "long" => "int",
+            "uint64_t" or "unsigned long long" => "ulong",
+            "int64_t" or "long long" => "long",
+            _ => "int"
+        };
+    }
+
+    /// <summary>
     /// Maps a C++ field type to a C# type for struct fields.
     /// Handles pointers, qualified types, etc.
     /// </summary>
@@ -794,6 +974,9 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
             var csInner = MapCppFieldTypeToCs(inner, typeMap);
             // Special case: void* and char* and wchar_t* map to nint
             if (csInner is "void" or "char" or "byte")
+                return "nint";
+            // If the inner type is unmapped (returns the raw C++ name), use nint for the pointer
+            if (!IsKnownCsType(csInner) && !typeMap.ContainsKey(csInner))
                 return "nint";
             return csInner + "*";
         }
@@ -852,6 +1035,17 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
             // Everything else: assume it's a struct/enum name we'll reference directly
             _ => cppType,
         };
+    }
+
+    /// <summary>
+    /// Checks if a type name is a known C# primitive or built-in type.
+    /// </summary>
+    private static bool IsKnownCsType(string csType)
+    {
+        return csType is "byte" or "sbyte" or "short" or "ushort" or "int" or "uint"
+            or "long" or "ulong" or "float" or "double" or "char" or "nint" or "nuint"
+            or "void" or "bool" or "string" or "object"
+            or "global::System.Numerics.Vector2" or "global::System.Numerics.Vector3";
     }
 
     private static bool IsBlittableForFixed(string csType)
@@ -1246,6 +1440,7 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         public List<CppEnumDef> Enums { get; } = [];
         public List<CppConstField> Constants { get; } = [];
         public List<CppStructDef> Structs { get; } = [];
+        public List<CppTypeAlias> TypeAliases { get; } = [];
         public int DebugPopLine { get; set; } // Debug: line number where this namespace was popped
 
         public ConstantsNode GetOrCreateChild(string childName)
@@ -1297,5 +1492,15 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         public int? Offset { get; set; }
         public string? ArraySize { get; set; } // e.g., "7", "0x10", "20"
         public string? Comment { get; set; }
+    }
+
+    /// <summary>
+    /// Represents a C++ typedef alias like: typedef Array&lt;T&gt; AliasName;
+    /// </summary>
+    internal sealed class CppTypeAlias
+    {
+        public string AliasName { get; set; } = "";
+        public string SourceType { get; set; } = ""; // e.g., "Array"
+        public string? TemplateArg { get; set; } // e.g., "Buff"
     }
 }

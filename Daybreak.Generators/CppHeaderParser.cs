@@ -48,8 +48,9 @@ internal static class CppHeaderParser
         RegexOptions.Compiled);
 
     // Matches field without offset comment: Type field;
+    // Also handles inline initializers like = value or {} or {value}
     private static readonly Regex FieldNoOffsetRegex = new(
-        @"^\s*(?!(?:inline|static|virtual|GWCA_API|typedef|using|enum|struct|union|return|if|for|while|switch|\[\[|\}))([A-Za-z_][\w:*&<>\s,]+?)\s+(\w+)(?:\s*\[\s*([^\]]+)\s*\])?\s*(?:=\s*[^;]+)?\s*;\s*(?://\s*(.*))?$",
+        @"^\s*(?!(?:inline|static|virtual|GWCA_API|typedef|using|enum|struct|union|return|if|for|while|switch|\[\[|\}))([A-Za-z_][\w:*&<>\s,]+?)\s+(\w+)(?:\s*\[\s*([^\]]+)\s*\])?(?:\s*\{[^}]*\})?(?:\s*=\s*[^;]+)?\s*;\s*(?://\s*(.*))?$",
         RegexOptions.Compiled);
 
     // Matches static_assert(sizeof(Name) == 0xHEX or decimal)
@@ -107,10 +108,17 @@ internal static class CppHeaderParser
         @"^\s*(?:static|inline|GWCA_API|virtual|explicit|constexpr).*\([^)]*\)\s*(?:const)?\s*$",
         RegexOptions.Compiled);
 
+    // Matches out-of-line method definitions: Type* Class::Method() { or Type Class::Method() const {
+    private static readonly Regex OutOfLineMethodRegex = new(
+        @"^\s*(?:const\s+)?[\w:*&<>]+(?:\s+[\w:*&<>]+)*\s+\w+::\w+\s*\([^)]*\)\s*(?:const)?\s*\{",
+        RegexOptions.Compiled);
+
     // Matches standalone opening brace
     private static readonly Regex OpenBraceOnlyRegex = new(
         @"^\s*\{\s*$",
         RegexOptions.Compiled);
+
+    public static List<string> DebugLines { get; } = [];
 
     public static void Parse(string headerText, ConstantsNode root)
     {
@@ -211,9 +219,18 @@ internal static class CppHeaderParser
             // ── Inside a struct body ───────────────────────────────
             if (inStruct && currentStruct is not null)
             {
-                int openBraces = CountChar(line, '{');
-                int closeBraces = CountChar(line, '}');
+                // Strip comments before counting braces - comments can contain braces
+                var lineWithoutComments = StripComments(line);
+                int openBraces = CountChar(lineWithoutComments, '{');
+                int closeBraces = CountChar(lineWithoutComments, '}');
+                int prevDepth = structBraceDepth;
                 structBraceDepth += openBraces - closeBraces;
+                
+                // Debug: Track brace changes for AgentLiving
+                if (currentStruct.Name == "AgentLiving" && (openBraces > 0 || closeBraces > 0))
+                {
+                    DebugLines.Add($"[BRACE] line {i+1}: {currentStruct.Name} depth {prevDepth}->{structBraceDepth} (open={openBraces}, close={closeBraces})");
+                }
 
                 // If we hit the closing brace of the struct
                 if (structBraceDepth <= 0)
@@ -230,6 +247,7 @@ internal static class CppHeaderParser
                     pathParts.Reverse();
                     currentStruct.DebugNamespacePath = string.Join(".", pathParts);
                     
+                    DebugLines.Add($"[STRUCT-END] line {i+1}: {currentStruct.Name} with {currentStruct.Fields.Count} fields");
                     node.Structs.Add(currentStruct);
                     currentStruct = null;
                     inStruct = false;
@@ -360,6 +378,22 @@ internal static class CppHeaderParser
                 continue;
             }
 
+            // ── Handle typedef Array<T> AliasName; ───────────────────────
+            var typedefArrayMatch = Regex.Match(trimmed, @"^\s*typedef\s+(\w+)\s*<\s*([\w:\s*]+)\s*>\s+(\w+)\s*;");
+            if (typedefArrayMatch.Success)
+            {
+                var sourceType = typedefArrayMatch.Groups[1].Value;
+                var templateArg = typedefArrayMatch.Groups[2].Value.Trim();
+                var aliasName = typedefArrayMatch.Groups[3].Value;
+                namespaceStack.Peek().TypeAliases.Add(new CppTypeAlias
+                {
+                    AliasName = aliasName,
+                    SourceType = sourceType,
+                    TemplateArg = templateArg
+                });
+                continue;
+            }
+
             // ── Skip other typedef ─────────────────────────────────
             if (TypedefRegex.IsMatch(trimmed))
                 continue;
@@ -386,6 +420,23 @@ internal static class CppHeaderParser
                     skipBlockBraceCount = braces;
                 }
                 continue;
+            }
+
+            // ── Skip out-of-line method definitions (Type* Class::Method() {) ─
+            if (OutOfLineMethodRegex.IsMatch(trimmed))
+            {
+                int braces = CountChar(trimmed, '{') - CountChar(trimmed, '}');
+                DebugLines.Add($"[OUT-OF-LINE] line {i+1}: {trimmed.Substring(0, Math.Min(50, trimmed.Length))}... braces={braces}");
+                if (braces > 0)
+                {
+                    inSkipBlock = true;
+                    skipBlockBraceCount = braces;
+                }
+                continue;
+            }
+            else if (trimmed.Contains("::") && trimmed.Contains("(") && trimmed.Contains("{"))
+            {
+                DebugLines.Add($"[UNMATCHED-METHOD] line {i+1}: {trimmed.Substring(0, Math.Min(60, trimmed.Length))}");
             }
 
             // ── Track function declarations with body on separate line ─
@@ -421,6 +472,7 @@ internal static class CppHeaderParser
             {
                 var structName = structMatch.Groups[1].Value;
                 var baseType = structMatch.Groups[2].Success ? structMatch.Groups[2].Value : null;
+                DebugLines.Add($"[STRUCT-START] line {i+1}: {structName} (inSkip={inSkipBlock}, freeBrace={freeBraceDepth})");
 
                 // Skip some special cases
                 if (structName.StartsWith("__") || structName == "Packet")
@@ -702,6 +754,31 @@ internal static class CppHeaderParser
         {
             lastMember.Comment = lineComment;
         }
+    }
+
+    /// <summary>
+    /// Strips C++ comments from a line (both // and /* */ style).
+    /// </summary>
+    private static string StripComments(string line)
+    {
+        // Remove // style comments
+        int slashSlash = line.IndexOf("//");
+        if (slashSlash >= 0)
+            line = line.Substring(0, slashSlash);
+        
+        // Remove /* */ style comments (simple - doesn't handle nested)
+        int blockStart = line.IndexOf("/*");
+        while (blockStart >= 0)
+        {
+            int blockEnd = line.IndexOf("*/", blockStart + 2);
+            if (blockEnd >= 0)
+                line = line.Substring(0, blockStart) + line.Substring(blockEnd + 2);
+            else
+                line = line.Substring(0, blockStart);
+            blockStart = line.IndexOf("/*");
+        }
+        
+        return line;
     }
 
     private static int CountChar(string s, char c)

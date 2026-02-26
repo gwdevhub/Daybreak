@@ -9,14 +9,15 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 
-namespace Daybreak.API.Interop;
+namespace Daybreak.API.Interop
+{
 
 /// <summary>
 /// P/Invoke bindings for 522 C++ exports from gwca.dll (0 skipped).
 /// Nested classes mirror the C++ namespace hierarchy (e.g. GW::Agents → GWCA.GW.Agents).
 /// Types annotated with [GWCAEquivalent] are used in signatures where available.
 /// </summary>
-internal static unsafe partial class GWCA
+public static unsafe partial class GWCA
 {
     private const string DllName = "gwca.dll";
     // ═══════════════════════════════════════════════════
@@ -61,2745 +62,2748 @@ internal static unsafe partial class GWCA
     // [NAMESPACE] GWCA.GW.UI.UIPacket popped at line 29
     // [NAMESPACE] GWCA.GW.UIPacket popped at line 966
     // [NAMESPACE] GWCA.GWCA popped at line 15
-    // GWCA.GW.AccountContext: 8 fields (nsPath=GWCA.GW)
-    // GWCA.GW.AccountInfo: 7 fields (nsPath=GWCA.GW)
-    // GWCA.GW.AccountUnlockedCount: 3 fields (nsPath=GWCA.GW)
-    // GWCA.GW.AccountUnlockedItemInfo: 3 fields (nsPath=GWCA.GW)
-    // GWCA.GW.Agent: 29 fields (nsPath=GWCA.GW)
-    // GWCA.GW.AgentContext: 27 fields (nsPath=GWCA.GW)
-    // GWCA.GW.AgentEffects: 3 fields (nsPath=GWCA.GW)
-    // GWCA.GW.AgentGadget: 5 fields (nsPath=GWCA.GW)
-    // GWCA.GW.AgentItem: 4 fields (nsPath=GWCA.GW)
-    // GWCA.GW.AgentLiving: 14 fields (nsPath=GWCA.GW)
-    // GWCA.GW.AgentSummaryInfo: 3 fields (nsPath=GWCA.GW)
-    // GWCA.GW.AreaInfo: 31 fields (nsPath=GWCA.GW)
-    // GWCA.GW.Attribute: 4 fields (nsPath=GWCA.GW)
-    // GWCA.GW.AttributeInfo: 5 fields (nsPath=GWCA.GW)
-    // GWCA.GW.Bag: 7 fields (nsPath=GWCA.GW)
-    // GWCA.GW.Buff: 3 fields (nsPath=GWCA.GW)
-    // GWCA.GW.ButtonFrame: 0 fields (nsPath=GWCA.GW)
-    // GWCA.GW.Camera: 56 fields (nsPath=GWCA.GW)
-    // GWCA.GW.CapeDesign: 7 fields (nsPath=GWCA.GW)
-    // GWCA.GW.CharacterInformation: 4 fields (nsPath=GWCA.GW)
-    // GWCA.GW.CharAdjustment: 4 fields (nsPath=GWCA.GW)
-    // GWCA.GW.CharContext: 34 fields (nsPath=GWCA.GW)
-    // GWCA.GW.Chat.ChatBuffer: 4 fields (nsPath=GWCA.GW.Chat)
-    // GWCA.GW.Chat.ChatMessage: 4 fields (nsPath=GWCA.GW.Chat)
-    // GWCA.GW.Cinematic: 2 fields (nsPath=GWCA.GW)
-    // GWCA.GW.CompositeModelInfo: 2 fields (nsPath=GWCA.GW)
-    // GWCA.GW.ControlledMinions: 2 fields (nsPath=GWCA.GW)
-    // GWCA.GW.DupeSkill: 2 fields (nsPath=GWCA.GW)
-    // GWCA.GW.DyeInfo: 1 fields (nsPath=GWCA.GW)
-    // GWCA.GW.EditableTextFrame: 0 fields (nsPath=GWCA.GW)
-    // GWCA.GW.Effect: 6 fields (nsPath=GWCA.GW)
-    // GWCA.GW.EquipmentVTable: 0 fields (nsPath=GWCA.GW)
-    // GWCA.GW.FrameWithValue: 0 fields (nsPath=GWCA.GW)
-    // GWCA.GW.Friend: 7 fields (nsPath=GWCA.GW)
-    // GWCA.GW.FriendList: 8 fields (nsPath=GWCA.GW)
-    // GWCA.GW.GadgetContext: 1 fields (nsPath=GWCA.GW)
-    // GWCA.GW.GadgetInfo: 4 fields (nsPath=GWCA.GW)
-    // GWCA.GW.GameContext: 23 fields (nsPath=GWCA.GW)
-    // GWCA.GW.GameplayContext: 3 fields (nsPath=GWCA.GW)
-    // GWCA.GW.GamePos: 3 fields (nsPath=GWCA.GW)
-    // GWCA.GW.GHKey: 0 fields (nsPath=GWCA.GW)
-    // GWCA.GW.Guild: 12 fields (nsPath=GWCA.GW)
-    // GWCA.GW.GuildContext: 34 fields (nsPath=GWCA.GW)
-    // GWCA.GW.GuildHistoryEvent: 3 fields (nsPath=GWCA.GW)
-    // GWCA.GW.GuildPlayer: 12 fields (nsPath=GWCA.GW)
-    // GWCA.GW.HenchmanPartyMember: 4 fields (nsPath=GWCA.GW)
-    // GWCA.GW.HeroConstData: 6 fields (nsPath=GWCA.GW)
-    // GWCA.GW.HeroFlag: 8 fields (nsPath=GWCA.GW)
-    // GWCA.GW.HeroInfo: 30 fields (nsPath=GWCA.GW)
-    // GWCA.GW.HeroPartyMember: 6 fields (nsPath=GWCA.GW)
-    // GWCA.GW.Inventory: 6 fields (nsPath=GWCA.GW)
-    // GWCA.GW.Item: 25 fields (nsPath=GWCA.GW)
-    // GWCA.GW.ItemContext: 12 fields (nsPath=GWCA.GW)
-    // GWCA.GW.ItemData: 4 fields (nsPath=GWCA.GW)
-    // GWCA.GW.ItemFormula: 5 fields (nsPath=GWCA.GW)
-    // GWCA.GW.ItemModifier: 1 fields (nsPath=GWCA.GW)
-    // GWCA.GW.LoginCharacter: 2 fields (nsPath=GWCA.GW)
-    // GWCA.GW.MapContext: 57 fields (nsPath=GWCA.GW)
-    // GWCA.GW.MapProp: 18 fields (nsPath=GWCA.GW)
-    // GWCA.GW.MapStaticData: 37 fields (nsPath=GWCA.GW)
-    // GWCA.GW.MapTypeInstanceInfo: 3 fields (nsPath=GWCA.GW)
-    // GWCA.GW.Mat4x3f: 13 fields (nsPath=GWCA.GW)
-    // GWCA.GW.MaterialCost: 4 fields (nsPath=GWCA.GW)
-    // GWCA.GW.Merchant.QuoteInfo: 2 fields (nsPath=GWCA.GW.Merchant)
-    // GWCA.GW.Merchant.TransactionInfo: 1 fields (nsPath=GWCA.GW.Merchant)
-    // GWCA.GW.MissionMapContext: 10 fields (nsPath=GWCA.GW)
-    // GWCA.GW.MissionMapIcon: 10 fields (nsPath=GWCA.GW)
-    // GWCA.GW.MissionMapSubContext: 1 fields (nsPath=GWCA.GW)
-    // GWCA.GW.MissionMapSubContext2: 9 fields (nsPath=GWCA.GW)
-    // GWCA.GW.MissionObjective: 3 fields (nsPath=GWCA.GW)
-    // GWCA.GW.Module: 0 fields (nsPath=GWCA.GW)
-    // GWCA.GW.Node: 2 fields (nsPath=GWCA.GW)
-    // GWCA.GW.NodeCache: 3 fields (nsPath=GWCA.GW)
-    // GWCA.GW.NPC: 12 fields (nsPath=GWCA.GW)
-    // GWCA.GW.NPCEquipment: 16 fields (nsPath=GWCA.GW)
-    // GWCA.GW.ObjectPool: 3 fields (nsPath=GWCA.GW)
-    // GWCA.GW.ObjectPoolBlock: 2 fields (nsPath=GWCA.GW)
-    // GWCA.GW.ObserverMatch: 11 fields (nsPath=GWCA.GW)
-    // GWCA.GW.ObserverMatchTeam: 5 fields (nsPath=GWCA.GW)
-    // GWCA.GW.Packet.StoC.PacketBase: 1 fields (nsPath=GWCA.GW.Packet.StoC)
-    // GWCA.GW.PartyAlly: 3 fields (nsPath=GWCA.GW)
-    // GWCA.GW.PartyAttribute: 2 fields (nsPath=GWCA.GW)
-    // GWCA.GW.PartyContext: 16 fields (nsPath=GWCA.GW)
-    // GWCA.GW.PartyInfo: 7 fields (nsPath=GWCA.GW)
-    // GWCA.GW.PartyMemberMoraleInfo: 4 fields (nsPath=GWCA.GW)
-    // GWCA.GW.PartyMoraleLink: 3 fields (nsPath=GWCA.GW)
-    // GWCA.GW.PartySearch: 13 fields (nsPath=GWCA.GW)
-    // GWCA.GW.PartySearchContext: 5 fields (nsPath=GWCA.GW)
-    // GWCA.GW.PathContext: 15 fields (nsPath=GWCA.GW)
-    // GWCA.GW.PathEngineContext: 6 fields (nsPath=GWCA.GW)
-    // GWCA.GW.PathingMap: 19 fields (nsPath=GWCA.GW)
-    // GWCA.GW.PathingTrapezoid: 9 fields (nsPath=GWCA.GW)
-    // GWCA.GW.PathNode: 6 fields (nsPath=GWCA.GW)
-    // GWCA.GW.PathWaypoint: 6 fields (nsPath=GWCA.GW)
-    // GWCA.GW.PetInfo: 7 fields (nsPath=GWCA.GW)
-    // GWCA.GW.Player: 15 fields (nsPath=GWCA.GW)
-    // GWCA.GW.PlayerControlledCharacter: 77 fields (nsPath=GWCA.GW)
-    // GWCA.GW.PlayerEquipment: 3 fields (nsPath=GWCA.GW)
-    // GWCA.GW.PlayerPartyMember: 3 fields (nsPath=GWCA.GW)
-    // GWCA.GW.Portal: 6 fields (nsPath=GWCA.GW)
-    // GWCA.GW.PreGameContext: 7 fields (nsPath=GWCA.GW)
-    // GWCA.GW.PrioQ: 2 fields (nsPath=GWCA.GW)
-    // GWCA.GW.PrioQLink: 3 fields (nsPath=GWCA.GW)
-    // GWCA.GW.ProfessionState: 5 fields (nsPath=GWCA.GW)
-    // GWCA.GW.ProgressBarContext: 5 fields (nsPath=GWCA.GW)
-    // GWCA.GW.PropByType: 2 fields (nsPath=GWCA.GW)
-    // GWCA.GW.PropModelInfo: 6 fields (nsPath=GWCA.GW)
-    // GWCA.GW.PropsContext: 6 fields (nsPath=GWCA.GW)
-    // GWCA.GW.PvPItemInfo: 1 fields (nsPath=GWCA.GW)
-    // GWCA.GW.PvPItemUpgradeInfo: 10 fields (nsPath=GWCA.GW)
-    // GWCA.GW.Quest: 11 fields (nsPath=GWCA.GW)
-    // GWCA.GW.RecObject: 9 fields (nsPath=GWCA.GW)
-    // GWCA.GW.Render.Mat4x3f: 13 fields (nsPath=GWCA.GW.Render)
-    // GWCA.GW.SalvageSessionInfo: 9 fields (nsPath=GWCA.GW)
-    // GWCA.GW.ScannerSectionOffset: 2 fields (nsPath=GWCA.GW)
-    // GWCA.GW.ScrollableFrame: 0 fields (nsPath=GWCA.GW)
-    // GWCA.GW.SinkNode: 1 fields (nsPath=GWCA.GW)
-    // GWCA.GW.Skill: 47 fields (nsPath=GWCA.GW)
-    // GWCA.GW.Skillbar: 5 fields (nsPath=GWCA.GW)
-    // GWCA.GW.SkillbarCast: 3 fields (nsPath=GWCA.GW)
-    // GWCA.GW.SkillbarMgr.Attribute: 0 fields (nsPath=GWCA.GW.SkillbarMgr)
-    // GWCA.GW.SkillbarMgr.SkillTemplate: 3 fields (nsPath=GWCA.GW.SkillbarMgr)
-    // GWCA.GW.SkillbarSkill: 5 fields (nsPath=GWCA.GW)
-    // GWCA.GW.SubStruct1: 1 fields (nsPath=GWCA.GW)
-    // GWCA.GW.SubStructUnk: 9 fields (nsPath=GWCA.GW)
-    // GWCA.GW.TabsFrame: 0 fields (nsPath=GWCA.GW)
-    // GWCA.GW.TagInfo: 4 fields (nsPath=GWCA.GW)
-    // GWCA.GW.TextCache: 1 fields (nsPath=GWCA.GW)
-    // GWCA.GW.TextParser: 14 fields (nsPath=GWCA.GW)
-    // GWCA.GW.THash: 5 fields (nsPath=GWCA.GW)
-    // GWCA.GW.THashLink: 6 fields (nsPath=GWCA.GW)
-    // GWCA.GW.Title: 11 fields (nsPath=GWCA.GW)
-    // GWCA.GW.TitleClientData: 3 fields (nsPath=GWCA.GW)
-    // GWCA.GW.TitleTier: 3 fields (nsPath=GWCA.GW)
-    // GWCA.GW.TLink: 2 fields (nsPath=GWCA.GW)
-    // GWCA.GW.TList: 1 fields (nsPath=GWCA.GW)
-    // GWCA.GW.TownAlliance: 8 fields (nsPath=GWCA.GW)
-    // GWCA.GW.TradeContext: 4 fields (nsPath=GWCA.GW)
-    // GWCA.GW.TradeItem: 2 fields (nsPath=GWCA.GW)
-    // GWCA.GW.TradePlayer: 2 fields (nsPath=GWCA.GW)
-    // GWCA.GW.UI.AgentNameTagInfo: 13 fields (nsPath=GWCA.GW.UI)
-    // GWCA.GW.UI.ChatTemplate: 3 fields (nsPath=GWCA.GW.UI)
-    // GWCA.GW.UI.CompassPoint: 2 fields (nsPath=GWCA.GW.UI)
-    // GWCA.GW.UI.CreateUIComponentPacket: 6 fields (nsPath=GWCA.GW.UI)
-    // GWCA.GW.UI.DialogBodyInfo: 3 fields (nsPath=GWCA.GW.UI)
-    // GWCA.GW.UI.DialogButtonInfo: 4 fields (nsPath=GWCA.GW.UI)
-    // GWCA.GW.UI.FloatingWindow: 9 fields (nsPath=GWCA.GW.UI)
-    // GWCA.GW.UI.Frame: 86 fields (nsPath=GWCA.GW.UI)
-    // GWCA.GW.UI.FrameInteractionCallback: 3 fields (nsPath=GWCA.GW.UI)
-    // GWCA.GW.UI.FramePosition: 17 fields (nsPath=GWCA.GW.UI)
-    // GWCA.GW.UI.FrameRelation: 5 fields (nsPath=GWCA.GW.UI)
-    // GWCA.GW.UI.InteractionMessage: 3 fields (nsPath=GWCA.GW.UI)
-    // GWCA.GW.UI.MapEntryMessage: 2 fields (nsPath=GWCA.GW.UI)
-    // GWCA.GW.UI.TooltipInfo: 8 fields (nsPath=GWCA.GW.UI)
-    // GWCA.GW.UI.UIChatMessage: 3 fields (nsPath=GWCA.GW.UI)
-    // GWCA.GW.UI.WindowPosition: 3 fields (nsPath=GWCA.GW.UI)
-    // GWCA.GW.UIPacket.kAgentSkillPacket: 2 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kAgentSkillStartedCast: 4 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kAgentSpeechBubble: 4 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kAllyOrGuildMessage: 4 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kChangeTarget: 6 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kCompassDraw: 4 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kDialogueMessage: 5 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kEffectAdd: 2 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kErrorMessage: 2 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kGetColor: 2 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kInteractAgent: 2 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kInventorySlotUpdated: 4 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kItemUpdated: 14 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kKeyAction: 3 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kLoadMapContext: 7 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kLogChatMessage: 2 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kLogout: 2 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kMeasureContent: 3 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kMouseAction: 5 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kMouseClick: 5 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kMouseCoordsClick: 6 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kMoveItem: 4 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kObjectiveAdd: 3 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kObjectiveComplete: 1 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kObjectiveUpdated: 1 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kPartySearchInvite: 2 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kPartyShowConfirmDialog: 3 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kPlayerChatMessage: 3 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kPostProcessingEffect: 2 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kPreferenceEnumChanged: 2 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kPreferenceFlagChanged: 2 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kPreferenceValueChanged: 2 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kPreStartSalvage: 2 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kPrintChatMessage: 4 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kRecvWhisper: 3 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kResize: 9 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kSendCallTarget: 2 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kSendChangeTarget: 2 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kSendChatMessage: 2 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kSendLoadSkillTemplate: 2 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kSendMerchantRequestQuote: 2 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kSendMerchantTransactItem: 5 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kSendMoveItem: 4 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kSendPingWeaponSet: 3 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kSendUseItem: 2 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kSendWorldAction: 3 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kServerActiveQuestChanged: 5 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kSetAgentProfession: 3 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kSetLayout: 6 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kSetRendererValue: 3 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kShowXunlaiChest: 3 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kStartWhisper: 1 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kTomeSkillSelection: 3 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kUIPositionChanged: 2 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kUseKitOnItem: 2 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kVendorItems: 4 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kVendorQuote: 2 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kVendorWindow: 4 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kWeaponSetChanged: 4 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kWeaponSwap: 2 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kWriteToChatLog: 3 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.UIPacket.kWriteToChatLogWithSender: 3 fields (nsPath=GWCA.GW.UIPacket)
-    // GWCA.GW.Vec2f: 2 fields (nsPath=GWCA.GW)
-    // GWCA.GW.Vec3f: 3 fields (nsPath=GWCA.GW)
-    // GWCA.GW.VisibleEffect: 3 fields (nsPath=GWCA.GW)
-    // GWCA.GW.WeaponSet: 2 fields (nsPath=GWCA.GW)
-    // GWCA.GW.WorldContext: 107 fields (nsPath=GWCA.GW)
-    // GWCA.GW.WorldMapContext: 21 fields (nsPath=GWCA.GW)
-    // GWCA.GW.XNode: 4 fields (nsPath=GWCA.GW)
-    // GWCA.GW.YNode: 3 fields (nsPath=GWCA.GW)
-    // GWCA.HookEntry: 0 fields (nsPath=GWCA)
-    // GWCA.ItemGeneral_ReuseID: 0 fields (nsPath=GWCA)
-    // GWCA.TextLabelFrame: 0 fields (nsPath=GWCA)
+    // GWCA.GW.AccountContext: 8 fields [OK]
+    // GWCA.GW.AccountInfo: 7 fields [OK]
+    // GWCA.GW.AccountUnlockedCount: 3 fields [OK]
+    // GWCA.GW.AccountUnlockedItemInfo: 3 fields [OK]
+    // GWCA.GW.Agent: 29 fields [SKIP: complex template in field link: TLink<Agent>]
+    // GWCA.GW.AgentContext: 27 fields [OK]
+    // GWCA.GW.AgentEffects: 3 fields [OK]
+    // GWCA.GW.AgentGadget: 5 fields [OK]
+    // GWCA.GW.AgentInfo: 1 fields [OK]
+    // GWCA.GW.AgentItem: 4 fields [OK]
+    // GWCA.GW.AgentLiving: 52 fields [OK]
+    // GWCA.GW.AgentMovement: 12 fields [OK]
+    // GWCA.GW.AgentSummaryInfo: 3 fields [SKIP: unresolved typedef in field extra_info_sub: AgentSummaryInfoSub*]
+    // GWCA.GW.AreaInfo: 31 fields [OK]
+    // GWCA.GW.Attribute: 4 fields [OK]
+    // GWCA.GW.AttributeInfo: 5 fields [OK]
+    // GWCA.GW.Bag: 7 fields [OK]
+    // GWCA.GW.Buff: 3 fields [OK]
+    // GWCA.GW.ButtonFrame: 0 fields [SKIP: no fields]
+    // GWCA.GW.Camera: 56 fields [OK]
+    // GWCA.GW.CapeDesign: 7 fields [OK]
+    // GWCA.GW.CharacterInformation: 4 fields [OK]
+    // GWCA.GW.CharAdjustment: 4 fields [OK]
+    // GWCA.GW.CharContext: 34 fields [OK]
+    // GWCA.GW.Chat.ChatBuffer: 4 fields [OK]
+    // GWCA.GW.Chat.ChatMessage: 4 fields [OK]
+    // GWCA.GW.Cinematic: 2 fields [OK]
+    // GWCA.GW.CompositeModelInfo: 2 fields [OK]
+    // GWCA.GW.ControlledMinions: 2 fields [OK]
+    // GWCA.GW.DupeSkill: 2 fields [OK]
+    // GWCA.GW.DyeInfo: 1 fields [OK]
+    // GWCA.GW.EditableTextFrame: 0 fields [SKIP: no fields]
+    // GWCA.GW.Effect: 6 fields [OK]
+    // GWCA.GW.EquipmentVTable: 0 fields [SKIP: no fields]
+    // GWCA.GW.FrameWithValue: 0 fields [SKIP: no fields]
+    // GWCA.GW.Friend: 7 fields [OK]
+    // GWCA.GW.FriendList: 8 fields [SKIP: unresolved typedef in field friends: FriendsListArray]
+    // GWCA.GW.GadgetContext: 1 fields [OK]
+    // GWCA.GW.GadgetInfo: 4 fields [OK]
+    // GWCA.GW.GameContext: 23 fields [OK]
+    // GWCA.GW.GameplayContext: 3 fields [OK]
+    // GWCA.GW.GamePos: 3 fields [OK]
+    // GWCA.GW.GHKey: 1 fields [OK]
+    // GWCA.GW.Guild: 12 fields [OK]
+    // GWCA.GW.GuildContext: 34 fields [OK]
+    // GWCA.GW.GuildHistoryEvent: 3 fields [OK]
+    // GWCA.GW.GuildPlayer: 12 fields [OK]
+    // GWCA.GW.HenchmanPartyMember: 4 fields [OK]
+    // GWCA.GW.HeroConstData: 6 fields [OK]
+    // GWCA.GW.HeroFlag: 8 fields [OK]
+    // GWCA.GW.HeroInfo: 30 fields [OK]
+    // GWCA.GW.HeroPartyMember: 6 fields [OK]
+    // GWCA.GW.Inventory: 6 fields [OK]
+    // GWCA.GW.Item: 25 fields [OK]
+    // GWCA.GW.ItemContext: 12 fields [OK]
+    // GWCA.GW.ItemData: 4 fields [OK]
+    // GWCA.GW.ItemFormula: 5 fields [OK]
+    // GWCA.GW.ItemModifier: 1 fields [OK]
+    // GWCA.GW.LoginCharacter: 2 fields [OK]
+    // GWCA.GW.MapAgent: 13 fields [OK]
+    // GWCA.GW.MapContext: 57 fields [OK]
+    // GWCA.GW.MapProp: 18 fields [OK]
+    // GWCA.GW.MapStaticData: 37 fields [SKIP: unresolved typedef in field map: PathingMapArray]
+    // GWCA.GW.MapTypeInstanceInfo: 3 fields [OK]
+    // GWCA.GW.Mat4x3f: 13 fields [OK]
+    // GWCA.GW.MaterialCost: 4 fields [OK]
+    // GWCA.GW.Merchant.QuoteInfo: 2 fields [OK]
+    // GWCA.GW.Merchant.TransactionInfo: 1 fields [OK]
+    // GWCA.GW.MissionMapContext: 10 fields [OK]
+    // GWCA.GW.MissionMapIcon: 10 fields [OK]
+    // GWCA.GW.MissionMapSubContext: 1 fields [OK]
+    // GWCA.GW.MissionMapSubContext2: 9 fields [OK]
+    // GWCA.GW.MissionObjective: 3 fields [OK]
+    // GWCA.GW.Module: 0 fields [SKIP: no fields]
+    // GWCA.GW.Node: 2 fields [OK]
+    // GWCA.GW.NodeCache: 3 fields [SKIP: complex template in field buffer: BaseArray<uint32_t>]
+    // GWCA.GW.NPC: 12 fields [OK]
+    // GWCA.GW.NPCEquipment: 16 fields [SKIP: vtable in field vtable: EquipmentVTable*]
+    // GWCA.GW.ObjectPool: 3 fields [OK]
+    // GWCA.GW.ObjectPoolBlock: 2 fields [OK]
+    // GWCA.GW.ObserverMatch: 11 fields [OK]
+    // GWCA.GW.ObserverMatchTeam: 5 fields [OK]
+    // GWCA.GW.Packet.StoC.PacketBase: 1 fields [OK]
+    // GWCA.GW.PartyAlly: 3 fields [OK]
+    // GWCA.GW.PartyAttribute: 2 fields [OK]
+    // GWCA.GW.PartyContext: 16 fields [SKIP: complex template in field requests: TList<PartyInfo>]
+    // GWCA.GW.PartyInfo: 7 fields [SKIP: complex template in field invite_link: TLink<PartyInfo>]
+    // GWCA.GW.PartyMemberMoraleInfo: 4 fields [OK]
+    // GWCA.GW.PartyMoraleLink: 3 fields [OK]
+    // GWCA.GW.PartySearch: 13 fields [OK]
+    // GWCA.GW.PartySearchContext: 5 fields [OK]
+    // GWCA.GW.PathContext: 15 fields [SKIP: unresolved typedef in field blockedPlanes: BlockedPlaneArray]
+    // GWCA.GW.PathEngineContext: 6 fields [OK]
+    // GWCA.GW.PathingMap: 19 fields [SKIP: complex template in field dat_vectors: BaseArray<Vec2f>]
+    // GWCA.GW.PathingTrapezoid: 9 fields [OK]
+    // GWCA.GW.PathNode: 6 fields [SKIP: complex template in field priority: PrioQLink<PathNode*>]
+    // GWCA.GW.PathWaypoint: 6 fields [OK]
+    // GWCA.GW.PetInfo: 7 fields [OK]
+    // GWCA.GW.Player: 15 fields [OK]
+    // GWCA.GW.PlayerControlledCharacter: 77 fields [OK]
+    // GWCA.GW.PlayerEquipment: 3 fields [OK]
+    // GWCA.GW.PlayerPartyMember: 3 fields [OK]
+    // GWCA.GW.Portal: 6 fields [OK]
+    // GWCA.GW.PreGameContext: 7 fields [OK]
+    // GWCA.GW.PrioQ: 2 fields [OK]
+    // GWCA.GW.PrioQLink: 3 fields [SKIP: template param T in field pq]
+    // GWCA.GW.ProfessionState: 5 fields [OK]
+    // GWCA.GW.ProgressBarContext: 5 fields [OK]
+    // GWCA.GW.PropByType: 2 fields [OK]
+    // GWCA.GW.PropModelInfo: 6 fields [OK]
+    // GWCA.GW.PropsContext: 6 fields [SKIP: complex template in field propsByType: Array<TList<PropByType>>]
+    // GWCA.GW.PvPItemInfo: 1 fields [OK]
+    // GWCA.GW.PvPItemUpgradeInfo: 10 fields [OK]
+    // GWCA.GW.Quest: 11 fields [OK]
+    // GWCA.GW.RecObject: 9 fields [OK]
+    // GWCA.GW.Render.Mat4x3f: 13 fields [OK]
+    // GWCA.GW.SalvageSessionInfo: 9 fields [OK]
+    // GWCA.GW.ScannerSectionOffset: 2 fields [OK]
+    // GWCA.GW.ScrollableFrame: 0 fields [SKIP: no fields]
+    // GWCA.GW.SinkNode: 1 fields [OK]
+    // GWCA.GW.Skill: 47 fields [OK]
+    // GWCA.GW.Skillbar: 5 fields [OK]
+    // GWCA.GW.SkillbarCast: 3 fields [OK]
+    // GWCA.GW.SkillbarMgr.Attribute: 1 fields [OK]
+    // GWCA.GW.SkillbarMgr.SkillTemplate: 6 fields [OK]
+    // GWCA.GW.SkillbarSkill: 5 fields [OK]
+    // GWCA.GW.SubStruct1: 1 fields [OK]
+    // GWCA.GW.SubStructUnk: 9 fields [OK]
+    // GWCA.GW.TabsFrame: 0 fields [SKIP: no fields]
+    // GWCA.GW.TagInfo: 4 fields [OK]
+    // GWCA.GW.TextCache: 1 fields [OK]
+    // GWCA.GW.TextParser: 14 fields [OK]
+    // GWCA.GW.THash: 5 fields [SKIP: template param T in field m_fullList]
+    // GWCA.GW.THashLink: 6 fields [SKIP: template param T in field elem]
+    // GWCA.GW.Title: 11 fields [OK]
+    // GWCA.GW.TitleClientData: 3 fields [OK]
+    // GWCA.GW.TitleTier: 3 fields [OK]
+    // GWCA.GW.TLink: 2 fields [SKIP: template param T in field next_node]
+    // GWCA.GW.TList: 2 fields [SKIP: template param T in field link]
+    // GWCA.GW.TownAlliance: 8 fields [OK]
+    // GWCA.GW.TradeContext: 4 fields [OK]
+    // GWCA.GW.TradeItem: 2 fields [OK]
+    // GWCA.GW.TradePlayer: 2 fields [OK]
+    // GWCA.GW.UI.AgentNameTagInfo: 13 fields [OK]
+    // GWCA.GW.UI.ChatTemplate: 3 fields [OK]
+    // GWCA.GW.UI.CompassPoint: 2 fields [OK]
+    // GWCA.GW.UI.CreateUIComponentPacket: 6 fields [SKIP: unresolved typedef in field event_callback: UI::UIInteractionCallback]
+    // GWCA.GW.UI.DialogBodyInfo: 3 fields [OK]
+    // GWCA.GW.UI.DialogButtonInfo: 4 fields [OK]
+    // GWCA.GW.UI.FloatingWindow: 9 fields [OK]
+    // GWCA.GW.UI.Frame: 86 fields [OK]
+    // GWCA.GW.UI.FrameInteractionCallback: 3 fields [SKIP: unresolved typedef in field callback: UIInteractionCallback]
+    // GWCA.GW.UI.FramePosition: 17 fields [OK]
+    // GWCA.GW.UI.FrameRelation: 5 fields [SKIP: complex template in field siblings: TList<FrameRelation>]
+    // GWCA.GW.UI.InteractionMessage: 3 fields [OK]
+    // GWCA.GW.UI.MapEntryMessage: 2 fields [OK]
+    // GWCA.GW.UI.TooltipInfo: 8 fields [SKIP: unresolved typedef in field render: GW::UI::UIInteractionCallback*]
+    // GWCA.GW.UI.UIChatMessage: 3 fields [OK]
+    // GWCA.GW.UI.WindowPosition: 3 fields [OK]
+    // GWCA.GW.UIPacket.kAgentSkillPacket: 2 fields [OK]
+    // GWCA.GW.UIPacket.kAgentSkillStartedCast: 4 fields [OK]
+    // GWCA.GW.UIPacket.kAgentSpeechBubble: 4 fields [OK]
+    // GWCA.GW.UIPacket.kAllyOrGuildMessage: 4 fields [OK]
+    // GWCA.GW.UIPacket.kChangeTarget: 6 fields [OK]
+    // GWCA.GW.UIPacket.kCompassDraw: 4 fields [OK]
+    // GWCA.GW.UIPacket.kDialogueMessage: 5 fields [OK]
+    // GWCA.GW.UIPacket.kEffectAdd: 2 fields [OK]
+    // GWCA.GW.UIPacket.kErrorMessage: 2 fields [OK]
+    // GWCA.GW.UIPacket.kGetColor: 2 fields [OK]
+    // GWCA.GW.UIPacket.kInteractAgent: 2 fields [OK]
+    // GWCA.GW.UIPacket.kInventorySlotUpdated: 4 fields [OK]
+    // GWCA.GW.UIPacket.kItemUpdated: 14 fields [OK]
+    // GWCA.GW.UIPacket.kKeyAction: 3 fields [OK]
+    // GWCA.GW.UIPacket.kLoadMapContext: 7 fields [OK]
+    // GWCA.GW.UIPacket.kLogChatMessage: 2 fields [OK]
+    // GWCA.GW.UIPacket.kLogout: 2 fields [OK]
+    // GWCA.GW.UIPacket.kMeasureContent: 3 fields [OK]
+    // GWCA.GW.UIPacket.kMouseAction: 5 fields [OK]
+    // GWCA.GW.UIPacket.kMouseClick: 5 fields [OK]
+    // GWCA.GW.UIPacket.kMouseCoordsClick: 6 fields [OK]
+    // GWCA.GW.UIPacket.kMoveItem: 4 fields [OK]
+    // GWCA.GW.UIPacket.kObjectiveAdd: 3 fields [OK]
+    // GWCA.GW.UIPacket.kObjectiveComplete: 1 fields [OK]
+    // GWCA.GW.UIPacket.kObjectiveUpdated: 1 fields [OK]
+    // GWCA.GW.UIPacket.kPartySearchInvite: 2 fields [OK]
+    // GWCA.GW.UIPacket.kPartyShowConfirmDialog: 3 fields [OK]
+    // GWCA.GW.UIPacket.kPlayerChatMessage: 3 fields [OK]
+    // GWCA.GW.UIPacket.kPostProcessingEffect: 2 fields [OK]
+    // GWCA.GW.UIPacket.kPreferenceEnumChanged: 2 fields [OK]
+    // GWCA.GW.UIPacket.kPreferenceFlagChanged: 2 fields [OK]
+    // GWCA.GW.UIPacket.kPreferenceValueChanged: 2 fields [OK]
+    // GWCA.GW.UIPacket.kPreStartSalvage: 2 fields [OK]
+    // GWCA.GW.UIPacket.kPrintChatMessage: 4 fields [OK]
+    // GWCA.GW.UIPacket.kRecvWhisper: 3 fields [OK]
+    // GWCA.GW.UIPacket.kResize: 9 fields [OK]
+    // GWCA.GW.UIPacket.kSendCallTarget: 2 fields [OK]
+    // GWCA.GW.UIPacket.kSendChangeTarget: 2 fields [OK]
+    // GWCA.GW.UIPacket.kSendChatMessage: 2 fields [OK]
+    // GWCA.GW.UIPacket.kSendLoadSkillTemplate: 2 fields [OK]
+    // GWCA.GW.UIPacket.kSendMerchantRequestQuote: 2 fields [OK]
+    // GWCA.GW.UIPacket.kSendMerchantTransactItem: 5 fields [OK]
+    // GWCA.GW.UIPacket.kSendMoveItem: 4 fields [OK]
+    // GWCA.GW.UIPacket.kSendPingWeaponSet: 3 fields [OK]
+    // GWCA.GW.UIPacket.kSendUseItem: 2 fields [OK]
+    // GWCA.GW.UIPacket.kSendWorldAction: 3 fields [OK]
+    // GWCA.GW.UIPacket.kServerActiveQuestChanged: 5 fields [OK]
+    // GWCA.GW.UIPacket.kSetAgentProfession: 3 fields [OK]
+    // GWCA.GW.UIPacket.kSetLayout: 6 fields [OK]
+    // GWCA.GW.UIPacket.kSetRendererValue: 3 fields [OK]
+    // GWCA.GW.UIPacket.kShowXunlaiChest: 3 fields [OK]
+    // GWCA.GW.UIPacket.kStartWhisper: 1 fields [OK]
+    // GWCA.GW.UIPacket.kTomeSkillSelection: 3 fields [OK]
+    // GWCA.GW.UIPacket.kUIPositionChanged: 2 fields [OK]
+    // GWCA.GW.UIPacket.kUseKitOnItem: 2 fields [OK]
+    // GWCA.GW.UIPacket.kVendorItems: 4 fields [OK]
+    // GWCA.GW.UIPacket.kVendorQuote: 2 fields [OK]
+    // GWCA.GW.UIPacket.kVendorWindow: 4 fields [OK]
+    // GWCA.GW.UIPacket.kWeaponSetChanged: 4 fields [OK]
+    // GWCA.GW.UIPacket.kWeaponSwap: 2 fields [OK]
+    // GWCA.GW.UIPacket.kWriteToChatLog: 3 fields [OK]
+    // GWCA.GW.UIPacket.kWriteToChatLogWithSender: 3 fields [OK]
+    // GWCA.GW.Vec2f: 2 fields [OK]
+    // GWCA.GW.Vec3f: 3 fields [OK]
+    // GWCA.GW.VisibleEffect: 3 fields [OK]
+    // GWCA.GW.WeaponSet: 2 fields [OK]
+    // GWCA.GW.WorldContext: 107 fields [OK]
+    // GWCA.GW.WorldMapContext: 21 fields [OK]
+    // GWCA.GW.XNode: 4 fields [OK]
+    // GWCA.GW.YNode: 3 fields [OK]
+    // GWCA.HookEntry: 0 fields [SKIP: no fields]
+    // GWCA.ItemGeneral_ReuseID: 0 fields [SKIP: no fields]
+    // GWCA.TextLabelFrame: 0 fields [SKIP: no fields]
     // ═══════════════════════════════════════════════════
 
 
-    internal static partial class GW
+    public static partial class GW
     {
 
         // GW::DisableHooks
         [LibraryImport(DllName, EntryPoint = "?DisableHooks@GW@@YAXXZ")]
-        internal static partial void DisableHooks();
+        public static partial void DisableHooks();
 
         // GW::EnableHooks
         [LibraryImport(DllName, EntryPoint = "?EnableHooks@GW@@YAXXZ")]
-        internal static partial void EnableHooks();
+        public static partial void EnableHooks();
 
         // GW::FatalAssert
         [LibraryImport(DllName, EntryPoint = "?FatalAssert@GW@@YAXPBD0I0@Z")]
-        internal static partial void FatalAssert(byte* ptr1, nint ptr2, uint value3, nint ptr4);
+        public static partial void FatalAssert(byte* ptr1, nint ptr2, uint value3, nint ptr4);
 
         // GW::GetAccountContext
         [LibraryImport(DllName, EntryPoint = "?GetAccountContext@GW@@YAPAUAccountContext@1@XZ")]
-        internal static partial global::Daybreak.API.Interop.GWCA.GW.AccountContext* GetAccountContext();
+        public static partial global::Daybreak.API.Interop.GuildWars.AccountContext* GetAccountContext();
 
         // GW::GetAgentContext
         [LibraryImport(DllName, EntryPoint = "?GetAgentContext@GW@@YAPAUAgentContext@1@XZ")]
-        internal static partial global::Daybreak.API.Interop.GWCA.GW.AgentContext* GetAgentContext();
+        public static partial global::Daybreak.API.Interop.GuildWars.AgentContext* GetAgentContext();
 
         // GW::GetAvailableChars
         [LibraryImport(DllName, EntryPoint = "?GetAvailableChars@GW@@YAPAV?$Array@UCharacterInformation@GW@@@1@XZ")]
-        internal static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GWCA.GW.CharacterInformation>* GetAvailableChars();
+        public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.CharacterInformation>* GetAvailableChars();
 
         // GW::GetCharContext
         [LibraryImport(DllName, EntryPoint = "?GetCharContext@GW@@YAPAUCharContext@1@XZ")]
-        internal static partial global::Daybreak.API.Interop.GWCA.GW.CharContext* GetCharContext();
+        public static partial global::Daybreak.API.Interop.GuildWars.CharContext* GetCharContext();
 
         // GW::GetDistance
         [LibraryImport(DllName, EntryPoint = "?GetDistance@GW@@YAMABUVec2f@1@0@Z")]
-        internal static partial float GetDistance(global::System.Numerics.Vector2* vector21, nint ptr2);
+        public static partial float GetDistance(global::System.Numerics.Vector2* vector21, nint ptr2);
 
         // GW::GetDistance
         [LibraryImport(DllName, EntryPoint = "?GetDistance@GW@@YAMUVec3f@1@0@Z")]
-        internal static partial float GetDistance(global::System.Numerics.Vector3 vector31, nint ptr2);
+        public static partial float GetDistance(global::System.Numerics.Vector3 vector31, nint ptr2);
 
         // GW::GetGameContext
         [LibraryImport(DllName, EntryPoint = "?GetGameContext@GW@@YAPAUGameContext@1@XZ")]
-        internal static partial global::Daybreak.API.Interop.GWCA.GW.GameContext* GetGameContext();
+        public static partial global::Daybreak.API.Interop.GuildWars.GameContext* GetGameContext();
 
         // GW::GetGameplayContext
         [LibraryImport(DllName, EntryPoint = "?GetGameplayContext@GW@@YAPAUGameplayContext@1@XZ")]
-        internal static partial global::Daybreak.API.Interop.GWCA.GW.GameplayContext* GetGameplayContext();
+        public static partial global::Daybreak.API.Interop.GuildWars.GameplayContext* GetGameplayContext();
 
-        // GW::GetGuildContext | returns TODO: map struct GW::GuildContext
-        // [LibraryImport(DllName, EntryPoint = "?GetGuildContext@GW@@YAPAUGuildContext@1@XZ")]
-        // internal static partial GuildContext* GetGuildContext();
+        // GW::GetGuildContext
+        [LibraryImport(DllName, EntryPoint = "?GetGuildContext@GW@@YAPAUGuildContext@1@XZ")]
+        public static partial global::Daybreak.API.Interop.GuildWars.GuildContext* GetGuildContext();
 
         // GW::GetItemContext
         [LibraryImport(DllName, EntryPoint = "?GetItemContext@GW@@YAPAUItemContext@1@XZ")]
-        internal static partial global::Daybreak.API.Interop.GWCA.GW.ItemContext* GetItemContext();
+        public static partial global::Daybreak.API.Interop.GuildWars.ItemContext* GetItemContext();
 
         // GW::GetMapContext
         [LibraryImport(DllName, EntryPoint = "?GetMapContext@GW@@YAPAUMapContext@1@XZ")]
-        internal static partial global::Daybreak.API.Interop.GWCA.GW.MapContext* GetMapContext();
+        public static partial global::Daybreak.API.Interop.GuildWars.MapContext* GetMapContext();
 
         // GW::GetNorm
         [LibraryImport(DllName, EntryPoint = "?GetNorm@GW@@YAMUVec2f@1@@Z")]
-        internal static partial float GetNorm(global::System.Numerics.Vector2 vector2);
+        public static partial float GetNorm(global::System.Numerics.Vector2 vector2);
 
         // GW::GetNorm
         [LibraryImport(DllName, EntryPoint = "?GetNorm@GW@@YAMUVec3f@1@@Z")]
-        internal static partial float GetNorm(global::System.Numerics.Vector3 vector3);
+        public static partial float GetNorm(global::System.Numerics.Vector3 vector3);
 
         // GW::GetPartyContext | returns TODO: map struct GW::PartyContext
         // [LibraryImport(DllName, EntryPoint = "?GetPartyContext@GW@@YAPAUPartyContext@1@XZ")]
-        // internal static partial PartyContext* GetPartyContext();
+        // public static partial PartyContext* GetPartyContext();
 
         // GW::GetPreGameContext
         [LibraryImport(DllName, EntryPoint = "?GetPreGameContext@GW@@YAPAUPreGameContext@1@XZ")]
-        internal static partial global::Daybreak.API.Interop.GWCA.GW.PreGameContext* GetPreGameContext();
+        public static partial global::Daybreak.API.Interop.GuildWars.PreGameContext* GetPreGameContext();
 
         // GW::GetWorldContext
         [LibraryImport(DllName, EntryPoint = "?GetWorldContext@GW@@YAPAUWorldContext@1@XZ")]
-        internal static partial global::Daybreak.API.Interop.GWCA.GW.WorldContext* GetWorldContext();
+        public static partial global::Daybreak.API.Interop.GuildWars.WorldContext* GetWorldContext();
 
         // GW::Hash
         [LibraryImport(DllName, EntryPoint = "?Hash@GW@@YAIPBXI@Z")]
-        internal static partial uint Hash(void* ptr1, uint value2);
+        public static partial uint Hash(void* ptr1, uint value2);
 
         // GW::Hash16
         [LibraryImport(DllName, EntryPoint = "?Hash16@GW@@YAIG@Z")]
-        internal static partial uint Hash16(ushort value);
+        public static partial uint Hash16(ushort value);
 
         // GW::Hash32
         [LibraryImport(DllName, EntryPoint = "?Hash32@GW@@YAII@Z")]
-        internal static partial uint Hash32(uint value);
+        public static partial uint Hash32(uint value);
 
         // GW::Hash8
         [LibraryImport(DllName, EntryPoint = "?Hash8@GW@@YAIE@Z")]
-        internal static partial uint Hash8(byte value);
+        public static partial uint Hash8(byte value);
 
         // GW::HashWString
         [LibraryImport(DllName, EntryPoint = "?HashWString@GW@@YAIPB_WI@Z")]
-        internal static partial uint HashWString(ushort* ptr1, uint value2);
+        public static partial uint HashWString(ushort* ptr1, uint value2);
 
         // GW::Initialize
         [LibraryImport(DllName, EntryPoint = "?Initialize@GW@@YA_NXZ")]
         [return: MarshalAs(UnmanagedType.U1)]
-        internal static partial bool Initialize();
+        public static partial bool Initialize();
 
         // GW::LogMessage — varargs, requires manual interop
 
         // GW::RegisterLogHandler
         [LibraryImport(DllName, EntryPoint = "?RegisterLogHandler@GW@@YAXP6AXPAXW4LogLevel@1@PBD2I2@Z0@Z")]
-        internal static partial void RegisterLogHandler(nint callback1, nint ptr2);
+        public static partial void RegisterLogHandler(nint callback1, nint ptr2);
 
         // GW::RegisterPanicHandler
         [LibraryImport(DllName, EntryPoint = "?RegisterPanicHandler@GW@@YAXP6AXPAXPBD1I1@Z0@Z")]
-        internal static partial void RegisterPanicHandler(nint callback1, nint ptr2);
+        public static partial void RegisterPanicHandler(nint callback1, nint ptr2);
 
         // GW::Terminate
         [LibraryImport(DllName, EntryPoint = "?Terminate@GW@@YAXXZ")]
-        internal static partial void Terminate();
+        public static partial void Terminate();
 
-        internal static partial class Agents
+        public static partial class Agents
         {
 
             // GW::Agents::ChangeTarget
             [LibraryImport(DllName, EntryPoint = "?ChangeTarget@Agents@GW@@YA_NI@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool ChangeTarget(uint value);
+            public static partial bool ChangeTarget(uint value);
 
             // GW::Agents::ChangeTarget | agent: TODO: map struct GW::Agent
             // [LibraryImport(DllName, EntryPoint = "?ChangeTarget@Agents@GW@@YA_NPBUAgent@2@@Z")]
             // [return: MarshalAs(UnmanagedType.U1)]
-            // internal static partial bool ChangeTarget(Agent* agent);
+            // public static partial bool ChangeTarget(Agent* agent);
 
             // GW::Agents::CountAllegianceInRange
             [LibraryImport(DllName, EntryPoint = "?CountAllegianceInRange@Agents@GW@@YAIW4Allegiance@Constants@2@M@Z")]
-            internal static partial uint CountAllegianceInRange(global::Daybreak.API.Interop.GWCA.GW.Constants.Allegiance allegiance1, float value2);
+            public static partial uint CountAllegianceInRange(global::Daybreak.API.Interop.GWCA.GW.Constants.Allegiance allegiance1, float value2);
 
             // GW::Agents::GetAgentArray
             // [LibraryImport(DllName, EntryPoint = "?GetAgentArray@Agents@GW@@YAPAV?$Array@PAUAgent@GW@@@2@XZ")]
-            // internal static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint>* GetAgentArray();
+            // public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint>* GetAgentArray();
 
             // GW::Agents::GetAgentByID | returns TODO: map struct GW::Agent
             // [LibraryImport(DllName, EntryPoint = "?GetAgentByID@Agents@GW@@YAPAUAgent@2@I@Z")]
-            // internal static partial Agent* GetAgentByID(uint value);
+            // public static partial Agent* GetAgentByID(uint value);
 
             // GW::Agents::GetAgentEncName
             [LibraryImport(DllName, EntryPoint = "?GetAgentEncName@Agents@GW@@YAPA_WI@Z")]
-            internal static partial ushort* GetAgentEncName(uint value);
+            public static partial ushort* GetAgentEncName(uint value);
 
             // GW::Agents::GetAgentEncName | agent: TODO: map struct GW::Agent
             // [LibraryImport(DllName, EntryPoint = "?GetAgentEncName@Agents@GW@@YAPA_WPBUAgent@2@@Z")]
-            // internal static partial ushort* GetAgentEncName(Agent* agent);
+            // public static partial ushort* GetAgentEncName(Agent* agent);
 
             // GW::Agents::GetAgentIdByLoginNumber
             [LibraryImport(DllName, EntryPoint = "?GetAgentIdByLoginNumber@Agents@GW@@YAII@Z")]
-            internal static partial uint GetAgentIdByLoginNumber(uint value);
+            public static partial uint GetAgentIdByLoginNumber(uint value);
 
             // GW::Agents::GetAmountOfPlayersInInstance
             [LibraryImport(DllName, EntryPoint = "?GetAmountOfPlayersInInstance@Agents@GW@@YAIXZ")]
-            internal static partial uint GetAmountOfPlayersInInstance();
+            public static partial uint GetAmountOfPlayersInInstance();
 
             // GW::Agents::GetControlledCharacter
             [LibraryImport(DllName, EntryPoint = "?GetControlledCharacter@Agents@GW@@YAPAUAgentLiving@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.AgentLiving* GetControlledCharacter();
+            public static partial global::Daybreak.API.Interop.GuildWars.AgentLiving* GetControlledCharacter();
 
             // GW::Agents::GetControlledCharacterId
             [LibraryImport(DllName, EntryPoint = "?GetControlledCharacterId@Agents@GW@@YAIXZ")]
-            internal static partial uint GetControlledCharacterId();
+            public static partial uint GetControlledCharacterId();
 
             // GW::Agents::GetEvaluatedTargetId
             [LibraryImport(DllName, EntryPoint = "?GetEvaluatedTargetId@Agents@GW@@YAIXZ")]
-            internal static partial uint GetEvaluatedTargetId();
+            public static partial uint GetEvaluatedTargetId();
 
             // GW::Agents::GetHeroAgentID
             [LibraryImport(DllName, EntryPoint = "?GetHeroAgentID@Agents@GW@@YAII@Z")]
-            internal static partial uint GetHeroAgentID(uint value);
+            public static partial uint GetHeroAgentID(uint value);
 
             // GW::Agents::GetIsAgentTargettable | agent: TODO: map struct GW::Agent
             // [LibraryImport(DllName, EntryPoint = "?GetIsAgentTargettable@Agents@GW@@YA_NPBUAgent@2@@Z")]
             // [return: MarshalAs(UnmanagedType.U1)]
-            // internal static partial bool GetIsAgentTargettable(Agent* agent);
+            // public static partial bool GetIsAgentTargettable(Agent* agent);
 
             // GW::Agents::GetMapAgentArray
-            // [LibraryImport(DllName, EntryPoint = "?GetMapAgentArray@Agents@GW@@YAPAV?$Array@UMapAgent@GW@@@2@XZ")]
-            // internal static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<MapAgent>* GetMapAgentArray();
+            [LibraryImport(DllName, EntryPoint = "?GetMapAgentArray@Agents@GW@@YAPAV?$Array@UMapAgent@GW@@@2@XZ")]
+            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.MapAgent>* GetMapAgentArray();
 
-            // GW::Agents::GetMapAgentByID | returns TODO: map struct GW::MapAgent
-            // [LibraryImport(DllName, EntryPoint = "?GetMapAgentByID@Agents@GW@@YAPAUMapAgent@2@I@Z")]
-            // internal static partial MapAgent* GetMapAgentByID(uint value);
+            // GW::Agents::GetMapAgentByID
+            [LibraryImport(DllName, EntryPoint = "?GetMapAgentByID@Agents@GW@@YAPAUMapAgent@2@I@Z")]
+            public static partial global::Daybreak.API.Interop.GuildWars.MapAgent* GetMapAgentByID(uint value);
 
             // GW::Agents::GetNPCArray
             [LibraryImport(DllName, EntryPoint = "?GetNPCArray@Agents@GW@@YAPAV?$Array@UNPC@GW@@@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GWCA.GW.NPC>* GetNPCArray();
+            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.NPC>* GetNPCArray();
 
             // GW::Agents::GetNPCByID
             [LibraryImport(DllName, EntryPoint = "?GetNPCByID@Agents@GW@@YAPAUNPC@2@I@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.NPC* GetNPCByID(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.NPC* GetNPCByID(uint value);
 
             // GW::Agents::GetObservingId
             [LibraryImport(DllName, EntryPoint = "?GetObservingId@Agents@GW@@YAIXZ")]
-            internal static partial uint GetObservingId();
+            public static partial uint GetObservingId();
 
             // GW::Agents::GetPlayerArray
             [LibraryImport(DllName, EntryPoint = "?GetPlayerArray@Agents@GW@@YAPAV?$Array@UPlayer@GW@@@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GWCA.GW.Player>* GetPlayerArray();
+            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.Player>* GetPlayerArray();
 
             // GW::Agents::GetPlayerByID | returns TODO: map struct GW::Agent
             // [LibraryImport(DllName, EntryPoint = "?GetPlayerByID@Agents@GW@@YAPAUAgent@2@I@Z")]
-            // internal static partial Agent* GetPlayerByID(uint value);
+            // public static partial Agent* GetPlayerByID(uint value);
 
             // GW::Agents::GetPlayerNameByLoginNumber
             [LibraryImport(DllName, EntryPoint = "?GetPlayerNameByLoginNumber@Agents@GW@@YAPA_WI@Z")]
-            internal static partial ushort* GetPlayerNameByLoginNumber(uint value);
+            public static partial ushort* GetPlayerNameByLoginNumber(uint value);
 
             // GW::Agents::GetTargetAsAgentLiving
             [LibraryImport(DllName, EntryPoint = "?GetTargetAsAgentLiving@Agents@GW@@YAPAUAgentLiving@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.AgentLiving* GetTargetAsAgentLiving();
+            public static partial global::Daybreak.API.Interop.GuildWars.AgentLiving* GetTargetAsAgentLiving();
 
             // GW::Agents::GetTargetId
             [LibraryImport(DllName, EntryPoint = "?GetTargetId@Agents@GW@@YAIXZ")]
-            internal static partial uint GetTargetId();
+            public static partial uint GetTargetId();
 
             // GW::Agents::InteractAgent | agent1: TODO: map struct GW::Agent
             // [LibraryImport(DllName, EntryPoint = "?InteractAgent@Agents@GW@@YA_NPBUAgent@2@_N@Z")]
             // [return: MarshalAs(UnmanagedType.U1)]
-            // internal static partial bool InteractAgent(Agent* agent1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            // public static partial bool InteractAgent(Agent* agent1, [MarshalAs(UnmanagedType.U1)] bool flag2);
 
             // GW::Agents::IsObserving
             [LibraryImport(DllName, EntryPoint = "?IsObserving@Agents@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool IsObserving();
+            public static partial bool IsObserving();
 
             // GW::Agents::Move
             [LibraryImport(DllName, EntryPoint = "?Move@Agents@GW@@YA_NMMI@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool Move(float value1, float value2, uint value3);
+            public static partial bool Move(float value1, float value2, uint value3);
 
             // GW::Agents::Move
             [LibraryImport(DllName, EntryPoint = "?Move@Agents@GW@@YA_NUGamePos@2@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool Move(global::Daybreak.API.Interop.GWCA.GW.GamePos gamePos);
+            public static partial bool Move(global::Daybreak.API.Interop.GuildWars.GamePos gamePos);
 
             // GW::Agents::SendDialog
             [LibraryImport(DllName, EntryPoint = "?SendDialog@Agents@GW@@YA_NI@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SendDialog(uint value);
+            public static partial bool SendDialog(uint value);
         }
 
-        internal static partial class ButtonFrame
+        public static partial class ButtonFrame
         {
 
             // GW::ButtonFrame::Click
             [LibraryImport(DllName, EntryPoint = "?Click@ButtonFrame@GW@@QAE_NXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double Click(nint self);
+            public static partial double Click(nint self);
 
             // GW::ButtonFrame::Create | returns TODO: map struct GW::ButtonFrame
             // [LibraryImport(DllName, EntryPoint = "?Create@ButtonFrame@GW@@SAPAU12@IIIPB_W0@Z")]
-            // internal static partial ButtonFrame* Create(uint value1, uint value2, uint value3, ushort* ptr4, nint ptr5);
+            // public static partial ButtonFrame* Create(uint value1, uint value2, uint value3, ushort* ptr4, nint ptr5);
 
             // GW::ButtonFrame::DoubleClick
             [LibraryImport(DllName, EntryPoint = "?DoubleClick@ButtonFrame@GW@@QAE_NXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double DoubleClick(nint self);
+            public static partial double DoubleClick(nint self);
 
             // GW::ButtonFrame::GetLabel
             [LibraryImport(DllName, EntryPoint = "?GetLabel@ButtonFrame@GW@@QAE_NPAPB_W@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double GetLabel(nint self, void* ptr2);
+            public static partial double GetLabel(nint self, void* ptr2);
 
             // GW::ButtonFrame::MouseAction
             [LibraryImport(DllName, EntryPoint = "?MouseAction@ButtonFrame@GW@@QAE_NW4ActionState@UIPacket@UI@2@@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double MouseAction(nint self, global::Daybreak.API.Interop.GWCA.GW.UIPacket.ActionState actionState2);
+            public static partial double MouseAction(nint self, global::Daybreak.API.Interop.GWCA.GW.UIPacket.ActionState actionState2);
 
             // GW::ButtonFrame::SetLabel
             [LibraryImport(DllName, EntryPoint = "?SetLabel@ButtonFrame@GW@@QAE_NPB_W@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double SetLabel(nint self, ushort* ptr2);
+            public static partial double SetLabel(nint self, ushort* ptr2);
         }
 
-        internal static partial class CameraMgr
+        public static partial class CameraMgr
         {
 
             // GW::CameraMgr::ComputeCamPos
             [LibraryImport(DllName, EntryPoint = "?ComputeCamPos@CameraMgr@GW@@YA?AUVec3f@2@M@Z")]
-            internal static partial global::System.Numerics.Vector3 ComputeCamPos(float value);
+            public static partial global::System.Numerics.Vector3 ComputeCamPos(float value);
 
             // GW::CameraMgr::GetCamera
             [LibraryImport(DllName, EntryPoint = "?GetCamera@CameraMgr@GW@@YAPAUCamera@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Camera* GetCamera();
+            public static partial global::Daybreak.API.Interop.GuildWars.Camera* GetCamera();
 
             // GW::CameraMgr::GetCameraUnlock
             [LibraryImport(DllName, EntryPoint = "?GetCameraUnlock@CameraMgr@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetCameraUnlock();
+            public static partial bool GetCameraUnlock();
 
             // GW::CameraMgr::GetFieldOfView
             [LibraryImport(DllName, EntryPoint = "?GetFieldOfView@CameraMgr@GW@@YAMXZ")]
-            internal static partial float GetFieldOfView();
+            public static partial float GetFieldOfView();
 
             // GW::CameraMgr::GetYaw
             [LibraryImport(DllName, EntryPoint = "?GetYaw@CameraMgr@GW@@YAMXZ")]
-            internal static partial float GetYaw();
+            public static partial float GetYaw();
 
             // GW::CameraMgr::SetFieldOfView
             [LibraryImport(DllName, EntryPoint = "?SetFieldOfView@CameraMgr@GW@@YA_NM@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetFieldOfView(float value);
+            public static partial bool SetFieldOfView(float value);
 
             // GW::CameraMgr::SetFog
             [LibraryImport(DllName, EntryPoint = "?SetFog@CameraMgr@GW@@YA_N_N@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetFog([MarshalAs(UnmanagedType.U1)] bool flag);
+            public static partial bool SetFog([MarshalAs(UnmanagedType.U1)] bool flag);
 
             // GW::CameraMgr::SetMaxDist
             [LibraryImport(DllName, EntryPoint = "?SetMaxDist@CameraMgr@GW@@YA_NM@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetMaxDist(float value);
+            public static partial bool SetMaxDist(float value);
 
             // GW::CameraMgr::UnlockCam
             [LibraryImport(DllName, EntryPoint = "?UnlockCam@CameraMgr@GW@@YA_N_N@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool UnlockCam([MarshalAs(UnmanagedType.U1)] bool flag);
+            public static partial bool UnlockCam([MarshalAs(UnmanagedType.U1)] bool flag);
 
             // GW::CameraMgr::UpdateCameraPos
             [LibraryImport(DllName, EntryPoint = "?UpdateCameraPos@CameraMgr@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool UpdateCameraPos();
+            public static partial bool UpdateCameraPos();
         }
 
-        internal static partial class Chat
+        public static partial class Chat
         {
 
             // GW::Chat::AddToChatLog
             [LibraryImport(DllName, EntryPoint = "?AddToChatLog@Chat@GW@@YA_NPA_WI@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool AddToChatLog(ushort* ptr1, uint value2);
+            public static partial bool AddToChatLog(ushort* ptr1, uint value2);
 
             // GW::Chat::CreateCommand
             [LibraryImport(DllName, EntryPoint = "?CreateCommand@Chat@GW@@YAXPAUHookEntry@2@PB_WP6AXPAUHookStatus@2@1HPBQA_W@Z@Z")]
-            internal static partial void CreateCommand(global::Daybreak.API.Interop.HookEntry* hookEntry1, ushort* ptr2, nint callback3);
+            public static partial void CreateCommand(global::Daybreak.API.Interop.HookEntry* hookEntry1, ushort* ptr2, nint callback3);
 
             // GW::Chat::DeleteCommand
             [LibraryImport(DllName, EntryPoint = "?DeleteCommand@Chat@GW@@YAXPAUHookEntry@2@PB_W@Z")]
-            internal static partial void DeleteCommand(global::Daybreak.API.Interop.HookEntry* hookEntry1, ushort* ptr2);
+            public static partial void DeleteCommand(global::Daybreak.API.Interop.HookEntry* hookEntry1, ushort* ptr2);
 
             // GW::Chat::GetChannel
             [LibraryImport(DllName, EntryPoint = "?GetChannel@Chat@GW@@YA?AW4Channel@12@D@Z")]
-            internal static partial global::Daybreak.API.Models.Channel GetChannel(byte value);
+            public static partial global::Daybreak.API.Models.Channel GetChannel(byte value);
 
             // GW::Chat::GetChannel
             [LibraryImport(DllName, EntryPoint = "?GetChannel@Chat@GW@@YA?AW4Channel@12@_W@Z")]
-            internal static partial global::Daybreak.API.Models.Channel GetChannel(ushort value);
+            public static partial global::Daybreak.API.Models.Channel GetChannel(ushort value);
 
             // GW::Chat::GetChannelColors
             [LibraryImport(DllName, EntryPoint = "?GetChannelColors@Chat@GW@@YAXW4Channel@12@PAI1@Z")]
-            internal static partial void GetChannelColors(global::Daybreak.API.Models.Channel channel1, uint* ptr2, nint ptr3);
+            public static partial void GetChannelColors(global::Daybreak.API.Models.Channel channel1, uint* ptr2, nint ptr3);
 
             // GW::Chat::GetChatLog
             [LibraryImport(DllName, EntryPoint = "?GetChatLog@Chat@GW@@YAPAUChatBuffer@12@XZ")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Chat.ChatBuffer* GetChatLog();
+            public static partial global::Daybreak.API.Interop.GuildWars.ChatBuffer* GetChatLog();
 
             // GW::Chat::GetDefaultColors
             [LibraryImport(DllName, EntryPoint = "?GetDefaultColors@Chat@GW@@YAXW4Channel@12@PAI1@Z")]
-            internal static partial void GetDefaultColors(global::Daybreak.API.Models.Channel channel1, uint* ptr2, nint ptr3);
+            public static partial void GetDefaultColors(global::Daybreak.API.Models.Channel channel1, uint* ptr2, nint ptr3);
 
             // GW::Chat::GetIsTyping
             [LibraryImport(DllName, EntryPoint = "?GetIsTyping@Chat@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetIsTyping();
+            public static partial bool GetIsTyping();
 
             // GW::Chat::SendChat
             [LibraryImport(DllName, EntryPoint = "?SendChat@Chat@GW@@YA_NDPBD@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SendChat(byte value1, byte* ptr2);
+            public static partial bool SendChat(byte value1, byte* ptr2);
 
             // GW::Chat::SendChat
             [LibraryImport(DllName, EntryPoint = "?SendChat@Chat@GW@@YA_NDPB_W@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SendChat(byte value1, ushort* ptr2);
+            public static partial bool SendChat(byte value1, ushort* ptr2);
 
             // GW::Chat::SendChat
             [LibraryImport(DllName, EntryPoint = "?SendChat@Chat@GW@@YA_NPB_W0@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SendChat(ushort* ptr1, nint ptr2);
+            public static partial bool SendChat(ushort* ptr1, nint ptr2);
 
             // GW::Chat::SetMessageColor
             [LibraryImport(DllName, EntryPoint = "?SetMessageColor@Chat@GW@@YAIW4Channel@12@I@Z")]
-            internal static partial uint SetMessageColor(global::Daybreak.API.Models.Channel channel1, uint value2);
+            public static partial uint SetMessageColor(global::Daybreak.API.Models.Channel channel1, uint value2);
 
             // GW::Chat::SetSenderColor
             [LibraryImport(DllName, EntryPoint = "?SetSenderColor@Chat@GW@@YAIW4Channel@12@I@Z")]
-            internal static partial uint SetSenderColor(global::Daybreak.API.Models.Channel channel1, uint value2);
+            public static partial uint SetSenderColor(global::Daybreak.API.Models.Channel channel1, uint value2);
 
             // GW::Chat::SetTimestampsColor
             [LibraryImport(DllName, EntryPoint = "?SetTimestampsColor@Chat@GW@@YAXI@Z")]
-            internal static partial void SetTimestampsColor(uint value);
+            public static partial void SetTimestampsColor(uint value);
 
             // GW::Chat::SetTimestampsFormat
             [LibraryImport(DllName, EntryPoint = "?SetTimestampsFormat@Chat@GW@@YAX_N0@Z")]
-            internal static partial void SetTimestampsFormat([MarshalAs(UnmanagedType.U1)] bool flag1, nint ptr2);
+            public static partial void SetTimestampsFormat([MarshalAs(UnmanagedType.U1)] bool flag1, nint ptr2);
 
             // GW::Chat::ToggleTimestamps
             [LibraryImport(DllName, EntryPoint = "?ToggleTimestamps@Chat@GW@@YAX_N@Z")]
-            internal static partial void ToggleTimestamps([MarshalAs(UnmanagedType.U1)] bool flag);
+            public static partial void ToggleTimestamps([MarshalAs(UnmanagedType.U1)] bool flag);
 
             // GW::Chat::WriteChat
             [LibraryImport(DllName, EntryPoint = "?WriteChat@Chat@GW@@YAXW4Channel@12@PB_W1_N@Z")]
-            internal static partial void WriteChat(global::Daybreak.API.Models.Channel channel1, ushort* ptr2, nint ptr3, [MarshalAs(UnmanagedType.U1)] bool flag4);
+            public static partial void WriteChat(global::Daybreak.API.Models.Channel channel1, ushort* ptr2, nint ptr3, [MarshalAs(UnmanagedType.U1)] bool flag4);
 
             // GW::Chat::WriteChatEnc
             [LibraryImport(DllName, EntryPoint = "?WriteChatEnc@Chat@GW@@YAXW4Channel@12@PB_W1_N@Z")]
-            internal static partial void WriteChatEnc(global::Daybreak.API.Models.Channel channel1, ushort* ptr2, nint ptr3, [MarshalAs(UnmanagedType.U1)] bool flag4);
+            public static partial void WriteChatEnc(global::Daybreak.API.Models.Channel channel1, ushort* ptr2, nint ptr3, [MarshalAs(UnmanagedType.U1)] bool flag4);
 
             // GW::Chat::WriteChatF — varargs, requires manual interop
         }
 
-        internal static partial class CheckboxFrame
+        public static partial class CheckboxFrame
         {
 
             // GW::CheckboxFrame::Create | returns TODO: map struct GW::CheckboxFrame
             // [LibraryImport(DllName, EntryPoint = "?Create@CheckboxFrame@GW@@SAPAU12@IIIPB_W0@Z")]
-            // internal static partial CheckboxFrame* Create(uint value1, uint value2, uint value3, ushort* ptr4, nint ptr5);
+            // public static partial CheckboxFrame* Create(uint value1, uint value2, uint value3, ushort* ptr4, nint ptr5);
 
             // GW::CheckboxFrame::GetValue
             [LibraryImport(DllName, EntryPoint = "?GetValue@CheckboxFrame@GW@@UAEIXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial void GetValue(nint self);
+            public static partial void GetValue(nint self);
 
             // GW::CheckboxFrame::IsChecked
             [LibraryImport(DllName, EntryPoint = "?IsChecked@CheckboxFrame@GW@@QAE_NXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double IsChecked(nint self);
+            public static partial double IsChecked(nint self);
 
             // GW::CheckboxFrame::SetChecked
             [LibraryImport(DllName, EntryPoint = "?SetChecked@CheckboxFrame@GW@@QAE_N_N@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double SetChecked(nint self, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            public static partial double SetChecked(nint self, [MarshalAs(UnmanagedType.U1)] bool flag2);
 
             // GW::CheckboxFrame::SetValue
             [LibraryImport(DllName, EntryPoint = "?SetValue@CheckboxFrame@GW@@UAE_NI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double SetValue(nint self, uint value2);
+            public static partial double SetValue(nint self, uint value2);
         }
 
-        internal static partial class DropdownFrame
+        public static partial class DropdownFrame
         {
 
             // GW::DropdownFrame::AddOption
             [LibraryImport(DllName, EntryPoint = "?AddOption@DropdownFrame@GW@@QAE_NPB_WI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double AddOption(nint self, ushort* ptr2, uint value3);
+            public static partial double AddOption(nint self, ushort* ptr2, uint value3);
 
             // GW::DropdownFrame::GetCount
             [LibraryImport(DllName, EntryPoint = "?GetCount@DropdownFrame@GW@@QAE_NPAI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double GetCount(nint self, uint* ptr2);
+            public static partial double GetCount(nint self, uint* ptr2);
 
             // GW::DropdownFrame::GetOptionIndex
             [LibraryImport(DllName, EntryPoint = "?GetOptionIndex@DropdownFrame@GW@@QAE_NIPAI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double GetOptionIndex(nint self, uint value2, uint* ptr3);
+            public static partial double GetOptionIndex(nint self, uint value2, uint* ptr3);
 
             // GW::DropdownFrame::GetOptionValue
             [LibraryImport(DllName, EntryPoint = "?GetOptionValue@DropdownFrame@GW@@QAE_NIPAI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double GetOptionValue(nint self, uint value2, uint* ptr3);
+            public static partial double GetOptionValue(nint self, uint value2, uint* ptr3);
 
             // GW::DropdownFrame::GetOptions | returns TODO: map struct vector
             // [LibraryImport(DllName, EntryPoint = "?GetOptions@DropdownFrame@GW@@QAE?AV?$vector@IV?$allocator@I@std@@@std@@XZ")]
             // [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            // internal static partial vector* GetOptions(nint self, nint ptr2, nint ptr3, nint ptr4);
+            // public static partial vector* GetOptions(nint self, nint ptr2, nint ptr3, nint ptr4);
 
             // GW::DropdownFrame::GetSelectedIndex
             [LibraryImport(DllName, EntryPoint = "?GetSelectedIndex@DropdownFrame@GW@@QAE_NPAI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double GetSelectedIndex(nint self, uint* ptr2);
+            public static partial double GetSelectedIndex(nint self, uint* ptr2);
 
             // GW::DropdownFrame::GetValue
             [LibraryImport(DllName, EntryPoint = "?GetValue@DropdownFrame@GW@@UAEIXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial void GetValue(nint self);
+            public static partial void GetValue(nint self);
 
             // GW::DropdownFrame::HasValueMapping
             [LibraryImport(DllName, EntryPoint = "?HasValueMapping@DropdownFrame@GW@@QAE_NXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double HasValueMapping(nint self);
+            public static partial double HasValueMapping(nint self);
 
             // GW::DropdownFrame::SelectIndex
             [LibraryImport(DllName, EntryPoint = "?SelectIndex@DropdownFrame@GW@@QAE_NI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double SelectIndex(nint self, uint value2);
+            public static partial double SelectIndex(nint self, uint value2);
 
             // GW::DropdownFrame::SelectOption
             [LibraryImport(DllName, EntryPoint = "?SelectOption@DropdownFrame@GW@@QAE_NI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double SelectOption(nint self, uint value2);
+            public static partial double SelectOption(nint self, uint value2);
 
             // GW::DropdownFrame::SetValue
             [LibraryImport(DllName, EntryPoint = "?SetValue@DropdownFrame@GW@@UAE_NI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double SetValue(nint self, uint value2);
+            public static partial double SetValue(nint self, uint value2);
         }
 
-        internal static partial class EditableTextFrame
+        public static partial class EditableTextFrame
         {
 
             // GW::EditableTextFrame::GetValue
             [LibraryImport(DllName, EntryPoint = "?GetValue@EditableTextFrame@GW@@QAEPB_WXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial nint GetValue(nint self, ushort value2);
+            public static partial nint GetValue(nint self, ushort value2);
 
             // GW::EditableTextFrame::IsReadOnly
             [LibraryImport(DllName, EntryPoint = "?IsReadOnly@EditableTextFrame@GW@@QAE_NXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double IsReadOnly(nint self);
+            public static partial double IsReadOnly(nint self);
 
             // GW::EditableTextFrame::SetMaxLength
             [LibraryImport(DllName, EntryPoint = "?SetMaxLength@EditableTextFrame@GW@@QAE_NI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double SetMaxLength(nint self, uint value2);
+            public static partial double SetMaxLength(nint self, uint value2);
 
             // GW::EditableTextFrame::SetReadOnly
             [LibraryImport(DllName, EntryPoint = "?SetReadOnly@EditableTextFrame@GW@@QAE_N_N@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double SetReadOnly(nint self, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            public static partial double SetReadOnly(nint self, [MarshalAs(UnmanagedType.U1)] bool flag2);
 
             // GW::EditableTextFrame::SetValue
             [LibraryImport(DllName, EntryPoint = "?SetValue@EditableTextFrame@GW@@QAE_NPB_W@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double SetValue(nint self, ushort* ptr2);
+            public static partial double SetValue(nint self, ushort* ptr2);
         }
 
-        internal static partial class Effect
+        public static partial class Effect
         {
 
             // GW::Effect::GetTimeElapsed
             [LibraryImport(DllName, EntryPoint = "?GetTimeElapsed@Effect@GW@@QBEKXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial void GetTimeElapsed(nint self);
+            public static partial void GetTimeElapsed(nint self);
 
             // GW::Effect::GetTimeRemaining
             [LibraryImport(DllName, EntryPoint = "?GetTimeRemaining@Effect@GW@@QBEKXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial void GetTimeRemaining(nint self);
+            public static partial void GetTimeRemaining(nint self);
         }
 
-        internal static partial class Effects
+        public static partial class Effects
         {
 
             // GW::Effects::DropBuff
             [LibraryImport(DllName, EntryPoint = "?DropBuff@Effects@GW@@YA_NI@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool DropBuff(uint value);
+            public static partial bool DropBuff(uint value);
 
             // GW::Effects::GetAgentBuffs
             [LibraryImport(DllName, EntryPoint = "?GetAgentBuffs@Effects@GW@@YAPAV?$Array@UBuff@GW@@@2@I@Z")]
-            internal static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GWCA.GW.Buff>* GetAgentBuffs();
+            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.Buff>* GetAgentBuffs();
 
             // GW::Effects::GetAgentEffects
             [LibraryImport(DllName, EntryPoint = "?GetAgentEffects@Effects@GW@@YAPAV?$Array@UEffect@GW@@@2@I@Z")]
-            internal static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GWCA.GW.EffectData>* GetAgentEffects();
+            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.EffectData>* GetAgentEffects();
 
             // GW::Effects::GetAgentEffectsArray
             [LibraryImport(DllName, EntryPoint = "?GetAgentEffectsArray@Effects@GW@@YAPAUAgentEffects@2@I@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.AgentEffects* GetAgentEffectsArray(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.AgentEffects* GetAgentEffectsArray(uint value);
 
             // GW::Effects::GetAlcoholLevel
             [LibraryImport(DllName, EntryPoint = "?GetAlcoholLevel@Effects@GW@@YAIXZ")]
-            internal static partial uint GetAlcoholLevel();
+            public static partial uint GetAlcoholLevel();
 
             // GW::Effects::GetDrunkAf
             [LibraryImport(DllName, EntryPoint = "?GetDrunkAf@Effects@GW@@YAXMI@Z")]
-            internal static partial void GetDrunkAf(float value1, uint value2);
+            public static partial void GetDrunkAf(float value1, uint value2);
 
             // GW::Effects::GetPartyEffectsArray
             [LibraryImport(DllName, EntryPoint = "?GetPartyEffectsArray@Effects@GW@@YAPAV?$Array@UAgentEffects@GW@@@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GWCA.GW.AgentEffects>* GetPartyEffectsArray();
+            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.AgentEffects>* GetPartyEffectsArray();
 
             // GW::Effects::GetPlayerBuffBySkillId
             [LibraryImport(DllName, EntryPoint = "?GetPlayerBuffBySkillId@Effects@GW@@YAPAUBuff@2@W4SkillID@Constants@2@@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Buff* GetPlayerBuffBySkillId(global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillID);
+            public static partial global::Daybreak.API.Interop.GuildWars.Buff* GetPlayerBuffBySkillId(global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillID);
 
             // GW::Effects::GetPlayerBuffs
             [LibraryImport(DllName, EntryPoint = "?GetPlayerBuffs@Effects@GW@@YAPAV?$Array@UBuff@GW@@@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GWCA.GW.Buff>* GetPlayerBuffs();
+            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.Buff>* GetPlayerBuffs();
 
             // GW::Effects::GetPlayerEffectBySkillId
             [LibraryImport(DllName, EntryPoint = "?GetPlayerEffectBySkillId@Effects@GW@@YAPAUEffect@2@W4SkillID@Constants@2@@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.EffectData* GetPlayerEffectBySkillId(global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillID);
+            public static partial global::Daybreak.API.Interop.GuildWars.EffectData* GetPlayerEffectBySkillId(global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillID);
 
             // GW::Effects::GetPlayerEffects
             [LibraryImport(DllName, EntryPoint = "?GetPlayerEffects@Effects@GW@@YAPAV?$Array@UEffect@GW@@@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GWCA.GW.EffectData>* GetPlayerEffects();
+            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.EffectData>* GetPlayerEffects();
 
             // GW::Effects::GetPlayerEffectsArray
             [LibraryImport(DllName, EntryPoint = "?GetPlayerEffectsArray@Effects@GW@@YAPAUAgentEffects@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.AgentEffects* GetPlayerEffectsArray();
+            public static partial global::Daybreak.API.Interop.GuildWars.AgentEffects* GetPlayerEffectsArray();
         }
 
-        internal static partial class EventMgr
+        public static partial class EventMgr
         {
 
             // GW::EventMgr::RegisterEventCallback | function3: TODO: map struct function
             // [LibraryImport(DllName, EntryPoint = "?RegisterEventCallback@EventMgr@GW@@YAXPAUHookEntry@2@W4EventID@12@ABV?$function@$$A6AXPAUHookStatus@GW@@W4EventID@EventMgr@2@PAXI@Z@std@@H@Z")]
-            // internal static partial void RegisterEventCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, global::Daybreak.API.Interop.GWCA.GW.EventMgr.EventID eventID2, function* function3, global::Daybreak.API.Interop.GWCA.GW.EventMgr.EventID eventID4, void* ptr5, uint value6);
+            // public static partial void RegisterEventCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, global::Daybreak.API.Interop.GWCA.GW.EventMgr.EventID eventID2, function* function3, global::Daybreak.API.Interop.GWCA.GW.EventMgr.EventID eventID4, void* ptr5, uint value6);
 
             // GW::EventMgr::RemoveEventCallback
             [LibraryImport(DllName, EntryPoint = "?RemoveEventCallback@EventMgr@GW@@YAXPAUHookEntry@2@W4EventID@12@@Z")]
-            internal static partial void RemoveEventCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, global::Daybreak.API.Interop.GWCA.GW.EventMgr.EventID eventID2);
+            public static partial void RemoveEventCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, global::Daybreak.API.Interop.GWCA.GW.EventMgr.EventID eventID2);
         }
 
-        internal static partial class FriendListMgr
+        public static partial class FriendListMgr
         {
 
             // GW::FriendListMgr::AddFriend
             [LibraryImport(DllName, EntryPoint = "?AddFriend@FriendListMgr@GW@@YA_NPB_W0@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool AddFriend(ushort* ptr1, nint ptr2);
+            public static partial bool AddFriend(ushort* ptr1, nint ptr2);
 
             // GW::FriendListMgr::AddIgnore
             [LibraryImport(DllName, EntryPoint = "?AddIgnore@FriendListMgr@GW@@YA_NPB_W0@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool AddIgnore(ushort* ptr1, nint ptr2);
+            public static partial bool AddIgnore(ushort* ptr1, nint ptr2);
 
             // GW::FriendListMgr::ChangeFriendType
             [LibraryImport(DllName, EntryPoint = "?ChangeFriendType@FriendListMgr@GW@@YA_NPAUFriend@2@W4FriendType@2@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool ChangeFriendType(global::Daybreak.API.Interop.GWCA.GW.Friend* friend1, global::Daybreak.API.Interop.GWCA.GW.FriendType friendType2);
+            public static partial bool ChangeFriendType(global::Daybreak.API.Interop.GuildWars.Friend* friend1, global::Daybreak.API.Interop.GWCA.GW.FriendType friendType2);
 
             // GW::FriendListMgr::GetFriend
             [LibraryImport(DllName, EntryPoint = "?GetFriend@FriendListMgr@GW@@YAPAUFriend@2@I@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Friend* GetFriend(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.Friend* GetFriend(uint value);
 
             // GW::FriendListMgr::GetFriend
             [LibraryImport(DllName, EntryPoint = "?GetFriend@FriendListMgr@GW@@YAPAUFriend@2@PBE@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Friend* GetFriend(byte* ptr);
+            public static partial global::Daybreak.API.Interop.GuildWars.Friend* GetFriend(byte* ptr);
 
             // GW::FriendListMgr::GetFriend
             [LibraryImport(DllName, EntryPoint = "?GetFriend@FriendListMgr@GW@@YAPAUFriend@2@PB_W0W4FriendType@2@@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Friend* GetFriend(ushort* ptr1, nint ptr2, global::Daybreak.API.Interop.GWCA.GW.FriendType friendType3);
+            public static partial global::Daybreak.API.Interop.GuildWars.Friend* GetFriend(ushort* ptr1, nint ptr2, global::Daybreak.API.Interop.GWCA.GW.FriendType friendType3);
 
             // GW::FriendListMgr::GetFriendList | returns TODO: map struct GW::FriendList
             // [LibraryImport(DllName, EntryPoint = "?GetFriendList@FriendListMgr@GW@@YAPAUFriendList@2@XZ")]
-            // internal static partial FriendList* GetFriendList();
+            // public static partial FriendList* GetFriendList();
 
             // GW::FriendListMgr::GetMyStatus
             [LibraryImport(DllName, EntryPoint = "?GetMyStatus@FriendListMgr@GW@@YA?AW4FriendStatus@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.FriendStatus GetMyStatus();
+            public static partial global::Daybreak.API.Interop.GWCA.GW.FriendStatus GetMyStatus();
 
             // GW::FriendListMgr::GetNumberOfFriends
             [LibraryImport(DllName, EntryPoint = "?GetNumberOfFriends@FriendListMgr@GW@@YAIW4FriendType@2@@Z")]
-            internal static partial uint GetNumberOfFriends(global::Daybreak.API.Interop.GWCA.GW.FriendType friendType);
+            public static partial uint GetNumberOfFriends(global::Daybreak.API.Interop.GWCA.GW.FriendType friendType);
 
             // GW::FriendListMgr::GetNumberOfIgnores
             [LibraryImport(DllName, EntryPoint = "?GetNumberOfIgnores@FriendListMgr@GW@@YAIXZ")]
-            internal static partial uint GetNumberOfIgnores();
+            public static partial uint GetNumberOfIgnores();
 
             // GW::FriendListMgr::GetNumberOfPartners
             [LibraryImport(DllName, EntryPoint = "?GetNumberOfPartners@FriendListMgr@GW@@YAIXZ")]
-            internal static partial uint GetNumberOfPartners();
+            public static partial uint GetNumberOfPartners();
 
             // GW::FriendListMgr::GetNumberOfTraders
             [LibraryImport(DllName, EntryPoint = "?GetNumberOfTraders@FriendListMgr@GW@@YAIXZ")]
-            internal static partial uint GetNumberOfTraders();
+            public static partial uint GetNumberOfTraders();
 
             // GW::FriendListMgr::RegisterFriendStatusCallback | function2: TODO: map struct function
             // [LibraryImport(DllName, EntryPoint = "?RegisterFriendStatusCallback@FriendListMgr@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUHookStatus@GW@@PBUFriend@2@1@Z@std@@@Z")]
-            // internal static partial void RegisterFriendStatusCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, global::Daybreak.API.Interop.GWCA.GW.Friend* friend3, nint ptr4);
+            // public static partial void RegisterFriendStatusCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, global::Daybreak.API.Interop.GuildWars.Friend* friend3, nint ptr4);
 
             // GW::FriendListMgr::RemoveFriend
             [LibraryImport(DllName, EntryPoint = "?RemoveFriend@FriendListMgr@GW@@YA_NPAUFriend@2@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool RemoveFriend(global::Daybreak.API.Interop.GWCA.GW.Friend* friend);
+            public static partial bool RemoveFriend(global::Daybreak.API.Interop.GuildWars.Friend* friend);
 
             // GW::FriendListMgr::RemoveFriendStatusCallback
             [LibraryImport(DllName, EntryPoint = "?RemoveFriendStatusCallback@FriendListMgr@GW@@YAXPAUHookEntry@2@@Z")]
-            internal static partial void RemoveFriendStatusCallback(global::Daybreak.API.Interop.HookEntry* hookEntry);
+            public static partial void RemoveFriendStatusCallback(global::Daybreak.API.Interop.HookEntry* hookEntry);
 
             // GW::FriendListMgr::SetFriendListStatus
             [LibraryImport(DllName, EntryPoint = "?SetFriendListStatus@FriendListMgr@GW@@YA_NW4FriendStatus@2@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetFriendListStatus(global::Daybreak.API.Interop.GWCA.GW.FriendStatus friendStatus);
+            public static partial bool SetFriendListStatus(global::Daybreak.API.Interop.GWCA.GW.FriendStatus friendStatus);
         }
 
-        internal static partial class GameThread
+        public static partial class GameThread
         {
 
             // GW::GameThread::ClearCalls
             [LibraryImport(DllName, EntryPoint = "?ClearCalls@GameThread@GW@@YAXXZ")]
-            internal static partial void ClearCalls();
+            public static partial void ClearCalls();
 
             // GW::GameThread::EnableHooks
             [LibraryImport(DllName, EntryPoint = "?EnableHooks@GameThread@GW@@YAXXZ")]
-            internal static partial void EnableHooks();
+            public static partial void EnableHooks();
 
             // GW::GameThread::Enqueue | via C export
             [LibraryImport(DllName, EntryPoint = "Enqueue")]
-            internal static partial void Enqueue(nint function1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            public static partial void Enqueue(nint function1, [MarshalAs(UnmanagedType.U1)] bool flag2);
 
             // GW::GameThread::IsInGameThread
             [LibraryImport(DllName, EntryPoint = "?IsInGameThread@GameThread@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool IsInGameThread();
+            public static partial bool IsInGameThread();
 
             // GW::GameThread::RegisterGameThreadCallback | via C export
             [LibraryImport(DllName, EntryPoint = "RegisterGameThreadCallback")]
-            internal static partial void RegisterGameThreadCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, nint function2);
+            public static partial void RegisterGameThreadCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, nint function2);
 
             // GW::GameThread::RemoveGameThreadCallback
             [LibraryImport(DllName, EntryPoint = "?RemoveGameThreadCallback@GameThread@GW@@YAXPAUHookEntry@2@@Z")]
-            internal static partial void RemoveGameThreadCallback(global::Daybreak.API.Interop.HookEntry* hookEntry);
+            public static partial void RemoveGameThreadCallback(global::Daybreak.API.Interop.HookEntry* hookEntry);
         }
 
-        internal static partial class GuildMgr
+        public static partial class GuildMgr
         {
 
-            // GW::GuildMgr::GetCurrentGH | returns TODO: map struct GW::Guild
-            // [LibraryImport(DllName, EntryPoint = "?GetCurrentGH@GuildMgr@GW@@YAPAUGuild@2@XZ")]
-            // internal static partial Guild* GetCurrentGH();
+            // GW::GuildMgr::GetCurrentGH
+            [LibraryImport(DllName, EntryPoint = "?GetCurrentGH@GuildMgr@GW@@YAPAUGuild@2@XZ")]
+            public static partial global::Daybreak.API.Interop.GuildWars.Guild* GetCurrentGH();
 
             // GW::GuildMgr::GetGuildArray
-            // [LibraryImport(DllName, EntryPoint = "?GetGuildArray@GuildMgr@GW@@YAPAV?$Array@PAUGuild@GW@@@2@XZ")]
-            // internal static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint>* GetGuildArray();
+            [LibraryImport(DllName, EntryPoint = "?GetGuildArray@GuildMgr@GW@@YAPAV?$Array@PAUGuild@GW@@@2@XZ")]
+            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint>* GetGuildArray();
 
-            // GW::GuildMgr::GetGuildInfo | returns TODO: map struct GW::Guild
-            // [LibraryImport(DllName, EntryPoint = "?GetGuildInfo@GuildMgr@GW@@YAPAUGuild@2@I@Z")]
-            // internal static partial Guild* GetGuildInfo(uint value);
+            // GW::GuildMgr::GetGuildInfo
+            [LibraryImport(DllName, EntryPoint = "?GetGuildInfo@GuildMgr@GW@@YAPAUGuild@2@I@Z")]
+            public static partial global::Daybreak.API.Interop.GuildWars.Guild* GetGuildInfo(uint value);
 
-            // GW::GuildMgr::GetPlayerGuild | returns TODO: map struct GW::Guild
-            // [LibraryImport(DllName, EntryPoint = "?GetPlayerGuild@GuildMgr@GW@@YAPAUGuild@2@XZ")]
-            // internal static partial Guild* GetPlayerGuild();
+            // GW::GuildMgr::GetPlayerGuild
+            [LibraryImport(DllName, EntryPoint = "?GetPlayerGuild@GuildMgr@GW@@YAPAUGuild@2@XZ")]
+            public static partial global::Daybreak.API.Interop.GuildWars.Guild* GetPlayerGuild();
 
             // GW::GuildMgr::GetPlayerGuildAnnouncement
             [LibraryImport(DllName, EntryPoint = "?GetPlayerGuildAnnouncement@GuildMgr@GW@@YAPA_WXZ")]
-            internal static partial ushort* GetPlayerGuildAnnouncement();
+            public static partial ushort* GetPlayerGuildAnnouncement();
 
             // GW::GuildMgr::GetPlayerGuildAnnouncer
             [LibraryImport(DllName, EntryPoint = "?GetPlayerGuildAnnouncer@GuildMgr@GW@@YAPA_WXZ")]
-            internal static partial ushort* GetPlayerGuildAnnouncer();
+            public static partial ushort* GetPlayerGuildAnnouncer();
 
             // GW::GuildMgr::GetPlayerGuildIndex
             [LibraryImport(DllName, EntryPoint = "?GetPlayerGuildIndex@GuildMgr@GW@@YAIXZ")]
-            internal static partial uint GetPlayerGuildIndex();
+            public static partial uint GetPlayerGuildIndex();
 
             // GW::GuildMgr::LeaveGH
             [LibraryImport(DllName, EntryPoint = "?LeaveGH@GuildMgr@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool LeaveGH();
+            public static partial bool LeaveGH();
 
-            // GW::GuildMgr::TravelGH | gHKey: TODO: map struct GW::GHKey
-            // [LibraryImport(DllName, EntryPoint = "?TravelGH@GuildMgr@GW@@YA_NUGHKey@2@@Z")]
-            // [return: MarshalAs(UnmanagedType.U1)]
-            // internal static partial bool TravelGH(GHKey gHKey);
+            // GW::GuildMgr::TravelGH
+            [LibraryImport(DllName, EntryPoint = "?TravelGH@GuildMgr@GW@@YA_NUGHKey@2@@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool TravelGH(global::Daybreak.API.Interop.GuildWars.GHKey gHKey);
 
             // GW::GuildMgr::TravelGH
             [LibraryImport(DllName, EntryPoint = "?TravelGH@GuildMgr@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool TravelGH();
+            public static partial bool TravelGH();
         }
 
-        internal static partial class Hook
+        public static partial class Hook
         {
 
             // GW::Hook::CreateHook
             [LibraryImport(DllName, EntryPoint = "?CreateHook@Hook@GW@@YAHPAPAXPAX0@Z")]
-            internal static partial int CreateHook(void* ptr1, void* ptr2, nint ptr3);
+            public static partial int CreateHook(void* ptr1, void* ptr2, nint ptr3);
 
             // GW::Hook::Deinitialize
             [LibraryImport(DllName, EntryPoint = "?Deinitialize@Hook@GW@@YAXXZ")]
-            internal static partial void Deinitialize();
+            public static partial void Deinitialize();
 
             // GW::Hook::DisableHooks
             [LibraryImport(DllName, EntryPoint = "?DisableHooks@Hook@GW@@YAXPAX@Z")]
-            internal static partial void DisableHooks(void* ptr);
+            public static partial void DisableHooks(void* ptr);
 
             // GW::Hook::EnableHooks
             [LibraryImport(DllName, EntryPoint = "?EnableHooks@Hook@GW@@YAXPAX@Z")]
-            internal static partial void EnableHooks(void* ptr);
+            public static partial void EnableHooks(void* ptr);
 
             // GW::Hook::EnterHook
             [LibraryImport(DllName, EntryPoint = "?EnterHook@Hook@GW@@YAXXZ")]
-            internal static partial void EnterHook();
+            public static partial void EnterHook();
 
             // GW::Hook::GetInHookCount
             [LibraryImport(DllName, EntryPoint = "?GetInHookCount@Hook@GW@@YAHXZ")]
-            internal static partial int GetInHookCount();
+            public static partial int GetInHookCount();
 
             // GW::Hook::Initialize
             [LibraryImport(DllName, EntryPoint = "?Initialize@Hook@GW@@YAXXZ")]
-            internal static partial void Initialize();
+            public static partial void Initialize();
 
             // GW::Hook::LeaveHook
             [LibraryImport(DllName, EntryPoint = "?LeaveHook@Hook@GW@@YAXXZ")]
-            internal static partial void LeaveHook();
+            public static partial void LeaveHook();
 
             // GW::Hook::RemoveHook
             [LibraryImport(DllName, EntryPoint = "?RemoveHook@Hook@GW@@YAXPAX@Z")]
-            internal static partial void RemoveHook(void* ptr);
+            public static partial void RemoveHook(void* ptr);
         }
 
-        internal static partial class Item
+        public static partial class Item
         {
 
             // GW::Item::GetIsMaterial
             [LibraryImport(DllName, EntryPoint = "?GetIsMaterial@Item@GW@@QBE_NXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double GetIsMaterial(nint self);
+            public static partial double GetIsMaterial(nint self);
 
             // GW::Item::GetIsZcoin
             [LibraryImport(DllName, EntryPoint = "?GetIsZcoin@Item@GW@@QBE_NXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double GetIsZcoin(nint self);
+            public static partial double GetIsZcoin(nint self);
         }
 
-        internal static partial class Items
+        public static partial class Items
         {
 
             // GW::Items::CanAccessXunlaiChest
             [LibraryImport(DllName, EntryPoint = "?CanAccessXunlaiChest@Items@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool CanAccessXunlaiChest();
+            public static partial bool CanAccessXunlaiChest();
 
             // GW::Items::CanInteractWithItem
             [LibraryImport(DllName, EntryPoint = "?CanInteractWithItem@Items@GW@@YA_NPBUItem@2@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool CanInteractWithItem(global::Daybreak.API.Interop.GWCA.GW.ItemData* itemData);
+            public static partial bool CanInteractWithItem(global::Daybreak.API.Interop.GuildWars.ItemStruct* itemStruct);
 
             // GW::Items::CountItemByModelId
             [LibraryImport(DllName, EntryPoint = "?CountItemByModelId@Items@GW@@YAIIHH@Z")]
-            internal static partial uint CountItemByModelId(uint value1, int value2, int value3);
+            public static partial uint CountItemByModelId(uint value1, int value2, int value3);
 
             // GW::Items::DepositGold
             [LibraryImport(DllName, EntryPoint = "?DepositGold@Items@GW@@YAII@Z")]
-            internal static partial uint DepositGold(uint value);
+            public static partial uint DepositGold(uint value);
 
             // GW::Items::DestroyItem
             [LibraryImport(DllName, EntryPoint = "?DestroyItem@Items@GW@@YA_NI@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool DestroyItem(uint value);
+            public static partial bool DestroyItem(uint value);
 
             // GW::Items::DropGold
             [LibraryImport(DllName, EntryPoint = "?DropGold@Items@GW@@YA_NI@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool DropGold(uint value);
+            public static partial bool DropGold(uint value);
 
             // GW::Items::DropItem
             [LibraryImport(DllName, EntryPoint = "?DropItem@Items@GW@@YA_NPBUItem@2@I@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool DropItem(global::Daybreak.API.Interop.GWCA.GW.ItemData* itemData1, uint value2);
+            public static partial bool DropItem(global::Daybreak.API.Interop.GuildWars.ItemStruct* itemStruct1, uint value2);
 
             // GW::Items::EquipItem
             [LibraryImport(DllName, EntryPoint = "?EquipItem@Items@GW@@YA_NPBUItem@2@I@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool EquipItem(global::Daybreak.API.Interop.GWCA.GW.ItemData* itemData1, uint value2);
+            public static partial bool EquipItem(global::Daybreak.API.Interop.GuildWars.ItemStruct* itemStruct1, uint value2);
 
             // GW::Items::GetBag
             [LibraryImport(DllName, EntryPoint = "?GetBag@Items@GW@@YAPAUBag@2@W43Constants@2@@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Bag* GetBag(global::Daybreak.API.Interop.GWCA.GW.Bag bag);
+            public static partial global::Daybreak.API.Interop.GuildWars.Bag* GetBag(global::Daybreak.API.Interop.GuildWars.Bag bag);
 
             // GW::Items::GetBagArray
             [LibraryImport(DllName, EntryPoint = "?GetBagArray@Items@GW@@YAPAPAUBag@2@XZ")]
-            internal static partial void* GetBagArray();
+            public static partial void* GetBagArray();
 
             // GW::Items::GetBagByIndex
             [LibraryImport(DllName, EntryPoint = "?GetBagByIndex@Items@GW@@YAPAUBag@2@I@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Bag* GetBagByIndex(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.Bag* GetBagByIndex(uint value);
 
             // GW::Items::GetCompositeModelInfo
             [LibraryImport(DllName, EntryPoint = "?GetCompositeModelInfo@Items@GW@@YAPBUCompositeModelInfo@2@I@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.CompositeModelInfo* GetCompositeModelInfo(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.CompositeModelInfo* GetCompositeModelInfo(uint value);
 
             // GW::Items::GetCompositeModelInfoArray | returns TODO: map struct BaseArray
             // [LibraryImport(DllName, EntryPoint = "?GetCompositeModelInfoArray@Items@GW@@YAABV?$BaseArray@UCompositeModelInfo@GW@@@2@XZ")]
-            // internal static partial BaseArray* GetCompositeModelInfoArray();
+            // public static partial BaseArray* GetCompositeModelInfoArray();
 
             // GW::Items::GetEquipmentVisibility
             [LibraryImport(DllName, EntryPoint = "?GetEquipmentVisibility@Items@GW@@YA?AW4EquipmentStatus@2@W4EquipmentType@2@@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.EquipmentStatus GetEquipmentVisibility(global::Daybreak.API.Interop.GWCA.GW.EquipmentType equipmentType);
+            public static partial global::Daybreak.API.Interop.GWCA.GW.EquipmentStatus GetEquipmentVisibility(global::Daybreak.API.Interop.GWCA.GW.EquipmentType equipmentType);
 
             // GW::Items::GetGoldAmountInStorage
             [LibraryImport(DllName, EntryPoint = "?GetGoldAmountInStorage@Items@GW@@YAIXZ")]
-            internal static partial uint GetGoldAmountInStorage();
+            public static partial uint GetGoldAmountInStorage();
 
             // GW::Items::GetGoldAmountOnCharacter
             [LibraryImport(DllName, EntryPoint = "?GetGoldAmountOnCharacter@Items@GW@@YAIXZ")]
-            internal static partial uint GetGoldAmountOnCharacter();
+            public static partial uint GetGoldAmountOnCharacter();
 
             // GW::Items::GetHoveredItem
             [LibraryImport(DllName, EntryPoint = "?GetHoveredItem@Items@GW@@YAPAUItem@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.ItemData* GetHoveredItem();
+            public static partial global::Daybreak.API.Interop.GuildWars.ItemStruct* GetHoveredItem();
 
             // GW::Items::GetInventory
             [LibraryImport(DllName, EntryPoint = "?GetInventory@Items@GW@@YAPAUInventory@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Inventory* GetInventory();
+            public static partial global::Daybreak.API.Interop.GuildWars.Inventory* GetInventory();
 
             // GW::Items::GetIsStorageOpen
             [LibraryImport(DllName, EntryPoint = "?GetIsStorageOpen@Items@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetIsStorageOpen();
+            public static partial bool GetIsStorageOpen();
 
             // GW::Items::GetItemArray
             [LibraryImport(DllName, EntryPoint = "?GetItemArray@Items@GW@@YAPAV?$Array@PAUItem@GW@@@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint>* GetItemArray();
+            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint>* GetItemArray();
 
             // GW::Items::GetItemById
             [LibraryImport(DllName, EntryPoint = "?GetItemById@Items@GW@@YAPAUItem@2@I@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.ItemData* GetItemById(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.ItemStruct* GetItemById(uint value);
 
             // GW::Items::GetItemByModelId
             [LibraryImport(DllName, EntryPoint = "?GetItemByModelId@Items@GW@@YAPAUItem@2@IHH@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.ItemData* GetItemByModelId(uint value1, int value2, int value3);
+            public static partial global::Daybreak.API.Interop.GuildWars.ItemStruct* GetItemByModelId(uint value1, int value2, int value3);
 
             // GW::Items::GetItemByModelIdAndModifiers
             [LibraryImport(DllName, EntryPoint = "?GetItemByModelIdAndModifiers@Items@GW@@YAPAUItem@2@IPBUItemModifier@2@IHH@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.ItemData* GetItemByModelIdAndModifiers(uint value1, global::Daybreak.API.Interop.GWCA.GW.ItemModifier* itemModifier2, uint value3, int value4, int value5);
+            public static partial global::Daybreak.API.Interop.GuildWars.ItemStruct* GetItemByModelIdAndModifiers(uint value1, global::Daybreak.API.Interop.GuildWars.ItemModifier* itemModifier2, uint value3, int value4, int value5);
 
             // GW::Items::GetItemBySlot
             [LibraryImport(DllName, EntryPoint = "?GetItemBySlot@Items@GW@@YAPAUItem@2@PBUBag@2@I@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.ItemData* GetItemBySlot(global::Daybreak.API.Interop.GWCA.GW.Bag* bag1, uint value2);
+            public static partial global::Daybreak.API.Interop.GuildWars.ItemStruct* GetItemBySlot(global::Daybreak.API.Interop.GuildWars.Bag* bag1, uint value2);
 
             // GW::Items::GetItemFormula
             [LibraryImport(DllName, EntryPoint = "?GetItemFormula@Items@GW@@YAPBUItemFormula@2@PBUItem@2@@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.ItemFormula* GetItemFormula(global::Daybreak.API.Interop.GWCA.GW.ItemData* itemData);
+            public static partial global::Daybreak.API.Interop.GuildWars.ItemFormula* GetItemFormula(global::Daybreak.API.Interop.GuildWars.ItemStruct* itemStruct);
 
             // GW::Items::GetMaterialSlot
             [LibraryImport(DllName, EntryPoint = "?GetMaterialSlot@Items@GW@@YA?AW4MaterialSlot@Constants@2@PBUItem@2@@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Constants.MaterialSlot GetMaterialSlot(global::Daybreak.API.Interop.GWCA.GW.ItemData* itemData);
+            public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.MaterialSlot GetMaterialSlot(global::Daybreak.API.Interop.GuildWars.ItemStruct* itemStruct);
 
             // GW::Items::GetMaterialStorageStackSize
             [LibraryImport(DllName, EntryPoint = "?GetMaterialStorageStackSize@Items@GW@@YAIXZ")]
-            internal static partial uint GetMaterialStorageStackSize();
+            public static partial uint GetMaterialStorageStackSize();
 
             // GW::Items::GetPvPItemInfo
             [LibraryImport(DllName, EntryPoint = "?GetPvPItemInfo@Items@GW@@YAPBUPvPItemInfo@2@I@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.PvPItemInfo* GetPvPItemInfo(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.PvPItemInfo* GetPvPItemInfo(uint value);
 
             // GW::Items::GetPvPItemInfoArray | returns TODO: map struct BaseArray
             // [LibraryImport(DllName, EntryPoint = "?GetPvPItemInfoArray@Items@GW@@YAABV?$BaseArray@UPvPItemInfo@GW@@@2@XZ")]
-            // internal static partial BaseArray* GetPvPItemInfoArray();
+            // public static partial BaseArray* GetPvPItemInfoArray();
 
             // GW::Items::GetPvPItemUpgrade
             [LibraryImport(DllName, EntryPoint = "?GetPvPItemUpgrade@Items@GW@@YAPBUPvPItemUpgradeInfo@2@I@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.PvPItemUpgradeInfo* GetPvPItemUpgrade(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.PvPItemUpgradeInfo* GetPvPItemUpgrade(uint value);
 
             // GW::Items::GetPvPItemUpgradeEncodedDescription
             [LibraryImport(DllName, EntryPoint = "?GetPvPItemUpgradeEncodedDescription@Items@GW@@YA_NIPAPA_W@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetPvPItemUpgradeEncodedDescription(uint value1, void* ptr2);
+            public static partial bool GetPvPItemUpgradeEncodedDescription(uint value1, void* ptr2);
 
             // GW::Items::GetPvPItemUpgradeEncodedName
             [LibraryImport(DllName, EntryPoint = "?GetPvPItemUpgradeEncodedName@Items@GW@@YA_NIPAPA_W@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetPvPItemUpgradeEncodedName(uint value1, void* ptr2);
+            public static partial bool GetPvPItemUpgradeEncodedName(uint value1, void* ptr2);
 
             // GW::Items::GetPvPItemUpgradesArray | returns TODO: map struct BaseArray
             // [LibraryImport(DllName, EntryPoint = "?GetPvPItemUpgradesArray@Items@GW@@YAABV?$BaseArray@UPvPItemUpgradeInfo@GW@@@2@XZ")]
-            // internal static partial BaseArray* GetPvPItemUpgradesArray();
+            // public static partial BaseArray* GetPvPItemUpgradesArray();
 
             // GW::Items::GetSalvageSessionInfo
             [LibraryImport(DllName, EntryPoint = "?GetSalvageSessionInfo@Items@GW@@YAPAUSalvageSessionInfo@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.SalvageSessionInfo* GetSalvageSessionInfo();
+            public static partial global::Daybreak.API.Interop.GuildWars.SalvageSessionInfo* GetSalvageSessionInfo();
 
             // GW::Items::GetStoragePage
             [LibraryImport(DllName, EntryPoint = "?GetStoragePage@Items@GW@@YA?AW4StoragePane@Constants@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Constants.StoragePane GetStoragePage();
+            public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.StoragePane GetStoragePage();
 
             // GW::Items::IdentifyItem
             [LibraryImport(DllName, EntryPoint = "?IdentifyItem@Items@GW@@YA_NII@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool IdentifyItem(uint value1, uint value2);
+            public static partial bool IdentifyItem(uint value1, uint value2);
 
             // GW::Items::MoveItem
             [LibraryImport(DllName, EntryPoint = "?MoveItem@Items@GW@@YA_NPBUItem@2@0I@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool MoveItem(global::Daybreak.API.Interop.GWCA.GW.ItemData* itemData1, nint ptr2, uint value3);
+            public static partial bool MoveItem(global::Daybreak.API.Interop.GuildWars.ItemStruct* itemStruct1, nint ptr2, uint value3);
 
             // GW::Items::MoveItem
             [LibraryImport(DllName, EntryPoint = "?MoveItem@Items@GW@@YA_NPBUItem@2@PBUBag@2@II@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool MoveItem(global::Daybreak.API.Interop.GWCA.GW.ItemData* itemData1, global::Daybreak.API.Interop.GWCA.GW.Bag* bag2, uint value3, uint value4);
+            public static partial bool MoveItem(global::Daybreak.API.Interop.GuildWars.ItemStruct* itemStruct1, global::Daybreak.API.Interop.GuildWars.Bag* bag2, uint value3, uint value4);
 
             // GW::Items::MoveItem
             [LibraryImport(DllName, EntryPoint = "?MoveItem@Items@GW@@YA_NPBUItem@2@W4Bag@Constants@2@II@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool MoveItem(global::Daybreak.API.Interop.GWCA.GW.ItemData* itemData1, global::Daybreak.API.Interop.GWCA.GW.Bag bag2, uint value3, uint value4);
+            public static partial bool MoveItem(global::Daybreak.API.Interop.GuildWars.ItemStruct* itemStruct1, global::Daybreak.API.Interop.GuildWars.Bag bag2, uint value3, uint value4);
 
             // GW::Items::OpenXunlaiWindow
             [LibraryImport(DllName, EntryPoint = "?OpenXunlaiWindow@Items@GW@@YA_N_N0@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool OpenXunlaiWindow([MarshalAs(UnmanagedType.U1)] bool flag1, nint ptr2);
+            public static partial bool OpenXunlaiWindow([MarshalAs(UnmanagedType.U1)] bool flag1, nint ptr2);
 
             // GW::Items::PickUpItem
             [LibraryImport(DllName, EntryPoint = "?PickUpItem@Items@GW@@YA_NPBUItem@2@I@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool PickUpItem(global::Daybreak.API.Interop.GWCA.GW.ItemData* itemData1, uint value2);
+            public static partial bool PickUpItem(global::Daybreak.API.Interop.GuildWars.ItemStruct* itemStruct1, uint value2);
 
             // GW::Items::PingWeaponSet
             [LibraryImport(DllName, EntryPoint = "?PingWeaponSet@Items@GW@@YA_NIII@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool PingWeaponSet(uint value1, uint value2, uint value3);
+            public static partial bool PingWeaponSet(uint value1, uint value2, uint value3);
 
             // GW::Items::RegisterItemClickCallback | function2: TODO: map struct function
             // [LibraryImport(DllName, EntryPoint = "?RegisterItemClickCallback@Items@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUHookStatus@GW@@PAUkMouseAction@UIPacket@UI@2@PAUItem@2@@Z@std@@@Z")]
-            // internal static partial void RegisterItemClickCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, global::Daybreak.API.Interop.GWCA.GW.UIPacket.kMouseAction* kMouseAction3, global::Daybreak.API.Interop.GWCA.GW.ItemData* itemData4);
+            // public static partial void RegisterItemClickCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, global::Daybreak.API.Interop.GuildWars.kMouseAction* kMouseAction3, global::Daybreak.API.Interop.GuildWars.ItemStruct* itemStruct4);
 
             // GW::Items::RemoveItemClickCallback
             [LibraryImport(DllName, EntryPoint = "?RemoveItemClickCallback@Items@GW@@YAXPAUHookEntry@2@@Z")]
-            internal static partial void RemoveItemClickCallback(global::Daybreak.API.Interop.HookEntry* hookEntry);
+            public static partial void RemoveItemClickCallback(global::Daybreak.API.Interop.HookEntry* hookEntry);
 
             // GW::Items::SalvageMaterials
             [LibraryImport(DllName, EntryPoint = "?SalvageMaterials@Items@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SalvageMaterials();
+            public static partial bool SalvageMaterials();
 
             // GW::Items::SalvageSessionCancel
             [LibraryImport(DllName, EntryPoint = "?SalvageSessionCancel@Items@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SalvageSessionCancel();
+            public static partial bool SalvageSessionCancel();
 
             // GW::Items::SalvageStart
             [LibraryImport(DllName, EntryPoint = "?SalvageStart@Items@GW@@YA_NII@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SalvageStart(uint value1, uint value2);
+            public static partial bool SalvageStart(uint value1, uint value2);
 
             // GW::Items::SetEquipmentVisibility
             [LibraryImport(DllName, EntryPoint = "?SetEquipmentVisibility@Items@GW@@YA_NW4EquipmentType@2@W4EquipmentStatus@2@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetEquipmentVisibility(global::Daybreak.API.Interop.GWCA.GW.EquipmentType equipmentType1, global::Daybreak.API.Interop.GWCA.GW.EquipmentStatus equipmentStatus2);
+            public static partial bool SetEquipmentVisibility(global::Daybreak.API.Interop.GWCA.GW.EquipmentType equipmentType1, global::Daybreak.API.Interop.GWCA.GW.EquipmentStatus equipmentStatus2);
 
             // GW::Items::UseItem
             [LibraryImport(DllName, EntryPoint = "?UseItem@Items@GW@@YA_NPBUItem@2@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool UseItem(global::Daybreak.API.Interop.GWCA.GW.ItemData* itemData);
+            public static partial bool UseItem(global::Daybreak.API.Interop.GuildWars.ItemStruct* itemStruct);
 
             // GW::Items::UseItemByModelId
             [LibraryImport(DllName, EntryPoint = "?UseItemByModelId@Items@GW@@YA_NIHH@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool UseItemByModelId(uint value1, int value2, int value3);
+            public static partial bool UseItemByModelId(uint value1, int value2, int value3);
 
             // GW::Items::WithdrawGold
             [LibraryImport(DllName, EntryPoint = "?WithdrawGold@Items@GW@@YAII@Z")]
-            internal static partial uint WithdrawGold(uint value);
+            public static partial uint WithdrawGold(uint value);
         }
 
-        internal static partial class Map
+        public static partial class Map
         {
 
             // GW::Map::CancelEnterChallenge
             [LibraryImport(DllName, EntryPoint = "?CancelEnterChallenge@Map@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool CancelEnterChallenge();
+            public static partial bool CancelEnterChallenge();
 
             // GW::Map::CreateMapContext
             [LibraryImport(DllName, EntryPoint = "?CreateMapContext@Map@GW@@YAPAUMapContext@2@I@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.MapContext* CreateMapContext(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.MapContext* CreateMapContext(uint value);
 
             // GW::Map::DestroyMapContext
             [LibraryImport(DllName, EntryPoint = "?DestroyMapContext@Map@GW@@YA_NPAUMapContext@2@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool DestroyMapContext(global::Daybreak.API.Interop.GWCA.GW.MapContext* mapContext);
+            public static partial bool DestroyMapContext(global::Daybreak.API.Interop.GuildWars.MapContext* mapContext);
 
             // GW::Map::EnterChallenge
             [LibraryImport(DllName, EntryPoint = "?EnterChallenge@Map@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool EnterChallenge();
+            public static partial bool EnterChallenge();
 
             // GW::Map::GetDistrict
             [LibraryImport(DllName, EntryPoint = "?GetDistrict@Map@GW@@YAHXZ")]
-            internal static partial int GetDistrict();
+            public static partial int GetDistrict();
 
             // GW::Map::GetFoesKilled
             [LibraryImport(DllName, EntryPoint = "?GetFoesKilled@Map@GW@@YAIXZ")]
-            internal static partial uint GetFoesKilled();
+            public static partial uint GetFoesKilled();
 
             // GW::Map::GetFoesToKill
             [LibraryImport(DllName, EntryPoint = "?GetFoesToKill@Map@GW@@YAIXZ")]
-            internal static partial uint GetFoesToKill();
+            public static partial uint GetFoesToKill();
 
             // GW::Map::GetInstanceTime
             [LibraryImport(DllName, EntryPoint = "?GetInstanceTime@Map@GW@@YAIXZ")]
-            internal static partial uint GetInstanceTime();
+            public static partial uint GetInstanceTime();
 
             // GW::Map::GetInstanceType
             [LibraryImport(DllName, EntryPoint = "?GetInstanceType@Map@GW@@YA?AW4InstanceType@Constants@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Constants.InstanceType GetInstanceType();
+            public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.InstanceType GetInstanceType();
 
             // GW::Map::GetIsInCinematic
             [LibraryImport(DllName, EntryPoint = "?GetIsInCinematic@Map@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetIsInCinematic();
+            public static partial bool GetIsInCinematic();
 
             // GW::Map::GetIsMapLoaded
             [LibraryImport(DllName, EntryPoint = "?GetIsMapLoaded@Map@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetIsMapLoaded();
+            public static partial bool GetIsMapLoaded();
 
             // GW::Map::GetIsMapUnlocked
             [LibraryImport(DllName, EntryPoint = "?GetIsMapUnlocked@Map@GW@@YA_NW4MapID@Constants@2@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetIsMapUnlocked(global::Daybreak.API.Interop.GWCA.GW.Constants.MapID mapID);
+            public static partial bool GetIsMapUnlocked(global::Daybreak.API.Interop.GWCA.GW.Constants.MapID mapID);
 
             // GW::Map::GetIsObserving
             [LibraryImport(DllName, EntryPoint = "?GetIsObserving@Map@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetIsObserving();
+            public static partial bool GetIsObserving();
 
             // GW::Map::GetLanguage
             [LibraryImport(DllName, EntryPoint = "?GetLanguage@Map@GW@@YA?AW4Language@Constants@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Constants.Language GetLanguage();
+            public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.Language GetLanguage();
 
             // GW::Map::GetMapID
             [LibraryImport(DllName, EntryPoint = "?GetMapID@Map@GW@@YA?AW4MapID@Constants@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Constants.MapID GetMapID();
+            public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.MapID GetMapID();
 
             // GW::Map::GetMapInfo
             [LibraryImport(DllName, EntryPoint = "?GetMapInfo@Map@GW@@YAPAUAreaInfo@2@W4MapID@Constants@2@@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.AreaInfo* GetMapInfo(global::Daybreak.API.Interop.GWCA.GW.Constants.MapID mapID);
+            public static partial global::Daybreak.API.Interop.GuildWars.AreaInfo* GetMapInfo(global::Daybreak.API.Interop.GWCA.GW.Constants.MapID mapID);
 
             // GW::Map::GetMissionMapContext
             [LibraryImport(DllName, EntryPoint = "?GetMissionMapContext@Map@GW@@YAPAUMissionMapContext@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.MissionMapContext* GetMissionMapContext();
+            public static partial global::Daybreak.API.Interop.GuildWars.MissionMapContext* GetMissionMapContext();
 
             // GW::Map::GetMissionMapIconArray
             [LibraryImport(DllName, EntryPoint = "?GetMissionMapIconArray@Map@GW@@YAPAV?$Array@UMissionMapIcon@GW@@@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GWCA.GW.MissionMapIcon>* GetMissionMapIconArray();
+            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.MissionMapIcon>* GetMissionMapIconArray();
 
             // GW::Map::GetPathingMap
             // [LibraryImport(DllName, EntryPoint = "?GetPathingMap@Map@GW@@YAPAV?$Array@UPathingMap@GW@@@2@XZ")]
-            // internal static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<PathingMap>* GetPathingMap();
+            // public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<PathingMap>* GetPathingMap();
 
             // GW::Map::GetRegion
             [LibraryImport(DllName, EntryPoint = "?GetRegion@Map@GW@@YA?AW4ServerRegion@Constants@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Constants.ServerRegion GetRegion();
+            public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.ServerRegion GetRegion();
 
             // GW::Map::GetWorldMapContext
             [LibraryImport(DllName, EntryPoint = "?GetWorldMapContext@Map@GW@@YAPAUWorldMapContext@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.WorldMapContext* GetWorldMapContext();
+            public static partial global::Daybreak.API.Interop.GuildWars.WorldMapContext* GetWorldMapContext();
 
             // GW::Map::LanguageFromDistrict
             [LibraryImport(DllName, EntryPoint = "?LanguageFromDistrict@Map@GW@@YA?AW4Language@Constants@2@W4District@42@@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Constants.Language LanguageFromDistrict(global::Daybreak.API.Interop.GWCA.GW.Constants.District district);
+            public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.Language LanguageFromDistrict(global::Daybreak.API.Interop.GWCA.GW.Constants.District district);
 
             // GW::Map::QueryAltitude
             [LibraryImport(DllName, EntryPoint = "?QueryAltitude@Map@GW@@YAMPBUGamePos@2@MPAUMapContext@2@@Z")]
-            internal static partial float QueryAltitude(global::Daybreak.API.Interop.GWCA.GW.GamePos* gamePos1, float value2, global::Daybreak.API.Interop.GWCA.GW.MapContext* mapContext3);
+            public static partial float QueryAltitude(global::Daybreak.API.Interop.GuildWars.GamePos* gamePos1, float value2, global::Daybreak.API.Interop.GuildWars.MapContext* mapContext3);
 
             // GW::Map::RegionFromDistrict
             [LibraryImport(DllName, EntryPoint = "?RegionFromDistrict@Map@GW@@YA?AW4ServerRegion@Constants@2@W4District@42@@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Constants.ServerRegion RegionFromDistrict(global::Daybreak.API.Interop.GWCA.GW.Constants.District district);
+            public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.ServerRegion RegionFromDistrict(global::Daybreak.API.Interop.GWCA.GW.Constants.District district);
 
             // GW::Map::SkipCinematic
             [LibraryImport(DllName, EntryPoint = "?SkipCinematic@Map@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SkipCinematic();
+            public static partial bool SkipCinematic();
 
             // GW::Map::Travel
             [LibraryImport(DllName, EntryPoint = "?Travel@Map@GW@@YA_NW4MapID@Constants@2@W4District@42@H@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool Travel(global::Daybreak.API.Interop.GWCA.GW.Constants.MapID mapID1, global::Daybreak.API.Interop.GWCA.GW.Constants.District district2, int value3);
+            public static partial bool Travel(global::Daybreak.API.Interop.GWCA.GW.Constants.MapID mapID1, global::Daybreak.API.Interop.GWCA.GW.Constants.District district2, int value3);
 
             // GW::Map::Travel
             [LibraryImport(DllName, EntryPoint = "?Travel@Map@GW@@YA_NW4MapID@Constants@2@W4ServerRegion@42@HW4Language@42@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool Travel(global::Daybreak.API.Interop.GWCA.GW.Constants.MapID mapID1, global::Daybreak.API.Interop.GWCA.GW.Constants.ServerRegion serverRegion2, int value3, global::Daybreak.API.Interop.GWCA.GW.Constants.Language language4);
+            public static partial bool Travel(global::Daybreak.API.Interop.GWCA.GW.Constants.MapID mapID1, global::Daybreak.API.Interop.GWCA.GW.Constants.ServerRegion serverRegion2, int value3, global::Daybreak.API.Interop.GWCA.GW.Constants.Language language4);
         }
 
-        internal static partial class MemoryMgr
+        public static partial class MemoryMgr
         {
 
             // GW::MemoryMgr::GetGWVersion
             [LibraryImport(DllName, EntryPoint = "?GetGWVersion@MemoryMgr@GW@@YAIXZ")]
-            internal static partial uint GetGWVersion();
+            public static partial uint GetGWVersion();
 
             // GW::MemoryMgr::GetGWWindowHandle
             [LibraryImport(DllName, EntryPoint = "?GetGWWindowHandle@MemoryMgr@GW@@YAPAUHWND__@@XZ")]
-            internal static partial global::Daybreak.API.Interop.GWHwnd* GetGWWindowHandle();
+            public static partial global::Daybreak.API.Interop.GWHwnd* GetGWWindowHandle();
 
             // GW::MemoryMgr::GetPersonalDir
             [LibraryImport(DllName, EntryPoint = "?GetPersonalDir@MemoryMgr@GW@@YA_NIPA_W@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetPersonalDir(uint value1, ushort* ptr2);
+            public static partial bool GetPersonalDir(uint value1, ushort* ptr2);
 
             // GW::MemoryMgr::GetSkillTimer
             [LibraryImport(DllName, EntryPoint = "?GetSkillTimer@MemoryMgr@GW@@YAKXZ")]
-            internal static partial uint GetSkillTimer();
+            public static partial uint GetSkillTimer();
 
             // GW::MemoryMgr::MemAlloc
             [LibraryImport(DllName, EntryPoint = "?MemAlloc@MemoryMgr@GW@@YAPAXI@Z")]
-            internal static partial void* MemAlloc(uint value);
+            public static partial void* MemAlloc(uint value);
 
             // GW::MemoryMgr::MemFree
             [LibraryImport(DllName, EntryPoint = "?MemFree@MemoryMgr@GW@@YAXPAX@Z")]
-            internal static partial void MemFree(void* ptr);
+            public static partial void MemFree(void* ptr);
 
             // GW::MemoryMgr::MemRealloc
             [LibraryImport(DllName, EntryPoint = "?MemRealloc@MemoryMgr@GW@@YAPAXPAXI@Z")]
-            internal static partial void* MemRealloc(void* ptr1, uint value2);
+            public static partial void* MemRealloc(void* ptr1, uint value2);
         }
 
-        internal static partial class MemoryPatcher
+        public static partial class MemoryPatcher
         {
 
             // GW::MemoryPatcher::DisableHooks
             [LibraryImport(DllName, EntryPoint = "?DisableHooks@MemoryPatcher@GW@@SAXXZ")]
-            internal static partial void DisableHooks();
+            public static partial void DisableHooks();
 
             // GW::MemoryPatcher::EnableHooks
             [LibraryImport(DllName, EntryPoint = "?EnableHooks@MemoryPatcher@GW@@SAXXZ")]
-            internal static partial void EnableHooks();
+            public static partial void EnableHooks();
 
             // GW::MemoryPatcher::Reset
             [LibraryImport(DllName, EntryPoint = "?Reset@MemoryPatcher@GW@@QAEXXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial void Reset(nint self);
+            public static partial void Reset(nint self);
 
             // GW::MemoryPatcher::SetPatch
             [LibraryImport(DllName, EntryPoint = "?SetPatch@MemoryPatcher@GW@@QAEXIPBDI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial uint SetPatch(nint self, byte* ptr2, uint value3);
+            public static partial uint SetPatch(nint self, byte* ptr2, uint value3);
 
             // GW::MemoryPatcher::SetRedirect
             [LibraryImport(DllName, EntryPoint = "?SetRedirect@MemoryPatcher@GW@@QAE_NIPAX@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double SetRedirect(nint self, uint value2, void* ptr3);
+            public static partial double SetRedirect(nint self, uint value2, void* ptr3);
 
             // GW::MemoryPatcher::TogglePatch
             [LibraryImport(DllName, EntryPoint = "?TogglePatch@MemoryPatcher@GW@@QAE_N_N@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double TogglePatch(nint self, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            public static partial double TogglePatch(nint self, [MarshalAs(UnmanagedType.U1)] bool flag2);
         }
 
-        internal static partial class Merchant
+        public static partial class Merchant
         {
 
             // GW::Merchant::GetMerchantItems
             [LibraryImport(DllName, EntryPoint = "?GetMerchantItems@Merchant@GW@@YAIW4TransactionType@12@IPAI@Z")]
-            internal static partial uint GetMerchantItems(global::Daybreak.API.Interop.GWCA.GW.Merchant.TransactionType transactionType1, uint value2, uint* ptr3);
+            public static partial uint GetMerchantItems(global::Daybreak.API.Interop.GWCA.GW.Merchant.TransactionType transactionType1, uint value2, uint* ptr3);
 
             // GW::Merchant::RequestQuote
             [LibraryImport(DllName, EntryPoint = "?RequestQuote@Merchant@GW@@YA_NW4TransactionType@12@I@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool RequestQuote(global::Daybreak.API.Interop.GWCA.GW.Merchant.TransactionType transactionType1, uint value2);
+            public static partial bool RequestQuote(global::Daybreak.API.Interop.GWCA.GW.Merchant.TransactionType transactionType1, uint value2);
 
             // GW::Merchant::TransactItems
             [LibraryImport(DllName, EntryPoint = "?TransactItems@Merchant@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool TransactItems();
+            public static partial bool TransactItems();
         }
 
-        internal static partial class MultiLineTextLabelFrame
+        public static partial class MultiLineTextLabelFrame
         {
 
             // GW::MultiLineTextLabelFrame::GetDecodedLabel
             [LibraryImport(DllName, EntryPoint = "?GetDecodedLabel@MultiLineTextLabelFrame@GW@@QAEPB_WXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial nint GetDecodedLabel(nint self, ushort value2);
+            public static partial nint GetDecodedLabel(nint self, ushort value2);
 
             // GW::MultiLineTextLabelFrame::GetEncodedLabel
             [LibraryImport(DllName, EntryPoint = "?GetEncodedLabel@MultiLineTextLabelFrame@GW@@QAEPB_WXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial nint GetEncodedLabel(nint self, ushort value2);
+            public static partial nint GetEncodedLabel(nint self, ushort value2);
 
             // GW::MultiLineTextLabelFrame::SetLabel
             [LibraryImport(DllName, EntryPoint = "?SetLabel@MultiLineTextLabelFrame@GW@@QAE_NPB_W@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double SetLabel(nint self, ushort* ptr2);
+            public static partial double SetLabel(nint self, ushort* ptr2);
         }
 
-        internal static partial class PartyMgr
+        public static partial class PartyMgr
         {
 
             // GW::PartyMgr::AddHenchman
             [LibraryImport(DllName, EntryPoint = "?AddHenchman@PartyMgr@GW@@YA_NI@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool AddHenchman(uint value);
+            public static partial bool AddHenchman(uint value);
 
             // GW::PartyMgr::AddHero
             [LibraryImport(DllName, EntryPoint = "?AddHero@PartyMgr@GW@@YA_NW4HeroID@Constants@2@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool AddHero(global::Daybreak.API.Interop.GWCA.GW.Constants.HeroID heroID);
+            public static partial bool AddHero(global::Daybreak.API.Interop.GWCA.GW.Constants.HeroID heroID);
 
             // GW::PartyMgr::FlagAll
             [LibraryImport(DllName, EntryPoint = "?FlagAll@PartyMgr@GW@@YA_NUGamePos@2@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool FlagAll(global::Daybreak.API.Interop.GWCA.GW.GamePos gamePos);
+            public static partial bool FlagAll(global::Daybreak.API.Interop.GuildWars.GamePos gamePos);
 
             // GW::PartyMgr::FlagHero
             [LibraryImport(DllName, EntryPoint = "?FlagHero@PartyMgr@GW@@YA_NIUGamePos@2@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool FlagHero(uint value1, global::Daybreak.API.Interop.GWCA.GW.GamePos gamePos2);
+            public static partial bool FlagHero(uint value1, global::Daybreak.API.Interop.GuildWars.GamePos gamePos2);
 
             // GW::PartyMgr::GetAgentAttributes
             [LibraryImport(DllName, EntryPoint = "?GetAgentAttributes@PartyMgr@GW@@YAPAUAttribute@2@I@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Attribute* GetAgentAttributes(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.Attribute* GetAgentAttributes(uint value);
 
             // GW::PartyMgr::GetHeroAgentID
             [LibraryImport(DllName, EntryPoint = "?GetHeroAgentID@PartyMgr@GW@@YAII@Z")]
-            internal static partial uint GetHeroAgentID(uint value);
+            public static partial uint GetHeroAgentID(uint value);
 
             // GW::PartyMgr::GetHeroConstData
             [LibraryImport(DllName, EntryPoint = "?GetHeroConstData@PartyMgr@GW@@YAPAUHeroConstData@2@W4HeroID@Constants@2@@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.HeroConstData* GetHeroConstData(global::Daybreak.API.Interop.GWCA.GW.Constants.HeroID heroID);
+            public static partial global::Daybreak.API.Interop.GuildWars.HeroConstData* GetHeroConstData(global::Daybreak.API.Interop.GWCA.GW.Constants.HeroID heroID);
 
             // GW::PartyMgr::GetHeroInfo
             [LibraryImport(DllName, EntryPoint = "?GetHeroInfo@PartyMgr@GW@@YAPAUHeroInfo@2@W4HeroID@Constants@2@@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.HeroInfo* GetHeroInfo(global::Daybreak.API.Interop.GWCA.GW.Constants.HeroID heroID);
+            public static partial global::Daybreak.API.Interop.GuildWars.HeroInfo* GetHeroInfo(global::Daybreak.API.Interop.GWCA.GW.Constants.HeroID heroID);
 
             // GW::PartyMgr::GetIsHardModeUnlocked
             [LibraryImport(DllName, EntryPoint = "?GetIsHardModeUnlocked@PartyMgr@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetIsHardModeUnlocked();
+            public static partial bool GetIsHardModeUnlocked();
 
             // GW::PartyMgr::GetIsLeader
             [LibraryImport(DllName, EntryPoint = "?GetIsLeader@PartyMgr@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetIsLeader();
+            public static partial bool GetIsLeader();
 
             // GW::PartyMgr::GetIsPartyDefeated
             [LibraryImport(DllName, EntryPoint = "?GetIsPartyDefeated@PartyMgr@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetIsPartyDefeated();
+            public static partial bool GetIsPartyDefeated();
 
             // GW::PartyMgr::GetIsPartyInHardMode
             [LibraryImport(DllName, EntryPoint = "?GetIsPartyInHardMode@PartyMgr@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetIsPartyInHardMode();
+            public static partial bool GetIsPartyInHardMode();
 
             // GW::PartyMgr::GetIsPartyLoaded
             [LibraryImport(DllName, EntryPoint = "?GetIsPartyLoaded@PartyMgr@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetIsPartyLoaded();
+            public static partial bool GetIsPartyLoaded();
 
             // GW::PartyMgr::GetIsPartyTicked
             [LibraryImport(DllName, EntryPoint = "?GetIsPartyTicked@PartyMgr@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetIsPartyTicked();
+            public static partial bool GetIsPartyTicked();
 
             // GW::PartyMgr::GetIsPlayerTicked
             [LibraryImport(DllName, EntryPoint = "?GetIsPlayerTicked@PartyMgr@GW@@YA_NI@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetIsPlayerTicked(uint value);
+            public static partial bool GetIsPlayerTicked(uint value);
 
             // GW::PartyMgr::GetPartyHenchmanCount
             [LibraryImport(DllName, EntryPoint = "?GetPartyHenchmanCount@PartyMgr@GW@@YAIXZ")]
-            internal static partial uint GetPartyHenchmanCount();
+            public static partial uint GetPartyHenchmanCount();
 
             // GW::PartyMgr::GetPartyHeroCount
             [LibraryImport(DllName, EntryPoint = "?GetPartyHeroCount@PartyMgr@GW@@YAIXZ")]
-            internal static partial uint GetPartyHeroCount();
+            public static partial uint GetPartyHeroCount();
 
             // GW::PartyMgr::GetPartyInfo | returns TODO: map struct GW::PartyInfo
             // [LibraryImport(DllName, EntryPoint = "?GetPartyInfo@PartyMgr@GW@@YAPAUPartyInfo@2@I@Z")]
-            // internal static partial PartyInfo* GetPartyInfo(uint value);
+            // public static partial PartyInfo* GetPartyInfo(uint value);
 
             // GW::PartyMgr::GetPartyPlayerCount
             [LibraryImport(DllName, EntryPoint = "?GetPartyPlayerCount@PartyMgr@GW@@YAIXZ")]
-            internal static partial uint GetPartyPlayerCount();
+            public static partial uint GetPartyPlayerCount();
 
             // GW::PartyMgr::GetPartySearch
             [LibraryImport(DllName, EntryPoint = "?GetPartySearch@PartyMgr@GW@@YAPAUPartySearch@2@I@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.PartySearch* GetPartySearch(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.PartySearch* GetPartySearch(uint value);
 
             // GW::PartyMgr::GetPartySize
             [LibraryImport(DllName, EntryPoint = "?GetPartySize@PartyMgr@GW@@YAIXZ")]
-            internal static partial uint GetPartySize();
+            public static partial uint GetPartySize();
 
             // GW::PartyMgr::GetPetInfo
             [LibraryImport(DllName, EntryPoint = "?GetPetInfo@PartyMgr@GW@@YAPAUPetInfo@2@I@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.PetInfo* GetPetInfo(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.PetInfo* GetPetInfo(uint value);
 
             // GW::PartyMgr::InvitePlayer
             [LibraryImport(DllName, EntryPoint = "?InvitePlayer@PartyMgr@GW@@YA_NI@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool InvitePlayer(uint value);
+            public static partial bool InvitePlayer(uint value);
 
             // GW::PartyMgr::InvitePlayer
             [LibraryImport(DllName, EntryPoint = "?InvitePlayer@PartyMgr@GW@@YA_NPB_W@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool InvitePlayer(ushort* ptr);
+            public static partial bool InvitePlayer(ushort* ptr);
 
             // GW::PartyMgr::KickAllHeroes
             [LibraryImport(DllName, EntryPoint = "?KickAllHeroes@PartyMgr@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool KickAllHeroes();
+            public static partial bool KickAllHeroes();
 
             // GW::PartyMgr::KickHenchman
             [LibraryImport(DllName, EntryPoint = "?KickHenchman@PartyMgr@GW@@YA_NI@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool KickHenchman(uint value);
+            public static partial bool KickHenchman(uint value);
 
             // GW::PartyMgr::KickHero
             [LibraryImport(DllName, EntryPoint = "?KickHero@PartyMgr@GW@@YA_NW4HeroID@Constants@2@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool KickHero(global::Daybreak.API.Interop.GWCA.GW.Constants.HeroID heroID);
+            public static partial bool KickHero(global::Daybreak.API.Interop.GWCA.GW.Constants.HeroID heroID);
 
             // GW::PartyMgr::KickPlayer
             [LibraryImport(DllName, EntryPoint = "?KickPlayer@PartyMgr@GW@@YA_NI@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool KickPlayer(uint value);
+            public static partial bool KickPlayer(uint value);
 
             // GW::PartyMgr::LeaveParty
             [LibraryImport(DllName, EntryPoint = "?LeaveParty@PartyMgr@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool LeaveParty();
+            public static partial bool LeaveParty();
 
             // GW::PartyMgr::RespondToPartyRequest
             [LibraryImport(DllName, EntryPoint = "?RespondToPartyRequest@PartyMgr@GW@@YA_NI_N@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool RespondToPartyRequest(uint value1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            public static partial bool RespondToPartyRequest(uint value1, [MarshalAs(UnmanagedType.U1)] bool flag2);
 
             // GW::PartyMgr::ReturnToOutpost
             [LibraryImport(DllName, EntryPoint = "?ReturnToOutpost@PartyMgr@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool ReturnToOutpost();
+            public static partial bool ReturnToOutpost();
 
             // GW::PartyMgr::SearchParty
             [LibraryImport(DllName, EntryPoint = "?SearchParty@PartyMgr@GW@@YA_NIPB_W@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SearchParty(uint value1, ushort* ptr2);
+            public static partial bool SearchParty(uint value1, ushort* ptr2);
 
             // GW::PartyMgr::SearchPartyCancel
             [LibraryImport(DllName, EntryPoint = "?SearchPartyCancel@PartyMgr@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SearchPartyCancel();
+            public static partial bool SearchPartyCancel();
 
             // GW::PartyMgr::SearchPartyReply
             [LibraryImport(DllName, EntryPoint = "?SearchPartyReply@PartyMgr@GW@@YA_NI_N@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SearchPartyReply(uint value1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            public static partial bool SearchPartyReply(uint value1, [MarshalAs(UnmanagedType.U1)] bool flag2);
 
             // GW::PartyMgr::SetHardMode
             [LibraryImport(DllName, EntryPoint = "?SetHardMode@PartyMgr@GW@@YA_N_N@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetHardMode([MarshalAs(UnmanagedType.U1)] bool flag);
+            public static partial bool SetHardMode([MarshalAs(UnmanagedType.U1)] bool flag);
 
             // GW::PartyMgr::SetHeroBehavior
             [LibraryImport(DllName, EntryPoint = "?SetHeroBehavior@PartyMgr@GW@@YA_NIW4HeroBehavior@2@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetHeroBehavior(uint value1, global::Daybreak.API.Interop.GWCA.GW.HeroBehavior heroBehavior2);
+            public static partial bool SetHeroBehavior(uint value1, global::Daybreak.API.Interop.GWCA.GW.HeroBehavior heroBehavior2);
 
             // GW::PartyMgr::SetHeroTarget
             [LibraryImport(DllName, EntryPoint = "?SetHeroTarget@PartyMgr@GW@@YA_NII@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetHeroTarget(uint value1, uint value2);
+            public static partial bool SetHeroTarget(uint value1, uint value2);
 
             // GW::PartyMgr::SetPetBehavior
             [LibraryImport(DllName, EntryPoint = "?SetPetBehavior@PartyMgr@GW@@YA_NIW4HeroBehavior@2@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetPetBehavior(uint value1, global::Daybreak.API.Interop.GWCA.GW.HeroBehavior heroBehavior2);
+            public static partial bool SetPetBehavior(uint value1, global::Daybreak.API.Interop.GWCA.GW.HeroBehavior heroBehavior2);
 
             // GW::PartyMgr::SetTickToggle
             [LibraryImport(DllName, EntryPoint = "?SetTickToggle@PartyMgr@GW@@YAX_N@Z")]
-            internal static partial void SetTickToggle([MarshalAs(UnmanagedType.U1)] bool flag);
+            public static partial void SetTickToggle([MarshalAs(UnmanagedType.U1)] bool flag);
 
             // GW::PartyMgr::Tick
             [LibraryImport(DllName, EntryPoint = "?Tick@PartyMgr@GW@@YA_N_N@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool Tick([MarshalAs(UnmanagedType.U1)] bool flag);
+            public static partial bool Tick([MarshalAs(UnmanagedType.U1)] bool flag);
 
             // GW::PartyMgr::UnflagAll
             [LibraryImport(DllName, EntryPoint = "?UnflagAll@PartyMgr@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool UnflagAll();
+            public static partial bool UnflagAll();
 
             // GW::PartyMgr::UnflagHero
             [LibraryImport(DllName, EntryPoint = "?UnflagHero@PartyMgr@GW@@YA_NI@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool UnflagHero(uint value);
+            public static partial bool UnflagHero(uint value);
         }
 
-        internal static partial class PlayerMgr
+        public static partial class PlayerMgr
         {
 
             // GW::PlayerMgr::ChangeSecondProfession
             [LibraryImport(DllName, EntryPoint = "?ChangeSecondProfession@PlayerMgr@GW@@YA_NW4Profession@Constants@2@I@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool ChangeSecondProfession(global::Daybreak.API.Interop.GWCA.GW.Constants.Profession profession1, uint value2);
+            public static partial bool ChangeSecondProfession(global::Daybreak.API.Interop.GWCA.GW.Constants.Profession profession1, uint value2);
 
             // GW::PlayerMgr::GetActiveTitle
             [LibraryImport(DllName, EntryPoint = "?GetActiveTitle@PlayerMgr@GW@@YAPAUTitle@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Title* GetActiveTitle();
+            public static partial global::Daybreak.API.Interop.GuildWars.Title* GetActiveTitle();
 
             // GW::PlayerMgr::GetActiveTitleId
             [LibraryImport(DllName, EntryPoint = "?GetActiveTitleId@PlayerMgr@GW@@YA?AW4TitleID@Constants@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Constants.TitleID GetActiveTitleId();
+            public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.TitleID GetActiveTitleId();
 
             // GW::PlayerMgr::GetAmountOfPlayersInInstance
             [LibraryImport(DllName, EntryPoint = "?GetAmountOfPlayersInInstance@PlayerMgr@GW@@YAIXZ")]
-            internal static partial uint GetAmountOfPlayersInInstance();
+            public static partial uint GetAmountOfPlayersInInstance();
 
             // GW::PlayerMgr::GetPlayerAgentId
             [LibraryImport(DllName, EntryPoint = "?GetPlayerAgentId@PlayerMgr@GW@@YAII@Z")]
-            internal static partial uint GetPlayerAgentId(uint value);
+            public static partial uint GetPlayerAgentId(uint value);
 
             // GW::PlayerMgr::GetPlayerArray
             [LibraryImport(DllName, EntryPoint = "?GetPlayerArray@PlayerMgr@GW@@YAPAV?$Array@UPlayer@GW@@@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GWCA.GW.Player>* GetPlayerArray();
+            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.Player>* GetPlayerArray();
 
             // GW::PlayerMgr::GetPlayerByID
             [LibraryImport(DllName, EntryPoint = "?GetPlayerByID@PlayerMgr@GW@@YAPAUPlayer@2@I@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Player* GetPlayerByID(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.Player* GetPlayerByID(uint value);
 
             // GW::PlayerMgr::GetPlayerByName
             [LibraryImport(DllName, EntryPoint = "?GetPlayerByName@PlayerMgr@GW@@YAPAUPlayer@2@PB_W@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Player* GetPlayerByName(ushort* ptr);
+            public static partial global::Daybreak.API.Interop.GuildWars.Player* GetPlayerByName(ushort* ptr);
 
             // GW::PlayerMgr::GetPlayerName
             [LibraryImport(DllName, EntryPoint = "?GetPlayerName@PlayerMgr@GW@@YAPA_WI@Z")]
-            internal static partial ushort* GetPlayerName(uint value);
+            public static partial ushort* GetPlayerName(uint value);
 
             // GW::PlayerMgr::GetPlayerNumber
             [LibraryImport(DllName, EntryPoint = "?GetPlayerNumber@PlayerMgr@GW@@YAIXZ")]
-            internal static partial uint GetPlayerNumber();
+            public static partial uint GetPlayerNumber();
 
             // GW::PlayerMgr::GetTitleData
             [LibraryImport(DllName, EntryPoint = "?GetTitleData@PlayerMgr@GW@@YAPAUTitleClientData@2@W4TitleID@Constants@2@@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.TitleClientData* GetTitleData(global::Daybreak.API.Interop.GWCA.GW.Constants.TitleID titleID);
+            public static partial global::Daybreak.API.Interop.GuildWars.TitleClientData* GetTitleData(global::Daybreak.API.Interop.GWCA.GW.Constants.TitleID titleID);
 
             // GW::PlayerMgr::GetTitleTrack
             [LibraryImport(DllName, EntryPoint = "?GetTitleTrack@PlayerMgr@GW@@YAPAUTitle@2@W4TitleID@Constants@2@@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Title* GetTitleTrack(global::Daybreak.API.Interop.GWCA.GW.Constants.TitleID titleID);
+            public static partial global::Daybreak.API.Interop.GuildWars.Title* GetTitleTrack(global::Daybreak.API.Interop.GWCA.GW.Constants.TitleID titleID);
 
             // GW::PlayerMgr::RemoveActiveTitle
             [LibraryImport(DllName, EntryPoint = "?RemoveActiveTitle@PlayerMgr@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool RemoveActiveTitle();
+            public static partial bool RemoveActiveTitle();
 
             // GW::PlayerMgr::SetActiveTitle
             [LibraryImport(DllName, EntryPoint = "?SetActiveTitle@PlayerMgr@GW@@YA_NW4TitleID@Constants@2@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetActiveTitle(global::Daybreak.API.Interop.GWCA.GW.Constants.TitleID titleID);
+            public static partial bool SetActiveTitle(global::Daybreak.API.Interop.GWCA.GW.Constants.TitleID titleID);
 
             // GW::PlayerMgr::SetPlayerName
             [LibraryImport(DllName, EntryPoint = "?SetPlayerName@PlayerMgr@GW@@YAPA_WIPB_W@Z")]
-            internal static partial ushort* SetPlayerName(uint value1, ushort* ptr2);
+            public static partial ushort* SetPlayerName(uint value1, ushort* ptr2);
         }
 
-        internal static partial class ProgressBar
+        public static partial class ProgressBar
         {
 
             // GW::ProgressBar::GetValue
             [LibraryImport(DllName, EntryPoint = "?GetValue@ProgressBar@GW@@UAEIXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial void GetValue(nint self);
+            public static partial void GetValue(nint self);
 
             // GW::ProgressBar::SetColorId
             [LibraryImport(DllName, EntryPoint = "?SetColorId@ProgressBar@GW@@QAE_NI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double SetColorId(nint self, uint value2);
+            public static partial double SetColorId(nint self, uint value2);
 
             // GW::ProgressBar::SetMax
             [LibraryImport(DllName, EntryPoint = "?SetMax@ProgressBar@GW@@QAE_NI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double SetMax(nint self, uint value2);
+            public static partial double SetMax(nint self, uint value2);
 
             // GW::ProgressBar::SetStyle
             [LibraryImport(DllName, EntryPoint = "?SetStyle@ProgressBar@GW@@QAE_NW4ProgressBarStyle@12@@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double SetStyle(nint self, global::Daybreak.API.Interop.GWCA.GW.ProgressBarStyle progressBarStyle2);
+            public static partial double SetStyle(nint self, global::Daybreak.API.Interop.GWCA.GW.ProgressBarStyle progressBarStyle2);
 
             // GW::ProgressBar::SetValue
             [LibraryImport(DllName, EntryPoint = "?SetValue@ProgressBar@GW@@UAE_NI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double SetValue(nint self, uint value2);
+            public static partial double SetValue(nint self, uint value2);
         }
 
-        internal static partial class QuestMgr
+        public static partial class QuestMgr
         {
 
             // GW::QuestMgr::AbandonQuest
             [LibraryImport(DllName, EntryPoint = "?AbandonQuest@QuestMgr@GW@@YA_NPAUQuest@2@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool AbandonQuest(global::Daybreak.API.Interop.GWCA.GW.Quest* quest);
+            public static partial bool AbandonQuest(global::Daybreak.API.Interop.GuildWars.Quest* quest);
 
             // GW::QuestMgr::AbandonQuestId
             [LibraryImport(DllName, EntryPoint = "?AbandonQuestId@QuestMgr@GW@@YA_NW4QuestID@Constants@2@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool AbandonQuestId(global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID questID);
+            public static partial bool AbandonQuestId(global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID questID);
 
             // GW::QuestMgr::GetActiveQuest
             [LibraryImport(DllName, EntryPoint = "?GetActiveQuest@QuestMgr@GW@@YAPAUQuest@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Quest* GetActiveQuest();
+            public static partial global::Daybreak.API.Interop.GuildWars.Quest* GetActiveQuest();
 
             // GW::QuestMgr::GetActiveQuestId
             [LibraryImport(DllName, EntryPoint = "?GetActiveQuestId@QuestMgr@GW@@YA?AW4QuestID@Constants@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID GetActiveQuestId();
+            public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID GetActiveQuestId();
 
             // GW::QuestMgr::GetQuest
             [LibraryImport(DllName, EntryPoint = "?GetQuest@QuestMgr@GW@@YAPAUQuest@2@W4QuestID@Constants@2@@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Quest* GetQuest(global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID questID);
+            public static partial global::Daybreak.API.Interop.GuildWars.Quest* GetQuest(global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID questID);
 
             // GW::QuestMgr::GetQuestEntryGroupName
             [LibraryImport(DllName, EntryPoint = "?GetQuestEntryGroupName@QuestMgr@GW@@YA_NW4QuestID@Constants@2@PA_WI@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetQuestEntryGroupName(global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID questID1, ushort* ptr2, uint value3);
+            public static partial bool GetQuestEntryGroupName(global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID questID1, ushort* ptr2, uint value3);
 
             // GW::QuestMgr::GetQuestLog
             [LibraryImport(DllName, EntryPoint = "?GetQuestLog@QuestMgr@GW@@YAPAV?$Array@UQuest@GW@@@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GWCA.GW.Quest>* GetQuestLog();
+            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.Quest>* GetQuestLog();
 
             // GW::QuestMgr::RequestQuestInfo
             [LibraryImport(DllName, EntryPoint = "?RequestQuestInfo@QuestMgr@GW@@YA_NPBUQuest@2@_N@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool RequestQuestInfo(global::Daybreak.API.Interop.GWCA.GW.Quest* quest1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            public static partial bool RequestQuestInfo(global::Daybreak.API.Interop.GuildWars.Quest* quest1, [MarshalAs(UnmanagedType.U1)] bool flag2);
 
             // GW::QuestMgr::RequestQuestInfoId
             [LibraryImport(DllName, EntryPoint = "?RequestQuestInfoId@QuestMgr@GW@@YA_NW4QuestID@Constants@2@_N@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool RequestQuestInfoId(global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID questID1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            public static partial bool RequestQuestInfoId(global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID questID1, [MarshalAs(UnmanagedType.U1)] bool flag2);
 
             // GW::QuestMgr::SetActiveQuest
             [LibraryImport(DllName, EntryPoint = "?SetActiveQuest@QuestMgr@GW@@YA_NPAUQuest@2@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetActiveQuest(global::Daybreak.API.Interop.GWCA.GW.Quest* quest);
+            public static partial bool SetActiveQuest(global::Daybreak.API.Interop.GuildWars.Quest* quest);
 
             // GW::QuestMgr::SetActiveQuestId
             [LibraryImport(DllName, EntryPoint = "?SetActiveQuestId@QuestMgr@GW@@YA_NW4QuestID@Constants@2@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetActiveQuestId(global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID questID);
+            public static partial bool SetActiveQuestId(global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID questID);
         }
 
-        internal static partial class Render
+        public static partial class Render
         {
 
             // GW::Render::EnableHooks
             [LibraryImport(DllName, EntryPoint = "?EnableHooks@Render@GW@@YAXXZ")]
-            internal static partial void EnableHooks();
+            public static partial void EnableHooks();
 
             // GW::Render::GetDevice | returns TODO: map struct IDirect3DDevice9
             // [LibraryImport(DllName, EntryPoint = "?GetDevice@Render@GW@@YAPAUIDirect3DDevice9@@XZ")]
-            // internal static partial IDirect3DDevice9* GetDevice();
+            // public static partial IDirect3DDevice9* GetDevice();
 
             // GW::Render::GetFieldOfView
             [LibraryImport(DllName, EntryPoint = "?GetFieldOfView@Render@GW@@YAMXZ")]
-            internal static partial float GetFieldOfView();
+            public static partial float GetFieldOfView();
 
             // GW::Render::GetFrameLimit
             [LibraryImport(DllName, EntryPoint = "?GetFrameLimit@Render@GW@@YAIXZ")]
-            internal static partial uint GetFrameLimit();
+            public static partial uint GetFrameLimit();
 
             // GW::Render::GetGraphicsRendererValue
             [LibraryImport(DllName, EntryPoint = "?GetGraphicsRendererValue@Render@GW@@YAIW4Metric@12@I@Z")]
-            internal static partial uint GetGraphicsRendererValue(global::Daybreak.API.Interop.GWCA.GW.Render.Metric metric1, uint value2);
+            public static partial uint GetGraphicsRendererValue(global::Daybreak.API.Interop.GWCA.GW.Render.Metric metric1, uint value2);
 
             // GW::Render::GetIsFullscreen
             [LibraryImport(DllName, EntryPoint = "?GetIsFullscreen@Render@GW@@YAHXZ")]
-            internal static partial int GetIsFullscreen();
+            public static partial int GetIsFullscreen();
 
             // GW::Render::GetIsInRenderLoop
             [LibraryImport(DllName, EntryPoint = "?GetIsInRenderLoop@Render@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetIsInRenderLoop();
+            public static partial bool GetIsInRenderLoop();
 
             // GW::Render::GetRenderCallback
             [LibraryImport(DllName, EntryPoint = "?GetRenderCallback@Render@GW@@YAP6AXPAUIDirect3DDevice9@@@ZXZ")]
-            internal static partial nint GetRenderCallback();
+            public static partial nint GetRenderCallback();
 
             // GW::Render::GetTransform
             [LibraryImport(DllName, EntryPoint = "?GetTransform@Render@GW@@YAPAUMat4x3f@12@W4Transform@12@@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Mat4x3f* GetTransform(global::Daybreak.API.Interop.GWCA.GW.Render.Transform transform);
+            public static partial global::Daybreak.API.Interop.GuildWars.Mat4x3f* GetTransform(global::Daybreak.API.Interop.GWCA.GW.Render.Transform transform);
 
             // GW::Render::GetViewportHeight
             [LibraryImport(DllName, EntryPoint = "?GetViewportHeight@Render@GW@@YAIXZ")]
-            internal static partial uint GetViewportHeight();
+            public static partial uint GetViewportHeight();
 
             // GW::Render::GetViewportWidth
             [LibraryImport(DllName, EntryPoint = "?GetViewportWidth@Render@GW@@YAIXZ")]
-            internal static partial uint GetViewportWidth();
+            public static partial uint GetViewportWidth();
 
             // GW::Render::GetWindowHandle
             [LibraryImport(DllName, EntryPoint = "?GetWindowHandle@Render@GW@@YAPAUHWND__@@XZ")]
-            internal static partial global::Daybreak.API.Interop.GWHwnd* GetWindowHandle();
+            public static partial global::Daybreak.API.Interop.GWHwnd* GetWindowHandle();
 
             // GW::Render::SetFog
             [LibraryImport(DllName, EntryPoint = "?SetFog@Render@GW@@YA_N_N@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetFog([MarshalAs(UnmanagedType.U1)] bool flag);
+            public static partial bool SetFog([MarshalAs(UnmanagedType.U1)] bool flag);
 
             // GW::Render::SetFrameLimit
             [LibraryImport(DllName, EntryPoint = "?SetFrameLimit@Render@GW@@YA_NI@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetFrameLimit(uint value);
+            public static partial bool SetFrameLimit(uint value);
 
             // GW::Render::SetGraphicsRendererValue
             [LibraryImport(DllName, EntryPoint = "?SetGraphicsRendererValue@Render@GW@@YA_NW4Metric@12@II@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetGraphicsRendererValue(global::Daybreak.API.Interop.GWCA.GW.Render.Metric metric1, uint value2, uint value3);
+            public static partial bool SetGraphicsRendererValue(global::Daybreak.API.Interop.GWCA.GW.Render.Metric metric1, uint value2, uint value3);
 
             // GW::Render::SetRenderCallback
             [LibraryImport(DllName, EntryPoint = "?SetRenderCallback@Render@GW@@YAXP6AXPAUIDirect3DDevice9@@@Z@Z")]
-            internal static partial void SetRenderCallback(nint callback);
+            public static partial void SetRenderCallback(nint callback);
 
             // GW::Render::SetResetCallback
             [LibraryImport(DllName, EntryPoint = "?SetResetCallback@Render@GW@@YAXP6AXPAUIDirect3DDevice9@@@Z@Z")]
-            internal static partial void SetResetCallback(nint callback);
+            public static partial void SetResetCallback(nint callback);
         }
 
-        internal static partial class Scanner
+        public static partial class Scanner
         {
 
             // GW::Scanner::Find
             [LibraryImport(DllName, EntryPoint = "?Find@Scanner@GW@@YAIPBD0HW4ScannerSection@2@@Z")]
-            internal static partial uint Find(byte* ptr1, nint ptr2, int value3, global::Daybreak.API.Interop.GWCA.GW.ScannerSection scannerSection4);
+            public static partial uint Find(byte* ptr1, nint ptr2, int value3, global::Daybreak.API.Interop.GWCA.GW.ScannerSection scannerSection4);
 
             // GW::Scanner::FindAssertion
             [LibraryImport(DllName, EntryPoint = "?FindAssertion@Scanner@GW@@YAIPBD0IH@Z")]
-            internal static partial uint FindAssertion(byte* ptr1, nint ptr2, uint value3, int value4);
+            public static partial uint FindAssertion(byte* ptr1, nint ptr2, uint value3, int value4);
 
             // GW::Scanner::FindInRange
             [LibraryImport(DllName, EntryPoint = "?FindInRange@Scanner@GW@@YAIPBD0HKK@Z")]
-            internal static partial uint FindInRange(byte* ptr1, nint ptr2, int value3, uint value4, uint value5);
+            public static partial uint FindInRange(byte* ptr1, nint ptr2, int value3, uint value4, uint value5);
 
             // GW::Scanner::FindNthUseOfString
             [LibraryImport(DllName, EntryPoint = "?FindNthUseOfString@Scanner@GW@@YAIPBDIHW4ScannerSection@2@@Z")]
-            internal static partial uint FindNthUseOfString(byte* ptr1, uint value2, int value3, global::Daybreak.API.Interop.GWCA.GW.ScannerSection scannerSection4);
+            public static partial uint FindNthUseOfString(byte* ptr1, uint value2, int value3, global::Daybreak.API.Interop.GWCA.GW.ScannerSection scannerSection4);
 
             // GW::Scanner::FindNthUseOfString
             [LibraryImport(DllName, EntryPoint = "?FindNthUseOfString@Scanner@GW@@YAIPB_WIHW4ScannerSection@2@@Z")]
-            internal static partial uint FindNthUseOfString(ushort* ptr1, uint value2, int value3, global::Daybreak.API.Interop.GWCA.GW.ScannerSection scannerSection4);
+            public static partial uint FindNthUseOfString(ushort* ptr1, uint value2, int value3, global::Daybreak.API.Interop.GWCA.GW.ScannerSection scannerSection4);
 
             // GW::Scanner::FindUseOfString
             [LibraryImport(DllName, EntryPoint = "?FindUseOfString@Scanner@GW@@YAIPBDHW4ScannerSection@2@@Z")]
-            internal static partial uint FindUseOfString(byte* ptr1, int value2, global::Daybreak.API.Interop.GWCA.GW.ScannerSection scannerSection3);
+            public static partial uint FindUseOfString(byte* ptr1, int value2, global::Daybreak.API.Interop.GWCA.GW.ScannerSection scannerSection3);
 
             // GW::Scanner::FindUseOfString
             [LibraryImport(DllName, EntryPoint = "?FindUseOfString@Scanner@GW@@YAIPB_WHW4ScannerSection@2@@Z")]
-            internal static partial uint FindUseOfString(ushort* ptr1, int value2, global::Daybreak.API.Interop.GWCA.GW.ScannerSection scannerSection3);
+            public static partial uint FindUseOfString(ushort* ptr1, int value2, global::Daybreak.API.Interop.GWCA.GW.ScannerSection scannerSection3);
 
             // GW::Scanner::FunctionFromNearCall
             [LibraryImport(DllName, EntryPoint = "?FunctionFromNearCall@Scanner@GW@@YAII_N@Z")]
-            internal static partial uint FunctionFromNearCall(uint value1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            public static partial uint FunctionFromNearCall(uint value1, [MarshalAs(UnmanagedType.U1)] bool flag2);
 
             // GW::Scanner::GetGameTlsIndex
             [LibraryImport(DllName, EntryPoint = "?GetGameTlsIndex@Scanner@GW@@YAKXZ")]
-            internal static partial uint GetGameTlsIndex();
+            public static partial uint GetGameTlsIndex();
 
             // GW::Scanner::GetSectionAddressRange
             [LibraryImport(DllName, EntryPoint = "?GetSectionAddressRange@Scanner@GW@@YAXW4ScannerSection@2@PAI1@Z")]
-            internal static partial void GetSectionAddressRange(global::Daybreak.API.Interop.GWCA.GW.ScannerSection scannerSection1, uint* ptr2, nint ptr3);
+            public static partial void GetSectionAddressRange(global::Daybreak.API.Interop.GWCA.GW.ScannerSection scannerSection1, uint* ptr2, nint ptr3);
 
             // GW::Scanner::Initialize | hINSTANCE__: TODO: map struct HINSTANCE__
             // [LibraryImport(DllName, EntryPoint = "?Initialize@Scanner@GW@@YAXPAUHINSTANCE__@@@Z")]
-            // internal static partial void Initialize(HINSTANCE__* hINSTANCE__);
+            // public static partial void Initialize(HINSTANCE__* hINSTANCE__);
 
             // GW::Scanner::Initialize
             [LibraryImport(DllName, EntryPoint = "?Initialize@Scanner@GW@@YAXPBD@Z")]
-            internal static partial void Initialize(byte* ptr);
+            public static partial void Initialize(byte* ptr);
 
             // GW::Scanner::IsValidPtr
             [LibraryImport(DllName, EntryPoint = "?IsValidPtr@Scanner@GW@@YA_NIW4ScannerSection@2@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool IsValidPtr(uint value1, global::Daybreak.API.Interop.GWCA.GW.ScannerSection scannerSection2);
+            public static partial bool IsValidPtr(uint value1, global::Daybreak.API.Interop.GWCA.GW.ScannerSection scannerSection2);
 
             // GW::Scanner::ToFunctionStart
             [LibraryImport(DllName, EntryPoint = "?ToFunctionStart@Scanner@GW@@YAIII@Z")]
-            internal static partial uint ToFunctionStart(uint value1, uint value2);
+            public static partial uint ToFunctionStart(uint value1, uint value2);
         }
 
-        internal static partial class ScrollableFrame
+        public static partial class ScrollableFrame
         {
 
             // GW::ScrollableFrame::AddItem
             [LibraryImport(DllName, EntryPoint = "?AddItem@ScrollableFrame@GW@@QAE_NIIP6AXPAUInteractionMessage@UI@2@PAX1@Z@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double AddItem(nint self, uint value2, uint value3, nint callback4);
+            public static partial double AddItem(nint self, uint value2, uint value3, nint callback4);
 
             // GW::ScrollableFrame::ClearItems
             [LibraryImport(DllName, EntryPoint = "?ClearItems@ScrollableFrame@GW@@QAE_NXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double ClearItems(nint self);
+            public static partial double ClearItems(nint self);
 
             // GW::ScrollableFrame::Create | returns TODO: map struct GW::ScrollableFrame | scrollablePageContext4: TODO: map struct GW::ScrollableFrame::ScrollablePageContext
             // [LibraryImport(DllName, EntryPoint = "?Create@ScrollableFrame@GW@@SAPAU12@IIIPAUScrollablePageContext@12@PB_W@Z")]
-            // internal static partial ScrollableFrame* Create(uint value1, uint value2, uint value3, ScrollablePageContext* scrollablePageContext4, ushort* ptr5);
+            // public static partial ScrollableFrame* Create(uint value1, uint value2, uint value3, ScrollablePageContext* scrollablePageContext4, ushort* ptr5);
 
             // GW::ScrollableFrame::GetCount
             [LibraryImport(DllName, EntryPoint = "?GetCount@ScrollableFrame@GW@@QAE_NPAI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double GetCount(nint self, uint* ptr2);
+            public static partial double GetCount(nint self, uint* ptr2);
 
             // GW::ScrollableFrame::GetFirstChildFrameId
             [LibraryImport(DllName, EntryPoint = "?GetFirstChildFrameId@ScrollableFrame@GW@@QAEIPAI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial uint* GetFirstChildFrameId(nint self);
+            public static partial uint* GetFirstChildFrameId(nint self);
 
             // GW::ScrollableFrame::GetItemFrameId
             [LibraryImport(DllName, EntryPoint = "?GetItemFrameId@ScrollableFrame@GW@@QAEII@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial uint GetItemFrameId(nint self);
+            public static partial uint GetItemFrameId(nint self);
 
             // GW::ScrollableFrame::GetItemRect
             [LibraryImport(DllName, EntryPoint = "?GetItemRect@ScrollableFrame@GW@@QAE_NIQAM@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double GetItemRect(nint self, uint value2, float* ptr3);
+            public static partial double GetItemRect(nint self, uint value2, float* ptr3);
 
             // GW::ScrollableFrame::GetItems
             [LibraryImport(DllName, EntryPoint = "?GetItems@ScrollableFrame@GW@@QAEIPAII@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial uint* GetItems(nint self, uint value2);
+            public static partial uint* GetItems(nint self, uint value2);
 
             // GW::ScrollableFrame::GetLastChildFrameId
             [LibraryImport(DllName, EntryPoint = "?GetLastChildFrameId@ScrollableFrame@GW@@QAEIPAI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial uint* GetLastChildFrameId(nint self);
+            public static partial uint* GetLastChildFrameId(nint self);
 
             // GW::ScrollableFrame::GetNextChildFrameId
             [LibraryImport(DllName, EntryPoint = "?GetNextChildFrameId@ScrollableFrame@GW@@QAEIIPAI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial uint GetNextChildFrameId(nint self, uint* ptr2);
+            public static partial uint GetNextChildFrameId(nint self, uint* ptr2);
 
             // GW::ScrollableFrame::GetPage
             [LibraryImport(DllName, EntryPoint = "?GetPage@ScrollableFrame@GW@@QAEPAUFrame@UI@2@XZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.UI.Frame* GetPage(nint self);
+            public static partial global::Daybreak.API.Interop.GuildWars.Frame* GetPage(nint self);
 
             // GW::ScrollableFrame::GetPrevChildFrameId
             [LibraryImport(DllName, EntryPoint = "?GetPrevChildFrameId@ScrollableFrame@GW@@QAEIIPAI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial uint GetPrevChildFrameId(nint self, uint* ptr2);
+            public static partial uint GetPrevChildFrameId(nint self, uint* ptr2);
 
             // GW::ScrollableFrame::GetSelectedValue
             [LibraryImport(DllName, EntryPoint = "?GetSelectedValue@ScrollableFrame@GW@@QAE_NPAI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double GetSelectedValue(nint self, uint* ptr2);
+            public static partial double GetSelectedValue(nint self, uint* ptr2);
 
             // GW::ScrollableFrame::GetSortHandler
             [LibraryImport(DllName, EntryPoint = "?GetSortHandler@ScrollableFrame@GW@@QAEP6AHII@ZXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial nint GetSortHandler(nint self, int* ptr2, uint value3, uint value4);
+            public static partial nint GetSortHandler(nint self, int* ptr2, uint value3, uint value4);
 
             // GW::ScrollableFrame::RemoveItem
             [LibraryImport(DllName, EntryPoint = "?RemoveItem@ScrollableFrame@GW@@QAE_NI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double RemoveItem(nint self, uint value2);
+            public static partial double RemoveItem(nint self, uint value2);
 
             // GW::ScrollableFrame::SetPage | scrollablePageContext2: TODO: map struct GW::ScrollableFrame::ScrollablePageContext
             // [LibraryImport(DllName, EntryPoint = "?SetPage@ScrollableFrame@GW@@QAEPAUFrame@UI@2@PAUScrollablePageContext@12@@Z")]
             // [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            // internal static partial global::Daybreak.API.Interop.GWCA.GW.UI.Frame* SetPage(nint self, ScrollablePageContext* scrollablePageContext2);
+            // public static partial global::Daybreak.API.Interop.GuildWars.Frame* SetPage(nint self, ScrollablePageContext* scrollablePageContext2);
 
             // GW::ScrollableFrame::SetSortHandler
             [LibraryImport(DllName, EntryPoint = "?SetSortHandler@ScrollableFrame@GW@@QAE_NP6AHII@Z@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double SetSortHandler(nint self, nint callback2);
+            public static partial double SetSortHandler(nint self, nint callback2);
         }
 
-        internal static partial class Skillbar
+        public static partial class Skillbar
         {
 
             // GW::Skillbar::GetSkillById
             [LibraryImport(DllName, EntryPoint = "?GetSkillById@Skillbar@GW@@QAEPAUSkillbarSkill@2@W4SkillID@Constants@2@PAI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.SkillbarSkillData* GetSkillById(nint self, global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillID2, uint* ptr3);
+            public static partial global::Daybreak.API.Interop.GuildWars.SkillbarSkillData* GetSkillById(nint self, global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillID2, uint* ptr3);
         }
 
-        internal static partial class SkillbarMgr
+        public static partial class SkillbarMgr
         {
 
             // GW::SkillbarMgr::ChangeSecondProfession
             [LibraryImport(DllName, EntryPoint = "?ChangeSecondProfession@SkillbarMgr@GW@@YA_NIW4Profession@Constants@2@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool ChangeSecondProfession(uint value1, global::Daybreak.API.Interop.GWCA.GW.Constants.Profession profession2);
+            public static partial bool ChangeSecondProfession(uint value1, global::Daybreak.API.Interop.GWCA.GW.Constants.Profession profession2);
 
             // GW::SkillbarMgr::DecodeSkillTemplate
             [LibraryImport(DllName, EntryPoint = "?DecodeSkillTemplate@SkillbarMgr@GW@@YA_NAAUSkillTemplate@12@PBD@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool DecodeSkillTemplate(global::Daybreak.API.Interop.GWCA.GW.SkillbarMgr.SkillTemplate* skillTemplate1, byte* ptr2);
+            public static partial bool DecodeSkillTemplate(global::Daybreak.API.Interop.GuildWars.SkillTemplate* skillTemplate1, byte* ptr2);
 
             // GW::SkillbarMgr::EncodeSkillTemplate
             [LibraryImport(DllName, EntryPoint = "?EncodeSkillTemplate@SkillbarMgr@GW@@YA_NABUSkillTemplate@12@PADI@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool EncodeSkillTemplate(global::Daybreak.API.Interop.GWCA.GW.SkillbarMgr.SkillTemplate* skillTemplate1, byte* ptr2, uint value3);
+            public static partial bool EncodeSkillTemplate(global::Daybreak.API.Interop.GuildWars.SkillTemplate* skillTemplate1, byte* ptr2, uint value3);
 
             // GW::SkillbarMgr::GetAttributeConstantData
             [LibraryImport(DllName, EntryPoint = "?GetAttributeConstantData@SkillbarMgr@GW@@YAPAUAttributeInfo@2@W4Attribute@Constants@2@@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.AttributeInfo* GetAttributeConstantData(global::Daybreak.API.Interop.GWCA.GW.Attribute attribute);
+            public static partial global::Daybreak.API.Interop.GuildWars.AttributeInfo* GetAttributeConstantData(global::Daybreak.API.Interop.GuildWars.Attribute attribute);
 
             // GW::SkillbarMgr::GetHeroSkillbar
             [LibraryImport(DllName, EntryPoint = "?GetHeroSkillbar@SkillbarMgr@GW@@YAPAUSkillbar@2@I@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.SkillbarData* GetHeroSkillbar(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.SkillbarData* GetHeroSkillbar(uint value);
 
             // GW::SkillbarMgr::GetHoveredSkill
             [LibraryImport(DllName, EntryPoint = "?GetHoveredSkill@SkillbarMgr@GW@@YAPAUSkill@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Skill* GetHoveredSkill();
+            public static partial global::Daybreak.API.Interop.GuildWars.Skill* GetHoveredSkill();
 
             // GW::SkillbarMgr::GetIsSkillLearnt
             [LibraryImport(DllName, EntryPoint = "?GetIsSkillLearnt@SkillbarMgr@GW@@YA_NW4SkillID@Constants@2@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetIsSkillLearnt(global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillID);
+            public static partial bool GetIsSkillLearnt(global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillID);
 
             // GW::SkillbarMgr::GetIsSkillUnlocked
             [LibraryImport(DllName, EntryPoint = "?GetIsSkillUnlocked@SkillbarMgr@GW@@YA_NW4SkillID@Constants@2@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetIsSkillUnlocked(global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillID);
+            public static partial bool GetIsSkillUnlocked(global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillID);
 
             // GW::SkillbarMgr::GetPlayerSkillbar
             [LibraryImport(DllName, EntryPoint = "?GetPlayerSkillbar@SkillbarMgr@GW@@YAPAUSkillbar@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.SkillbarData* GetPlayerSkillbar();
+            public static partial global::Daybreak.API.Interop.GuildWars.SkillbarData* GetPlayerSkillbar();
 
             // GW::SkillbarMgr::GetSkillConstantData
             [LibraryImport(DllName, EntryPoint = "?GetSkillConstantData@SkillbarMgr@GW@@YAPAUSkill@2@W4SkillID@Constants@2@@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Skill* GetSkillConstantData(global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillID);
+            public static partial global::Daybreak.API.Interop.GuildWars.Skill* GetSkillConstantData(global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillID);
 
             // GW::SkillbarMgr::GetSkillSlot
             [LibraryImport(DllName, EntryPoint = "?GetSkillSlot@SkillbarMgr@GW@@YAHW4SkillID@Constants@2@@Z")]
-            internal static partial int GetSkillSlot(global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillID);
+            public static partial int GetSkillSlot(global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillID);
 
             // GW::SkillbarMgr::GetSkillTemplate
             [LibraryImport(DllName, EntryPoint = "?GetSkillTemplate@SkillbarMgr@GW@@YA_NAAUSkillTemplate@12@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetSkillTemplate(global::Daybreak.API.Interop.GWCA.GW.SkillbarMgr.SkillTemplate* skillTemplate);
+            public static partial bool GetSkillTemplate(global::Daybreak.API.Interop.GuildWars.SkillTemplate* skillTemplate);
 
             // GW::SkillbarMgr::GetSkillTemplate
             [LibraryImport(DllName, EntryPoint = "?GetSkillTemplate@SkillbarMgr@GW@@YA_NIAAUSkillTemplate@12@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetSkillTemplate(uint value1, global::Daybreak.API.Interop.GWCA.GW.SkillbarMgr.SkillTemplate* skillTemplate2);
+            public static partial bool GetSkillTemplate(uint value1, global::Daybreak.API.Interop.GuildWars.SkillTemplate* skillTemplate2);
 
             // GW::SkillbarMgr::GetSkillbar
             [LibraryImport(DllName, EntryPoint = "?GetSkillbar@SkillbarMgr@GW@@YAPAUSkillbar@2@I@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.SkillbarData* GetSkillbar(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.SkillbarData* GetSkillbar(uint value);
 
             // GW::SkillbarMgr::GetSkillbarArray
             [LibraryImport(DllName, EntryPoint = "?GetSkillbarArray@SkillbarMgr@GW@@YAPAV?$Array@USkillbar@GW@@@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GWCA.GW.SkillbarData>* GetSkillbarArray();
+            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.SkillbarData>* GetSkillbarArray();
 
             // GW::SkillbarMgr::LoadSkillTemplate
             [LibraryImport(DllName, EntryPoint = "?LoadSkillTemplate@SkillbarMgr@GW@@YA_NAAUSkillTemplate@12@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool LoadSkillTemplate(global::Daybreak.API.Interop.GWCA.GW.SkillbarMgr.SkillTemplate* skillTemplate);
+            public static partial bool LoadSkillTemplate(global::Daybreak.API.Interop.GuildWars.SkillTemplate* skillTemplate);
 
             // GW::SkillbarMgr::LoadSkillTemplate
             [LibraryImport(DllName, EntryPoint = "?LoadSkillTemplate@SkillbarMgr@GW@@YA_NIAAUSkillTemplate@12@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool LoadSkillTemplate(uint value1, global::Daybreak.API.Interop.GWCA.GW.SkillbarMgr.SkillTemplate* skillTemplate2);
+            public static partial bool LoadSkillTemplate(uint value1, global::Daybreak.API.Interop.GuildWars.SkillTemplate* skillTemplate2);
 
             // GW::SkillbarMgr::LoadSkillTemplate
             [LibraryImport(DllName, EntryPoint = "?LoadSkillTemplate@SkillbarMgr@GW@@YA_NIPBD@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool LoadSkillTemplate(uint value1, byte* ptr2);
+            public static partial bool LoadSkillTemplate(uint value1, byte* ptr2);
 
             // GW::SkillbarMgr::LoadSkillTemplate
             [LibraryImport(DllName, EntryPoint = "?LoadSkillTemplate@SkillbarMgr@GW@@YA_NPBD@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool LoadSkillTemplate(byte* ptr);
+            public static partial bool LoadSkillTemplate(byte* ptr);
 
             // GW::SkillbarMgr::UseSkill
             [LibraryImport(DllName, EntryPoint = "?UseSkill@SkillbarMgr@GW@@YA_NII@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool UseSkill(uint value1, uint value2);
+            public static partial bool UseSkill(uint value1, uint value2);
 
             // GW::SkillbarMgr::UseSkillByID
             [LibraryImport(DllName, EntryPoint = "?UseSkillByID@SkillbarMgr@GW@@YA_NII@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool UseSkillByID(uint value1, uint value2);
+            public static partial bool UseSkillByID(uint value1, uint value2);
         }
 
-        internal static partial class SkillbarSkill
+        public static partial class SkillbarSkill
         {
 
             // GW::SkillbarSkill::GetRecharge
             [LibraryImport(DllName, EntryPoint = "?GetRecharge@SkillbarSkill@GW@@QBEIXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial void GetRecharge(nint self);
+            public static partial void GetRecharge(nint self);
         }
 
-        internal static partial class SliderFrame
+        public static partial class SliderFrame
         {
 
             // GW::SliderFrame::GetValue
             [LibraryImport(DllName, EntryPoint = "?GetValue@SliderFrame@GW@@QAE_NPAI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double GetValue(nint self, uint* ptr2);
+            public static partial double GetValue(nint self, uint* ptr2);
 
             // GW::SliderFrame::GetValue
             [LibraryImport(DllName, EntryPoint = "?GetValue@SliderFrame@GW@@UAEIXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial void GetValue(nint self);
+            public static partial void GetValue(nint self);
 
             // GW::SliderFrame::SetValue
             [LibraryImport(DllName, EntryPoint = "?SetValue@SliderFrame@GW@@UAE_NI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double SetValue(nint self, uint value2);
+            public static partial double SetValue(nint self, uint value2);
         }
 
-        internal static partial class StoC
+        public static partial class StoC
         {
 
             // GW::StoC::EmulatePacket
             [LibraryImport(DllName, EntryPoint = "?EmulatePacket@StoC@GW@@YA_NPAUPacketBase@1Packet@2@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool EmulatePacket(global::Daybreak.API.Interop.GWCA.GW.Packet.StoC.PacketBase* packetBase);
+            public static partial bool EmulatePacket(global::Daybreak.API.Interop.GuildWars.PacketBase* packetBase);
 
             // GW::StoC::RegisterPacketCallback | function3: TODO: map struct function
             // [LibraryImport(DllName, EntryPoint = "?RegisterPacketCallback@StoC@GW@@YA_NPAUHookEntry@2@IABV?$function@$$A6AXPAUHookStatus@GW@@PAUPacketBase@StoC@Packet@2@@Z@std@@H@Z")]
             // [return: MarshalAs(UnmanagedType.U1)]
-            // internal static partial bool RegisterPacketCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, uint value2, function* function3, global::Daybreak.API.Interop.GWCA.GW.Packet.StoC.PacketBase* packetBase4);
+            // public static partial bool RegisterPacketCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, uint value2, function* function3, global::Daybreak.API.Interop.GuildWars.PacketBase* packetBase4);
 
             // GW::StoC::RegisterPostPacketCallback | function3: TODO: map struct function
             // [LibraryImport(DllName, EntryPoint = "?RegisterPostPacketCallback@StoC@GW@@YA_NPAUHookEntry@2@IABV?$function@$$A6AXPAUHookStatus@GW@@PAUPacketBase@StoC@Packet@2@@Z@std@@@Z")]
             // [return: MarshalAs(UnmanagedType.U1)]
-            // internal static partial bool RegisterPostPacketCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, uint value2, function* function3, global::Daybreak.API.Interop.GWCA.GW.Packet.StoC.PacketBase* packetBase4);
+            // public static partial bool RegisterPostPacketCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, uint value2, function* function3, global::Daybreak.API.Interop.GuildWars.PacketBase* packetBase4);
 
             // GW::StoC::RemoveCallback
             [LibraryImport(DllName, EntryPoint = "?RemoveCallback@StoC@GW@@YAIIPAUHookEntry@2@@Z")]
-            internal static partial uint RemoveCallback(uint value1, global::Daybreak.API.Interop.HookEntry* hookEntry2);
+            public static partial uint RemoveCallback(uint value1, global::Daybreak.API.Interop.HookEntry* hookEntry2);
 
             // GW::StoC::RemoveCallbacks
             [LibraryImport(DllName, EntryPoint = "?RemoveCallbacks@StoC@GW@@YAIPAUHookEntry@2@@Z")]
-            internal static partial uint RemoveCallbacks(global::Daybreak.API.Interop.HookEntry* hookEntry);
+            public static partial uint RemoveCallbacks(global::Daybreak.API.Interop.HookEntry* hookEntry);
 
             // GW::StoC::RemovePostCallback
             [LibraryImport(DllName, EntryPoint = "?RemovePostCallback@StoC@GW@@YAXIPAUHookEntry@2@@Z")]
-            internal static partial void RemovePostCallback(uint value1, global::Daybreak.API.Interop.HookEntry* hookEntry2);
+            public static partial void RemovePostCallback(uint value1, global::Daybreak.API.Interop.HookEntry* hookEntry2);
         }
 
-        internal static partial class TabsFrame
+        public static partial class TabsFrame
         {
 
             // GW::TabsFrame::AddTab
             [LibraryImport(DllName, EntryPoint = "?AddTab@TabsFrame@GW@@QAEPAUFrame@UI@2@PB_WIIP6AXPAUInteractionMessage@42@PAX2@Z2@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.UI.Frame* AddTab(nint self, ushort* ptr2, uint value3, uint value4, nint callback5, nint ptr6);
+            public static partial global::Daybreak.API.Interop.GuildWars.Frame* AddTab(nint self, ushort* ptr2, uint value3, uint value4, nint callback5, nint ptr6);
 
             // GW::TabsFrame::ChooseTab
             [LibraryImport(DllName, EntryPoint = "?ChooseTab@TabsFrame@GW@@QAE_NI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double ChooseTab(nint self, uint value2);
+            public static partial double ChooseTab(nint self, uint value2);
 
             // GW::TabsFrame::ChooseTab
             [LibraryImport(DllName, EntryPoint = "?ChooseTab@TabsFrame@GW@@QAE_NPAUFrame@UI@2@@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double ChooseTab(nint self, global::Daybreak.API.Interop.GWCA.GW.UI.Frame* frame2);
+            public static partial double ChooseTab(nint self, global::Daybreak.API.Interop.GuildWars.Frame* frame2);
 
             // GW::TabsFrame::DisableTab
             [LibraryImport(DllName, EntryPoint = "?DisableTab@TabsFrame@GW@@QAE_NI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double DisableTab(nint self, uint value2);
+            public static partial double DisableTab(nint self, uint value2);
 
             // GW::TabsFrame::EnableTab
             [LibraryImport(DllName, EntryPoint = "?EnableTab@TabsFrame@GW@@QAE_NI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double EnableTab(nint self, uint value2);
+            public static partial double EnableTab(nint self, uint value2);
 
             // GW::TabsFrame::GetCurrentTab
             [LibraryImport(DllName, EntryPoint = "?GetCurrentTab@TabsFrame@GW@@QAEPAUFrame@UI@2@XZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.UI.Frame* GetCurrentTab(nint self);
+            public static partial global::Daybreak.API.Interop.GuildWars.Frame* GetCurrentTab(nint self);
 
             // GW::TabsFrame::GetCurrentTabIndex
             [LibraryImport(DllName, EntryPoint = "?GetCurrentTabIndex@TabsFrame@GW@@QAE_NPAI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double GetCurrentTabIndex(nint self, uint* ptr2);
+            public static partial double GetCurrentTabIndex(nint self, uint* ptr2);
 
             // GW::TabsFrame::GetIsTabEnabled
             [LibraryImport(DllName, EntryPoint = "?GetIsTabEnabled@TabsFrame@GW@@QAE_NIPAI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double GetIsTabEnabled(nint self, uint value2, uint* ptr3);
+            public static partial double GetIsTabEnabled(nint self, uint value2, uint* ptr3);
 
             // GW::TabsFrame::GetTabButton | returns TODO: map struct GW::ButtonFrame
             // [LibraryImport(DllName, EntryPoint = "?GetTabButton@TabsFrame@GW@@QAEPAUButtonFrame@2@PAUFrame@UI@2@@Z")]
             // [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            // internal static partial ButtonFrame* GetTabButton(nint self, global::Daybreak.API.Interop.GWCA.GW.UI.Frame* frame2);
+            // public static partial ButtonFrame* GetTabButton(nint self, global::Daybreak.API.Interop.GuildWars.Frame* frame2);
 
             // GW::TabsFrame::GetTabByLabel
             [LibraryImport(DllName, EntryPoint = "?GetTabByLabel@TabsFrame@GW@@QAEPAUFrame@UI@2@PB_W@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.UI.Frame* GetTabByLabel(nint self, ushort* ptr2);
+            public static partial global::Daybreak.API.Interop.GuildWars.Frame* GetTabByLabel(nint self, ushort* ptr2);
 
             // GW::TabsFrame::GetTabFrameId
             [LibraryImport(DllName, EntryPoint = "?GetTabFrameId@TabsFrame@GW@@QAE_NIPAI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double GetTabFrameId(nint self, uint value2, uint* ptr3);
+            public static partial double GetTabFrameId(nint self, uint value2, uint* ptr3);
 
             // GW::TabsFrame::RemoveTab
             [LibraryImport(DllName, EntryPoint = "?RemoveTab@TabsFrame@GW@@QAE_NI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double RemoveTab(nint self, uint value2);
+            public static partial double RemoveTab(nint self, uint value2);
         }
 
-        internal static partial class TextLabelFrame
+        public static partial class TextLabelFrame
         {
 
             // GW::TextLabelFrame::Create | returns TODO: map struct GW::TextLabelFrame
             // [LibraryImport(DllName, EntryPoint = "?Create@TextLabelFrame@GW@@SAPAU12@IIIPB_W0@Z")]
-            // internal static partial TextLabelFrame* Create(uint value1, uint value2, uint value3, ushort* ptr4, nint ptr5);
+            // public static partial TextLabelFrame* Create(uint value1, uint value2, uint value3, ushort* ptr4, nint ptr5);
 
             // GW::TextLabelFrame::GetDecodedLabel
             [LibraryImport(DllName, EntryPoint = "?GetDecodedLabel@TextLabelFrame@GW@@QAEPB_WXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial nint GetDecodedLabel(nint self, ushort value2);
+            public static partial nint GetDecodedLabel(nint self, ushort value2);
 
             // GW::TextLabelFrame::GetEncodedLabel
             [LibraryImport(DllName, EntryPoint = "?GetEncodedLabel@TextLabelFrame@GW@@QAEPB_WXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial nint GetEncodedLabel(nint self, ushort value2);
+            public static partial nint GetEncodedLabel(nint self, ushort value2);
 
             // GW::TextLabelFrame::SetFont
             [LibraryImport(DllName, EntryPoint = "?SetFont@TextLabelFrame@GW@@QAE_NI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double SetFont(nint self, uint value2);
+            public static partial double SetFont(nint self, uint value2);
 
             // GW::TextLabelFrame::SetLabel
             [LibraryImport(DllName, EntryPoint = "?SetLabel@TextLabelFrame@GW@@QAE_NPB_W@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial double SetLabel(nint self, ushort* ptr2);
+            public static partial double SetLabel(nint self, ushort* ptr2);
         }
 
-        internal static partial class Trade
+        public static partial class Trade
         {
 
             // GW::Trade::AcceptTrade
             [LibraryImport(DllName, EntryPoint = "?AcceptTrade@Trade@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool AcceptTrade();
+            public static partial bool AcceptTrade();
 
             // GW::Trade::CancelTrade
             [LibraryImport(DllName, EntryPoint = "?CancelTrade@Trade@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool CancelTrade();
+            public static partial bool CancelTrade();
 
             // GW::Trade::ChangeOffer
             [LibraryImport(DllName, EntryPoint = "?ChangeOffer@Trade@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool ChangeOffer();
+            public static partial bool ChangeOffer();
 
             // GW::Trade::IsItemOffered
             [LibraryImport(DllName, EntryPoint = "?IsItemOffered@Trade@GW@@YAPAUTradeItem@2@I@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.TradeItem* IsItemOffered(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.TradeItem* IsItemOffered(uint value);
 
             // GW::Trade::OfferItem
             [LibraryImport(DllName, EntryPoint = "?OfferItem@Trade@GW@@YA_NII@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool OfferItem(uint value1, uint value2);
+            public static partial bool OfferItem(uint value1, uint value2);
 
             // GW::Trade::OpenTradeWindow
             [LibraryImport(DllName, EntryPoint = "?OpenTradeWindow@Trade@GW@@YA_NI@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool OpenTradeWindow(uint value);
+            public static partial bool OpenTradeWindow(uint value);
 
             // GW::Trade::RemoveItem
             [LibraryImport(DllName, EntryPoint = "?RemoveItem@Trade@GW@@YA_NI@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool RemoveItem(uint value);
+            public static partial bool RemoveItem(uint value);
 
             // GW::Trade::SubmitOffer
             [LibraryImport(DllName, EntryPoint = "?SubmitOffer@Trade@GW@@YA_NI@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SubmitOffer(uint value);
+            public static partial bool SubmitOffer(uint value);
         }
 
-        internal static partial class UI
+        public static partial class UI
         {
 
             // GW::UI::AddFrameUIInteractionCallback
             [LibraryImport(DllName, EntryPoint = "?AddFrameUIInteractionCallback@UI@GW@@YA_NPAUFrame@12@P6AXPAUInteractionMessage@12@PAX2@Z2@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool AddFrameUIInteractionCallback(global::Daybreak.API.Interop.GWCA.GW.UI.Frame* frame1, nint callback2, nint ptr3);
+            public static partial bool AddFrameUIInteractionCallback(global::Daybreak.API.Interop.GuildWars.Frame* frame1, nint callback2, nint ptr3);
 
             // GW::UI::AsyncDecodeStr
             [LibraryImport(DllName, EntryPoint = "?AsyncDecodeStr@UI@GW@@YAXPB_WP6AXPAX0@Z1W4Language@Constants@2@@Z")]
-            internal static partial void AsyncDecodeStr(ushort* ptr1, nint callback2, nint ptr3, global::Daybreak.API.Interop.GWCA.GW.Constants.Language language4);
+            public static partial void AsyncDecodeStr(ushort* ptr1, nint callback2, nint ptr3, global::Daybreak.API.Interop.GWCA.GW.Constants.Language language4);
 
             // GW::UI::AsyncDecodeStr
             [LibraryImport(DllName, EntryPoint = "?AsyncDecodeStr@UI@GW@@YAXPB_WPA_WI@Z")]
-            internal static partial void AsyncDecodeStr(ushort* ptr1, ushort* ptr2, uint value3);
+            public static partial void AsyncDecodeStr(ushort* ptr1, ushort* ptr2, uint value3);
 
             // GW::UI::ButtonClick
             [LibraryImport(DllName, EntryPoint = "?ButtonClick@UI@GW@@YA_NPAUFrame@12@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool ButtonClick(global::Daybreak.API.Interop.GWCA.GW.UI.Frame* frame);
+            public static partial bool ButtonClick(global::Daybreak.API.Interop.GuildWars.Frame* frame);
 
             // GW::UI::CreateUIComponent
             [LibraryImport(DllName, EntryPoint = "?CreateUIComponent@UI@GW@@YAIIIIP6AXPAUInteractionMessage@12@PAX1@Z1PB_W@Z")]
-            internal static partial uint CreateUIComponent(uint value1, uint value2, uint value3, nint callback4, nint ptr5, ushort* ptr6);
+            public static partial uint CreateUIComponent(uint value1, uint value2, uint value3, nint callback4, nint ptr5, ushort* ptr6);
 
             // GW::UI::Default_UICallback
             [LibraryImport(DllName, EntryPoint = "?Default_UICallback@UI@GW@@YA_NPAUInteractionMessage@12@PAX1@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool Default_UICallback(global::Daybreak.API.Interop.GWCA.GW.UI.InteractionMessage* interactionMessage1, void* ptr2, nint ptr3);
+            public static partial bool Default_UICallback(global::Daybreak.API.Interop.GuildWars.InteractionMessage* interactionMessage1, void* ptr2, nint ptr3);
 
             // GW::UI::DestroyUIComponent
             [LibraryImport(DllName, EntryPoint = "?DestroyUIComponent@UI@GW@@YA_NPAUFrame@12@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool DestroyUIComponent(global::Daybreak.API.Interop.GWCA.GW.UI.Frame* frame);
+            public static partial bool DestroyUIComponent(global::Daybreak.API.Interop.GuildWars.Frame* frame);
 
             // GW::UI::DrawOnCompass
             [LibraryImport(DllName, EntryPoint = "?DrawOnCompass@UI@GW@@YA_NIIPAUCompassPoint@12@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool DrawOnCompass(uint value1, uint value2, global::Daybreak.API.Interop.GWCA.GW.UI.CompassPoint* compassPoint3);
+            public static partial bool DrawOnCompass(uint value1, uint value2, global::Daybreak.API.Interop.GuildWars.CompassPoint* compassPoint3);
 
             // GW::UI::EncStrToUInt32
             [LibraryImport(DllName, EntryPoint = "?EncStrToUInt32@UI@GW@@YAIPB_W@Z")]
-            internal static partial uint EncStrToUInt32(ushort* ptr);
+            public static partial uint EncStrToUInt32(ushort* ptr);
 
             // GW::UI::GetChildFrame
             [LibraryImport(DllName, EntryPoint = "?GetChildFrame@UI@GW@@YAPAUFrame@12@PAU312@I@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.UI.Frame* GetChildFrame(global::Daybreak.API.Interop.GWCA.GW.UI.Frame* frame1, uint value2);
+            public static partial global::Daybreak.API.Interop.GuildWars.Frame* GetChildFrame(global::Daybreak.API.Interop.GuildWars.Frame* frame1, uint value2);
 
             // GW::UI::GetCommandLinePref
             [LibraryImport(DllName, EntryPoint = "?GetCommandLinePref@UI@GW@@YA_NPB_WPAI@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetCommandLinePref(ushort* ptr1, uint* ptr2);
+            public static partial bool GetCommandLinePref(ushort* ptr1, uint* ptr2);
 
             // GW::UI::GetCommandLinePref
             [LibraryImport(DllName, EntryPoint = "?GetCommandLinePref@UI@GW@@YA_NPB_WPAPA_W@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetCommandLinePref(ushort* ptr1, void* ptr2);
+            public static partial bool GetCommandLinePref(ushort* ptr1, void* ptr2);
 
             // GW::UI::GetCurrentTooltip | returns TODO: map struct GW::UI::TooltipInfo
             // [LibraryImport(DllName, EntryPoint = "?GetCurrentTooltip@UI@GW@@YAPAUTooltipInfo@12@XZ")]
-            // internal static partial TooltipInfo* GetCurrentTooltip();
+            // public static partial TooltipInfo* GetCurrentTooltip();
 
             // GW::UI::GetFrameById
             [LibraryImport(DllName, EntryPoint = "?GetFrameById@UI@GW@@YAPAUFrame@12@I@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.UI.Frame* GetFrameById(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.Frame* GetFrameById(uint value);
 
             // GW::UI::GetFrameByLabel
             [LibraryImport(DllName, EntryPoint = "?GetFrameByLabel@UI@GW@@YAPAUFrame@12@PB_W@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.UI.Frame* GetFrameByLabel(ushort* ptr);
+            public static partial global::Daybreak.API.Interop.GuildWars.Frame* GetFrameByLabel(ushort* ptr);
 
             // GW::UI::GetFrameContext
             [LibraryImport(DllName, EntryPoint = "?GetFrameContext@UI@GW@@YAPAXPAUFrame@12@@Z")]
-            internal static partial void* GetFrameContext(global::Daybreak.API.Interop.GWCA.GW.UI.Frame* frame);
+            public static partial void* GetFrameContext(global::Daybreak.API.Interop.GuildWars.Frame* frame);
 
             // GW::UI::GetIsShiftScreenShot
             [LibraryImport(DllName, EntryPoint = "?GetIsShiftScreenShot@UI@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetIsShiftScreenShot();
+            public static partial bool GetIsShiftScreenShot();
 
             // GW::UI::GetIsUIDrawn
             [LibraryImport(DllName, EntryPoint = "?GetIsUIDrawn@UI@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetIsUIDrawn();
+            public static partial bool GetIsUIDrawn();
 
             // GW::UI::GetIsWorldMapShowing
             [LibraryImport(DllName, EntryPoint = "?GetIsWorldMapShowing@UI@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetIsWorldMapShowing();
+            public static partial bool GetIsWorldMapShowing();
 
             // GW::UI::GetParentFrame
             [LibraryImport(DllName, EntryPoint = "?GetParentFrame@UI@GW@@YAPAUFrame@12@PAU312@@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.UI.Frame* GetParentFrame(global::Daybreak.API.Interop.GWCA.GW.UI.Frame* frame);
+            public static partial global::Daybreak.API.Interop.GuildWars.Frame* GetParentFrame(global::Daybreak.API.Interop.GuildWars.Frame* frame);
 
             // GW::UI::GetPreference
             [LibraryImport(DllName, EntryPoint = "?GetPreference@UI@GW@@YAIW4EnumPreference@12@@Z")]
-            internal static partial uint GetPreference(global::Daybreak.API.Interop.GWCA.GW.UI.EnumPreference enumPreference);
+            public static partial uint GetPreference(global::Daybreak.API.Interop.GWCA.GW.UI.EnumPreference enumPreference);
 
             // GW::UI::GetPreference
             [LibraryImport(DllName, EntryPoint = "?GetPreference@UI@GW@@YAIW4NumberPreference@12@@Z")]
-            internal static partial uint GetPreference(global::Daybreak.API.Interop.GWCA.GW.UI.NumberPreference numberPreference);
+            public static partial uint GetPreference(global::Daybreak.API.Interop.GWCA.GW.UI.NumberPreference numberPreference);
 
             // GW::UI::GetPreference
             [LibraryImport(DllName, EntryPoint = "?GetPreference@UI@GW@@YAPA_WW4StringPreference@12@@Z")]
-            internal static partial ushort* GetPreference(global::Daybreak.API.Interop.GWCA.GW.UI.StringPreference stringPreference);
+            public static partial ushort* GetPreference(global::Daybreak.API.Interop.GWCA.GW.UI.StringPreference stringPreference);
 
             // GW::UI::GetPreference
             [LibraryImport(DllName, EntryPoint = "?GetPreference@UI@GW@@YA_NW4FlagPreference@12@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetPreference(global::Daybreak.API.Interop.GWCA.GW.UI.FlagPreference flagPreference);
+            public static partial bool GetPreference(global::Daybreak.API.Interop.GWCA.GW.UI.FlagPreference flagPreference);
 
             // GW::UI::GetPreferenceOptions
             [LibraryImport(DllName, EntryPoint = "?GetPreferenceOptions@UI@GW@@YAIW4EnumPreference@12@PAPAI@Z")]
-            internal static partial uint GetPreferenceOptions(global::Daybreak.API.Interop.GWCA.GW.UI.EnumPreference enumPreference1, void* ptr2);
+            public static partial uint GetPreferenceOptions(global::Daybreak.API.Interop.GWCA.GW.UI.EnumPreference enumPreference1, void* ptr2);
 
             // GW::UI::GetRootFrame
             [LibraryImport(DllName, EntryPoint = "?GetRootFrame@UI@GW@@YAPAUFrame@12@XZ")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.UI.Frame* GetRootFrame();
+            public static partial global::Daybreak.API.Interop.GuildWars.Frame* GetRootFrame();
 
             // GW::UI::GetSettings
             [LibraryImport(DllName, EntryPoint = "?GetSettings@UI@GW@@YAPAV?$Array@E@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<byte>* GetSettings();
+            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<byte>* GetSettings();
 
             // GW::UI::GetTextLanguage
             [LibraryImport(DllName, EntryPoint = "?GetTextLanguage@UI@GW@@YA?AW4Language@Constants@2@XZ")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.Constants.Language GetTextLanguage();
+            public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.Language GetTextLanguage();
 
             // GW::UI::GetWindowPosition
             [LibraryImport(DllName, EntryPoint = "?GetWindowPosition@UI@GW@@YAPAUWindowPosition@12@W4WindowID@12@@Z")]
-            internal static partial global::Daybreak.API.Interop.GWCA.GW.UI.WindowPositionData* GetWindowPosition(global::Daybreak.API.Interop.GWCA.GW.UI.WindowID windowID);
+            public static partial global::Daybreak.API.Interop.GuildWars.WindowPositionData* GetWindowPosition(global::Daybreak.API.Interop.GWCA.GW.UI.WindowID windowID);
 
             // GW::UI::IsInControllerCursorMode
             [LibraryImport(DllName, EntryPoint = "?IsInControllerCursorMode@UI@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool IsInControllerCursorMode();
+            public static partial bool IsInControllerCursorMode();
 
             // GW::UI::IsInControllerMode
             [LibraryImport(DllName, EntryPoint = "?IsInControllerMode@UI@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool IsInControllerMode();
+            public static partial bool IsInControllerMode();
 
             // GW::UI::IsValidEncStr
             [LibraryImport(DllName, EntryPoint = "?IsValidEncStr@UI@GW@@YA_NPB_W@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool IsValidEncStr(ushort* ptr);
+            public static partial bool IsValidEncStr(ushort* ptr);
 
             // GW::UI::Keydown
             [LibraryImport(DllName, EntryPoint = "?Keydown@UI@GW@@YA_NW4ControlAction@12@PAUFrame@12@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool Keydown(global::Daybreak.API.Interop.GWCA.GW.UI.ControlAction controlAction1, global::Daybreak.API.Interop.GWCA.GW.UI.Frame* frame2);
+            public static partial bool Keydown(global::Daybreak.API.Interop.GWCA.GW.UI.ControlAction controlAction1, global::Daybreak.API.Interop.GuildWars.Frame* frame2);
 
             // GW::UI::Keypress
             [LibraryImport(DllName, EntryPoint = "?Keypress@UI@GW@@YA_NW4ControlAction@12@PAUFrame@12@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool Keypress(global::Daybreak.API.Interop.GWCA.GW.UI.ControlAction controlAction1, global::Daybreak.API.Interop.GWCA.GW.UI.Frame* frame2);
+            public static partial bool Keypress(global::Daybreak.API.Interop.GWCA.GW.UI.ControlAction controlAction1, global::Daybreak.API.Interop.GuildWars.Frame* frame2);
 
             // GW::UI::Keyup
             [LibraryImport(DllName, EntryPoint = "?Keyup@UI@GW@@YA_NW4ControlAction@12@PAUFrame@12@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool Keyup(global::Daybreak.API.Interop.GWCA.GW.UI.ControlAction controlAction1, global::Daybreak.API.Interop.GWCA.GW.UI.Frame* frame2);
+            public static partial bool Keyup(global::Daybreak.API.Interop.GWCA.GW.UI.ControlAction controlAction1, global::Daybreak.API.Interop.GuildWars.Frame* frame2);
 
             // GW::UI::RegisterCreateUIComponentCallback | function2: TODO: map struct function
             // [LibraryImport(DllName, EntryPoint = "?RegisterCreateUIComponentCallback@UI@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUCreateUIComponentPacket@UI@GW@@@Z@std@@H@Z")]
-            // internal static partial void RegisterCreateUIComponentCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2);
+            // public static partial void RegisterCreateUIComponentCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2);
 
             // GW::UI::RegisterFrameUIMessageCallback | function3: TODO: map struct function
             // [LibraryImport(DllName, EntryPoint = "?RegisterFrameUIMessageCallback@UI@GW@@YAXPAUHookEntry@2@W4UIMessage@12@ABV?$function@$$A6AXPAUHookStatus@GW@@PBUFrame@UI@2@W4UIMessage@42@PAX3@Z@std@@H@Z")]
-            // internal static partial void RegisterFrameUIMessageCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, global::Daybreak.API.Models.UIMessage uIMessage2, function* function3, global::Daybreak.API.Interop.GWCA.GW.UI.Frame* frame4, global::Daybreak.API.Models.UIMessage uIMessage5, void* ptr6, nint ptr7);
+            // public static partial void RegisterFrameUIMessageCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, global::Daybreak.API.Models.UIMessage uIMessage2, function* function3, global::Daybreak.API.Interop.GuildWars.Frame* frame4, global::Daybreak.API.Models.UIMessage uIMessage5, void* ptr6, nint ptr7);
 
             // GW::UI::RegisterKeydownCallback | function2: TODO: map struct function
             // [LibraryImport(DllName, EntryPoint = "?RegisterKeydownCallback@UI@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUHookStatus@GW@@I@Z@std@@@Z")]
-            // internal static partial void RegisterKeydownCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, uint value3);
+            // public static partial void RegisterKeydownCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, uint value3);
 
             // GW::UI::RegisterKeyupCallback | function2: TODO: map struct function
             // [LibraryImport(DllName, EntryPoint = "?RegisterKeyupCallback@UI@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUHookStatus@GW@@I@Z@std@@@Z")]
-            // internal static partial void RegisterKeyupCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, uint value3);
+            // public static partial void RegisterKeyupCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, uint value3);
 
             // GW::UI::RegisterUIMessageCallback | function3: TODO: map struct function
             // [LibraryImport(DllName, EntryPoint = "?RegisterUIMessageCallback@UI@GW@@YAXPAUHookEntry@2@W4UIMessage@12@ABV?$function@$$A6AXPAUHookStatus@GW@@W4UIMessage@UI@2@PAX2@Z@std@@H@Z")]
-            // internal static partial void RegisterUIMessageCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, global::Daybreak.API.Models.UIMessage uIMessage2, function* function3, global::Daybreak.API.Models.UIMessage uIMessage4, void* ptr5, nint ptr6);
+            // public static partial void RegisterUIMessageCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, global::Daybreak.API.Models.UIMessage uIMessage2, function* function3, global::Daybreak.API.Models.UIMessage uIMessage4, void* ptr5, nint ptr6);
 
             // GW::UI::RemoveCreateUIComponentCallback
             [LibraryImport(DllName, EntryPoint = "?RemoveCreateUIComponentCallback@UI@GW@@YAXPAUHookEntry@2@@Z")]
-            internal static partial void RemoveCreateUIComponentCallback(global::Daybreak.API.Interop.HookEntry* hookEntry);
+            public static partial void RemoveCreateUIComponentCallback(global::Daybreak.API.Interop.HookEntry* hookEntry);
 
             // GW::UI::RemoveFrameUIMessageCallback
             [LibraryImport(DllName, EntryPoint = "?RemoveFrameUIMessageCallback@UI@GW@@YAXPAUHookEntry@2@@Z")]
-            internal static partial void RemoveFrameUIMessageCallback(global::Daybreak.API.Interop.HookEntry* hookEntry);
+            public static partial void RemoveFrameUIMessageCallback(global::Daybreak.API.Interop.HookEntry* hookEntry);
 
             // GW::UI::RemoveKeydownCallback
             [LibraryImport(DllName, EntryPoint = "?RemoveKeydownCallback@UI@GW@@YAXPAUHookEntry@2@@Z")]
-            internal static partial void RemoveKeydownCallback(global::Daybreak.API.Interop.HookEntry* hookEntry);
+            public static partial void RemoveKeydownCallback(global::Daybreak.API.Interop.HookEntry* hookEntry);
 
             // GW::UI::RemoveKeyupCallback
             [LibraryImport(DllName, EntryPoint = "?RemoveKeyupCallback@UI@GW@@YAXPAUHookEntry@2@@Z")]
-            internal static partial void RemoveKeyupCallback(global::Daybreak.API.Interop.HookEntry* hookEntry);
+            public static partial void RemoveKeyupCallback(global::Daybreak.API.Interop.HookEntry* hookEntry);
 
             // GW::UI::RemoveUIMessageCallback
             [LibraryImport(DllName, EntryPoint = "?RemoveUIMessageCallback@UI@GW@@YAXPAUHookEntry@2@W4UIMessage@12@@Z")]
-            internal static partial void RemoveUIMessageCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, global::Daybreak.API.Models.UIMessage uIMessage2);
+            public static partial void RemoveUIMessageCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, global::Daybreak.API.Models.UIMessage uIMessage2);
 
             // GW::UI::SelectDropdownOption
             [LibraryImport(DllName, EntryPoint = "?SelectDropdownOption@UI@GW@@YA_NPAUFrame@12@I@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SelectDropdownOption(global::Daybreak.API.Interop.GWCA.GW.UI.Frame* frame1, uint value2);
+            public static partial bool SelectDropdownOption(global::Daybreak.API.Interop.GuildWars.Frame* frame1, uint value2);
 
             // GW::UI::SendFrameUIMessage
             [LibraryImport(DllName, EntryPoint = "?SendFrameUIMessage@UI@GW@@YA_NPAUFrame@12@W4UIMessage@12@PAX2@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SendFrameUIMessage(global::Daybreak.API.Interop.GWCA.GW.UI.Frame* frame1, global::Daybreak.API.Models.UIMessage uIMessage2, void* ptr3, nint ptr4);
+            public static partial bool SendFrameUIMessage(global::Daybreak.API.Interop.GuildWars.Frame* frame1, global::Daybreak.API.Models.UIMessage uIMessage2, void* ptr3, nint ptr4);
 
             // GW::UI::SendUIMessage
             [LibraryImport(DllName, EntryPoint = "?SendUIMessage@UI@GW@@YA_NW4UIMessage@12@PAX1@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SendUIMessage(global::Daybreak.API.Models.UIMessage uIMessage1, void* ptr2, nint ptr3);
+            public static partial bool SendUIMessage(global::Daybreak.API.Models.UIMessage uIMessage1, void* ptr2, nint ptr3);
 
             // GW::UI::SetCommandLinePref
             [LibraryImport(DllName, EntryPoint = "?SetCommandLinePref@UI@GW@@YA_NPB_WI@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetCommandLinePref(ushort* ptr1, uint value2);
+            public static partial bool SetCommandLinePref(ushort* ptr1, uint value2);
 
             // GW::UI::SetCommandLinePref
             [LibraryImport(DllName, EntryPoint = "?SetCommandLinePref@UI@GW@@YA_NPB_WPA_W@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetCommandLinePref(ushort* ptr1, ushort* ptr2);
+            public static partial bool SetCommandLinePref(ushort* ptr1, ushort* ptr2);
 
             // GW::UI::SetFrameDisabled
             [LibraryImport(DllName, EntryPoint = "?SetFrameDisabled@UI@GW@@YA_NPAUFrame@12@_N@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetFrameDisabled(global::Daybreak.API.Interop.GWCA.GW.UI.Frame* frame1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            public static partial bool SetFrameDisabled(global::Daybreak.API.Interop.GuildWars.Frame* frame1, [MarshalAs(UnmanagedType.U1)] bool flag2);
 
             // GW::UI::SetFrameMargins
             [LibraryImport(DllName, EntryPoint = "?SetFrameMargins@UI@GW@@YA_NPAUFrame@12@IQAM1I@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetFrameMargins(global::Daybreak.API.Interop.GWCA.GW.UI.Frame* frame1, uint value2, float* ptr3, nint ptr4, uint value5);
+            public static partial bool SetFrameMargins(global::Daybreak.API.Interop.GuildWars.Frame* frame1, uint value2, float* ptr3, nint ptr4, uint value5);
 
             // GW::UI::SetFrameTitle
             [LibraryImport(DllName, EntryPoint = "?SetFrameTitle@UI@GW@@YA_NPAUFrame@12@PB_W@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetFrameTitle(global::Daybreak.API.Interop.GWCA.GW.UI.Frame* frame1, ushort* ptr2);
+            public static partial bool SetFrameTitle(global::Daybreak.API.Interop.GuildWars.Frame* frame1, ushort* ptr2);
 
             // GW::UI::SetFrameVisible
             [LibraryImport(DllName, EntryPoint = "?SetFrameVisible@UI@GW@@YA_NPAUFrame@12@_N@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetFrameVisible(global::Daybreak.API.Interop.GWCA.GW.UI.Frame* frame1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            public static partial bool SetFrameVisible(global::Daybreak.API.Interop.GuildWars.Frame* frame1, [MarshalAs(UnmanagedType.U1)] bool flag2);
 
             // GW::UI::SetOpenLinks
             [LibraryImport(DllName, EntryPoint = "?SetOpenLinks@UI@GW@@YAX_N@Z")]
-            internal static partial void SetOpenLinks([MarshalAs(UnmanagedType.U1)] bool flag);
+            public static partial void SetOpenLinks([MarshalAs(UnmanagedType.U1)] bool flag);
 
             // GW::UI::SetPreference
             [LibraryImport(DllName, EntryPoint = "?SetPreference@UI@GW@@YA_NW4EnumPreference@12@I@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetPreference(global::Daybreak.API.Interop.GWCA.GW.UI.EnumPreference enumPreference1, uint value2);
+            public static partial bool SetPreference(global::Daybreak.API.Interop.GWCA.GW.UI.EnumPreference enumPreference1, uint value2);
 
             // GW::UI::SetPreference
             [LibraryImport(DllName, EntryPoint = "?SetPreference@UI@GW@@YA_NW4FlagPreference@12@_N@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetPreference(global::Daybreak.API.Interop.GWCA.GW.UI.FlagPreference flagPreference1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            public static partial bool SetPreference(global::Daybreak.API.Interop.GWCA.GW.UI.FlagPreference flagPreference1, [MarshalAs(UnmanagedType.U1)] bool flag2);
 
             // GW::UI::SetPreference
             [LibraryImport(DllName, EntryPoint = "?SetPreference@UI@GW@@YA_NW4NumberPreference@12@I@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetPreference(global::Daybreak.API.Interop.GWCA.GW.UI.NumberPreference numberPreference1, uint value2);
+            public static partial bool SetPreference(global::Daybreak.API.Interop.GWCA.GW.UI.NumberPreference numberPreference1, uint value2);
 
             // GW::UI::SetPreference
             [LibraryImport(DllName, EntryPoint = "?SetPreference@UI@GW@@YA_NW4StringPreference@12@PA_W@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetPreference(global::Daybreak.API.Interop.GWCA.GW.UI.StringPreference stringPreference1, ushort* ptr2);
+            public static partial bool SetPreference(global::Daybreak.API.Interop.GWCA.GW.UI.StringPreference stringPreference1, ushort* ptr2);
 
             // GW::UI::SetWindowPosition
             [LibraryImport(DllName, EntryPoint = "?SetWindowPosition@UI@GW@@YA_NW4WindowID@12@PAUWindowPosition@12@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetWindowPosition(global::Daybreak.API.Interop.GWCA.GW.UI.WindowID windowID1, global::Daybreak.API.Interop.GWCA.GW.UI.WindowPositionData* windowPositionData2);
+            public static partial bool SetWindowPosition(global::Daybreak.API.Interop.GWCA.GW.UI.WindowID windowID1, global::Daybreak.API.Interop.GuildWars.WindowPositionData* windowPositionData2);
 
             // GW::UI::SetWindowVisible
             [LibraryImport(DllName, EntryPoint = "?SetWindowVisible@UI@GW@@YA_NW4WindowID@12@_N@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetWindowVisible(global::Daybreak.API.Interop.GWCA.GW.UI.WindowID windowID1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            public static partial bool SetWindowVisible(global::Daybreak.API.Interop.GWCA.GW.UI.WindowID windowID1, [MarshalAs(UnmanagedType.U1)] bool flag2);
 
             // GW::UI::TriggerFrameRedraw
             [LibraryImport(DllName, EntryPoint = "?TriggerFrameRedraw@UI@GW@@YA_NPAUFrame@12@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool TriggerFrameRedraw(global::Daybreak.API.Interop.GWCA.GW.UI.Frame* frame);
+            public static partial bool TriggerFrameRedraw(global::Daybreak.API.Interop.GuildWars.Frame* frame);
 
             // GW::UI::UInt32ToEncStr
             [LibraryImport(DllName, EntryPoint = "?UInt32ToEncStr@UI@GW@@YA_NIPA_WI@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool UInt32ToEncStr(uint value1, ushort* ptr2, uint value3);
+            public static partial bool UInt32ToEncStr(uint value1, ushort* ptr2, uint value3);
 
-            internal static partial class FramePosition
+            public static partial class FramePosition
             {
 
                 // GW::UI::FramePosition::GetBottomRightOnScreen
                 [LibraryImport(DllName, EntryPoint = "?GetBottomRightOnScreen@FramePosition@UI@GW@@QBE?AUVec2f@3@PBUFrame@23@@Z")]
                 [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                internal static partial global::System.Numerics.Vector2* GetBottomRightOnScreen(nint self, global::Daybreak.API.Interop.GWCA.GW.UI.Frame* frame2);
+                public static partial global::System.Numerics.Vector2* GetBottomRightOnScreen(nint self, global::Daybreak.API.Interop.GuildWars.Frame* frame2);
 
                 // GW::UI::FramePosition::GetContentBottomRight
                 [LibraryImport(DllName, EntryPoint = "?GetContentBottomRight@FramePosition@UI@GW@@QBE?AUVec2f@3@PBUFrame@23@@Z")]
                 [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                internal static partial global::System.Numerics.Vector2* GetContentBottomRight(nint self, global::Daybreak.API.Interop.GWCA.GW.UI.Frame* frame2);
+                public static partial global::System.Numerics.Vector2* GetContentBottomRight(nint self, global::Daybreak.API.Interop.GuildWars.Frame* frame2);
 
                 // GW::UI::FramePosition::GetContentTopLeft
                 [LibraryImport(DllName, EntryPoint = "?GetContentTopLeft@FramePosition@UI@GW@@QBE?AUVec2f@3@PBUFrame@23@@Z")]
                 [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                internal static partial global::System.Numerics.Vector2* GetContentTopLeft(nint self, global::Daybreak.API.Interop.GWCA.GW.UI.Frame* frame2);
+                public static partial global::System.Numerics.Vector2* GetContentTopLeft(nint self, global::Daybreak.API.Interop.GuildWars.Frame* frame2);
 
                 // GW::UI::FramePosition::GetSizeOnScreen
                 [LibraryImport(DllName, EntryPoint = "?GetSizeOnScreen@FramePosition@UI@GW@@QBE?AUVec2f@3@PBUFrame@23@@Z")]
                 [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                internal static partial global::System.Numerics.Vector2* GetSizeOnScreen(nint self, global::Daybreak.API.Interop.GWCA.GW.UI.Frame* frame2);
+                public static partial global::System.Numerics.Vector2* GetSizeOnScreen(nint self, global::Daybreak.API.Interop.GuildWars.Frame* frame2);
 
                 // GW::UI::FramePosition::GetTopLeftOnScreen
                 [LibraryImport(DllName, EntryPoint = "?GetTopLeftOnScreen@FramePosition@UI@GW@@QBE?AUVec2f@3@PBUFrame@23@@Z")]
                 [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                internal static partial global::System.Numerics.Vector2* GetTopLeftOnScreen(nint self, global::Daybreak.API.Interop.GWCA.GW.UI.Frame* frame2);
+                public static partial global::System.Numerics.Vector2* GetTopLeftOnScreen(nint self, global::Daybreak.API.Interop.GuildWars.Frame* frame2);
 
                 // GW::UI::FramePosition::GetViewportScale
                 [LibraryImport(DllName, EntryPoint = "?GetViewportScale@FramePosition@UI@GW@@QBE?AUVec2f@3@PBUFrame@23@@Z")]
                 [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                internal static partial global::System.Numerics.Vector2* GetViewportScale(nint self, global::Daybreak.API.Interop.GWCA.GW.UI.Frame* frame2);
+                public static partial global::System.Numerics.Vector2* GetViewportScale(nint self, global::Daybreak.API.Interop.GuildWars.Frame* frame2);
             }
 
-            internal static partial class FrameRelation
+            public static partial class FrameRelation
             {
 
                 // GW::UI::FrameRelation::GetFrame
                 [LibraryImport(DllName, EntryPoint = "?GetFrame@FrameRelation@UI@GW@@QAEPAUFrame@23@XZ")]
                 [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                internal static partial global::Daybreak.API.Interop.GWCA.GW.UI.Frame* GetFrame(nint self);
+                public static partial global::Daybreak.API.Interop.GuildWars.Frame* GetFrame(nint self);
 
                 // GW::UI::FrameRelation::GetParent
                 [LibraryImport(DllName, EntryPoint = "?GetParent@FrameRelation@UI@GW@@QBEPAUFrame@23@XZ")]
                 [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                internal static partial global::Daybreak.API.Interop.GWCA.GW.UI.Frame* GetParent(nint self);
+                public static partial global::Daybreak.API.Interop.GuildWars.Frame* GetParent(nint self);
             }
 
-            internal static partial class WindowPosition
+            public static partial class WindowPosition
             {
 
                 // GW::UI::WindowPosition::xAxis
                 [LibraryImport(DllName, EntryPoint = "?xAxis@WindowPosition@UI@GW@@QBE?AUVec2f@3@M_N@Z")]
                 [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                internal static partial global::System.Numerics.Vector2* xAxis(nint self, float value2, [MarshalAs(UnmanagedType.U1)] bool flag3);
+                public static partial global::System.Numerics.Vector2* xAxis(nint self, float value2, [MarshalAs(UnmanagedType.U1)] bool flag3);
 
                 // GW::UI::WindowPosition::yAxis
                 [LibraryImport(DllName, EntryPoint = "?yAxis@WindowPosition@UI@GW@@QBE?AUVec2f@3@M_N@Z")]
                 [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                internal static partial global::System.Numerics.Vector2* yAxis(nint self, float value2, [MarshalAs(UnmanagedType.U1)] bool flag3);
+                public static partial global::System.Numerics.Vector2* yAxis(nint self, float value2, [MarshalAs(UnmanagedType.U1)] bool flag3);
             }
         }
     }
 
-    internal static partial class GW
+    public static partial class GW
     {
 
-        internal enum CallTargetType : uint
+        public enum CallTargetType : uint
         {
             Following = 0x3,
             Morale = 0x7,
@@ -2807,7 +2811,7 @@ internal static unsafe partial class GWCA
             None = 0xFF,
         }
 
-        internal enum Continent : uint
+        public enum Continent : uint
         {
             Kryta,
             DevContinent,
@@ -2817,7 +2821,7 @@ internal static unsafe partial class GWCA
             RealmOfTorment,
         }
 
-        internal enum DyeColor : byte
+        public enum DyeColor : byte
         {
             None = 0,
             Blue = 2,
@@ -2834,7 +2838,7 @@ internal static unsafe partial class GWCA
             Pink = 13,
         }
 
-        internal enum EquipmentStatus : uint
+        public enum EquipmentStatus : uint
         {
             AlwaysHide,
             HideInTownsAndOutposts,
@@ -2842,7 +2846,7 @@ internal static unsafe partial class GWCA
             AlwaysShow,
         }
 
-        internal enum EquipmentType : uint
+        public enum EquipmentType : uint
         {
             Cape = 0x0,
             Helm = 0x2,
@@ -2851,7 +2855,7 @@ internal static unsafe partial class GWCA
             Unknown = 0xff,
         }
 
-        internal enum FriendStatus : uint
+        public enum FriendStatus : uint
         {
             Offline = 0,
             Online = 1,
@@ -2860,7 +2864,7 @@ internal static unsafe partial class GWCA
             Unknown = 4,
         }
 
-        internal enum FriendType : uint
+        public enum FriendType : uint
         {
             Unknow = 0,
             Friend = 1,
@@ -2869,14 +2873,14 @@ internal static unsafe partial class GWCA
             Trade = 4,
         }
 
-        internal enum HeroBehavior : uint
+        public enum HeroBehavior : uint
         {
             Fight,
             Guard,
             AvoidCombat,
         }
 
-        internal enum ObserverMatchType : uint
+        public enum ObserverMatchType : uint
         {
             SpecialEvent,
             HallOfHeroe,
@@ -2889,7 +2893,7 @@ internal static unsafe partial class GWCA
             Top1v1TournamentBattle,
         }
 
-        internal enum PartySearchType : int
+        public enum PartySearchType : int
         {
             PartySearchType_Hunting = 0,
             PartySearchType_Mission = 1,
@@ -2898,7 +2902,7 @@ internal static unsafe partial class GWCA
             PartySearchType_Guild = 4,
         }
 
-        internal enum ProgressBarStyle : uint
+        public enum ProgressBarStyle : uint
         {
             kPeach,
             kPink,
@@ -2911,7 +2915,7 @@ internal static unsafe partial class GWCA
             kUnk,
         }
 
-        internal enum Region : uint
+        public enum Region : uint
         {
             Region_Kryta,
             Region_Maguuma,
@@ -2943,7 +2947,7 @@ internal static unsafe partial class GWCA
             Region_DevRegion,
         }
 
-        internal enum RegionType : uint
+        public enum RegionType : uint
         {
             AllianceBattle,
             Arena,
@@ -2969,7 +2973,7 @@ internal static unsafe partial class GWCA
             DevRegion,
         }
 
-        internal enum ScannerSection : byte
+        public enum ScannerSection : byte
         {
             Section_TEXT = 0,
             Section_RDATA = 1,
@@ -2977,7 +2981,7 @@ internal static unsafe partial class GWCA
             Section_Count = 3,
         }
 
-        internal enum WorldActionId : uint
+        public enum WorldActionId : uint
         {
             InteractEnemy,
             InteractPlayerOrOther,
@@ -2986,2443 +2990,38 @@ internal static unsafe partial class GWCA
             InteractTrade,
             InteractGadget,
         }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x138)]
-        public unsafe struct AccountContext
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public nint AccountUnlockedCounts; // e.g. number of unlocked storage panes
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public fixed byte H0010[164];
-            [global::System.Runtime.InteropServices.FieldOffset(0x00B4)]
-            public nint UnlockedPvpHeros; // Unused, hero battles is no more :(
-            [global::System.Runtime.InteropServices.FieldOffset(0x00C4)]
-            public nint H00c4; // If an item is unlocked, the mod struct is stored here. Use unlocked_pvp_items_info to find the index. Idk why, chaos reigns I guess
-            [global::System.Runtime.InteropServices.FieldOffset(0x00E4)]
-            public nint UnlockedPvpItemInfo; // If an item is unlocked, the details are stored here
-            [global::System.Runtime.InteropServices.FieldOffset(0x00F4)]
-            public nint UnlockedPvpItems; // Bitwise array of which pvp items are unlocked
-            [global::System.Runtime.InteropServices.FieldOffset(0x0104)]
-            public fixed byte H0104[48]; // Some arrays, some linked lists, meh
-            [global::System.Runtime.InteropServices.FieldOffset(0x0134)]
-            public uint AccountFlags;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x1C)]
-        public unsafe struct AccountInfo
-        {
-            public nint AccountName;
-            public uint Wins;
-            public uint Losses;
-            public uint Rating;
-            public uint QualifierPoints;
-            public uint Rank;
-            public uint TournamentRewardPoints;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-        public unsafe struct AccountUnlockedCount
-        {
-            public uint Id;
-            public uint Unk1;
-            public uint Unk2;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-        public unsafe struct AccountUnlockedItemInfo
-        {
-            public uint NameId;
-            public uint ModStructIndex; // Used to find mod struct in unlocked_pvp_items_mod_structs...
-            public uint ModStructSize;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
-        public unsafe struct AgentContext
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public nint H0000;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public fixed uint H0010[5];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
-            public uint H0024; // function
-            [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
-            public fixed uint H0028[2];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
-            public uint H0030; // function
-            [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
-            public fixed uint H0034[2];
-            [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
-            public uint H003C; // function
-            [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
-            public fixed uint H0040[2];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0048)]
-            public uint H0048; // function
-            [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
-            public fixed uint H004C[2];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0054)]
-            public uint H0054; // function
-            [global::System.Runtime.InteropServices.FieldOffset(0x0058)]
-            public fixed uint H0058[11];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0084)]
-            public nint H0084;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0094)]
-            public uint H0094; // this field and the next array are link together in a structure.
-            [global::System.Runtime.InteropServices.FieldOffset(0x0098)]
-            public nint AgentSummaryInfo; // elements are of size 12. {ptr, func, ptr}
-            [global::System.Runtime.InteropServices.FieldOffset(0x00A8)]
-            public nint H00A8;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00B8)]
-            public nint H00B8;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00C8)]
-            public uint Rand1; // Number seems to be randomized quite a bit o.o seems to be accessed by textparser.cpp
-            [global::System.Runtime.InteropServices.FieldOffset(0x00CC)]
-            public uint Rand2;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00D0)]
-            public fixed byte H00D0[24];
-            [global::System.Runtime.InteropServices.FieldOffset(0x00E8)]
-            public nint AgentMovement;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00F8)]
-            public nint H00F8;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0108)]
-            public fixed uint H0108[17];
-            [global::System.Runtime.InteropServices.FieldOffset(0x014C)]
-            public nint AgentArray1;
-            [global::System.Runtime.InteropServices.FieldOffset(0x015C)]
-            public nint AgentAsyncMovement;
-            [global::System.Runtime.InteropServices.FieldOffset(0x016C)]
-            public fixed uint H016C[16];
-            [global::System.Runtime.InteropServices.FieldOffset(0x01AC)]
-            public uint InstanceTimer;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x24)]
-        public unsafe struct AgentEffects
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint AgentId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public BuffArray Buffs;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public EffectArray Effects;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0xE4)]
-        public unsafe struct AgentGadget
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x00C4)]
-            public uint H00C4;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00C8)]
-            public uint H00C8;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00CC)]
-            public uint ExtraType;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00D0)]
-            public uint GadgetId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00D4)]
-            public fixed uint H00D4[4];
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0xD4)]
-        public unsafe struct AgentItem
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x00C4)]
-            public uint Owner;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00C8)]
-            public uint ItemId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00CC)]
-            public uint H00CC;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00D0)]
-            public uint ExtraType;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x1C4)]
-        public unsafe struct AgentLiving
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x00C4)]
-            public uint Owner;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00C8)]
-            public uint H00C8;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00CC)]
-            public uint H00CC;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00D0)]
-            public uint H00D0;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00D4)]
-            public fixed uint H00D4[3];
-            [global::System.Runtime.InteropServices.FieldOffset(0x00E0)]
-            public float AnimationType;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00E4)]
-            public fixed uint H00E4[2];
-            [global::System.Runtime.InteropServices.FieldOffset(0x00EC)]
-            public float WeaponAttackSpeed; // The base attack speed in float of last attacks weapon. 1.33 = axe, sWORD, daggers etc.
-            [global::System.Runtime.InteropServices.FieldOffset(0x00F4)]
-            public ushort PlayerNumber; // Selfexplanatory. All non-players have identifiers for their type. Two of the same mob = same number
-            [global::System.Runtime.InteropServices.FieldOffset(0x00F6)]
-            public ushort AgentModelType; // Player = 0x3000, NPC = 0x2000
-            [global::System.Runtime.InteropServices.FieldOffset(0x00F8)]
-            public uint TransmogNpcId; // Actually, it's 0x20000000 | npc_id, It's not defined for npc, minipet, etc...
-            [global::System.Runtime.InteropServices.FieldOffset(0x00FC)]
-            public NPCEquipment* Equip;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0100)]
-            public uint H0100;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0104)]
-            public uint H0104; // New variable added here
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x7C)]
-        public unsafe struct AreaInfo
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.Campaign Campaign;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public global::Daybreak.API.Interop.GWCA.GW.Continent Continent;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public global::Daybreak.API.Interop.GWCA.GW.Region Region;
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public global::Daybreak.API.Interop.GWCA.GW.RegionType Type;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public uint Flags;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public uint ThumbnailId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
-            public uint MinPartySize;
-            [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
-            public uint MaxPartySize;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
-            public uint MinPlayerSize;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
-            public uint MaxPlayerSize;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
-            public uint ControlledOutpostId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
-            public uint FractionMission;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
-            public uint MinLevel;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
-            public uint MaxLevel;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0038)]
-            public uint NeededPq;
-            [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
-            public uint MissionMapsTo;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
-            public uint X; // icon position on map.
-            [global::System.Runtime.InteropServices.FieldOffset(0x0044)]
-            public uint Y;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0048)]
-            public uint IconStartX;
-            [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
-            public uint IconStartY;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0050)]
-            public uint IconEndX;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0054)]
-            public uint IconEndY;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0058)]
-            public uint IconStartXDupe;
-            [global::System.Runtime.InteropServices.FieldOffset(0x005C)]
-            public uint IconStartYDupe;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0060)]
-            public uint IconEndXDupe;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0064)]
-            public uint IconEndYDupe;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0068)]
-            public uint FileId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x006C)]
-            public uint MissionChronology;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0070)]
-            public uint HaMapChronology;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0074)]
-            public uint NameId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0078)]
-            public uint DescriptionId;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
-        public unsafe struct Attribute
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public global::Daybreak.API.Interop.GWCA.GW.Attribute Id; // ID of attribute
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public uint Level; // Level with modifiers
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public uint DecrementPoints; // Points that you will receive back if you decrement level.
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public uint IncrementPoints; // Points you will need to increment level.
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x14)]
-        public unsafe struct AttributeInfo
-        {
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.Profession ProfessionId;
-            public global::Daybreak.API.Interop.GWCA.GW.Attribute AttributeId;
-            public uint NameId;
-            public uint DescId;
-            public uint IsPve;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x28)]
-        public unsafe struct Bag
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.BagType BagType;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint Index;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public uint Unknown0;
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public uint ContainerItem;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public uint ItemsCount;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public global::Daybreak.API.Interop.GWCA.GW.Bag* BagArray;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
-            public ItemArray Items;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x10)]
-        public unsafe struct Buff
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID SkillId; // skill id of the buff
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint H0004;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public uint BuffId; // id of buff in the buff array
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
-        public unsafe struct Camera
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint LookAtAgentId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint H0004;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public float H0008;
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public float H000C;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public float MaxDistance;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public float H0014;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
-            public float Yaw; // left/right camera angle, radians w/ origin @ east
-            [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
-            public float Pitch; // up/down camera angle, range of [-1,1]
-            [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
-            public float Distance; // current distance from players head.
-            [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
-            public fixed uint H0024[4];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
-            public float YawRightClick;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0038)]
-            public float YawRightClick2;
-            [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
-            public float PitchRightClick;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
-            public float Distance2;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0044)]
-            public float AccelerationConstant;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0048)]
-            public float TimeSinceLastKeyboardRotation; // In seconds it seems.
-            [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
-            public float TimeSinceLastMouseRotation;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0050)]
-            public float TimeSinceLastMouseMove;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0054)]
-            public float TimeSinceLastAgentSelection;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0058)]
-            public float TimeInTheMap;
-            [global::System.Runtime.InteropServices.FieldOffset(0x005C)]
-            public float TimeInTheDistrict;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0060)]
-            public float YawToGo;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0064)]
-            public float PitchToGo;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0068)]
-            public float DistToGo;
-            [global::System.Runtime.InteropServices.FieldOffset(0x006C)]
-            public float MaxDistance2;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0070)]
-            public fixed float H0070[2];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0078)]
-            public global::System.Numerics.Vector3 Position;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0084)]
-            public global::System.Numerics.Vector3 CameraPosToGo;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0090)]
-            public global::System.Numerics.Vector3 CamPosInverted;
-            [global::System.Runtime.InteropServices.FieldOffset(0x009C)]
-            public global::System.Numerics.Vector3 CamPosInvertedToGo;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00A8)]
-            public global::System.Numerics.Vector3 LookAtTarget;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00B4)]
-            public global::System.Numerics.Vector3 LookAtToGo;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00C0)]
-            public float FieldOfView;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00C4)]
-            public float FieldOfView2;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00C8)]
-            public uint H00C8;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00CC)]
-            public uint H00CC;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00D0)]
-            public uint H00D0;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00D4)]
-            public uint H00D4;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00D8)]
-            public uint H00D8; // Camera controller/mode handler pointer
-            [global::System.Runtime.InteropServices.FieldOffset(0x00DC)]
-            public uint H00DC;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00E0)]
-            public uint H00E0;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00E4)]
-            public uint H00E4;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00E8)]
-            public uint H00E8;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00EC)]
-            public uint H00EC;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00F0)]
-            public uint H00F0;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00F4)]
-            public uint H00F4;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00F8)]
-            public uint H00F8;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00FC)]
-            public uint H00FC;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0100)]
-            public uint H0100;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0104)]
-            public uint H0104;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0108)]
-            public uint H0108;
-            [global::System.Runtime.InteropServices.FieldOffset(0x010C)]
-            public uint H010C;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0110)]
-            public uint H0110;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0114)]
-            public uint H0114;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0118)]
-            public uint H0118;
-            [global::System.Runtime.InteropServices.FieldOffset(0x011C)]
-            public uint CameraMode; // 0=default, 1=?, 2=follow, 3=unlocked, 4=?, 5=?, 6=?, 7=?, 8=?, 9=?
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x1C)]
-        public unsafe struct CapeDesign
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint CapeBgColor;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint CapeDetailColor;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public uint CapeEmblemColor;
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public uint CapeShape;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public uint CapeDetail;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public uint CapeEmblem;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
-            public uint CapeTrim;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-        public unsafe struct CharAdjustment
-        {
-            public byte Hue;
-            public byte Saturation;
-            public byte Lightness;
-            public byte Scale; // percent
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x438)]
-        public unsafe struct CharContext
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public nint H0000;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public uint H0010;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public nint H0014;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
-            public fixed uint H0024[4];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
-            public nint H0034;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0044)]
-            public nint H0044;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0054)]
-            public fixed uint H0054[4]; // load head variables
-            [global::System.Runtime.InteropServices.FieldOffset(0x0064)]
-            public fixed uint PlayerUuid[4]; // uuid
-            [global::System.Runtime.InteropServices.FieldOffset(0x0074)]
-            public fixed char PlayerName[20];
-            [global::System.Runtime.InteropServices.FieldOffset(0x009C)]
-            public fixed uint H009C[20];
-            [global::System.Runtime.InteropServices.FieldOffset(0x00EC)]
-            public nint H00EC;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00FC)]
-            public fixed uint H00FC[37]; // 40
-            [global::System.Runtime.InteropServices.FieldOffset(0x0190)]
-            public uint WorldFlags;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0194)]
-            public uint Token1; // world id
-            [global::System.Runtime.InteropServices.FieldOffset(0x0198)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID MapId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x019C)]
-            public uint IsExplorable;
-            [global::System.Runtime.InteropServices.FieldOffset(0x01A0)]
-            public fixed byte Host[24];
-            [global::System.Runtime.InteropServices.FieldOffset(0x01B8)]
-            public uint Token2; // player id
-            [global::System.Runtime.InteropServices.FieldOffset(0x01BC)]
-            public fixed uint H01BC[25];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0220)]
-            public uint DistrictNumber;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0224)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.Language Language;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0228)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID ObserveMapId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x022C)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID CurrentMapId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0230)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.InstanceType ObserveMapType;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0234)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.InstanceType CurrentMapType;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0238)]
-            public fixed uint H0238[5];
-            [global::System.Runtime.InteropServices.FieldOffset(0x024C)]
-            public nint ObserverMatches;
-            [global::System.Runtime.InteropServices.FieldOffset(0x025C)]
-            public fixed uint H025C[17];
-            [global::System.Runtime.InteropServices.FieldOffset(0x02A0)]
-            public uint PlayerFlags; // bitwise something
-            [global::System.Runtime.InteropServices.FieldOffset(0x02A4)]
-            public uint PlayerNumber;
-            [global::System.Runtime.InteropServices.FieldOffset(0x02A8)]
-            public fixed uint H02A8[40];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0348)]
-            public global::Daybreak.API.Interop.GWCA.GW.ProgressBarContext* ProgressBar; // seems to never be nullptr
-            [global::System.Runtime.InteropServices.FieldOffset(0x034C)]
-            public fixed uint H034C[27];
-            [global::System.Runtime.InteropServices.FieldOffset(0x03B8)]
-            public fixed char PlayerEmail[64];
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
-        public unsafe struct CharacterInformation
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public fixed uint H0000[2];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public fixed uint Uuid[4];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
-            public fixed char Name[20];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
-            public fixed uint Props[17];
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
-        public unsafe struct Cinematic
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint H0000;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint H0004; // pointer to data
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x30)]
-        public unsafe struct CompositeModelInfo
-        {
-            public uint ClassFlags;
-            public fixed uint FileIds[11];
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-        public unsafe struct ControlledMinions
-        {
-            public uint AgentId;
-            public uint MinionCount;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-        public unsafe struct DupeSkill
-        {
-            public uint SkillId;
-            public uint Count;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x3)]
-        public unsafe struct DyeInfo
-        {
-            public byte DyeTint;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x18)]
-        public unsafe struct EffectData
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID SkillId; // skill id of the effect
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint AttributeLevel; // attribute level for the skill used
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public uint EffectId; // unique identifier of effect
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public uint AgentId; // non-zero means maintained enchantment - caster id
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public float Duration; // non-zero if effect has a duration
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public uint Timestamp; // GW-timestamp of when effect was applied - only with duration
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
-        public unsafe struct Friend
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public global::Daybreak.API.Interop.GWCA.GW.FriendType Type;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public global::Daybreak.API.Interop.GWCA.GW.FriendStatus Status;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public fixed byte Uuid[16];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
-            public fixed char Alias[20];
-            [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
-            public fixed char Charname[20];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
-            public uint FriendId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0044)]
-            public uint ZoneId;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
-        public unsafe struct GadgetContext
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public nint GadgetInfo;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
-        public unsafe struct GadgetInfo
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint H0000;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint H0004;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public uint H0008;
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public nint NameEnc;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
-        public unsafe struct GameContext
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public nint H0000;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public nint H0004;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public global::Daybreak.API.Interop.GWCA.GW.AgentContext* Agent; // Most functions that access are prefixed with Agent.
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public EventContext* Event;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public nint H0010;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public global::Daybreak.API.Interop.GWCA.GW.MapContext* Map; // Static object/collision data
-            [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
-            public global::Daybreak.API.Interop.GWCA.GW.TextParser* TextParser;
-            [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
-            public nint H001C;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
-            public uint SomeNumber; // 0x30 for me at the moment.
-            [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
-            public nint H0024;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
-            public global::Daybreak.API.Interop.GWCA.GW.AccountContext* Account;
-            [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
-            public global::Daybreak.API.Interop.GWCA.GW.WorldContext* World; // Best name to fit it that I can think of.
-            [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
-            public global::Daybreak.API.Interop.GWCA.GW.Cinematic* Cinematic;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
-            public nint H0034;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0038)]
-            public global::Daybreak.API.Interop.GWCA.GW.GadgetContext* Gadget;
-            [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
-            public GuildContext* Guild;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
-            public global::Daybreak.API.Interop.GWCA.GW.ItemContext* Items;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0044)]
-            public global::Daybreak.API.Interop.GWCA.GW.CharContext* Character;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0048)]
-            public nint H0048;
-            [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
-            public PartyContext* Party;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0050)]
-            public nint H0050;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0054)]
-            public nint H0054;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0058)]
-            public global::Daybreak.API.Interop.GWCA.GW.TradeContext* Trade;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-        public unsafe struct GamePos
-        {
-            public float X;
-            public float Y;
-            public uint Zplane;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x78)]
-        public unsafe struct GameplayContext
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public fixed uint H0000[19];
-            public float MissionMapZoom;
-            public fixed uint Unk[10];
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x208)]
-        public unsafe struct GuildHistoryEvent
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint Time1; // Guessing one of these is time in ms
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint Time2;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public fixed char Name[256]; // Name of added/kicked person, then the adder/kicker, they seem to be in the same array
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x174)]
-        public unsafe struct GuildPlayer
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public nint Vtable;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public nint NamePtr; // ptr to invitedname, why? dunno
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public fixed char InvitedName[20]; // name of character that was invited in
-            [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
-            public fixed char CurrentName[20]; // name of character currently being played
-            [global::System.Runtime.InteropServices.FieldOffset(0x0058)]
-            public fixed char InviterName[20]; // name of character that invited player
-            [global::System.Runtime.InteropServices.FieldOffset(0x0080)]
-            public uint InviteTime; // time in ms from game creation ??
-            [global::System.Runtime.InteropServices.FieldOffset(0x0084)]
-            public fixed char PromoterName[20]; // name of player that last modified rank
-            [global::System.Runtime.InteropServices.FieldOffset(0x00AC)]
-            public fixed uint H00AC[12];
-            [global::System.Runtime.InteropServices.FieldOffset(0x00DC)]
-            public uint Offline;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00E0)]
-            public uint MemberType;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00E4)]
-            public uint Status;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00E8)]
-            public fixed uint H00E8[35];
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x34)]
-        public unsafe struct HenchmanPartyMember
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint AgentId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public fixed uint H0004[10];
-            [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.Profession Profession;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
-            public uint Level;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x18)]
-        public unsafe struct HeroConstData
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint H0000;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint H0004;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public uint H0008;
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public uint NameId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public uint H0010;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public uint DescriptionId;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x24)]
-        public unsafe struct HeroFlag
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.HeroID HeroId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint AgentId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public uint Level;
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public global::Daybreak.API.Interop.GWCA.GW.HeroBehavior HeroBehavior;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public global::System.Numerics.Vector2 Flag;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
-            public uint H0018;
-            [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
-            public uint H001c;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
-            public uint LockedTargetId;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x9C)]
-        public unsafe struct HeroInfo
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.HeroID HeroId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint AgentId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public uint Level;
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public uint Primary;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public uint Secondary;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public uint HeroFileId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
-            public uint ModelFileId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
-            public uint H001C;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
-            public uint H0020;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
-            public uint H0024;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
-            public uint H0028;
-            [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
-            public uint H002C;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
-            public uint H0030;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
-            public uint H0034;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0038)]
-            public uint H0038;
-            [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
-            public uint H003C;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
-            public uint H0040;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0044)]
-            public uint H0044;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0048)]
-            public uint H0048;
-            [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
-            public uint H004C;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0050)]
-            public fixed char Name[20];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0078)]
-            public uint H0078;
-            [global::System.Runtime.InteropServices.FieldOffset(0x007C)]
-            public uint H007C;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0080)]
-            public uint H0080;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0084)]
-            public uint H0084;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0088)]
-            public uint H0088;
-            [global::System.Runtime.InteropServices.FieldOffset(0x008C)]
-            public uint H008C;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0090)]
-            public uint H0090;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0094)]
-            public uint H0094;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0098)]
-            public uint H0098;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x18)]
-        public unsafe struct HeroPartyMember
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint AgentId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint OwnerPlayerId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.HeroID HeroId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public uint H000C;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public uint H0010;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public uint Level;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x98)]
-        public unsafe struct Inventory
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x005C)]
-            public global::Daybreak.API.Interop.GWCA.GW.ItemData* Bundle;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0060)]
-            public uint StoragePanesUnlocked;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0084)]
-            public uint ActiveWeaponSet;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0088)]
-            public fixed uint H0088[2];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0090)]
-            public uint GoldCharacter;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0094)]
-            public uint GoldStorage;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x54)]
-        public unsafe struct ItemData
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint ItemId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint AgentId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public global::Daybreak.API.Interop.GWCA.GW.Bag* BagEquipped; // Only valid if Item is a equipped Bag
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public global::Daybreak.API.Interop.GWCA.GW.Bag* Bag;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public global::Daybreak.API.Interop.GWCA.GW.ItemModifier* ModStruct; // Pointer to an array of mods.
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public uint ModStructSize; // Size of this array.
-            [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
-            public nint Customized;
-            [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
-            public uint ModelFileId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.ItemType Type;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0021)]
-            public global::Daybreak.API.Interop.GWCA.GW.DyeInfo Dye;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
-            public ushort Value;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0026)]
-            public ushort H0026;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
-            public uint Interaction;
-            [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
-            public uint ModelId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
-            public nint InfoString;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
-            public nint NameEnc;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0038)]
-            public nint CompleteNameEnc; // with color, quantity, etc.
-            [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
-            public nint SingleItemName; // with color, w/o quantity, named as single item
-            [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
-            public fixed uint H0040[2];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0048)]
-            public ushort ItemFormula;
-            [global::System.Runtime.InteropServices.FieldOffset(0x004B)]
-            public byte H004B; // probably used for quantity extension for new material storage
-            [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
-            public ushort Quantity;
-            [global::System.Runtime.InteropServices.FieldOffset(0x004E)]
-            public byte Equipped;
-            [global::System.Runtime.InteropServices.FieldOffset(0x004F)]
-            public byte Profession;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0050)]
-            public byte Slot;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
-        public unsafe struct ItemContext
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public nint H0000;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public nint H0010;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
-            public uint H0020;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
-            public nint BagsArray;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
-            public fixed byte H0034[12];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
-            public nint H0040;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0050)]
-            public nint H0050;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0060)]
-            public fixed byte H0060[88];
-            [global::System.Runtime.InteropServices.FieldOffset(0x00B8)]
-            public nint ItemArray;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00C8)]
-            public fixed byte H00C8[48];
-            [global::System.Runtime.InteropServices.FieldOffset(0x00F8)]
-            public global::Daybreak.API.Interop.GWCA.GW.Inventory* Inventory;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00FC)]
-            public nint H00FC;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x10)]
-        public unsafe struct ItemData
-        {
-            public uint ModelFileId;
-            public global::Daybreak.API.Interop.GWCA.GW.DyeInfo Dye;
-            public uint Value;
-            public uint Interaction;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x14)]
-        public unsafe struct ItemFormula
-        {
-            public uint H0000;
-            public uint GoldCost;
-            public uint SkillPointCost;
-            public uint MaterialCostCount;
-            public global::Daybreak.API.Interop.GWCA.GW.MaterialCost* MaterialCostBuffer; // NB: The game stores a cached array of material amounts that the player has in inventory; we don't care about it though!
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-        public unsafe struct ItemModifier
-        {
-            public uint Mod;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-        public unsafe struct LoginCharacter
-        {
-            public uint Unk0; // Some kind of function call
-            public fixed char CharacterName[20];
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x138)]
-        public unsafe struct MapContext
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint MapType; // less than 4
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public global::System.Numerics.Vector2 StartPos;
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public global::System.Numerics.Vector2 EndPos;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public fixed uint H0014[6];
-            [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
-            public nint Spawns1; // Seem to be arena spawns. struct is X,Y,unk 4 byte value,unk 4 byte value.
-            [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
-            public nint Spawns2; // Same as above
-            [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
-            public nint Spawns3; // Same as above
-            [global::System.Runtime.InteropServices.FieldOffset(0x005C)]
-            public fixed float H005C[6]; // Some trapezoid i think.
-            [global::System.Runtime.InteropServices.FieldOffset(0x0074)]
-            public PathContext* Path;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0078)]
-            public global::Daybreak.API.Interop.GWCA.GW.PathEngineContext* PathEngine;
-            [global::System.Runtime.InteropServices.FieldOffset(0x007C)]
-            public PropsContext* Props;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0080)]
-            public uint H0080;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0084)]
-            public nint Terrain;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0088)]
-            public uint H0088;
-            [global::System.Runtime.InteropServices.FieldOffset(0x008C)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID MapId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0090)]
-            public uint H0090;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0094)]
-            public uint H0094;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0098)]
-            public uint H0098;
-            [global::System.Runtime.InteropServices.FieldOffset(0x009C)]
-            public uint H009C;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00A0)]
-            public uint H00A0;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00A4)]
-            public uint H00A4;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00A8)]
-            public uint H00A8;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00AC)]
-            public uint H00AC;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00B0)]
-            public uint H00B0;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00B4)]
-            public uint H00B4;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00B8)]
-            public uint H00B8;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00BC)]
-            public uint H00BC;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00C0)]
-            public uint H00C0;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00C4)]
-            public uint H00C4;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00C8)]
-            public uint H00C8;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00CC)]
-            public uint H00CC;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00D0)]
-            public uint H00D0;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00D4)]
-            public uint H00D4;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00D8)]
-            public uint H00D8;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00DC)]
-            public uint H00DC;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00E0)]
-            public uint H00E0;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00E4)]
-            public uint H00E4;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00E8)]
-            public uint H00E8;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00EC)]
-            public uint H00EC;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00F0)]
-            public uint H00F0;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00F4)]
-            public uint H00F4;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00F8)]
-            public uint H00F8;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00FC)]
-            public uint H00FC;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0100)]
-            public uint H0100;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0104)]
-            public uint H0104;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0108)]
-            public uint H0108;
-            [global::System.Runtime.InteropServices.FieldOffset(0x010C)]
-            public uint H010C;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0110)]
-            public uint H0110;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0114)]
-            public uint H0114;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0118)]
-            public uint H0118;
-            [global::System.Runtime.InteropServices.FieldOffset(0x011C)]
-            public uint H011C;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0120)]
-            public uint H0120;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0124)]
-            public uint H0124;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0128)]
-            public uint H0128;
-            [global::System.Runtime.InteropServices.FieldOffset(0x012C)]
-            public uint H012C;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0130)]
-            public nint Zones;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0134)]
-            public uint H0134;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x90)]
-        public unsafe struct MapProp
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public fixed uint H0000[5];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public uint UptimeSeconds; // time since spawned
-            [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
-            public uint H0018;
-            [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
-            public uint PropIndex;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
-            public global::System.Numerics.Vector3 Position;
-            [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
-            public uint ModelFileId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
-            public fixed uint H0030[2];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0038)]
-            public float RotationAngle;
-            [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
-            public float RotationCos;
-            [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
-            public float RotationSin;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
-            public fixed uint H0034[5];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0058)]
-            public global::Daybreak.API.Interop.GWCA.GW.RecObject* InteractiveModel;
-            [global::System.Runtime.InteropServices.FieldOffset(0x005C)]
-            public fixed uint H005C[4];
-            [global::System.Runtime.InteropServices.FieldOffset(0x006C)]
-            public uint AppearanceBitmap; // Modified when animation changes
-            [global::System.Runtime.InteropServices.FieldOffset(0x0070)]
-            public uint AnimationBits;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0064)]
-            public fixed uint H0064[5];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0088)]
-            public global::Daybreak.API.Interop.GWCA.GW.PropByType* PropObjectInfo;
-            [global::System.Runtime.InteropServices.FieldOffset(0x008C)]
-            public uint H008C;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-        public unsafe struct MapTypeInstanceInfo
-        {
-            public uint RequestInstanceMapType; // Used for auth server
-            public byte IsOutpost;
-            public global::Daybreak.API.Interop.GWCA.GW.RegionType MapRegionType;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-        public unsafe struct Mat4x3f
-        {
-            public float _11;
-            public float _12;
-            public float _13;
-            public float _14;
-            public float _21;
-            public float _22;
-            public float _23;
-            public float _24;
-            public float _31;
-            public float _32;
-            public float _33;
-            public float _34;
-            public uint Flags;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x10)]
-        public unsafe struct MaterialCost
-        {
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.MaterialSlot Material;
-            public uint Amount;
-            public uint H0008;
-            public uint H000c;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x48)]
-        public unsafe struct MissionMapContext
-        {
-            public global::System.Numerics.Vector2 Size; // Dimensions of the drawable area inside the mission map frame
-            public uint H0008;
-            public uint FrameId;
-            public nint H0020;
-            public uint H0030;
-            public uint H0034;
-            public uint H0038;
-            public global::Daybreak.API.Interop.GWCA.GW.MissionMapSubContext2* H003c;
-            public uint H0040;
-            public uint H0044;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x28)]
-        public unsafe struct MissionMapIcon
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint Index;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public float X;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public float Y;
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public uint H000C; // = 0
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public uint H0010; // = 0
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public uint Option; // Affilitation/color. gray = 0, blue, red, yellow, teal, purple, green, gray
-            [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
-            public uint H0018; // = 0
-            [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
-            public uint ModelId; // Model of the displayed icon in the Minimap
-            [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
-            public uint H0020; // = 0
-            [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
-            public uint H0024; // May concern the name
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-        public unsafe struct MissionMapSubContext
-        {
-            public fixed uint H0000[14]; // Could be 0x38, 0x3C or 0x68 depending on if observing etc.
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x58)]
-        public unsafe struct MissionMapSubContext2
-        {
-            public uint H0000;
-            public global::System.Numerics.Vector2 PlayerMissionMapPos;
-            public uint H000c;
-            public global::System.Numerics.Vector2 MissionMapSize;
-            public float Unk;
-            public global::System.Numerics.Vector2 MissionMapPanOffset;
-            public global::System.Numerics.Vector2 MissionMapPanOffset2;
-            public fixed float Unk2[2];
-            public fixed uint Unk3[9];
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0xC)]
-        public unsafe struct MissionObjective
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint ObjectiveId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public nint EncStr;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public uint Type; // completed, bullet, etc...
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x30)]
-        public unsafe struct NPC
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint ModelFileId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint SkinFileId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public global::Daybreak.API.Interop.GWCA.GW.CharAdjustment VisualAdjustment; // may be overridden
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public uint Appearance;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public uint NpcFlags; // uses CHAR_CLASS_FLAG_* constants
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.Profession Primary;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.Profession Secondary;
-            [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
-            public byte DefaultLevel;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
-            public nint NameEnc;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
-            public uint* ModelFiles;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
-            public uint FilesCount; // length of ModelFile
-            [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
-            public uint FilesCapacity; // capacity of ModelFile
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
-        public unsafe struct Node
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint Type; // XNode = 0, YNode = 1, SinkNode = 2
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint Id;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0xC)]
-        public unsafe struct ObjectPool
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public nint FreeList; // This is a singly linked list of free object. The last object freed is always the pointer.
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public global::Daybreak.API.Interop.GWCA.GW.ObjectPoolBlock* Blocks; // This is a singly linked list of blocks that were allocated. Every blocks will generally be for many elements.
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public uint Count;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x8)]
-        public unsafe struct ObjectPoolBlock
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public global::Daybreak.API.Interop.GWCA.GW.ObjectPoolBlock* Next;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint H0004;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0xA4)]
-        public unsafe struct ObserverMatch
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint MatchId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint MatchIdDup;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID MapId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public uint Age; // Elapsed time since match started [minutes]
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public global::Daybreak.API.Interop.GWCA.GW.ObserverMatchType Type;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public uint MatchTitle; // eg. 19 - "Monthly Championship Guild Tournament Finals", 18 - "Semifinals", 17 - "Quarterfinals", 16 - "Playoffs", 0 - No title
-            [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
-            public uint H0018;
-            [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
-            public uint Count; // number of teams
-            [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
-            public global::Daybreak.API.Interop.GWCA.GW.ObserverMatchTeam Team; // [2]
-            [global::System.Runtime.InteropServices.FieldOffset(0x0078)]
-            public nint Team1NameDup;
-            [global::System.Runtime.InteropServices.FieldOffset(0x007C)]
-            public fixed uint H007C[10];
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x2C)]
-        public unsafe struct ObserverMatchTeam
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint Id; // 0 - gray, 1 - blue, 2 - red
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint H0004; // indicates something with the tabard
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public uint H0008; // same.
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public global::Daybreak.API.Interop.GWCA.GW.CapeDesign Cape; // aka. tabard in gw client
-            [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
-            public nint Name; // encoded name
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0xC)]
-        public unsafe struct PartyAlly
-        {
-            public uint AgentId;
-            public uint Unk;
-            public uint CompositeId;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x43C)]
-        public unsafe struct PartyAttribute
-        {
-            public uint AgentId;
-            public global::Daybreak.API.Interop.GWCA.GW.Attribute Attribute; // [54]
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-        public unsafe struct PartyMemberMoraleInfo
-        {
-            public uint AgentId;
-            public uint AgentIdDup;
-            public fixed uint Unk[4];
-            public uint Morale;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0xC)]
-        public unsafe struct PartyMoraleLink
-        {
-            public uint Unk;
-            public uint Unk2;
-            public global::Daybreak.API.Interop.GWCA.GW.PartyMemberMoraleInfo* PartyMemberInfo;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
-        public unsafe struct PartySearch
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint PartySearchId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint PartySearchType;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public uint Hardmode;
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public uint District;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public uint Language;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public uint PartySize;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
-            public uint HeroCount;
-            [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
-            public fixed char Message[32];
-            [global::System.Runtime.InteropServices.FieldOffset(0x005C)]
-            public fixed char PartyLeader[20];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0084)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.Profession Primary;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0088)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.Profession Secondary;
-            [global::System.Runtime.InteropServices.FieldOffset(0x008C)]
-            public uint Level;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0090)]
-            public uint Timestamp;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-        public unsafe struct PartySearchContext
-        {
-            public uint H0000;
-            public uint H0004;
-            public uint H0008;
-            public uint H000c;
-            public uint Flags;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x18)]
-        public unsafe struct PathEngineContext
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public nint Vtable;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint H0004;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public uint H0008;
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public nint UserData;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public nint HDll;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public uint PfnCreateInterface;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x18)]
-        public unsafe struct PathWaypoint
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public float X;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public float Y;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public float Width;
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public float Height;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public uint Plane;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public global::Daybreak.API.Interop.GWCA.GW.PathingTrapezoid* NextTrap;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x30)]
-        public unsafe struct PathingTrapezoid
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint Id;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public ushort PortalLeft;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0016)]
-            public ushort PortalRight;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
-            public float XTL;
-            [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
-            public float XTR;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
-            public float YT;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
-            public float XBL;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
-            public float XBR;
-            [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
-            public float YB;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x1C)]
-        public unsafe struct PetInfo
-        {
-            public uint AgentId;
-            public uint OwnerAgentId;
-            public nint PetName;
-            public uint ModelFileId1;
-            public uint ModelFileId2;
-            public global::Daybreak.API.Interop.GWCA.GW.HeroBehavior Behavior;
-            public uint LockedTargetId;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x50)]
-        public unsafe struct Player
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint AgentId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public fixed uint H0004[3];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public uint AppearanceBitmap;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public uint Flags; // Bitwise field
-            [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
-            public uint Primary;
-            [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
-            public uint Secondary;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
-            public uint H0020;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
-            public nint NameEnc;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
-            public nint Name;
-            [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
-            public uint PartyLeaderPlayerNumber;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
-            public uint ActiveTitleTier;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
-            public uint ReforgedOrDhuumsFlags;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0038)]
-            public uint PlayerNumber;
-            [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
-            public uint PartySize;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
-            public nint H0040;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x134)]
-        public unsafe struct PlayerControlledCharacter
-        {
-            public uint Field00x0;
-            public uint Field10x4;
-            public uint Field20x8;
-            public uint Field30xc;
-            public uint Field40x10;
-            public uint AgentId;
-            public uint CompositeId; // 0x30000000 | player_number
-            public uint Field70x1c;
-            public uint Field80x20;
-            public uint Field90x24;
-            public uint Field100x28;
-            public uint Field110x2c;
-            public uint Field120x30;
-            public uint Field130x34;
-            public uint Field140x38;
-            public uint Field150x3c;
-            public uint Field160x40;
-            public uint Field170x44;
-            public uint Field180x48;
-            public uint Field190x4c;
-            public uint Field200x50;
-            public uint Field210x54;
-            public uint Field220x58;
-            public uint Field230x5c;
-            public uint Field240x60;
-            public uint MoreFlags;
-            public uint Field260x68;
-            public uint Field270x6c;
-            public uint Field280x70;
-            public uint Field290x74;
-            public uint Field300x78;
-            public uint Field310x7c;
-            public uint Field320x80;
-            public uint Field330x84;
-            public uint Field340x88;
-            public uint Field350x8c;
-            public uint Field360x90;
-            public uint Field370x94;
-            public uint Field380x98;
-            public uint Field390x9c;
-            public uint Field400xa0;
-            public uint Field410xa4;
-            public uint Field420xa8;
-            public uint Field430xac;
-            public uint Field440xb0;
-            public uint Field450xb4;
-            public uint Field460xb8;
-            public uint Field470xbc;
-            public uint Field480xc0;
-            public uint Field490xc4;
-            public uint Field500xc8;
-            public uint Field510xcc;
-            public uint Field520xd0;
-            public uint Field530xd4;
-            public uint Field540xd8;
-            public uint Field550xdc;
-            public uint Field560xe0;
-            public uint Field570xe4;
-            public uint Field580xe8;
-            public uint Field590xec;
-            public uint Field600xf0;
-            public uint Field610xf4;
-            public uint Field620xf8;
-            public uint Field630xfc;
-            public uint Field640x100;
-            public uint Field650x104;
-            public uint Field660x108;
-            public uint Flags;
-            public uint Field680x110;
-            public uint Field690x114;
-            public uint Field700x118;
-            public uint Field710x11c;
-            public uint Field720x120;
-            public uint Field730x124;
-            public uint Field740x128;
-            public uint Field750x12c;
-            public uint Field760x130;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x3F8)]
-        public unsafe struct PlayerEquipment
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x010C)]
-            public uint H010C; // From constructor param_3
-            [global::System.Runtime.InteropServices.FieldOffset(0x03DC)]
-            public uint H03DC; // Initialized to 0
-            [global::System.Runtime.InteropServices.FieldOffset(0x03E4)]
-            public uint H03E4; // param_1 from constructor
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0xC)]
-        public unsafe struct PlayerPartyMember
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint LoginNumber;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint CalledTargetId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public uint State;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x14)]
-        public unsafe struct Portal
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public ushort PortalPlane;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0002)]
-            public ushort NeighborPlane;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint Flags; // 0x4 => "Not used for path finding"
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public global::Daybreak.API.Interop.GWCA.GW.Portal* Pair;
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public uint Count;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public global::Daybreak.API.Interop.GWCA.GW.PathingTrapezoid* Trapezoids;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
-        public unsafe struct PreGameContext
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint FrameId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public fixed uint H0004[72];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0124)]
-            public uint ChosenCharacterIndex;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0128)]
-            public fixed uint H0128[6];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0140)]
-            public uint Index1;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0144)]
-            public uint Index2;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0148)]
-            public nint Chars;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
-        public unsafe struct PrioQ
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint MLinkOffset;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public nint MNodes;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x14)]
-        public unsafe struct ProfessionState
-        {
-            public uint AgentId;
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.Profession Primary;
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.Profession Secondary;
-            public uint UnlockedProfessions; // bitwise
-            public uint Unk;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-        public unsafe struct ProgressBarContext
-        {
-            public int Pips;
-            public fixed byte Color[4]; // RGBA
-            public fixed byte Background[4]; // RGBA
-            public fixed int Unk[7];
-            public float Progress; // 0 ... 1
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-        public unsafe struct PropByType
-        {
-            public uint ObjectId;
-            public uint PropIndex;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x18)]
-        public unsafe struct PropModelInfo
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint H0000;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint H0004;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public uint H0008;
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public uint H000C;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public uint H0010;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public uint H0014;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x24)]
-        public unsafe struct PvPItemInfo
-        {
-            public fixed uint Unk[9];
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x28)]
-        public unsafe struct PvPItemUpgradeInfo
-        {
-            public uint FileId;
-            public uint NameId;
-            public uint UpgradeType; // Axe, Bow, Inscription
-            public uint CampaignId;
-            public uint Interaction;
-            public uint IsDev; // boolean; if 1, then don't use in-game
-            public uint Profession; // if 0xb then is for all professions
-            public uint H0018;
-            public uint ModStructSize;
-            public uint* ModStruct;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x34)]
-        public unsafe struct Quest
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID QuestId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint LogState;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public nint Location; // quest category
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public nint Name; // quest name
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public nint Npc; // 
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID MapFrom;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
-            public global::Daybreak.API.Interop.GWCA.GW.GamePos Marker;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
-            public uint H0024;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID MapTo;
-            [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
-            public nint Description; // namestring reward
-            [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
-            public nint Objectives; // namestring objective
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x24)]
-        public unsafe struct RecObject
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public nint Vtable;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint RefCount;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public uint AccessKey; // This is used by the game to make sure the data from the DAT matches the data in game
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public uint Standalone;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public uint FileId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public uint StreamId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
-            public uint Flags;
-            [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
-            public uint Opened;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
-            public uint RefCount2;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x24)]
-        public unsafe struct SalvageSessionInfo
-        {
-            public nint Vtable;
-            public uint FrameId;
-            public uint ItemId;
-            public uint Salvagable1; // Prefix
-            public uint Salvagable2; // Suffix
-            public uint Salvagable3; // Inscription
-            public uint ChosenSalvagable; // 3 for materials
-            public uint H001c;
-            public uint KitId;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-        public unsafe struct ScannerSectionOffset
-        {
-            public nuint Start;
-            public nuint End;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0xC)]
-        public unsafe struct SinkNode
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public global::Daybreak.API.Interop.GWCA.GW.PathingTrapezoid* Trapezoid;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0xA4)]
-        public unsafe struct Skill
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID SkillId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint H0004;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.Campaign Campaign;
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.SkillType Type;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public uint Special;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public uint ComboReq;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
-            public uint Effect1;
-            [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
-            public uint Condition;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
-            public uint Effect2;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
-            public uint WeaponReq;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.ProfessionByte Profession;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0029)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.AttributeByte Attribute;
-            [global::System.Runtime.InteropServices.FieldOffset(0x002A)]
-            public ushort Title;
-            [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID SkillIdPvp;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
-            public byte Combo;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0031)]
-            public byte Target;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0032)]
-            public byte H0032;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0033)]
-            public byte SkillEquipType;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
-            public byte Overcast; // only if special flag has 0x000001 set
-            [global::System.Runtime.InteropServices.FieldOffset(0x0035)]
-            public byte EnergyCost;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0036)]
-            public byte HealthCost;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0037)]
-            public byte H0037;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0038)]
-            public uint Adrenaline;
-            [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
-            public float Activation;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
-            public float Aftercast;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0044)]
-            public uint Duration0;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0048)]
-            public uint Duration15;
-            [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
-            public uint Recharge;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0050)]
-            public fixed ushort H0050[4];
-            [global::System.Runtime.InteropServices.FieldOffset(0x005C)]
-            public uint Scale0;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0060)]
-            public uint Scale15;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0064)]
-            public uint BonusScale0;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0068)]
-            public uint BonusScale15;
-            [global::System.Runtime.InteropServices.FieldOffset(0x006C)]
-            public float AoeRange;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0070)]
-            public float ConstEffect;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0074)]
-            public uint CasterOverheadAnimationId; // 2077 == max == no animation
-            [global::System.Runtime.InteropServices.FieldOffset(0x0078)]
-            public uint CasterBodyAnimationId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x007C)]
-            public uint TargetBodyAnimationId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0080)]
-            public uint TargetOverheadAnimationId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0084)]
-            public uint ProjectileAnimation1Id;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0088)]
-            public uint ProjectileAnimation2Id;
-            [global::System.Runtime.InteropServices.FieldOffset(0x008C)]
-            public uint IconFileId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0090)]
-            public uint IconFileId2;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0094)]
-            public uint IconFileIdHiRes;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0098)]
-            public uint Name; // String id
-            [global::System.Runtime.InteropServices.FieldOffset(0x009C)]
-            public uint Concise; // String id
-            [global::System.Runtime.InteropServices.FieldOffset(0x00A0)]
-            public uint Description; // String id
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0xBC)]
-        public unsafe struct SkillbarData
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint AgentId; // id of the agent whose skillbar this is
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public global::Daybreak.API.Interop.GWCA.GW.SkillbarSkillData Skills; // [8]
-            [global::System.Runtime.InteropServices.FieldOffset(0x00A4)]
-            public uint Disabled;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00A8)]
-            public SkillbarCastArray CastArray;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00B8)]
-            public uint H00B8;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
-        public unsafe struct SkillbarCast
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public ushort H0000;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID SkillId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public uint H0008;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x14)]
-        public unsafe struct SkillbarSkillData
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint AdrenalineA;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint AdrenalineB;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public uint Recharge;
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID SkillId; // see GWConst::SkillIds
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public uint Event;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
-        public unsafe struct SubStruct1
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint H0000;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
-        public unsafe struct SubStructUnk
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint AsyncDecodeStrCallback;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint AsyncDecodeStrParam;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public uint BufferUsed; // if it's 1 then uses s1 & if it's 0 uses s2.
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public nint S1;
-            [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
-            public nint S2;
-            [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
-            public uint H002C;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
-            public uint H0030; // tell us how many string will be enqueue before decoding.
-            [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
-            public uint H0034; // @0078B990
-            [global::System.Runtime.InteropServices.FieldOffset(0x0038)]
-            public fixed byte H0038[28];
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
-        public unsafe struct TagInfo
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public ushort GuildId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0002)]
-            public byte Primary;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0003)]
-            public byte Secondary;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public ushort Level;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
-        public unsafe struct TextCache
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint H0000;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
-        public unsafe struct TextParser
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public fixed uint H0000[8];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
-            public nint DecStart;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
-            public nint DecEnd;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
-            public uint Substitute1; // related to h0020 & h0024
-            [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
-            public uint Substitute2; // related to h0020 & h0024
-            [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
-            public global::Daybreak.API.Interop.GWCA.GW.TextCache* Cache;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
-            public fixed uint H0034[75];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0160)]
-            public uint H0160; // @0078BEF5
-            [global::System.Runtime.InteropServices.FieldOffset(0x0164)]
-            public uint H0164;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0168)]
-            public uint H0168; // set to 0 @0078BF34
-            [global::System.Runtime.InteropServices.FieldOffset(0x016C)]
-            public fixed uint H016C[5];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0180)]
-            public global::Daybreak.API.Interop.GWCA.GW.SubStruct1* SubStruct;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0184)]
-            public fixed uint H0184[19];
-            [global::System.Runtime.InteropServices.FieldOffset(0x01D0)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.Language LanguageId;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x2C)]
-        public unsafe struct Title
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint Props;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint CurrentPoints;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public uint CurrentTitleTierIndex;
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public uint PointsNeededCurrentRank;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public uint H0010;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public uint NextTitleTierIndex;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
-            public uint PointsNeededNextRank;
-            [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
-            public uint MaxTitleRank;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
-            public uint MaxTitleTierIndex;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
-            public nint PointsDesc; // Pretty sure these are ptrs to title hash strings
-            [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
-            public nint H0028; // Pretty sure these are ptrs to title hash strings
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-        public unsafe struct TitleClientData
-        {
-            public uint TitleFlags;
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.TitleID TitleId;
-            public uint NameId;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0xC)]
-        public unsafe struct TitleTier
-        {
-            public uint Props;
-            public uint TierNumber;
-            public nint TierNameEnc;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x78)]
-        public unsafe struct TownAlliance
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint Rank;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public uint Allegiance;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public uint Faction;
-            [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-            public fixed char Name[32];
-            [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
-            public fixed char Tag[5];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0056)]
-            public fixed byte Padding[2];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0058)]
-            public global::Daybreak.API.Interop.GWCA.GW.CapeDesign Cape;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0074)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID MapId;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
-        public unsafe struct TradeContext
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public uint Flags; // this is actually a flags
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public fixed uint H0004[3]; // Seemingly 3 null dwords
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public global::Daybreak.API.Interop.GWCA.GW.TradePlayer Player;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
-            public global::Daybreak.API.Interop.GWCA.GW.TradePlayer Partner;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-        public unsafe struct TradeItem
-        {
-            public uint ItemId;
-            public uint Quantity;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-        public unsafe struct TradePlayer
-        {
-            public uint Gold;
-            public nint Items;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-        public unsafe struct VisibleEffect
-        {
-            public uint Unk; // enchantment = 1, weapon spell = 9
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.EffectID Id;
-            public uint HasEnded; // effect no longer active, effect ending animation plays.
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x8)]
-        public unsafe struct WeaponSet
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public global::Daybreak.API.Interop.GWCA.GW.ItemData* Weapon;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public global::Daybreak.API.Interop.GWCA.GW.ItemData* Offhand;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x854)]
-        public unsafe struct WorldContext
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-            public global::Daybreak.API.Interop.GWCA.GW.AccountInfo* AccountInfo;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-            public nint MessageBuff;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public nint DialogBuff;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
-            public MerchItemArray MerchItems;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
-            public MerchItemArray MerchItems2;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0044)]
-            public uint AccumMapInitUnk0;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0048)]
-            public uint AccumMapInitUnk1;
-            [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
-            public uint AccumMapInitOffset;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0050)]
-            public uint AccumMapInitLength;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0054)]
-            public uint H0054;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0058)]
-            public uint AccumMapInitUnk2;
-            [global::System.Runtime.InteropServices.FieldOffset(0x005C)]
-            public fixed uint H005C[8];
-            [global::System.Runtime.InteropServices.FieldOffset(0x007C)]
-            public MapAgentArray MapAgents;
-            [global::System.Runtime.InteropServices.FieldOffset(0x008C)]
-            public nint PartyAllies; // List of allies added to the current party
-            [global::System.Runtime.InteropServices.FieldOffset(0x009C)]
-            public global::System.Numerics.Vector3 AllFlag;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00A8)]
-            public uint H00A8;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00AC)]
-            public PartyAttributeArray Attributes;
-            [global::System.Runtime.InteropServices.FieldOffset(0x00BC)]
-            public fixed uint H00BC[255];
-            [global::System.Runtime.InteropServices.FieldOffset(0x04B8)]
-            public nint H04B8;
-            [global::System.Runtime.InteropServices.FieldOffset(0x04C8)]
-            public nint H04C8;
-            [global::System.Runtime.InteropServices.FieldOffset(0x04D8)]
-            public uint H04D8;
-            [global::System.Runtime.InteropServices.FieldOffset(0x04DC)]
-            public nint H04DC;
-            [global::System.Runtime.InteropServices.FieldOffset(0x04EC)]
-            public fixed uint H04EC[7];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0508)]
-            public AgentEffectsArray PartyEffects;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0518)]
-            public nint H0518;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0528)]
-            public global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID ActiveQuestId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x052C)]
-            public QuestLog QuestLog;
-            [global::System.Runtime.InteropServices.FieldOffset(0x053C)]
-            public fixed uint H053C[10];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0564)]
-            public nint MissionObjectives;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0574)]
-            public nint HenchmenAgentIds;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0584)]
-            public HeroFlagArray HeroFlags;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0594)]
-            public HeroInfoArray HeroInfo;
-            [global::System.Runtime.InteropServices.FieldOffset(0x05A4)]
-            public nint CartographedAreas; // Struct size = 0x20
-            [global::System.Runtime.InteropServices.FieldOffset(0x05B4)]
-            public fixed uint H05B4[2];
-            [global::System.Runtime.InteropServices.FieldOffset(0x05BC)]
-            public nint ControlledMinionCount;
-            [global::System.Runtime.InteropServices.FieldOffset(0x05CC)]
-            public nint MissionsCompleted;
-            [global::System.Runtime.InteropServices.FieldOffset(0x05DC)]
-            public nint MissionsBonus;
-            [global::System.Runtime.InteropServices.FieldOffset(0x05EC)]
-            public nint MissionsCompletedHm;
-            [global::System.Runtime.InteropServices.FieldOffset(0x05FC)]
-            public nint MissionsBonusHm;
-            [global::System.Runtime.InteropServices.FieldOffset(0x060C)]
-            public nint UnlockedMap;
-            [global::System.Runtime.InteropServices.FieldOffset(0x061C)]
-            public fixed uint H061C[2];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0624)]
-            public global::Daybreak.API.Interop.GWCA.GW.PartyMemberMoraleInfo* PlayerMoraleInfo;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0628)]
-            public uint H028C;
-            [global::System.Runtime.InteropServices.FieldOffset(0x062C)]
-            public nint PartyMoraleRelated;
-            [global::System.Runtime.InteropServices.FieldOffset(0x063C)]
-            public fixed uint H063C[16];
-            [global::System.Runtime.InteropServices.FieldOffset(0x067C)]
-            public uint PlayerNumber;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0680)]
-            public global::Daybreak.API.Interop.GWCA.GW.PlayerControlledCharacter* PlayerControlledChar; // Struct size = 0x134 ?
-            [global::System.Runtime.InteropServices.FieldOffset(0x0684)]
-            public uint IsHardModeUnlocked;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0688)]
-            public fixed uint H0688[2];
-            [global::System.Runtime.InteropServices.FieldOffset(0x0690)]
-            public uint SalvageSessionId;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0694)]
-            public fixed uint H0694[5];
-            [global::System.Runtime.InteropServices.FieldOffset(0x06A8)]
-            public uint PlayerTeamToken;
-            [global::System.Runtime.InteropServices.FieldOffset(0x06AC)]
-            public nint Pets;
-            [global::System.Runtime.InteropServices.FieldOffset(0x06BC)]
-            public nint PartyProfessionStates; // Current state of primary/secondary/unlocked for current player and party heroes, used in skill window. aka attribStates
-            [global::System.Runtime.InteropServices.FieldOffset(0x06CC)]
-            public nint H06CC;
-            [global::System.Runtime.InteropServices.FieldOffset(0x06DC)]
-            public uint H06DC;
-            [global::System.Runtime.InteropServices.FieldOffset(0x06E0)]
-            public nint H06E0;
-            [global::System.Runtime.InteropServices.FieldOffset(0x06F0)]
-            public SkillbarArray Skillbar;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0700)]
-            public nint LearnableCharacterSkills; // populated at skill trainer and when using signet of capture
-            [global::System.Runtime.InteropServices.FieldOffset(0x0710)]
-            public nint UnlockedCharacterSkills; // bit field
-            [global::System.Runtime.InteropServices.FieldOffset(0x0720)]
-            public nint DuplicatedCharacterSkills; // When res signet is bought more than once, its mapped into this array. Used in skill window.
-            [global::System.Runtime.InteropServices.FieldOffset(0x0730)]
-            public nint H0730;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0740)]
-            public uint Experience;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0744)]
-            public uint ExperienceDupe;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0748)]
-            public uint CurrentKurzick;
-            [global::System.Runtime.InteropServices.FieldOffset(0x074C)]
-            public uint CurrentKurzickDupe;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0750)]
-            public uint TotalEarnedKurzick;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0754)]
-            public uint TotalEarnedKurzickDupe;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0758)]
-            public uint CurrentLuxon;
-            [global::System.Runtime.InteropServices.FieldOffset(0x075C)]
-            public uint CurrentLuxonDupe;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0760)]
-            public uint TotalEarnedLuxon;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0764)]
-            public uint TotalEarnedLuxonDupe;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0768)]
-            public uint CurrentImperial;
-            [global::System.Runtime.InteropServices.FieldOffset(0x076C)]
-            public uint CurrentImperialDupe;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0770)]
-            public uint TotalEarnedImperial;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0774)]
-            public uint TotalEarnedImperialDupe;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0778)]
-            public uint UnkFaction4;
-            [global::System.Runtime.InteropServices.FieldOffset(0x077C)]
-            public uint UnkFaction4Dupe;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0780)]
-            public uint UnkFaction5;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0784)]
-            public uint UnkFaction5Dupe;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0788)]
-            public uint Level;
-            [global::System.Runtime.InteropServices.FieldOffset(0x078C)]
-            public uint LevelDupe;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0790)]
-            public uint Morale;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0794)]
-            public uint MoraleDupe;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0798)]
-            public uint CurrentBalth;
-            [global::System.Runtime.InteropServices.FieldOffset(0x079C)]
-            public uint CurrentBalthDupe;
-            [global::System.Runtime.InteropServices.FieldOffset(0x07A0)]
-            public uint TotalEarnedBalth;
-            [global::System.Runtime.InteropServices.FieldOffset(0x07A4)]
-            public uint TotalEarnedBalthDupe;
-            [global::System.Runtime.InteropServices.FieldOffset(0x07A8)]
-            public uint CurrentSkillPoints;
-            [global::System.Runtime.InteropServices.FieldOffset(0x07AC)]
-            public uint CurrentSkillPointsDupe;
-            [global::System.Runtime.InteropServices.FieldOffset(0x07B0)]
-            public uint TotalEarnedSkillPoints;
-            [global::System.Runtime.InteropServices.FieldOffset(0x07B4)]
-            public uint TotalEarnedSkillPointsDupe;
-            [global::System.Runtime.InteropServices.FieldOffset(0x07B8)]
-            public uint MaxKurzick;
-            [global::System.Runtime.InteropServices.FieldOffset(0x07BC)]
-            public uint MaxLuxon;
-            [global::System.Runtime.InteropServices.FieldOffset(0x07C0)]
-            public uint MaxBalth;
-            [global::System.Runtime.InteropServices.FieldOffset(0x07C4)]
-            public uint MaxImperial;
-            [global::System.Runtime.InteropServices.FieldOffset(0x07C8)]
-            public uint EquipmentStatus;
-            [global::System.Runtime.InteropServices.FieldOffset(0x07CC)]
-            public AgentInfoArray AgentInfos;
-            [global::System.Runtime.InteropServices.FieldOffset(0x07DC)]
-            public nint H07DC;
-            [global::System.Runtime.InteropServices.FieldOffset(0x07EC)]
-            public MissionMapIconArray MissionMapIcons;
-            [global::System.Runtime.InteropServices.FieldOffset(0x07FC)]
-            public NPCArray Npcs;
-            [global::System.Runtime.InteropServices.FieldOffset(0x080C)]
-            public PlayerArray Players;
-            [global::System.Runtime.InteropServices.FieldOffset(0x081C)]
-            public TitleArray Titles;
-            [global::System.Runtime.InteropServices.FieldOffset(0x082C)]
-            public nint TitleTiers;
-            [global::System.Runtime.InteropServices.FieldOffset(0x083C)]
-            public nint VanquishedAreas;
-            [global::System.Runtime.InteropServices.FieldOffset(0x084C)]
-            public uint FoesKilled;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0850)]
-            public uint FoesToKill;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x224)]
-        public unsafe struct WorldMapContext
-        {
-            public uint FrameId;
-            public global::Daybreak.API.Interop.GWCA.GW.Continent Continent;
-            public uint H0008;
-            public float H000c;
-            public float H0010;
-            public uint H0014;
-            public float H0018;
-            public float H001c;
-            public float H0020;
-            public float H0024;
-            public float H0028;
-            public float H002c;
-            public float H0030;
-            public float H0034;
-            public float Zoom; // 1.0f if zoomed in, 0.0f if zoomed out
-            public global::System.Numerics.Vector2 TopLeft; // Viewport position relative to world map, start
-            public global::System.Numerics.Vector2 BottomRight; // Viewport position relative to world map, end
-            public fixed uint H004c[7];
-            public float H0068;
-            public float H006c;
-            public fixed uint Params[109];
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x20)]
-        public unsafe struct XNode
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public global::System.Numerics.Vector2 Pos;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public global::System.Numerics.Vector2 Dir;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
-            public global::Daybreak.API.Interop.GWCA.GW.Node* Left;
-            [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
-            public global::Daybreak.API.Interop.GWCA.GW.Node* Right;
-        }
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x18)]
-        public unsafe struct YNode
-        {
-            [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-            public global::System.Numerics.Vector2 Pos;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-            public global::Daybreak.API.Interop.GWCA.GW.Node* Above;
-            [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-            public global::Daybreak.API.Interop.GWCA.GW.Node* Below;
-        }
-
-        internal static partial class Chat
-        {
-
-            internal enum Channel : int
+        public unsafe struct AgentArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Value; }
+        public unsafe struct AgentEffectsArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.AgentEffects> Value; }
+        public unsafe struct AgentInfoArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.AgentInfo> Value; }
+        public unsafe struct AgentMovementArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Value; }
+        public unsafe struct BuffArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.Buff> Value; }
+        public unsafe struct EffectArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.EffectData> Value; }
+        public unsafe struct FriendsListArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Value; }
+        public unsafe struct GuildArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Value; }
+        public unsafe struct GuildHistory { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Value; }
+        public unsafe struct GuildRoster { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Value; }
+        public unsafe struct HenchmanPartyMemberArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.HenchmanPartyMember> Value; }
+        public unsafe struct HeroFlagArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.HeroFlag> Value; }
+        public unsafe struct HeroInfoArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.HeroInfo> Value; }
+        public unsafe struct HeroPartyMemberArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.HeroPartyMember> Value; }
+        public unsafe struct ItemArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Value; }
+        public unsafe struct MapAgentArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.MapAgent> Value; }
+        public unsafe struct MerchItemArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<ItemID> Value; }
+        public unsafe struct MissionMapIconArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.MissionMapIcon> Value; }
+        public unsafe struct NPCArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.NPC> Value; }
+        public unsafe struct PartyAttributeArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.PartyAttribute> Value; }
+        public unsafe struct PathingMapArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<PathingMap> Value; }
+        public unsafe struct PlayerArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.Player> Value; }
+        public unsafe struct PlayerPartyMemberArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.PlayerPartyMember> Value; }
+        public unsafe struct QuestLog { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.Quest> Value; }
+        public unsafe struct SkillbarArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.SkillbarData> Value; }
+        public unsafe struct SkillbarCastArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.SkillbarCast> Value; }
+        public unsafe struct TitleArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.Title> Value; }
+
+        public static partial class Chat
+        {
+
+            public enum Channel : int
             {
                 CHANNEL_ALLIANCE = 0,
                 CHANNEL_ALLIES = 1,
@@ -5444,25 +3043,7 @@ internal static unsafe partial class GWCA
                 CHANNEL_UNKNOW = -1,
             }
 
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct ChatBuffer
-            {
-                public uint Next;
-                public uint Unk1;
-                public uint Unk2;
-                public global::Daybreak.API.Interop.GWCA.GW.Chat.ChatMessage* Messages; // [CHAT_LOG_LENGTH]
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct ChatMessage
-            {
-                public uint Channel;
-                public uint Unk1;
-                public ulong Timestamp;
-                // Flexible array member: char Message[0]
-            }
-
-            internal static partial class TextColor
+            public static partial class TextColor
             {
                 internal const uint ColorItemAssign = 0xFF6CC16D;
                 internal const uint ColorItemBasic = 0xFFFFFFFf;
@@ -5484,17 +3065,17 @@ internal static unsafe partial class GWCA
             }
         }
 
-        internal static partial class Constants
+        public static partial class Constants
         {
 
-            internal enum AgentType : int
+            public enum AgentType : int
             {
                 Living = 0xDB,
                 Gadget = 0x200,
                 Item = 0x400,
             }
 
-            internal enum Allegiance : byte
+            public enum Allegiance : byte
             {
                 Ally_NonAttackable = 0x1,
                 Neutral = 0x2,
@@ -5504,7 +3085,7 @@ internal static unsafe partial class GWCA
                 Npc_Minipet = 0x6,
             }
 
-            internal enum Attribute : uint
+            public enum Attribute : uint
             {
                 FastCasting,
                 IllusionMagic,
@@ -5551,7 +3132,7 @@ internal static unsafe partial class GWCA
                 None = 0xff,
             }
 
-            internal enum AttributeByte : byte
+            public enum AttributeByte : byte
             {
                 FastCasting,
                 IllusionMagic,
@@ -5598,7 +3179,7 @@ internal static unsafe partial class GWCA
                 None = 0xff,
             }
 
-            internal enum Bag : byte
+            public enum Bag : byte
             {
                 None,
                 Backpack,
@@ -5626,7 +3207,7 @@ internal static unsafe partial class GWCA
                 Max,
             }
 
-            internal enum BagType : int
+            public enum BagType : int
             {
                 None,
                 Inventory,
@@ -5636,7 +3217,7 @@ internal static unsafe partial class GWCA
                 MaterialStorage,
             }
 
-            internal enum Campaign : uint
+            public enum Campaign : uint
             {
                 Core,
                 Prophecies,
@@ -5646,13 +3227,13 @@ internal static unsafe partial class GWCA
                 BonusMissionPack,
             }
 
-            internal enum Difficulty : int
+            public enum Difficulty : int
             {
                 Normal,
                 Hard,
             }
 
-            internal enum District : int
+            public enum District : int
             {
                 Current,
                 International,
@@ -5670,7 +3251,7 @@ internal static unsafe partial class GWCA
                 Unknown = 0xff,
             }
 
-            internal enum EffectID : uint
+            public enum EffectID : uint
             {
                 black_cloud = 1,
                 mesmer_symbol = 4,
@@ -5692,7 +3273,7 @@ internal static unsafe partial class GWCA
                 dervish_symbol = 36,
             }
 
-            internal enum HeroID : uint
+            public enum HeroID : uint
             {
                 NoHero,
                 Norgu,
@@ -5737,14 +3318,14 @@ internal static unsafe partial class GWCA
                 Count,
             }
 
-            internal enum InstanceType : int
+            public enum InstanceType : int
             {
                 Outpost,
                 Explorable,
                 Loading,
             }
 
-            internal enum InterfaceSize : int
+            public enum InterfaceSize : int
             {
                 SMALL = -1,
                 NORMAL,
@@ -5752,7 +3333,7 @@ internal static unsafe partial class GWCA
                 LARGER,
             }
 
-            internal enum ItemType : byte
+            public enum ItemType : byte
             {
                 Salvage,
                 Axe = 2,
@@ -5792,7 +3373,7 @@ internal static unsafe partial class GWCA
                 Unknown = 0xff,
             }
 
-            internal enum Language : int
+            public enum Language : int
             {
                 English,
                 Korean,
@@ -5808,7 +3389,7 @@ internal static unsafe partial class GWCA
                 Unknown = 0xff,
             }
 
-            internal enum MapID : uint
+            public enum MapID : uint
             {
                 None = 0,
                 Gladiators_Arena,
@@ -6663,7 +4244,7 @@ internal static unsafe partial class GWCA
                 Count = 0x370,
             }
 
-            internal enum MaterialSlot : uint
+            public enum MaterialSlot : uint
             {
                 Bone,
                 IronIngot,
@@ -6707,7 +4288,7 @@ internal static unsafe partial class GWCA
                 Count,
             }
 
-            internal enum Profession : uint
+            public enum Profession : uint
             {
                 None,
                 Warrior,
@@ -6722,7 +4303,7 @@ internal static unsafe partial class GWCA
                 Dervish,
             }
 
-            internal enum ProfessionByte : byte
+            public enum ProfessionByte : byte
             {
                 None,
                 Warrior,
@@ -6737,7 +4318,7 @@ internal static unsafe partial class GWCA
                 Dervish,
             }
 
-            internal enum QuestID : uint
+            public enum QuestID : uint
             {
                 None = 0,
                 UW_Chamber = 101,
@@ -6983,7 +4564,7 @@ internal static unsafe partial class GWCA
                 ZaishenVanquish_Spearhead_Peak = 1315,
             }
 
-            internal enum ServerRegion : int
+            public enum ServerRegion : int
             {
                 International = -2,
                 America = 0,
@@ -6994,7 +4575,7 @@ internal static unsafe partial class GWCA
                 Unknown = 0xff,
             }
 
-            internal enum SkillID : uint
+            public enum SkillID : uint
             {
                 No_Skill = 0,
                 Healing_Signet,
@@ -10030,7 +7611,7 @@ internal static unsafe partial class GWCA
                 Count = 0xD6c,
             }
 
-            internal enum SkillType : int
+            public enum SkillType : int
             {
                 Bounty = 1,
                 Scroll = 2,
@@ -10063,7 +7644,7 @@ internal static unsafe partial class GWCA
                 Disguise = 29,
             }
 
-            internal enum StoragePane : byte
+            public enum StoragePane : byte
             {
                 Storage_1,
                 Storage_2,
@@ -10082,13 +7663,13 @@ internal static unsafe partial class GWCA
                 Material_Storage,
             }
 
-            internal enum Tick : int
+            public enum Tick : int
             {
                 NOT_READY,
                 READY,
             }
 
-            internal enum TitleID : uint
+            public enum TitleID : uint
             {
                 Hero,
                 TyrianCarto,
@@ -10142,13 +7723,13 @@ internal static unsafe partial class GWCA
             }
             internal const uint SkillMax = 0xd69;
 
-            internal static partial class Camera
+            public static partial class Camera
             {
                 internal const float DEFAULT_DIST = 750.0f;
                 internal const float FIRST_PERSON_DIST = 2.0f;
             }
 
-            internal static partial class DialogID
+            public static partial class DialogID
             {
                 internal const int FactionMissionOutpost = 0x80000B;
                 internal const int FerryDocksToKaineng = 136; // Mhenlo
@@ -10177,7 +7758,7 @@ internal static unsafe partial class GWCA
                 internal const int UwTeleWastes = 140;
             }
 
-            internal static partial class HealthbarHeight
+            public static partial class HealthbarHeight
             {
                 internal const uint Large = 26;
                 internal const uint Larger = 30;
@@ -10185,7 +7766,7 @@ internal static unsafe partial class GWCA
                 internal const uint Small = 24;
             }
 
-            internal static partial class ItemID
+            public static partial class ItemID
             {
                 internal const int Absinthe = 6367;
                 internal const int AgedDwarvenAle = 24593;
@@ -10342,10 +7923,10 @@ internal static unsafe partial class GWCA
                 internal const int ZehtukasJug = 19171;
             }
 
-            internal static partial class Preference
+            public static partial class Preference
             {
 
-                internal enum CharSortOrder : uint
+                public enum CharSortOrder : uint
                 {
                     None,
                     Alphabetize,
@@ -10353,7 +7934,7 @@ internal static unsafe partial class GWCA
                 }
             }
 
-            internal static partial class Range
+            public static partial class Range
             {
                 internal const float Adjacent = 166.0f;
                 internal const float Area = 322.0f;
@@ -10367,10 +7948,10 @@ internal static unsafe partial class GWCA
             }
         }
 
-        internal static partial class EventMgr
+        public static partial class EventMgr
         {
 
-            internal enum EventID : int
+            public enum EventID : int
             {
                 kRecvPing = 0x8,
                 kSendFriendState = 0x26,
@@ -10379,10 +7960,10 @@ internal static unsafe partial class GWCA
             }
         }
 
-        internal static partial class Merchant
+        public static partial class Merchant
         {
 
-            internal enum TransactionType : uint
+            public enum TransactionType : uint
             {
                 AccountName,
                 MerchantBuy,
@@ -10402,39 +7983,20 @@ internal static unsafe partial class GWCA
                 UnlockItem,
                 UnlockSkill,
             }
+        }
 
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct QuoteInfo
-            {
-                public uint Unknown;
-                public uint ItemCount;
-            }
+        public static partial class Packet
+        {
 
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct TransactionInfo
+            public static partial class StoC
             {
-                public uint ItemCount;
             }
         }
 
-        internal static partial class Packet
+        public static partial class Render
         {
 
-            internal static partial class StoC
-            {
-
-                [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-                public unsafe struct PacketBase
-                {
-                    public uint Header;
-                }
-            }
-        }
-
-        internal static partial class Render
-        {
-
-            internal enum Metric : uint
+            public enum Metric : uint
             {
                 Metric0,
                 Metric1,
@@ -10465,48 +8027,26 @@ internal static unsafe partial class GWCA
                 Count,
             }
 
-            internal enum Transform : int
+            public enum Transform : int
             {
                 TRANSFORM_PROJECTION_MATRIX = 0,
                 TRANSFORM_MODEL_MATRIX = 1,
                 TRANSFORM_COUNT = 5,
             }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct Mat4x3f
-            {
-                public float _11;
-                public float _12;
-                public float _13;
-                public float _14;
-                public float _21;
-                public float _22;
-                public float _23;
-                public float _24;
-                public float _31;
-                public float _32;
-                public float _33;
-                public float _34;
-                public uint Flags;
-            }
         }
 
-        internal static partial class SkillbarMgr
+        public static partial class SkillbarMgr
         {
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x8C)]
-            public unsafe struct SkillTemplate
-            {
-                public uint AttributesCount;
-                public global::Daybreak.API.Interop.GWCA.GW.Attribute AttributeIds; // [12]
-                public fixed uint AttributeValues[12];
-            }
         }
 
-        internal static partial class UI
+        public static partial class StoC
+        {
+        }
+
+        public static partial class UI
         {
 
-            internal enum ControlAction : uint
+            public enum ControlAction : uint
             {
                 ControlAction_None = 0,
                 ControlAction_Screenshot = 0xAE,
@@ -10670,7 +8210,7 @@ internal static unsafe partial class GWCA
                 ControlAction_ToggleGamepadCursorMode = 0x13d, // right dpad
             }
 
-            internal enum EnumPreference : uint
+            public enum EnumPreference : uint
             {
                 CharSortOrder,
                 AntiAliasing, // multi sampling
@@ -10683,7 +8223,7 @@ internal static unsafe partial class GWCA
                 Count = 0x8,
             }
 
-            internal enum FlagPreference : uint
+            public enum FlagPreference : uint
             {
                 FlagPref_0x0,
                 FlagPref_0x1,
@@ -10796,7 +8336,7 @@ internal static unsafe partial class GWCA
                 Count,
             }
 
-            internal enum NumberCommandLineParameter : uint
+            public enum NumberCommandLineParameter : uint
             {
                 Unk1,
                 Unk2,
@@ -10805,7 +8345,7 @@ internal static unsafe partial class GWCA
                 Count,
             }
 
-            internal enum NumberPreference : uint
+            public enum NumberPreference : uint
             {
                 AutoTournPartySort,
                 ChatState,
@@ -10853,7 +8393,7 @@ internal static unsafe partial class GWCA
                 Count = 0x2b,
             }
 
-            internal enum StringPreference : uint
+            public enum StringPreference : uint
             {
                 Unk1,
                 Unk2,
@@ -10861,7 +8401,7 @@ internal static unsafe partial class GWCA
                 Count = 0x3,
             }
 
-            internal enum TooltipType : uint
+            public enum TooltipType : uint
             {
                 None = 0x0,
                 EncString1 = 0x4,
@@ -10872,7 +8412,7 @@ internal static unsafe partial class GWCA
                 Attribute = 0x4000,
             }
 
-            internal enum UIMessage : uint
+            public enum UIMessage : uint
             {
                 kNone = 0x0,
                 kFrameMessage_0x1,
@@ -11006,7 +8546,7 @@ internal static unsafe partial class GWCA
                 kShowMapEntryMessage, // 0x10000029, wparam = { wchar_t* title, wchar_t* subtitle
             }
 
-            internal enum WindowID : uint
+            public enum WindowID : uint
             {
                 WindowID_Dialogue1 = 0x0,
                 WindowID_Dialogue2 = 0x1,
@@ -11057,233 +8597,12 @@ internal static unsafe partial class GWCA
                 WindowID_Hero7 = 0x61,
                 WindowID_Count = 0x69,
             }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
-            public unsafe struct AgentNameTagInfo
-            {
-                [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
-                public uint AgentId;
-                [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-                public uint H0002;
-                [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-                public uint H0003;
-                [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-                public nint NameEnc;
-                [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-                public byte H0010;
-                [global::System.Runtime.InteropServices.FieldOffset(0x0011)]
-                public byte H0012;
-                [global::System.Runtime.InteropServices.FieldOffset(0x0012)]
-                public byte H0013;
-                [global::System.Runtime.InteropServices.FieldOffset(0x0013)]
-                public byte BackgroundAlpha; // ARGB, NB: Actual color is ignored, only alpha is used
-                [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-                public uint TextColor; // ARGB
-                [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-                public uint LabelAttributes; // bold/size etc
-                [global::System.Runtime.InteropServices.FieldOffset(0x001E)]
-                public byte H001E;
-                [global::System.Runtime.InteropServices.FieldOffset(0x001F)]
-                public byte H001F;
-                [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
-                public nint ExtraInfoEnc; // Title etc
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct ChatTemplate
-            {
-                public uint AgentId;
-                public uint Type; // 0 = build, 1 = equipment
-                public nint Code;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct CompassPoint
-            {
-                public int X;
-                public int Y;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct DialogBodyInfo
-            {
-                public uint Type;
-                public uint AgentId;
-                public nint MessageEnc;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct DialogButtonInfo
-            {
-                public uint ButtonIcon; // byte
-                public nint Message;
-                public uint DialogId;
-                public uint SkillId; // Default 0xFFFFFFF
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x24)]
-            public unsafe struct FloatingWindow
-            {
-                public nint Unk1; // Some kind of function call
-                public nint Name;
-                public uint Unk2;
-                public uint Unk3;
-                public uint SavePreference; // 1 or 0; if 1, will save to UI layout preferences.
-                public uint Unk4;
-                public uint Unk5;
-                public uint Unk6;
-                public uint WindowId; // Maps to window array
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x1C8)]
-            public unsafe struct Frame
-            {
-                public uint Field10x0;
-                public uint Field20x4;
-                public uint FrameLayout;
-                public uint Field30xc;
-                public uint Field40x10;
-                public uint Field50x14;
-                public uint VisibilityFlags;
-                public uint Field70x1c;
-                public uint Type;
-                public uint TemplateType;
-                public uint Field100x28;
-                public uint Field110x2c;
-                public uint Field120x30;
-                public uint Field130x34;
-                public uint Field140x38;
-                public uint Field150x3c;
-                public uint Field160x40;
-                public uint Field170x44;
-                public uint Field180x48;
-                public uint Field190x4c;
-                public uint Field200x50;
-                public uint Field210x54;
-                public uint Field220x58;
-                public uint Field230x5c;
-                public uint Field240x60;
-                public uint Field24a0x64;
-                public uint Field24b0x68;
-                public uint Field250x6c;
-                public uint Field260x70;
-                public uint Field270x74;
-                public uint Field280x78;
-                public uint Field290x7c;
-                public uint Field300x80;
-                public nint Field310x84;
-                public uint Field320x94;
-                public uint Field330x98;
-                public uint Field340x9c;
-                public uint Field350xa0;
-                public uint Field360xa4;
-                public nint FrameCallbacks;
-                public uint ChildOffsetId; // Offset of this child in relation to its parent
-                public uint FrameId; // Offset in the global frame array
-                public uint Field400xc0;
-                public uint Field410xc4;
-                public uint Field420xc8;
-                public uint Field430xcc;
-                public uint Field440xd0;
-                public uint Field450xd4;
-                public global::Daybreak.API.Interop.GWCA.GW.UI.FramePositionData Position;
-                public uint Field630x11c;
-                public uint Field640x120;
-                public uint Field650x124;
-                public FrameRelation Relation;
-                public uint Field730x144;
-                public uint Field740x148;
-                public uint Field750x14c;
-                public uint Field760x150;
-                public uint Field770x154;
-                public uint Field780x158;
-                public uint Field790x15c;
-                public uint Field800x160;
-                public uint Field810x164;
-                public uint Field820x168;
-                public uint Field830x16c;
-                public uint Field840x170;
-                public uint Field850x174;
-                public uint Field860x178;
-                public uint Field870x17c;
-                public uint Field880x180;
-                public uint Field890x184;
-                public uint Field900x188;
-                public uint FrameState;
-                public uint Field920x190;
-                public uint Field930x194;
-                public uint Field940x198;
-                public uint Field950x19c;
-                public uint Field960x1a0;
-                public uint Field970x1a4;
-                public uint Field980x1a8;
-                public TooltipInfo* TooltipInfo;
-                public uint Field1000x1b0;
-                public uint Field1010x1b4;
-                public uint Field1020x1b8;
-                public uint Field1030x1bc;
-                public uint Field1040x1c0;
-                public uint Field1050x1c4;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct FramePositionData
-            {
-                public uint Flags;
-                public float Left;
-                public float Bottom;
-                public float Right;
-                public float Top;
-                public float ContentLeft;
-                public float ContentBottom;
-                public float ContentRight;
-                public float ContentTop;
-                public float Unk;
-                public float ScaleFactor; // Depends on UI scale
-                public float ViewportWidth; // Width in px of available screen height; this may sometimes be scaled down, too!
-                public float ViewportHeight; // Height in px of available screen height; this may sometimes be scaled down, too!
-                public float ScreenLeft;
-                public float ScreenBottom;
-                public float ScreenRight;
-                public float ScreenTop;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct InteractionMessage
-            {
-                public uint FrameId;
-                public global::Daybreak.API.Models.UIMessage MessageId; // Same as UIMessage from UIMgr, but includes things like mouse move, click etc
-                public nint WParam;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct MapEntryMessage
-            {
-                public nint Title;
-                public nint Subtitle;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct UIChatMessage
-            {
-                public uint Channel;
-                public nint Message;
-                public uint Channel2;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct WindowPositionData
-            {
-                public uint State; // & 0x1 == visible
-                public global::System.Numerics.Vector2 P1;
-                public global::System.Numerics.Vector2 P2;
-            }
         }
 
-        internal static partial class UIPacket
+        public static partial class UIPacket
         {
 
-            internal enum ActionState : uint
+            public enum ActionState : uint
             {
                 MouseDown = 0x6,
                 MouseUp = 0x7,
@@ -11292,524 +8611,9006 @@ internal static unsafe partial class GWCA
                 DragRelease = 0xb,
                 KeyDown = 0xe,
             }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kAgentSkillPacket
-            {
-                public uint AgentId;
-                public global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID SkillId;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kAgentSkillStartedCast
-            {
-                public uint AgentId;
-                public global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID SkillId;
-                public float Duration;
-                public uint H000c;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kAgentSpeechBubble
-            {
-                public uint AgentId;
-                public nint Message;
-                public uint H0008;
-                public uint H000c;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kAllyOrGuildMessage
-            {
-                public global::Daybreak.API.Models.Channel Channel;
-                public nint Message;
-                public nint Sender;
-                public nint GuildTag;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kChangeTarget
-            {
-                public uint EvaluatedTargetId;
-                public byte HasEvaluatedTargetChanged;
-                public uint AutoTargetId;
-                public byte HasAutoTargetChanged;
-                public uint ManualTargetId;
-                public byte HasManualTargetChanged;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kCompassDraw
-            {
-                public uint PlayerNumber;
-                public uint SessionId;
-                public uint NumberOfPoints;
-                public global::Daybreak.API.Interop.GWCA.GW.UI.CompassPoint* Points;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kDialogueMessage
-            {
-                public uint AgentId;
-                public nint Sender;
-                public nint Message;
-                public uint Duration;
-                public uint IsDialogue1Or2;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kEffectAdd
-            {
-                public uint AgentId;
-                public global::Daybreak.API.Interop.GWCA.GW.EffectData* Effect;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kErrorMessage
-            {
-                public uint ErrorId;
-                public nint Message;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kGetColor
-            {
-                public uint* Color;
-                public global::Daybreak.API.Models.Channel Channel;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kInteractAgent
-            {
-                public uint AgentId;
-                public byte CallTarget;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kInventorySlotUpdated
-            {
-                public uint Unk;
-                public uint ItemId;
-                public uint BagIndex;
-                public uint SlotId;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kItemUpdated
-            {
-                public uint ItemId;
-                public uint ModelFileId;
-                public uint Type;
-                public uint Unk1;
-                public uint ExtraId; // Dye color
-                public uint Materials;
-                public uint Unk2;
-                public uint Interaction; // Flags
-                public uint Price;
-                public uint ModelId;
-                public uint Quantity;
-                public nint EncName;
-                public uint ModStructSize;
-                public uint* ModStruct;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kKeyAction
-            {
-                public uint GwKey;
-                public uint Modifiers;
-                public uint StateFlags; // shift held = 0x4, ctrl = 0x2, alt = 0x1
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x20)]
-            public unsafe struct kLoadMapContext
-            {
-                public nint FileName;
-                public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID MapId;
-                public global::Daybreak.API.Interop.GWCA.GW.Constants.InstanceType MapType;
-                public global::System.Numerics.Vector2 SpawnPoint;
-                public uint H0014;
-                public uint H0018;
-                public nint Success;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kLogChatMessage
-            {
-                public nint Message;
-                public global::Daybreak.API.Models.Channel Channel;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x8)]
-            public unsafe struct kLogout
-            {
-                public uint Unknown;
-                public uint CharacterSelect;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kMeasureContent
-            {
-                public float MaxWidth; // Maximum width constraint
-                public float MaxHeight; // Maximum height constraint
-                public float* SizeOutput; // Pointer to output buffer for calculated size
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kMouseAction
-            {
-                public uint FrameId;
-                public uint ChildOffsetId;
-                public global::Daybreak.API.Interop.GWCA.GW.UIPacket.ActionState CurrentState;
-                public nint Wparam;
-                public nint Lparam;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kMouseClick
-            {
-                public uint MouseButton; // 0x0 = left, 0x1 = middle, 0x2 = right
-                public uint IsDoubleclick;
-                public uint UnknownTypeScreenPos;
-                public uint H000c;
-                public uint H0010;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kMouseCoordsClick
-            {
-                public float OffsetX;
-                public float OffsetY;
-                public uint H0008;
-                public uint H000c;
-                public uint* H0010;
-                public uint H0014;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kMoveItem
-            {
-                public uint ItemId;
-                public uint ToBagIndex;
-                public uint ToSlot;
-                public uint Prompt;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kObjectiveAdd
-            {
-                public uint ObjectiveId;
-                public nint Name;
-                public uint Type;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kObjectiveComplete
-            {
-                public uint ObjectiveId;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kObjectiveUpdated
-            {
-                public uint ObjectiveId;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kPartySearchInvite
-            {
-                public uint SourcePartySearchId;
-                public uint DestPartySearchId;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kPartyShowConfirmDialog
-            {
-                public uint UiMessageToSendToPartyFrame;
-                public uint PromptIdentitifier;
-                public nint PromptEncStr;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kPlayerChatMessage
-            {
-                public global::Daybreak.API.Models.Channel Channel;
-                public nint Message;
-                public uint PlayerNumber;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kPostProcessingEffect
-            {
-                public uint Tint;
-                public float Amount;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kPreStartSalvage
-            {
-                public uint ItemId;
-                public uint KitId;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kPreferenceEnumChanged
-            {
-                public global::Daybreak.API.Interop.GWCA.GW.UI.EnumPreference PreferenceId;
-                public uint EnumIndex;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kPreferenceFlagChanged
-            {
-                public global::Daybreak.API.Interop.GWCA.GW.UI.FlagPreference PreferenceId;
-                public uint NewValue;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kPreferenceValueChanged
-            {
-                public global::Daybreak.API.Interop.GWCA.GW.UI.NumberPreference PreferenceId;
-                public uint NewValue;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kPrintChatMessage
-            {
-                public global::Daybreak.API.Models.Channel Channel;
-                public nint Message;
-                public ulong Timestamp;
-                public uint IsReprint;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kRecvWhisper
-            {
-                public uint TransactionId;
-                public nint From;
-                public nint Message;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kResize
-            {
-                public uint H0000;
-                public float ContentWidth;
-                public float ContentHeight;
-                public float H000c;
-                public float H0010;
-                public float ContentWidth2;
-                public float ContentHeight2;
-                public float MarginX;
-                public float MarginY;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kSendCallTarget
-            {
-                public global::Daybreak.API.Interop.GWCA.GW.CallTargetType CallType;
-                public uint AgentId;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kSendChangeTarget
-            {
-                public uint TargetId;
-                public uint AutoTargetId;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kSendChatMessage
-            {
-                public nint Message;
-                public uint AgentId;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kSendLoadSkillTemplate
-            {
-                public uint AgentId;
-                public global::Daybreak.API.Interop.GWCA.GW.SkillbarMgr.SkillTemplate* SkillTemplate;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kSendMerchantRequestQuote
-            {
-                public global::Daybreak.API.Interop.GWCA.GW.Merchant.TransactionType Type;
-                public uint ItemId;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kSendMerchantTransactItem
-            {
-                public global::Daybreak.API.Interop.GWCA.GW.Merchant.TransactionType Type;
-                public uint H0004;
-                public global::Daybreak.API.Interop.GWCA.GW.Merchant.QuoteInfo Give;
-                public uint GoldRecv;
-                public global::Daybreak.API.Interop.GWCA.GW.Merchant.QuoteInfo Recv;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kSendMoveItem
-            {
-                public uint ItemId;
-                public uint Quantity;
-                public uint BagIndex;
-                public uint Slot;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kSendPingWeaponSet
-            {
-                public uint AgentId;
-                public uint WeaponItemId;
-                public uint OffhandItemId;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kSendUseItem
-            {
-                public uint ItemId;
-                public ushort Quantity; // Unused, but would be cool
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kSendWorldAction
-            {
-                public global::Daybreak.API.Interop.GWCA.GW.WorldActionId ActionId;
-                public uint AgentId;
-                public byte SuppressCallTarget; // 1 to block "I'm targetting X", but will also only trigger if the key thing is down
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kServerActiveQuestChanged
-            {
-                public global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID QuestId;
-                public global::Daybreak.API.Interop.GWCA.GW.GamePos Marker;
-                public uint H0024;
-                public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID MapId;
-                public uint LogState;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kSetAgentProfession
-            {
-                public uint AgentId;
-                public uint Primary;
-                public uint Secondary;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kSetLayout
-            {
-                public float Field0x0;
-                public float Field0x4;
-                public float Field0x8;
-                public float Field0xc;
-                public float AvailableWidth;
-                public float AvailableHeight;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kSetRendererValue
-            {
-                public uint RendererMode; // 0 for window, 2 for full screen
-                public uint MetricId; // TODO: Enum this!
-                public uint Value;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kShowXunlaiChest
-            {
-                public uint H0000;
-                public byte StoragePaneUnlocked;
-                public byte AnniversaryPaneUnlocked;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kStartWhisper
-            {
-                public nint PlayerName;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kTomeSkillSelection
-            {
-                public uint ItemId;
-                public uint H0004;
-                public uint H0008;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kUIPositionChanged
-            {
-                public uint WindowId;
-                public global::Daybreak.API.Interop.GWCA.GW.UI.WindowPositionData* Position;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kUseKitOnItem
-            {
-                public uint ItemId;
-                public uint KitId;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kVendorItems
-            {
-                public global::Daybreak.API.Interop.GWCA.GW.Merchant.TransactionType TransactionType;
-                public uint ItemIdsCount;
-                public uint* ItemIdsBuffer1; // world->merchant_items.buffer
-                public uint* ItemIdsBuffer2; // world->merchant_items2.buffer
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kVendorQuote
-            {
-                public uint ItemId;
-                public uint Price;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kVendorWindow
-            {
-                public global::Daybreak.API.Interop.GWCA.GW.Merchant.TransactionType TransactionType;
-                public uint Unk;
-                public uint MerchantAgentId;
-                public uint IsPending;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kWeaponSetChanged
-            {
-                public uint H0000;
-                public uint H0004;
-                public uint H0008;
-                public uint H000c;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kWeaponSwap
-            {
-                public uint WeaponBarFrameId;
-                public uint WeaponSetId;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kWriteToChatLog
-            {
-                public global::Daybreak.API.Models.Channel Channel;
-                public nint Message;
-                public global::Daybreak.API.Models.Channel ChannelDupe;
-            }
-
-            [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-            public unsafe struct kWriteToChatLogWithSender
-            {
-                public uint Channel;
-                public nint Message;
-                public nint SenderEnc;
-            }
         }
     }
+}
+}
+
+namespace Daybreak.API.Interop.GuildWars
+{
+
+    public enum LogLevel : int
+    {
+        LEVEL_TRACE,
+        LEVEL_DEBUG,
+        LEVEL_INFO,
+        LEVEL_WARN,
+        LEVEL_ERR,
+        LEVEL_CRITICAL,
+    }
+
+    public enum CallTargetType : uint
+    {
+        Following = 0x3,
+        Morale = 0x7,
+        AttackingOrTargetting = 0xA,
+        None = 0xFF,
+    }
+
+    public enum Continent : uint
+    {
+        Kryta,
+        DevContinent,
+        Cantha,
+        BattleIsles,
+        Elona,
+        RealmOfTorment,
+    }
+
+    public enum DyeColor : byte
+    {
+        None = 0,
+        Blue = 2,
+        Green = 3,
+        Purple = 4,
+        Red = 5,
+        Yellow = 6,
+        Brown = 7,
+        Orange = 8,
+        Silver = 9,
+        Black = 10,
+        Gray = 11,
+        White = 12,
+        Pink = 13,
+    }
+
+    public enum EquipmentStatus : uint
+    {
+        AlwaysHide,
+        HideInTownsAndOutposts,
+        HideInCombatAreas,
+        AlwaysShow,
+    }
+
+    public enum EquipmentType : uint
+    {
+        Cape = 0x0,
+        Helm = 0x2,
+        CostumeBody = 0x4,
+        CostumeHeadpiece = 0x6,
+        Unknown = 0xff,
+    }
+
+    public enum FriendStatus : uint
+    {
+        Offline = 0,
+        Online = 1,
+        DND = 2,
+        Away = 3,
+        Unknown = 4,
+    }
+
+    public enum FriendType : uint
+    {
+        Unknow = 0,
+        Friend = 1,
+        Ignore = 2,
+        Player = 3,
+        Trade = 4,
+    }
+
+    public enum HeroBehavior : uint
+    {
+        Fight,
+        Guard,
+        AvoidCombat,
+    }
+
+    public enum ObserverMatchType : uint
+    {
+        SpecialEvent,
+        HallOfHeroe,
+        MyGuildsBattle,
+        MyGuildsHeroesAscentGame,
+        TopGuildBattle,
+        TopGuildHeroesAscentGame,
+        UploadedGame,
+        Top1v1Battle,
+        Top1v1TournamentBattle,
+    }
+
+    public enum PartySearchType : int
+    {
+        PartySearchType_Hunting = 0,
+        PartySearchType_Mission = 1,
+        PartySearchType_Quest = 2,
+        PartySearchType_Trade = 3,
+        PartySearchType_Guild = 4,
+    }
+
+    public enum ProgressBarStyle : uint
+    {
+        kPeach,
+        kPink,
+        kGrey,
+        kBlue,
+        kGreen,
+        kRed,
+        kPurple,
+        kOlive,
+        kUnk,
+    }
+
+    public enum Region : uint
+    {
+        Region_Kryta,
+        Region_Maguuma,
+        Region_Ascalon,
+        Region_NorthernShiverpeaks,
+        Region_HeroesAscent,
+        Region_CrystalDesert,
+        Region_FissureOfWoe,
+        Region_Presearing,
+        Region_Kaineng,
+        Region_Kurzick,
+        Region_Luxon,
+        Region_ShingJea,
+        Region_Kourna,
+        Region_Vaabi,
+        Region_Desolation,
+        Region_Istan,
+        Region_DomainOfAnguish,
+        Region_TarnishedCoast,
+        Region_DepthsOfTyria,
+        Region_FarShiverpeaks,
+        Region_CharrHomelands,
+        Region_BattleIslands,
+        Region_TheBattleOfJahai,
+        Region_TheFlightNorth,
+        Region_TheTenguAccords,
+        Region_TheRiseOfTheWhiteMantle,
+        Region_Swat,
+        Region_DevRegion,
+    }
+
+    public enum RegionType : uint
+    {
+        AllianceBattle,
+        Arena,
+        ExplorableZone,
+        GuildBattleArea,
+        GuildHall,
+        MissionOutpost,
+        CooperativeMission,
+        CompetitiveMission,
+        EliteMission,
+        Challenge,
+        Outpost,
+        ZaishenBattle,
+        HeroesAscent,
+        City,
+        MissionArea,
+        HeroBattleOutpost,
+        HeroBattleArea,
+        EotnMission,
+        Dungeon,
+        Marketplace,
+        Unknown,
+        DevRegion,
+    }
+
+    public enum ScannerSection : byte
+    {
+        Section_TEXT = 0,
+        Section_RDATA = 1,
+        Section_DATA = 2,
+        Section_Count = 3,
+    }
+
+    public enum WorldActionId : uint
+    {
+        InteractEnemy,
+        InteractPlayerOrOther,
+        InteractNPC,
+        InteractItem,
+        InteractTrade,
+        InteractGadget,
+    }
+
+    public enum AgentType : int
+    {
+        Living = 0xDB,
+        Gadget = 0x200,
+        Item = 0x400,
+    }
+
+    public enum Allegiance : byte
+    {
+        Ally_NonAttackable = 0x1,
+        Neutral = 0x2,
+        Enemy = 0x3,
+        Spirit_Pet = 0x4,
+        Minion = 0x5,
+        Npc_Minipet = 0x6,
+    }
+
+    public enum Attribute : uint
+    {
+        FastCasting,
+        IllusionMagic,
+        DominationMagic,
+        InspirationMagic,
+        BloodMagic,
+        DeathMagic,
+        SoulReaping,
+        Curses,
+        AirMagic,
+        EarthMagic,
+        FireMagic,
+        WaterMagic,
+        EnergyStorage,
+        HealingPrayers,
+        SmitingPrayers,
+        ProtectionPrayers,
+        DivineFavor,
+        Strength,
+        AxeMastery,
+        HammerMastery,
+        Swordsmanship,
+        Tactics,
+        BeastMastery,
+        Expertise,
+        WildernessSurvival,
+        Marksmanship,
+        DaggerMastery = 29,
+        DeadlyArts,
+        ShadowArts,
+        Communing,
+        RestorationMagic,
+        ChannelingMagic,
+        CriticalStrikes,
+        SpawningPower,
+        SpearMastery,
+        Command,
+        Motivation,
+        Leadership,
+        ScytheMastery,
+        WindPrayers,
+        EarthPrayers,
+        Mysticism,
+        None = 0xff,
+    }
+
+    public enum AttributeByte : byte
+    {
+        FastCasting,
+        IllusionMagic,
+        DominationMagic,
+        InspirationMagic,
+        BloodMagic,
+        DeathMagic,
+        SoulReaping,
+        Curses,
+        AirMagic,
+        EarthMagic,
+        FireMagic,
+        WaterMagic,
+        EnergyStorage,
+        HealingPrayers,
+        SmitingPrayers,
+        ProtectionPrayers,
+        DivineFavor,
+        Strength,
+        AxeMastery,
+        HammerMastery,
+        Swordsmanship,
+        Tactics,
+        BeastMastery,
+        Expertise,
+        WildernessSurvival,
+        Marksmanship,
+        DaggerMastery = 29,
+        DeadlyArts,
+        ShadowArts,
+        Communing,
+        RestorationMagic,
+        ChannelingMagic,
+        CriticalStrikes,
+        SpawningPower,
+        SpearMastery,
+        Command,
+        Motivation,
+        Leadership,
+        ScytheMastery,
+        WindPrayers,
+        EarthPrayers,
+        Mysticism,
+        None = 0xff,
+    }
+
+    public enum Bag : byte
+    {
+        None,
+        Backpack,
+        Belt_Pouch,
+        Bag_1,
+        Bag_2,
+        Equipment_Pack,
+        Material_Storage,
+        Unclaimed_Items,
+        Storage_1,
+        Storage_2,
+        Storage_3,
+        Storage_4,
+        Storage_5,
+        Storage_6,
+        Storage_7,
+        Storage_8,
+        Storage_9,
+        Storage_10,
+        Storage_11,
+        Storage_12,
+        Storage_13,
+        Storage_14,
+        Equipped_Items,
+        Max,
+    }
+
+    public enum BagType : int
+    {
+        None,
+        Inventory,
+        Equipped,
+        NotCollected,
+        Storage,
+        MaterialStorage,
+    }
+
+    public enum Campaign : uint
+    {
+        Core,
+        Prophecies,
+        Factions,
+        Nightfall,
+        EyeOfTheNorth,
+        BonusMissionPack,
+    }
+
+    public enum Difficulty : int
+    {
+        Normal,
+        Hard,
+    }
+
+    public enum District : int
+    {
+        Current,
+        International,
+        American,
+        EuropeEnglish,
+        EuropeFrench,
+        EuropeGerman,
+        EuropeItalian,
+        EuropeSpanish,
+        EuropePolish,
+        EuropeRussian,
+        AsiaKorean,
+        AsiaChinese,
+        AsiaJapanese,
+        Unknown = 0xff,
+    }
+
+    public enum EffectID : uint
+    {
+        black_cloud = 1,
+        mesmer_symbol = 4,
+        green_cloud = 7,
+        green_sparks = 8,
+        necro_symbol = 9,
+        ele_symbol = 11,
+        white_clouds = 13,
+        monk_symbol = 18,
+        bleeding = 23,
+        blind = 24,
+        burning = 25,
+        disease = 26,
+        poison = 27,
+        dazed = 28,
+        weakness = 29,
+        assasin_symbol = 34,
+        ritualist_symbol = 35,
+        dervish_symbol = 36,
+    }
+
+    public enum HeroID : uint
+    {
+        NoHero,
+        Norgu,
+        Goren,
+        Tahlkora,
+        MasterOfWhispers,
+        AcolyteJin,
+        Koss,
+        Dunkoro,
+        AcolyteSousuke,
+        Melonni,
+        ZhedShadowhoof,
+        GeneralMorgahn,
+        MargridTheSly,
+        Zenmai,
+        Olias,
+        Razah,
+        MOX,
+        KeiranThackeray,
+        Jora,
+        PyreFierceshot,
+        Anton,
+        Livia,
+        Hayda,
+        Kahmu,
+        Gwen,
+        Xandra,
+        Vekk,
+        Ogden,
+        Merc1,
+        Merc2,
+        Merc3,
+        Merc4,
+        Merc5,
+        Merc6,
+        Merc7,
+        Merc8,
+        Miku,
+        ZeiRi,
+        Devona,
+        GhostofAlthea,
+        Count,
+    }
+
+    public enum InstanceType : int
+    {
+        Outpost,
+        Explorable,
+        Loading,
+    }
+
+    public enum InterfaceSize : int
+    {
+        SMALL = -1,
+        NORMAL,
+        LARGE,
+        LARGER,
+    }
+
+    public enum ItemType : byte
+    {
+        Salvage,
+        Axe = 2,
+        Bag,
+        Boots,
+        Bow,
+        Bundle,
+        Chestpiece,
+        Rune_Mod,
+        Usable,
+        Dye,
+        Materials_Zcoins,
+        Offhand,
+        Gloves,
+        Hammer = 15,
+        Headpiece,
+        CC_Shards,
+        Key,
+        Leggings,
+        Gold_Coin,
+        Quest_Item,
+        Wand,
+        Shield = 24,
+        Staff = 26,
+        Sword,
+        Kit = 29,
+        Trophy,
+        Scroll,
+        Daggers,
+        Present,
+        Minipet,
+        Scythe,
+        Spear,
+        Storybook = 43,
+        Costume,
+        Costume_Headpiece,
+        Unknown = 0xff,
+    }
+
+    public enum Language : int
+    {
+        English,
+        Korean,
+        French,
+        German,
+        Italian,
+        Spanish,
+        TraditionalChinese,
+        Japanese = 8,
+        Polish,
+        Russian,
+        BorkBorkBork = 17,
+        Unknown = 0xff,
+    }
+
+    public enum MapID : uint
+    {
+        None = 0,
+        Gladiators_Arena,
+        DEV_Test_Arena_1v1,
+        Test_map,
+        Warriors_Isle_outpost,
+        Hunters_Isle_outpost,
+        Wizards_Isle_outpost,
+        Warriors_Isle,
+        Hunters_Isle,
+        Wizards_Isle,
+        Bloodstone_Fen,
+        The_Wilds,
+        Aurora_Glade,
+        Diessa_Lowlands,
+        Gates_of_Kryta,
+        DAlessio_Seaboard,
+        Divinity_Coast,
+        Talmark_Wilderness,
+        The_Black_Curtain,
+        Sanctum_Cay,
+        Droknars_Forge_outpost,
+        The_Frost_Gate,
+        Ice_Caves_of_Sorrow,
+        Thunderhead_Keep,
+        Iron_Mines_of_Moladune,
+        Borlis_Pass,
+        Talus_Chute,
+        Griffons_Mouth,
+        The_Great_Northern_Wall,
+        Fort_Ranik,
+        Ruins_of_Surmia,
+        Xaquang_Skyway,
+        Nolani_Academy,
+        Old_Ascalon,
+        The_Fissure_of_Woe,
+        Ember_Light_Camp_outpost,
+        Grendich_Courthouse_outpost,
+        Glints_Challenge_mission,
+        Augury_Rock_outpost,
+        Sardelac_Sanitarium_outpost,
+        Piken_Square_outpost,
+        Sage_Lands,
+        Mamnoon_Lagoon,
+        Silverwood,
+        Ettins_Back,
+        Reed_Bog,
+        The_Falls,
+        Dry_Top,
+        Tangle_Root,
+        Henge_of_Denravi_outpost,
+        Test_Map_species_art,
+        Senjis_Corner_outpost,
+        Burning_Isle_outpost,
+        Tears_of_the_Fallen,
+        Scoundrels_Rise,
+        Lions_Arch_outpost,
+        Cursed_Lands,
+        Bergen_Hot_Springs_outpost,
+        North_Kryta_Province,
+        Nebo_Terrace,
+        Majestys_Rest,
+        Twin_Serpent_Lakes,
+        Watchtower_Coast,
+        Stingray_Strand,
+        Kessex_Peak,
+        DAlessio_Arena_mission,
+        All_Call_Click_Point_1,
+        Burning_Isle,
+        Frozen_Isle,
+        Nomads_Isle,
+        Druids_Isle,
+        Isle_of_the_Dead_guild_hall,
+        The_Underworld,
+        Riverside_Province,
+        Tournament_6,
+        The_Hall_of_Heroes_arena_mission,
+        Broken_Tower_mission,
+        House_zu_Heltzer_outpost,
+        The_Courtyard_arena_mission,
+        Unholy_Temples_mission,
+        Burial_Mounds_mission,
+        Ascalon_City_outpost,
+        Tomb_of_the_Primeval_Kings,
+        The_Vault_mission,
+        The_Underworld_arena_mission,
+        Ascalon_Arena,
+        Sacred_Temples_mission,
+        Icedome,
+        Iron_Horse_Mine,
+        Anvil_Rock,
+        Lornars_Pass,
+        Snake_Dance,
+        Tascas_Demise,
+        Spearhead_Peak,
+        Ice_Floe,
+        Witmans_Folly,
+        Mineral_Springs,
+        Dreadnoughts_Drift,
+        Frozen_Forest,
+        Travelers_Vale,
+        Deldrimor_Bowl,
+        Regent_Valley,
+        The_Breach,
+        Ascalon_Foothills,
+        Pockmark_Flats,
+        Dragons_Gullet,
+        Flame_Temple_Corridor,
+        Eastern_Frontier,
+        The_Scar,
+        The_Amnoon_Oasis_outpost,
+        Diviners_Ascent,
+        Vulture_Drifts,
+        The_Arid_Sea,
+        Prophets_Path,
+        Salt_Flats,
+        Skyward_Reach,
+        Dunes_of_Despair,
+        Thirsty_River,
+        Elona_Reach,
+        Augury_Rock_mission,
+        The_Dragons_Lair,
+        Perdition_Rock,
+        Ring_of_Fire,
+        Abaddons_Mouth,
+        Hells_Precipice,
+        Titans_Tears,
+        Golden_Gates_mission,
+        Scarred_Earth2,
+        The_Eternal_Grove,
+        Lutgardis_Conservatory_outpost,
+        Vasburg_Armory_outpost,
+        Serenity_Temple_outpost,
+        Ice_Tooth_Cave_outpost,
+        Beacons_Perch_outpost,
+        Yaks_Bend_outpost,
+        Frontier_Gate_outpost,
+        Beetletun_outpost,
+        Fishermens_Haven_outpost,
+        Temple_of_the_Ages,
+        Ventaris_Refuge_outpost,
+        Druids_Overlook_outpost,
+        Maguuma_Stade_outpost,
+        Quarrel_Falls_outpost,
+        Ascalon_Academy_outpost,
+        Gyala_Hatchery,
+        The_Catacombs,
+        Lakeside_County,
+        The_Northlands,
+        Ascalon_City_pre_searing,
+        Ascalon_Academy_PvP_battle_mission_1,
+        Ascalon_Academy_PvP_battle_mission_2,
+        Ascalon_Academy_explorable,
+        Heroes_Audience_outpost,
+        Seekers_Passage_outpost,
+        Destinys_Gorge_outpost,
+        Camp_Rankor_outpost,
+        The_Granite_Citadel_outpost,
+        Marhans_Grotto_outpost,
+        Port_Sledge_outpost,
+        Copperhammer_Mines_outpost,
+        Green_Hills_County,
+        Wizards_Folly,
+        Regent_Valley_pre_Searing,
+        The_Barradin_Estate_outpost,
+        Ashford_Abbey_outpost,
+        Foibles_Fair_outpost,
+        Fort_Ranik_pre_Searing_outpost,
+        Burning_Isle_mission,
+        Druids_Isle_mission,
+        Frozen_Isle_mission = 170,
+        Warriors_Isle_mission,
+        Hunters_Isle_mission,
+        Wizards_Isle_mission,
+        Nomads_Isle_mission,
+        Isle_of_the_Dead_guild_hall_mission,
+        Frozen_Isle_outpost,
+        Nomads_Isle_outpost,
+        Druids_Isle_outpost,
+        Isle_of_the_Dead_guild_hall_outpost,
+        Fort_Koga_mission,
+        Shiverpeak_Arena,
+        Amnoon_Arena_mission,
+        Deldrimor_Arena_mission,
+        The_Crag_mission,
+        The_Underworld_gvg_mission,
+        The_Underworld_guild_hall,
+        The_Underworld_guild_hall_preview,
+        Random_Arenas_outpost,
+        Team_Arenas_outpost,
+        Sorrows_Furnace,
+        Grenths_Footprint,
+        All_Call_Click_Point_2,
+        Cavalon_outpost,
+        Kaineng_Center_outpost,
+        Drazach_Thicket,
+        Jaya_Bluffs,
+        Shenzun_Tunnels,
+        Archipelagos,
+        Maishang_Hills,
+        Mount_Qinkai,
+        Melandrus_Hope,
+        Rheas_Crater,
+        Silent_Surf,
+        Unwaking_Waters_mission,
+        Morostav_Trail,
+        Deldrimor_War_Camp_outpost,
+        Dragons_Thieves,
+        Heroes_Crypt_mission,
+        Mourning_Veil_Falls,
+        Ferndale,
+        Pongmei_Valley,
+        Monastery_Overlook1,
+        Zen_Daijun_outpost_mission,
+        Minister_Chos_Estate_outpost_mission,
+        Vizunah_Square_mission,
+        Nahpui_Quarter_outpost_mission,
+        Tahnnakai_Temple_outpost_mission,
+        Arborstone_outpost_mission,
+        Boreas_Seabed_outpost_mission,
+        Sunjiang_District_outpost_mission,
+        Fort_Aspenwood_mission,
+        The_Eternal_Grove_outpost_mission,
+        The_Jade_Quarry_mission,
+        Gyala_Hatchery_outpost_mission,
+        Raisu_Palace_outpost_mission,
+        Imperial_Sanctum_outpost_mission,
+        Unwaking_Waters,
+        Grenz_Frontier_mission,
+        The_Ancestral_Lands_mission,
+        Amatz_Basin,
+        Kaanai_Canyon_mission,
+        Shadows_Passage,
+        Raisu_Palace,
+        The_Aurios_Mines,
+        Panjiang_Peninsula,
+        Kinya_Province,
+        Haiju_Lagoon,
+        Sunqua_Vale,
+        Wajjun_Bazaar,
+        Bukdek_Byway,
+        The_Undercity,
+        Shing_Jea_Monastery_outpost,
+        Shing_Jea_Arena,
+        Arborstone_explorable,
+        Minister_Chos_Estate_explorable,
+        Zen_Daijun_explorable,
+        Boreas_Seabed_explorable,
+        Great_Temple_of_Balthazar_outpost,
+        Tsumei_Village_outpost,
+        Seitung_Harbor_outpost,
+        Ran_Musu_Gardens_outpost,
+        Linnok_Courtyard,
+        Dwayna_Vs_Grenth,
+        Dwaynas_Camp,
+        Grenths_Camp,
+        Sunjiang_District_explorable,
+        Minister_Chos_Estate_cinematic,
+        Zen_Daijun_cinematic,
+        The_Jade_Quarry_Kurzick_cinematic,
+        Nahpui_Quarter_cinematic,
+        Tahnnaka_Temple_cinematic,
+        Arborstone_cinematic,
+        Boreas_Seabed_cinematic,
+        Sunjiang_District_cinematic,
+        Nahpui_Quarter_explorable,
+        Urgozs_Warren,
+        The_Eternal_Grove_cinematic,
+        Gyala_Hatchery_cinematic,
+        Tahnnakai_Temple_explorable,
+        Raisu_Palace_cinematic,
+        Imperial_Sanctum_cinematic,
+        Altrumm_Ruins,
+        Zos_Shivros_Channel,
+        Dragons_Throat,
+        Isle_of_Weeping_Stone_outpost,
+        Isle_of_Jade_outpost,
+        Harvest_Temple_outpost,
+        Breaker_Hollow_outpost,
+        Leviathan_Pits_outpost,
+        Isle_of_the_Nameless,
+        Zaishen_Challenge_outpost,
+        Zaishen_Elite_outpost,
+        Maatu_Keep_outpost,
+        Zin_Ku_Corridor_outpost,
+        Monastery_Overlook2,
+        Brauer_Academy_outpost,
+        Durheim_Archives_outpost,
+        Bai_Paasu_Reach_outpost,
+        Seafarers_Rest_outpost,
+        Bejunkan_Pier,
+        Vizunah_Square_Local_Quarter_outpost,
+        Vizunah_Square_Foreign_Quarter_outpost,
+        Fort_Aspenwood_Luxon_outpost,
+        Fort_Aspenwood_Kurzick_outpost,
+        The_Jade_Quarry_Luxon_outpost,
+        The_Jade_Quarry_Kurzick_outpost,
+        Unwaking_Waters_Luxon_outpost,
+        Unwaking_Waters_Kurzick_outpost,
+        Saltspray_Beach_mission,
+        Etnaran_Keys_mission,
+        Raisu_Pavilion,
+        Kaineng_Docks,
+        The_Marketplace_outpost,
+        Vizunah_Square_Local_Quarter_cinematic,
+        Vizunah_Square_Foreign_Quarter_cinematic,
+        The_Jade_Quarry_Luxon_cinematic,
+        The_Deep,
+        Ascalon_Arena_mission,
+        Annihilation_mission,
+        Kill_Count_Training_mission,
+        Priest_Annihilation_Training,
+        Obelisk_Annihilation_Training_mission,
+        Saoshang_Trail,
+        Shiverpeak_Arena_mission,
+        Travel_Battle_Isles,
+        Travel_Tyria,
+        Travel_Cantha,
+        DAlessio_Arena_mission3 = 318,
+        Amnoon_Arena_mission3,
+        Fort_Koga_mission3,
+        Heroes_Crypt_mission3,
+        Shiverpeak_Arena_mission3,
+        Fort_Aspenwood_Kurzick_cinematic,
+        Fort_Aspenwood_Luxon_cinematic,
+        The_Harvest_Ceremony_Kurzick_cinematic,
+        The_Harvest_Ceremony_Luxon_cinematic,
+        Imperial_Sanctum_explorable,
+        Saltspray_Beach_Luxon_outpost,
+        Saltspray_Beach_Kurzick_outpost,
+        Heroes_Ascent_outpost,
+        Grenz_Frontier_Luxon_outpost,
+        Grenz_Frontier_Kurzick_outpost,
+        The_Ancestral_Lands_Luxon_outpost,
+        The_Ancestral_Lands_Kurzick_outpost,
+        Etnaran_Keys_Luxon_outpost,
+        Etnaran_Keys_Kurzick_outpost,
+        Kaanai_Canyon_Luxon_outpost,
+        Kaanai_Canyon_Kurzick_outpost,
+        DAlessio_Arena_mission2,
+        Amnoon_Arena_mission2,
+        Fort_Koga_mission2,
+        Heroes_Crypt_mission2,
+        Shiverpeak_Arena_mission2,
+        The_Hall_of_Heroes,
+        The_Courtyard,
+        Scarred_Earth,
+        The_Underworld_PvP,
+        Tanglewood_Copse_outpost,
+        Saint_Anjekas_Shrine_outpost,
+        Eredon_Terrace_outpost,
+        Divine_Path,
+        Brawlers_Pit_mission,
+        Petrified_Arena_mission,
+        Seabed_Arena_mission,
+        Isle_of_Weeping_Stone_mission,
+        Isle_of_Jade_mission,
+        Imperial_Isle_mission,
+        Isle_of_Meditation_mission,
+        Imperial_Isle_outpost,
+        Isle_of_Meditation_outpost,
+        Isle_of_Weeping_Stone,
+        Isle_of_Jade,
+        Imperial_Isle,
+        Isle_of_Meditation,
+        Random_Arenas_Test,
+        Shing_Jea_Arena_mission,
+        All_Skills,
+        Dragon_Arena,
+        Jahai_Bluffs,
+        Kamadan_mission,
+        Marga_Coast,
+        Fahranur_mission,
+        Sunward_Marches,
+        Vortex_Elona,
+        Barbarous_Shore,
+        Camp_Hojanu_outpost,
+        Bahdok_Caverns,
+        Wehhan_Terraces_outpost,
+        Dejarin_Estate,
+        Arkjok_Ward,
+        Yohlon_Haven_outpost,
+        Gandara_the_Moon_Fortress,
+        Vortex_Realm_of_Torment,
+        The_Floodplain_of_Mahnkelon,
+        Lions_Arch_Sunspears_in_Kryta,
+        Turais_Procession,
+        Sunspear_Sanctuary_outpost,
+        Aspenwood_Gate_Kurzick_outpost,
+        Aspenwood_Gate_Luxon_outpost,
+        Jade_Flats_Kurzick_outpost,
+        Jade_Flats_Luxon_outpost,
+        Yatendi_Canyons,
+        Chantry_of_Secrets_outpost,
+        Garden_of_Seborhin,
+        Holdings_of_Chokhin,
+        Mihanu_Township_outpost,
+        Vehjin_Mines,
+        Basalt_Grotto_outpost,
+        Forum_Highlands,
+        Kaineng_Center_Sunspears_in_Cantha,
+        Sebelkeh_Basilica,
+        Resplendent_Makuun,
+        Honur_Hill_outpost,
+        Wilderness_of_Bahdza,
+        Sun_Docks_cinematic,
+        Vehtendi_Valley,
+        Yahnur_Market_outpost,
+        The_Hidden_City_of_Ahdashim = 413,
+        The_Kodash_Bazaar_outpost,
+        Lions_Gate,
+        Monastery_Overlook_cinematic,
+        Bejunkan_Pier_cinematic,
+        Lions_Gate_cinematic,
+        The_Mirror_of_Lyss,
+        Secure_the_Refuge,
+        Venta_Cemetery,
+        Kamadan_Jewel_of_Istan_explorable,
+        The_Tribunal,
+        Kodonur_Crossroads,
+        Rilohn_Refuge,
+        Pogahn_Passage,
+        Moddok_Crevice,
+        Tihark_Orchard,
+        Consulate,
+        Plains_of_Jarin,
+        Sunspear_Great_Hall_outpost,
+        Cliffs_of_Dohjok,
+        Dzagonur_Bastion,
+        Dasha_Vestibule,
+        Grand_Court_of_Sebelkeh,
+        Command_Post,
+        Jokos_Domain,
+        Bone_Palace_outpost,
+        The_Ruptured_Heart,
+        The_Mouth_of_Torment_outpost,
+        The_Shattered_Ravines,
+        Lair_of_the_Forgotten_outpost,
+        Poisoned_Outcrops,
+        The_Sulfurous_Wastes,
+        The_Ebony_Citadel_of_Mallyx_mission,
+        The_Alkali_Pan,
+        A_Land_of_Heroes,
+        Crystal_Overlook,
+        Kamadan_Jewel_of_Istan_outpost,
+        Gate_of_Torment_outpost,
+        Gate_of_Anguish_elite_mission,
+        Secure_the_Refuge_cinematic,
+        Evacuation_cinematic,
+        Test_Map_solo_areas,
+        Nightfallen_Garden,
+        Churrhir_Fields,
+        Beknur_Harbor_outpost,
+        Kodonur_Crossroads_cinematic,
+        Rilohn_Refuge_cinematic,
+        Pogahn_Passage_cinematic,
+        The_Underworld2,
+        Heart_of_Abaddon,
+        The_Underworld3,
+        Nightfallen_Coast,
+        Nightfallen_Jahai,
+        Depths_of_Madness,
+        Rollerbeetle_Racing,
+        Domain_of_Fear,
+        Gate_of_Fear_outpost,
+        Domain_of_Pain,
+        Bloodstone_Fen_quest,
+        Domain_of_Secrets,
+        Gate_of_Secrets_outpost,
+        Domain_of_Anguish,
+        Ooze_Pit_mission,
+        Jennurs_Horde,
+        Nundu_Bay,
+        Gate_of_Desolation,
+        Champions_Dawn_outpost,
+        Ruins_of_Morah,
+        Fahranur_The_First_City,
+        Bjora_Marches,
+        Zehlon_Reach,
+        Lahtenda_Bog,
+        Arbor_Bay,
+        Issnur_Isles,
+        Beknur_Harbor,
+        Mehtani_Keys,
+        Kodlonu_Hamlet_outpost,
+        Island_of_Shehkah,
+        Jokanur_Diggings,
+        Blacktide_Den,
+        Consulate_Docks,
+        Gate_of_Pain,
+        Gate_of_Madness,
+        Abaddons_Gate,
+        Sunspear_Arena,
+        Travel_Elona,
+        Ice_Cliff_Chasms,
+        Bokka_Amphitheatre,
+        Riven_Earth,
+        The_Astralarium_outpost,
+        Throne_of_Secrets,
+        Churranu_Island_Arena_mission,
+        Shing_Jea_Monastery_mission,
+        Haiju_Lagoon_mission,
+        Jaya_Bluffs_mission,
+        Seitung_Harbor_mission,
+        Tsumei_Village_mission,
+        Seitung_Harbor_mission_2,
+        Tsumei_Village_mission_2,
+        Minister_Chos_Estate_mission_2,
+        Drakkar_Lake,
+        Island_of_Shehkah_cinematic,
+        Jokanur_Diggings_cinematic,
+        Blacktide_Den_cinematic,
+        Consulate_Docks_cinematic,
+        Tihark_Orchard_cinematic,
+        Dzagonur_Bastion_cinematic,
+        Hidden_City_of_Ahdashim_cinematic,
+        Grand_Court_of_Sebelkeh_cinematic,
+        Jennurs_Horde_cinematic,
+        Nundu_Bay_cinematic,
+        Gates_of_Desolation_cinematic,
+        Ruins_of_Morah_cinematic,
+        Domain_of_Pain_cinematic,
+        Gate_of_Madness_cinematic,
+        Abaddons_Gate_cinematic,
+        Uncharted_Isle_outpost,
+        Isle_of_Wurms_outpost,
+        Uncharted_Isle,
+        Isle_of_Wurms,
+        Uncharted_Isle_mission,
+        Isle_of_Wurms_mission,
+        Ahmtur_Arena_mission,
+        Sunspear_Arena_mission,
+        Corrupted_Isle_outpost,
+        Isle_of_Solitude_outpost,
+        Corrupted_Isle,
+        Isle_of_Solitude,
+        Corrupted_Isle_mission,
+        Isle_of_Solitude_mission,
+        Sun_Docks,
+        Chahbek_Village,
+        Remains_of_Sahlahja,
+        Jaga_Moraine,
+        Bombardment_mission,
+        Norrhart_Domains,
+        Hero_Battles_outpost,
+        The_Beachhead_mission,
+        The_Crossing_mission,
+        Desert_Sands_mission,
+        Varajar_Fells,
+        Dajkah_Inlet,
+        The_Shadow_Nexus,
+        Chahbek_Village_cutscene,
+        Throne_Of_Secrets_outpost,
+        Sparkfly_Swamp,
+        Gate_of_the_Nightfallen_Lands_outpost,
+        Cathedral_of_Flames_Level_1,
+        The_Troubled_Keeper,
+        Fortress_of_Jahai,
+        Halls_of_Chokhin,
+        Citadel_of_Dzagon,
+        Dynastic_Tombs,
+        Verdant_Cascades,
+        Cathedral_of_Flames_Level_2,
+        Cathedral_of_Flames_Level_3,
+        Magus_Stones,
+        Catacombs_of_Kathandrax_Level_1,
+        Catacombs_of_Kathandrax_Level_2,
+        Alcazia_Tangle,
+        Rragars_Menagerie_Level_1,
+        Rragars_Menagerie_Level_2,
+        Rragars_Menagerie_Level_3,
+        Ooze_Pit,
+        Slavers_Exile_Level_1,
+        Oolas_Lab_Level_1,
+        Oolas_Lab_Level_2,
+        Oolas_Lab_Level_3,
+        Shards_of_Orr_Level_1,
+        Shards_of_Orr_Level_2,
+        Shards_of_Orr_Level_3,
+        Arachnis_Haunt_Level_1,
+        Arachnis_Haunt_Level_2,
+        Five_Team_Test = 592,
+        Fetid_River_mission,
+        Overlook_mission,
+        Cemetery_mission,
+        Forgotten_Shrines_mission,
+        Track_mission,
+        Antechamber_mission,
+        Collision_mission,
+        The_Hall_of_Heroes2,
+        Vloxen_Excavations_Level_1 = 604,
+        Vloxen_Excavations_Level_2,
+        Vloxen_Excavations_Level_3,
+        Heart_of_the_Shiverpeaks_Level_1,
+        Heart_of_the_Shiverpeaks_Level_2,
+        Heart_of_the_Shiverpeaks_Level_3,
+        Bloodstone_Caves_Level_1 = 612,
+        Bloodstone_Caves_Level_2,
+        Bloodstone_Caves_Level_3,
+        Bogroot_Growths_Level_1,
+        Bogroot_Growths_Level_2,
+        Ravens_Point_Level_1,
+        Ravens_Point_Level_2,
+        Ravens_Point_Level_3,
+        Slavers_Exile_Level_2,
+        Slavers_Exile_Level_3,
+        Slavers_Exile_Level_4,
+        Slavers_Exile_Level_5,
+        Vloxs_Falls,
+        Battledepths_Level_1,
+        Battledepths_Level_2,
+        Battledepths_Level_3,
+        Sepulchre_of_Dragrimmar_Level_1,
+        Sepulchre_of_Dragrimmar_Level_2,
+        Frostmaws_Burrows_Level_1,
+        Frostmaws_Burrows_Level_2,
+        Frostmaws_Burrows_Level_3,
+        Frostmaws_Burrows_Level_4,
+        Frostmaws_Burrows_Level_5,
+        Darkrime_Delves_Level_1,
+        Darkrime_Delves_Level_2,
+        Darkrime_Delves_Level_3,
+        Gadds_Encampment_outpost,
+        Umbral_Grotto_outpost,
+        Rata_Sum_outpost,
+        Tarnished_Haven_outpost,
+        Eye_of_the_North_outpost,
+        Sifhalla_outpost,
+        Gunnars_Hold_outpost,
+        Olafstead_outpost,
+        Hall_of_Monuments,
+        Dalada_Uplands,
+        Doomlore_Shrine_outpost,
+        Grothmar_Wardowns,
+        Longeyes_Ledge_outpost,
+        Sacnoth_Valley,
+        Central_Transfer_Chamber_outpost,
+        Curse_of_the_Nornbear,
+        Blood_Washes_Blood,
+        A_Gate_Too_Far_Level_1,
+        A_Gate_Too_Far_Level_2,
+        A_Gate_Too_Far_Level_3,
+        The_Elusive_Golemancer_Level_1,
+        The_Elusive_Golemancer_Level_2,
+        The_Elusive_Golemancer_Level_3,
+        Finding_the_Bloodstone_Level_1,
+        Finding_the_Bloodstone_Level_2,
+        Finding_the_Bloodstone_Level_3,
+        Genius_Operated_Living_Enchanted_Manifestation,
+        Against_the_Charr,
+        Warband_of_Brothers_Level_1,
+        Warband_of_Brothers_Level_2,
+        Warband_of_Brothers_Level_3,
+        Assault_on_the_Stronghold,
+        Destructions_Depths_Level_1,
+        Destructions_Depths_Level_2,
+        Destructions_Depths_Level_3,
+        A_Time_for_Heroes,
+        Warband_Training,
+        Boreal_Station_outpost,
+        Catacombs_of_Kathandrax_Level_3,
+        Hall_of_Primordus,
+        Attack_of_the_Nornbear,
+        Cinematic_Cave_Norn_Cursed,
+        Cinematic_Steppe_Interrogation,
+        Cinematic_Interior_Research,
+        Cinematic_Eye_Vision_A,
+        Cinematic_Eye_Vision_B,
+        Cinematic_Eye_Vision_C,
+        Cinematic_Eye_Vision_D,
+        Polymock_Coliseum,
+        Polymock_Glacier,
+        Polymock_Crossing,
+        Cinematic_Mountain_Resolution,
+        Cold_as_Ice,
+        Beneath_Lions_Arch,
+        Tunnels_Below_Cantha,
+        Caverns_Below_Kamadan,
+        Cinematic_Mountain_Dwarfs,
+        Service_In_Defense_of_the_Eye,
+        Mano_a_Norn_o,
+        Service_Practice_Dummy,
+        Hero_Tutorial,
+        Prototype_Map,
+        The_Norn_Fighting_Tournament = 700,
+        Secret_Lair_of_the_Snowmen,
+        Norn_Brawling_Championship,
+        Kilroys_Punchout_Training,
+        Fronis_Irontoes_Lair_mission,
+        The_Justiciars_End,
+        Designer_Test_Map,
+        The_Great_Norn_Alemoot,
+        Varajar_Fells_Bear_Club_quest,
+        The_Crossing_mission2,
+        Epilogue,
+        Insidious_Remnants,
+        The_Beachhead_mission2,
+        Bombardment_mission2,
+        Desert_Sands_mission2,
+        MISSION_CINEMATIC_MISSION_PACK_TYRIA_INTRODUCTION,
+        The_Battlefield_cinematic,
+        Attack_on_Jaliss_Camp,
+        The_Hierophants_Stronghold_cinematic,
+        The_Asura_Plan_cinematic,
+        Creature_Test_Map,
+        Costume_Brawl_outpost,
+        Whitefury_Rapids_mission,
+        Kysten_Shore_mission,
+        Deepway_Ruins_mission,
+        Plikkup_Works_mission,
+        Kilroys_Punchout_Tournament,
+        Special_Ops_Flame_Temple_Corridor,
+        Special_Ops_Dragons_Gullet,
+        Special_Ops_Grendich_Courthouse,
+        Encounter_in_the_Depths_hom_cinematic,
+        Into_the_North_hom_cinematic,
+        Arrival_at_the_Eye_hom_cinematic,
+        Joras_Curse_hom_cinematic,
+        The_Nornbear_hom_cinematic,
+        Blood_Washes_Blood_hom_cinematic,
+        Joras_Redemption_hom_cinematic,
+        Sign_of_the_Raven_hom_cinematic,
+        Olaf_and_Ogden_hom_cinematic,
+        Audience_with_the_King_hom_cinematic,
+        The_Battlefield_hom_cinematic,
+        The_Charr_Prisoner_hom_cinematic,
+        The_Warband_hom_cinematic,
+        Questions_and_Answers_hom_cinematic,
+        The_Hierophants_Stronghold_hom_cinematic,
+        Revolution_hom_cinematic,
+        The_Asura_Plan_hom_cinematic,
+        Bookah_hom_cinematic,
+        Oola_hom_cinematic,
+        Gadd_hom_cinematic,
+        At_the_Bloodstone_hom_cinematic,
+        Before_the_Battle_hom_cinematic,
+        Price_of_Victory_hom_cinematic,
+        The_Great_Dwarf_hom_cinematic,
+        The_Great_Destroyer_hom_cinematic,
+        Ogdens_Benediction_hom_cinematic,
+        Asura_Gate_Tyria,
+        Asura_Gate_Cantha,
+        Asura_Gate_Elona,
+        Finding_the_Bloodstone_mission,
+        Genius_Operated_Living_Enchanted_Manifestation_mission,
+        Against_the_Charr_mission,
+        Warband_of_brothers_mission,
+        Assault_on_the_Stronghold_mission,
+        Destructions_Depths_mission,
+        A_Time_for_Heroes_mission,
+        Curse_of_the_Nornbear_mission,
+        Blood_Washes_Blood_mission,
+        A_Gate_Too_Far_mission,
+        The_Elusive_Golemancer_mission,
+        The_Tengu_Accords,
+        The_Battle_of_Jahai,
+        The_Flight_North,
+        The_Rise_of_the_White_Mantle,
+        Battle_Isles_Marketplace,
+        MISSION_CINEMATIC_MISSION_PACK_CANTHA_INTRODUCTION,
+        Mission_Pack_Test,
+        MISSION_CINEMATIC_MISSION_PACK_ELONA_INTRODUCTION,
+        MISSION_CINEMATIC_MISSION_PACK_GWX_INTRODUCTION,
+        Piken_Square_pre_Searing_outpost,
+        Secret_Lair_of_the_Snowmen2 = 781,
+        Secret_Lair_of_the_Snowmen3,
+        Droknars_Forge_cinematic,
+        Isle_of_the_Nameless_PvP,
+        Rollerbeetle_Racing_HeroBattles,
+        Dragon_Arena_gvg,
+        Dwayna_vs_Grenth_gvg,
+        Temple_of_the_Ages_ROX,
+        Wajjun_Bazaar_POX,
+        Bokka_Amphitheatre_NOX,
+        Secret_Underground_Lair,
+        Golem_Tutorial_Simulation,
+        Snowball_Dominance,
+        Zaishen_Menagerie_Grounds,
+        Zaishen_Menagerie_outpost,
+        Codex_Arena_outpost,
+        The_Underworld_Something_Wicked_This_Way_Comes = 806,
+        The_Underworld_Dont_Fear_the_Reapers,
+        Lions_Arch_Halloween_outpost,
+        Lions_Arch_Wintersday_outpost,
+        Lions_Arch_Canthan_New_Year_outpost,
+        Ascalon_City_Wintersday_outpost,
+        Droknars_Forge_Halloween_outpost,
+        Droknars_Forge_Wintersday_outpost,
+        Tomb_of_the_Primeval_Kings_Halloween_outpost,
+        Shing_Jea_Monastery_Dragon_Festival_outpost,
+        Shing_Jea_Monastery_Canthan_New_Year_outpost,
+        Kaineng_Center_Canthan_New_Year_outpost,
+        Kamadan_Jewel_of_Istan_Halloween_outpost,
+        Kamadan_Jewel_of_Istan_Wintersday_outpost,
+        Kamadan_Jewel_of_Istan_Canthan_New_Year_outpost,
+        Eye_of_the_North_outpost_Wintersday_outpost,
+        Tester_HUB,
+        DAlessio_Arena_mission4,
+        Amnoon_Arena_mission4,
+        Churranu_Island_Arena_mission2,
+        Fort_Koga_mission4,
+        Petrified_Arena_mission2,
+        Heroes_Crypt_mission4,
+        Seabed_Arena_mission2,
+        Deldrimor_Arena_mission2,
+        Brawlers_Pit_mission2,
+        The_Crag_mission2,
+        Sunspear_Arena_mission2,
+        Shing_Jea_Arena_mission2,
+        Ascalon_Arena_mission2,
+        Shiverpeak_Arena_mission4,
+        War_in_Kryta_Talmark_Wilderness,
+        War_in_Kryta_Trial_of_Zinn,
+        War_in_Kryta_Divinity_Coast,
+        War_in_Kryta_Lions_Arch_Keep,
+        War_in_Kryta_DAlessio_Seaboard,
+        War_in_Kryta_The_Battle_for_Lions_Arch,
+        War_in_Kryta_Riverside_Province,
+        War_in_Kryta_Lions_Arch,
+        War_in_Kryta_The_Mausoleum,
+        War_in_Kryta_Rise,
+        War_in_Kryta_Shadows_in_the_Jungle,
+        War_in_Kryta_A_Vengeance_of_Blades,
+        War_in_Kryta_Auspicious_Beginnings,
+        Beetletun_explorable,
+        Aurora_Glade2,
+        Majestys_Rest2,
+        Watchtower_Coast2,
+        Olafstead_cinematic,
+        The_Great_Snowball_Fight_of_the_Gods__Operation_Crush_Spirits,
+        The_Great_Snowball_Fight_of_the_Gods__Fighting_in_a_Winter_Wonderland,
+        Embark_Beach,
+        Regent_Valley_1059_AE,
+        Lakeside_County_1059_AE,
+        Dragons_Throat_area__What_Waits_in_Shadow = 860,
+        Kaineng_Center_Winds_of_Change__A_Chance_Encounter,
+        The_Marketplace_area__Tracking_the_Corruption,
+        Bukdek_Byway_Winds_of_Change__Cantha_Courier_Crisis,
+        Tsumei_Village_Winds_of_Change__A_Treatys_a_Treaty,
+        Seitung_Harbor_area__Deadly_Cargo,
+        Tahnnakai_Temple_Winds_of_Change__The_Rescue_Attempt,
+        Wajjun_Bazaar_Winds_of_Change__Violence_in_the_Streets,
+        Scarred_Psyche_mission,
+        Shadows_Passage_Winds_of_Change__Calling_All_Thugs,
+        Altrumm_Ruins__Finding_Jinnai,
+        Shing_Jea_Monastery__Raid_on_Shing_Jea_Monastery,
+        Kaineng_Center_Winds_of_Change__Raid_on_Kaineng_Center,
+        Wajjun_Bazaar_Winds_of_Change__Ministry_of_Oppression,
+        The_Final_Confrontation,
+        Lakeside_County_1070_AE,
+        Ashford_Catacombs_1070_AE,
+        Count = 0x370,
+    }
+
+    public enum MaterialSlot : uint
+    {
+        Bone,
+        IronIngot,
+        TannedHideSquare,
+        Scale,
+        ChitinFragment,
+        BoltofCloth,
+        WoodPlank,
+        GraniteSlab = 8,
+        PileofGlitteringDust,
+        PlantFiber,
+        Feather,
+        FurSquare,
+        BoltofLinen,
+        BoltofDamask,
+        BoltofSilk,
+        GlobofEctoplasm,
+        SteelIngot,
+        DeldrimorSteelIngot,
+        MonstrousClaw,
+        MonstrousEye,
+        MonstrousFang,
+        Ruby,
+        Sapphire,
+        Diamond,
+        OnyxGemstone,
+        LumpofCharcoal,
+        ObsidianShard,
+        TemperedGlassVial = 29,
+        LeatherSquare,
+        ElonianLeatherSquare,
+        VialofInk,
+        RollofParchment,
+        RollofVellum,
+        SpiritwoodPlank,
+        AmberChunk,
+        JadeiteShard,
+        BronzeZCoin,
+        SilverZCoin,
+        GoldZCoin,
+        Count,
+    }
+
+    public enum Profession : uint
+    {
+        None,
+        Warrior,
+        Ranger,
+        Monk,
+        Necromancer,
+        Mesmer,
+        Elementalist,
+        Assassin,
+        Ritualist,
+        Paragon,
+        Dervish,
+    }
+
+    public enum ProfessionByte : byte
+    {
+        None,
+        Warrior,
+        Ranger,
+        Monk,
+        Necromancer,
+        Mesmer,
+        Elementalist,
+        Assassin,
+        Ritualist,
+        Paragon,
+        Dervish,
+    }
+
+    public enum QuestID : uint
+    {
+        None = 0,
+        UW_Chamber = 101,
+        UW_Wastes,
+        UW_UWG,
+        UW_Mnt,
+        UW_Pits,
+        UW_Planes,
+        UW_Pools,
+        UW_Escort,
+        UW_Restore,
+        UW_Vale,
+        Fow_Defend = 202,
+        Fow_ArmyOfDarknesses,
+        Fow_WailingLord,
+        Fow_Griffons,
+        Fow_Slaves,
+        Fow_Restore,
+        Fow_Hunt,
+        Fow_Forgemaster,
+        Fow_Tos = 211,
+        Fow_Toc,
+        Fow_Khobay = 224,
+        Doa_DeathbringerCompany = 749,
+        Doa_RiftBetweenUs = 752,
+        Doa_ToTheRescue = 753,
+        Doa_City = 751,
+        Doa_BreachingStygianVeil = 742,
+        Doa_BroodWars = 755,
+        Doa_FoundryBreakout = 743,
+        Doa_FoundryOfFailedCreations = 744,
+        The_Last_Hierophant = 917,
+        ZaishenMission_The_Great_Northern_Wall = 936,
+        ZaishenMission_Fort_Ranik = 937,
+        ZaishenMission_Ruins_of_Surmia = 938,
+        ZaishenMission_Nolani_Academy = 939,
+        ZaishenMission_Borlis_Pass = 940,
+        ZaishenMission_The_Frost_Gate = 941,
+        ZaishenMission_Gates_of_Kryta = 942,
+        ZaishenMission_DAlessio_Seaboard = 943,
+        ZaishenMission_Divinity_Coast = 944,
+        ZaishenMission_The_Wilds = 945,
+        ZaishenMission_Bloodstone_Fen = 946,
+        ZaishenMission_Aurora_Glade = 947,
+        ZaishenMission_Riverside_Province = 948,
+        ZaishenMission_Sanctum_Cay = 949,
+        ZaishenMission_Dunes_of_Despair = 950,
+        ZaishenMission_Thirsty_River = 951,
+        ZaishenMission_Elona_Reach = 952,
+        ZaishenMission_Augury_Rock = 953,
+        ZaishenMission_The_Dragons_Lair = 954,
+        ZaishenMission_Ice_Caves_of_Sorrow = 955,
+        ZaishenMission_Iron_Mines_of_Moladune = 956,
+        ZaishenMission_Thunderhead_Keep = 957,
+        ZaishenMission_Ring_of_Fire = 958,
+        ZaishenMission_Abaddons_Mouth = 959,
+        ZaishenMission_Hells_Precipice = 960,
+        ZaishenMission_Minister_Chos_Estate = 1119,
+        ZaishenMission_Zen_Daijun = 961,
+        ZaishenMission_Vizunah_Square = 962,
+        ZaishenMission_Nahpui_Quarter = 963,
+        ZaishenMission_Tahnnakai_Temple = 964,
+        ZaishenMission_Arborstone = 965,
+        ZaishenMission_Boreas_Seabed = 966,
+        ZaishenMission_Sunjiang_District = 967,
+        ZaishenMission_The_Eternal_Grove = 968,
+        ZaishenMission_Gyala_Hatchery = 970,
+        ZaishenMission_Unwaking_Waters = 969,
+        ZaishenMission_Raisu_Palace = 971,
+        ZaishenMission_Imperial_Sanctum = 972,
+        ZaishenMission_Chahbek_Village = 978,
+        ZaishenMission_Jokanur_Diggings = 979,
+        ZaishenMission_Blacktide_Den = 980,
+        ZaishenMission_Consulate_Docks = 981,
+        ZaishenMission_Venta_Cemetery = 982,
+        ZaishenMission_Kodonur_Crossroads = 983,
+        ZaishenMission_Pogahn_Passage = 1181,
+        ZaishenMission_Rilohn_Refuge = 984,
+        ZaishenMission_Moddok_Crevice = 985,
+        ZaishenMission_Tihark_Orchard = 986,
+        ZaishenMission_Dasha_Vestibule = 988,
+        ZaishenMission_Dzagonur_Bastion = 987,
+        ZaishenMission_Grand_Court_of_Sebelkeh = 989,
+        ZaishenMission_Jennurs_Horde = 990,
+        ZaishenMission_Nundu_Bay = 991,
+        ZaishenMission_Gate_of_Desolation = 992,
+        ZaishenMission_Ruins_of_Morah = 993,
+        ZaishenMission_Gate_of_Pain = 994,
+        ZaishenMission_Gate_of_Madness = 995,
+        ZaishenMission_Abaddons_Gate = 996,
+        ZaishenMission_Finding_the_Bloodstone = 1000,
+        ZaishenMission_The_Elusive_Golemancer = 1001,
+        ZaishenMission_G_O_L_E_M = 1002,
+        ZaishenMission_Against_the_Charr = 1003,
+        ZaishenMission_Warband_of_Brothers = 1004,
+        ZaishenMission_Assault_on_the_Stronghold = 1005,
+        ZaishenMission_Curse_of_the_Nornbear = 1006,
+        ZaishenMission_A_Gate_Too_Far = 1008,
+        ZaishenMission_Blood_Washes_Blood = 1007,
+        ZaishenMission_Destructions_Depths = 1009,
+        ZaishenMission_A_Time_for_Heroes = 1010,
+        ZaishenBounty_Urgoz = 1025,
+        ZaishenBounty_Ilsundur_Lord_of_Fire = 1048,
+        ZaishenBounty_Chung_The_Attuned = 1026,
+        ZaishenBounty_Mungri_Magicbox = 1029,
+        ZaishenBounty_The_Stygian_Lords = 1046,
+        ZaishenBounty_Rragar_Maneater = 1049,
+        ZaishenBounty_Murakai_Lady_of_the_Night = 1050,
+        ZaishenBounty_Prismatic_Ooze = 1051,
+        ZaishenBounty_Havok_Soulwail = 1052,
+        ZaishenBounty_Frostmaw_the_Kinslayer = 1053,
+        ZaishenBounty_Remnant_of_Antiquities = 1054,
+        ZaishenBounty_Plague_of_Destruction = 1055,
+        ZaishenBounty_Zoldark_the_Unholy = 1056,
+        ZaishenBounty_Khabuus = 1057,
+        ZaishenBounty_Zhim_Monns = 1058,
+        ZaishenBounty_Eldritch_Ettin = 1059,
+        ZaishenBounty_Fendi_Nin = 1060,
+        ZaishenBounty_TPS_Regulator_Golem = 1061,
+        ZaishenBounty_Arachni = 1062,
+        ZaishenBounty_Forgewight = 1063,
+        ZaishenBounty_Selvetarm = 1064,
+        ZaishenBounty_Justiciar_Thommis = 1065,
+        ZaishenBounty_Rand_Stormweaver = 1066,
+        ZaishenBounty_Duncan_the_Black = 1067,
+        ZaishenBounty_Fronis_Irontoe = 1068,
+        ZaishenBounty_Magmus = 1070,
+        ZaishenBounty_Lord_Khobay = 1086,
+        ZaishenVanquish_Dejarin_Estate = 1201,
+        ZaishenVanquish_Watchtower_Coast = 1202,
+        ZaishenVanquish_Arbor_Bay = 1203,
+        ZaishenVanquish_Barbarous_Shore = 1204,
+        ZaishenVanquish_Deldrimor_Bowl = 1205,
+        ZaishenVanquish_Boreas_Seabed = 1206,
+        ZaishenVanquish_Cliffs_of_Dohjok = 1207,
+        ZaishenVanquish_Diessa_Lowlands = 1208,
+        ZaishenVanquish_Bukdek_Byway = 1209,
+        ZaishenVanquish_Bjora_Marches = 1210,
+        ZaishenVanquish_Crystal_Overlook = 1211,
+        ZaishenVanquish_Diviners_Ascent = 1212,
+        ZaishenVanquish_Dalada_Uplands = 1213,
+        ZaishenVanquish_Drazach_Thicket = 1214,
+        ZaishenVanquish_Fahranur_the_First_City = 1215,
+        ZaishenVanquish_Dragons_Gullet = 1216,
+        ZaishenVanquish_Ferndale = 1217,
+        ZaishenVanquish_Forum_Highlands = 1218,
+        ZaishenVanquish_Dreadnoughts_Drift = 1219,
+        ZaishenVanquish_Drakkar_Lake = 1220,
+        ZaishenVanquish_Dry_Top = 1221,
+        ZaishenVanquish_Tears_of_the_Fallen = 1222,
+        ZaishenVanquish_Gyala_Hatchery = 1223,
+        ZaishenVanquish_Ettins_Back = 1224,
+        ZaishenVanquish_Gandara_the_Moon_Fortress = 1225,
+        ZaishenVanquish_Grothmar_Wardowns = 1226,
+        ZaishenVanquish_Flame_Temple_Corridor = 1227,
+        ZaishenVanquish_Haiju_Lagoon = 1228,
+        ZaishenVanquish_Frozen_Forest = 1229,
+        ZaishenVanquish_Garden_of_Seborhin = 1230,
+        ZaishenVanquish_Grenths_Footprint = 1231,
+        ZaishenVanquish_Jaya_Bluffs = 1232,
+        ZaishenVanquish_Holdings_of_Chokhin = 1233,
+        ZaishenVanquish_Ice_Cliff_Chasms = 1234,
+        ZaishenVanquish_Griffons_Mouth = 1235,
+        ZaishenVanquish_Kinya_Province = 1236,
+        ZaishenVanquish_Issnur_Isles = 1237,
+        ZaishenVanquish_Jaga_Moraine = 1238,
+        ZaishenVanquish_Ice_Floe = 1239,
+        ZaishenVanquish_Maishang_Hills = 1240,
+        ZaishenVanquish_Jahai_Bluffs = 1241,
+        ZaishenVanquish_Riven_Earth = 1242,
+        ZaishenVanquish_Icedome = 1243,
+        ZaishenVanquish_Minister_Chos_Estate = 1244,
+        ZaishenVanquish_Mehtani_Keys = 1245,
+        ZaishenVanquish_Sacnoth_Valley = 1246,
+        ZaishenVanquish_Iron_Horse_Mine = 1247,
+        ZaishenVanquish_Morostav_Trail = 1248,
+        ZaishenVanquish_Plains_of_Jarin = 1249,
+        ZaishenVanquish_Sparkfly_Swamp = 1250,
+        ZaishenVanquish_Kessex_Peak = 1251,
+        ZaishenVanquish_Mourning_Veil_Falls = 1252,
+        ZaishenVanquish_The_Alkali_Pan = 1253,
+        ZaishenVanquish_Varajar_Fells = 1254,
+        ZaishenVanquish_Lornars_Pass = 1255,
+        ZaishenVanquish_Pongmei_Valley = 1256,
+        ZaishenVanquish_The_Floodplain_of_Mahnkelon = 1257,
+        ZaishenVanquish_Verdant_Cascades = 1258,
+        ZaishenVanquish_Majestys_Rest = 1259,
+        ZaishenVanquish_Raisu_Palace = 1260,
+        ZaishenVanquish_The_Hidden_City_of_Ahdashim = 1261,
+        ZaishenVanquish_Rheas_Crater = 1262,
+        ZaishenVanquish_Mamnoon_Lagoon = 1263,
+        ZaishenVanquish_Shadows_Passage = 1264,
+        ZaishenVanquish_The_Mirror_of_Lyss = 1265,
+        ZaishenVanquish_Saoshang_Trail = 1266,
+        ZaishenVanquish_Nebo_Terrace = 1267,
+        ZaishenVanquish_Shenzun_Tunnels = 1268,
+        ZaishenVanquish_The_Ruptured_Heart = 1269,
+        ZaishenVanquish_Salt_Flats = 1270,
+        ZaishenVanquish_North_Kryta_Province = 1271,
+        ZaishenVanquish_Silent_Surf = 1272,
+        ZaishenVanquish_The_Shattered_Ravines = 1273,
+        ZaishenVanquish_Scoundrels_Rise = 1274,
+        ZaishenVanquish_Old_Ascalon = 1275,
+        ZaishenVanquish_Sunjiang_District = 1276,
+        ZaishenVanquish_The_Sulphurous_Wastes = 1277,
+        ZaishenVanquish_Magus_Stones = 1278,
+        ZaishenVanquish_Perdition_Rock = 1279,
+        ZaishenVanquish_Sunqua_Vale = 1280,
+        ZaishenVanquish_Turais_Procession = 1281,
+        ZaishenVanquish_Norrhart_Domains = 1282,
+        ZaishenVanquish_Pockmark_Flats = 1283,
+        ZaishenVanquish_Tahnnakai_Temple = 1284,
+        ZaishenVanquish_Vehjin_Mines = 1285,
+        ZaishenVanquish_Poisoned_Outcrops = 1286,
+        ZaishenVanquish_Prophets_Path = 1287,
+        ZaishenVanquish_The_Eternal_Grove = 1288,
+        ZaishenVanquish_Tascas_Demise = 1289,
+        ZaishenVanquish_Respendent_Makuun = 1290,
+        ZaishenVanquish_Reed_Bog = 1291,
+        ZaishenVanquish_Unwaking_Waters = 1292,
+        ZaishenVanquish_Stingray_Strand = 1293,
+        ZaishenVanquish_Sunward_Marches = 1294,
+        ZaishenVanquish_Regent_Valley = 1295,
+        ZaishenVanquish_Wajjun_Bazaar = 1296,
+        ZaishenVanquish_Yatendi_Canyons = 1297,
+        ZaishenVanquish_Twin_Serpent_Lakes = 1298,
+        ZaishenVanquish_Sage_Lands = 1299,
+        ZaishenVanquish_Xaquang_Skyway = 1300,
+        ZaishenVanquish_Zehlon_Reach = 1301,
+        ZaishenVanquish_Tangle_Root = 1302,
+        ZaishenVanquish_Silverwood = 1303,
+        ZaishenVanquish_Zen_Daijun = 1304,
+        ZaishenVanquish_The_Arid_Sea = 1305,
+        ZaishenVanquish_Nahpui_Quarter = 1306,
+        ZaishenVanquish_Skyward_Reach = 1307,
+        ZaishenVanquish_The_Scar = 1308,
+        ZaishenVanquish_The_Black_Curtain = 1309,
+        ZaishenVanquish_Panjiang_Peninsula = 1310,
+        ZaishenVanquish_Snake_Dance = 1311,
+        ZaishenVanquish_Travelers_Vale = 1312,
+        ZaishenVanquish_The_Breach = 1313,
+        ZaishenVanquish_Lahtenda_Bog = 1314,
+        ZaishenVanquish_Spearhead_Peak = 1315,
+    }
+
+    public enum ServerRegion : int
+    {
+        International = -2,
+        America = 0,
+        Korea,
+        Europe,
+        China,
+        Japan,
+        Unknown = 0xff,
+    }
+
+    public enum SkillID : uint
+    {
+        No_Skill = 0,
+        Healing_Signet,
+        Resurrection_Signet,
+        Signet_of_Capture,
+        BAMPH,
+        Power_Block,
+        Mantra_of_Earth,
+        Mantra_of_Flame,
+        Mantra_of_Frost,
+        Mantra_of_Lightning,
+        Hex_Breaker,
+        Distortion,
+        Mantra_of_Celerity,
+        Mantra_of_Recovery,
+        Mantra_of_Persistence,
+        Mantra_of_Inscriptions,
+        Mantra_of_Concentration,
+        Mantra_of_Resolve,
+        Mantra_of_Signets,
+        Fragility,
+        Confusion,
+        Inspired_Enchantment,
+        Inspired_Hex,
+        Power_Spike,
+        Power_Leak,
+        Power_Drain,
+        Empathy,
+        Shatter_Delusions,
+        Backfire,
+        Blackout,
+        Diversion,
+        Conjure_Phantasm,
+        Illusion_of_Weakness,
+        Illusionary_Weaponry,
+        Sympathetic_Visage,
+        Ignorance,
+        Arcane_Conundrum,
+        Illusion_of_Haste,
+        Channeling,
+        Energy_Surge,
+        Ether_Feast,
+        Ether_Lord,
+        Energy_Burn,
+        Clumsiness,
+        Phantom_Pain,
+        Ethereal_Burden,
+        Guilt,
+        Ineptitude,
+        Spirit_of_Failure,
+        Mind_Wrack,
+        Wastrels_Worry,
+        Shame,
+        Panic,
+        Migraine,
+        Crippling_Anguish,
+        Fevered_Dreams,
+        Soothing_Images,
+        Cry_of_Frustration,
+        Signet_of_Midnight,
+        Signet_of_Weariness,
+        Signet_of_Illusions_beta_version,
+        Leech_Signet,
+        Signet_of_Humility,
+        Keystone_Signet,
+        Mimic,
+        Arcane_Mimicry,
+        Spirit_Shackles,
+        Shatter_Hex,
+        Drain_Enchantment,
+        Shatter_Enchantment,
+        Disappear,
+        Unnatural_Signet_alpha_version,
+        Elemental_Resistance,
+        Physical_Resistance,
+        Echo,
+        Arcane_Echo,
+        Imagined_Burden,
+        Chaos_Storm,
+        Epidemic,
+        Energy_Drain,
+        Energy_Tap,
+        Arcane_Thievery,
+        Mantra_of_Recall,
+        Animate_Bone_Horror,
+        Animate_Bone_Fiend,
+        Animate_Bone_Minions,
+        Grenths_Balance,
+        Veratas_Gaze,
+        Veratas_Aura,
+        Deathly_Chill,
+        Veratas_Sacrifice,
+        Well_of_Power,
+        Well_of_Blood,
+        Well_of_Suffering,
+        Well_of_the_Profane,
+        Putrid_Explosion,
+        Soul_Feast,
+        Necrotic_Traversal,
+        Consume_Corpse,
+        Parasitic_Bond,
+        Soul_Barbs,
+        Barbs,
+        Shadow_Strike,
+        Price_of_Failure,
+        Death_Nova,
+        Deathly_Swarm,
+        Rotting_Flesh,
+        Virulence,
+        Suffering,
+        Life_Siphon,
+        Unholy_Feast,
+        Awaken_the_Blood,
+        Desecrate_Enchantments,
+        Tainted_Flesh,
+        Aura_of_the_Lich,
+        Blood_Renewal,
+        Dark_Aura,
+        Enfeeble,
+        Enfeebling_Blood,
+        Blood_is_Power,
+        Blood_of_the_Master,
+        Spiteful_Spirit,
+        Malign_Intervention,
+        Insidious_Parasite,
+        Spinal_Shivers,
+        Wither,
+        Life_Transfer,
+        Mark_of_Subversion,
+        Soul_Leech,
+        Defile_Flesh,
+        Demonic_Flesh,
+        Barbed_Signet,
+        Plague_Signet,
+        Dark_Pact,
+        Order_of_Pain,
+        Faintheartedness,
+        Shadow_of_Fear,
+        Rigor_Mortis,
+        Dark_Bond,
+        Infuse_Condition,
+        Malaise,
+        Rend_Enchantments,
+        Lingering_Curse,
+        Strip_Enchantment,
+        Chilblains,
+        Signet_of_Agony,
+        Offering_of_Blood,
+        Dark_Fury,
+        Order_of_the_Vampire,
+        Plague_Sending,
+        Mark_of_Pain,
+        Feast_of_Corruption,
+        Taste_of_Death,
+        Vampiric_Gaze,
+        Plague_Touch,
+        Vile_Touch,
+        Vampiric_Touch,
+        Blood_Ritual,
+        Touch_of_Agony,
+        Weaken_Armor,
+        Windborne_Speed,
+        Lightning_Storm,
+        Gale,
+        Whirlwind,
+        Elemental_Attunement,
+        Armor_of_Earth,
+        Kinetic_Armor,
+        Eruption,
+        Magnetic_Aura,
+        Earth_Attunement,
+        Earthquake,
+        Stoning,
+        Stone_Daggers,
+        Grasping_Earth,
+        Aftershock,
+        Ward_Against_Elements,
+        Ward_Against_Melee,
+        Ward_Against_Foes,
+        Ether_Prodigy,
+        Incendiary_Bonds,
+        Aura_of_Restoration,
+        Ether_Renewal,
+        Conjure_Flame,
+        Inferno,
+        Fire_Attunement,
+        Mind_Burn,
+        Fireball,
+        Meteor,
+        Flame_Burst,
+        Rodgorts_Invocation,
+        Mark_of_Rodgort,
+        Immolate,
+        Meteor_Shower,
+        Phoenix,
+        Flare,
+        Lava_Font,
+        Searing_Heat,
+        Fire_Storm,
+        Glyph_of_Elemental_Power,
+        Glyph_of_Energy,
+        Glyph_of_Lesser_Energy,
+        Glyph_of_Concentration,
+        Glyph_of_Sacrifice,
+        Glyph_of_Renewal,
+        Rust,
+        Lightning_Surge,
+        Armor_of_Frost,
+        Conjure_Frost,
+        Water_Attunement,
+        Mind_Freeze,
+        Ice_Prison,
+        Ice_Spikes,
+        Frozen_Burst,
+        Shard_Storm,
+        Ice_Spear,
+        Maelstrom,
+        Iron_Mist,
+        Crystal_Wave,
+        Obsidian_Flesh,
+        Obsidian_Flame,
+        Blinding_Flash,
+        Conjure_Lightning,
+        Lightning_Strike,
+        Chain_Lightning,
+        Enervating_Charge,
+        Air_Attunement,
+        Mind_Shock,
+        Glimmering_Mark,
+        Thunderclap,
+        Lightning_Orb,
+        Lightning_Javelin,
+        Shock,
+        Lightning_Touch,
+        Swirling_Aura,
+        Deep_Freeze,
+        Blurred_Vision,
+        Mist_Form,
+        Water_Trident,
+        Armor_of_Mist,
+        Ward_Against_Harm,
+        Smite,
+        Life_Bond,
+        Balthazars_Spirit,
+        Strength_of_Honor,
+        Life_Attunement,
+        Protective_Spirit,
+        Divine_Intervention,
+        Symbol_of_Wrath,
+        Retribution,
+        Holy_Wrath,
+        Essence_Bond,
+        Scourge_Healing,
+        Banish,
+        Scourge_Sacrifice,
+        Vigorous_Spirit,
+        Watchful_Spirit,
+        Blessed_Aura,
+        Aegis,
+        Guardian,
+        Shield_of_Deflection,
+        Aura_of_Faith,
+        Shield_of_Regeneration,
+        Shield_of_Judgment,
+        Protective_Bond,
+        Pacifism,
+        Amity,
+        Peace_and_Harmony,
+        Judges_Insight,
+        Unyielding_Aura,
+        Mark_of_Protection,
+        Life_Barrier,
+        Zealots_Fire,
+        Balthazars_Aura,
+        Spell_Breaker,
+        Healing_Seed,
+        Mend_Condition,
+        Restore_Condition,
+        Mend_Ailment,
+        Purge_Conditions,
+        Divine_Healing,
+        Heal_Area,
+        Orison_of_Healing,
+        Word_of_Healing,
+        Dwaynas_Kiss,
+        Divine_Boon,
+        Healing_Hands,
+        Heal_Other,
+        Heal_Party,
+        Healing_Breeze,
+        Vital_Blessing,
+        Mending,
+        Live_Vicariously,
+        Infuse_Health,
+        Signet_of_Devotion,
+        Signet_of_Judgment,
+        Purge_Signet,
+        Bane_Signet,
+        Blessed_Signet,
+        Martyr,
+        Shielding_Hands,
+        Contemplation_of_Purity,
+        Remove_Hex,
+        Smite_Hex,
+        Convert_Hexes,
+        Light_of_Dwayna,
+        Resurrect,
+        Rebirth,
+        Reversal_of_Fortune,
+        Succor,
+        Holy_Veil,
+        Divine_Spirit,
+        Draw_Conditions,
+        Holy_Strike,
+        Healing_Touch,
+        Restore_Life,
+        Vengeance,
+        To_the_Limit,
+        Battle_Rage,
+        Defy_Pain,
+        Rush,
+        Hamstring,
+        Wild_Blow,
+        Power_Attack,
+        Desperation_Blow,
+        Thrill_of_Victory,
+        Distracting_Blow,
+        Protectors_Strike,
+        Griffons_Sweep,
+        Pure_Strike,
+        Skull_Crack,
+        Cyclone_Axe,
+        Hammer_Bash,
+        Bulls_Strike,
+        I_Will_Avenge_You,
+        Axe_Rake,
+        Cleave,
+        Executioners_Strike,
+        Dismember,
+        Eviscerate,
+        Penetrating_Blow,
+        Disrupting_Chop,
+        Swift_Chop,
+        Axe_Twist,
+        For_Great_Justice,
+        Flurry,
+        Defensive_Stance,
+        Frenzy,
+        Endure_Pain,
+        Watch_Yourself,
+        Sprint,
+        Belly_Smash,
+        Mighty_Blow,
+        Crushing_Blow,
+        Crude_Swing,
+        Earth_Shaker,
+        Devastating_Hammer,
+        Irresistible_Blow,
+        Counter_Blow,
+        Backbreaker,
+        Heavy_Blow,
+        Staggering_Blow,
+        Dolyak_Signet,
+        Warriors_Cunning,
+        Shield_Bash,
+        Charge,
+        Victory_Is_Mine,
+        Fear_Me,
+        Shields_Up,
+        I_Will_Survive,
+        Dont_Believe_Their_Lies,
+        Berserker_Stance,
+        Balanced_Stance,
+        Gladiators_Defense,
+        Deflect_Arrows,
+        Warriors_Endurance,
+        Dwarven_Battle_Stance,
+        Disciplined_Stance,
+        Wary_Stance,
+        Shield_Stance,
+        Bulls_Charge,
+        Bonettis_Defense,
+        Hundred_Blades,
+        Sever_Artery,
+        Galrath_Slash,
+        Gash,
+        Final_Thrust,
+        Seeking_Blade,
+        Riposte,
+        Deadly_Riposte,
+        Flourish,
+        Savage_Slash,
+        Hunters_Shot,
+        Pin_Down,
+        Crippling_Shot,
+        Power_Shot,
+        Barrage,
+        Dual_Shot,
+        Quick_Shot,
+        Penetrating_Attack,
+        Distracting_Shot,
+        Precision_Shot,
+        Splinter_Shot_monster_skill,
+        Determined_Shot,
+        Called_Shot,
+        Poison_Arrow,
+        Oath_Shot,
+        Debilitating_Shot,
+        Point_Blank_Shot,
+        Concussion_Shot,
+        Punishing_Shot,
+        Call_of_Ferocity,
+        Charm_Animal,
+        Call_of_Protection,
+        Call_of_Elemental_Protection,
+        Call_of_Vitality,
+        Call_of_Haste,
+        Call_of_Healing,
+        Call_of_Resilience,
+        Call_of_Feeding,
+        Call_of_the_Hunter,
+        Call_of_Brutality,
+        Call_of_Disruption,
+        Revive_Animal,
+        Symbiotic_Bond,
+        Throw_Dirt,
+        Dodge,
+        Savage_Shot,
+        Antidote_Signet,
+        Incendiary_Arrows,
+        Melandrus_Arrows,
+        Marksmans_Wager,
+        Ignite_Arrows,
+        Read_the_Wind,
+        Kindle_Arrows,
+        Choking_Gas,
+        Apply_Poison,
+        Comfort_Animal,
+        Bestial_Pounce,
+        Maiming_Strike,
+        Feral_Lunge,
+        Scavenger_Strike,
+        Melandrus_Assault,
+        Ferocious_Strike,
+        Predators_Pounce,
+        Brutal_Strike,
+        Disrupting_Lunge,
+        Troll_Unguent,
+        Otyughs_Cry,
+        Escape,
+        Practiced_Stance,
+        Whirling_Defense,
+        Melandrus_Resilience,
+        Dryders_Defenses,
+        Lightning_Reflexes,
+        Tigers_Fury,
+        Storm_Chaser,
+        Serpents_Quickness,
+        Dust_Trap,
+        Barbed_Trap,
+        Flame_Trap,
+        Healing_Spring,
+        Spike_Trap,
+        Winter,
+        Winnowing,
+        Edge_of_Extinction,
+        Greater_Conflagration,
+        Conflagration,
+        Fertile_Season,
+        Symbiosis,
+        Primal_Echoes,
+        Predatory_Season,
+        Frozen_Soil,
+        Favorable_Winds,
+        High_Winds,
+        Energizing_Wind,
+        Quickening_Zephyr,
+        Natures_Renewal,
+        Muddy_Terrain,
+        Bleeding,
+        Blind,
+        Burning,
+        Crippled,
+        Deep_Wound,
+        Disease,
+        Poison,
+        Dazed,
+        Weakness,
+        Cleansed,
+        Eruption_environment,
+        Fire_Storm_environment,
+        Vital_Blessing_monster_skill,
+        Fount_Of_Maguuma,
+        Healing_Fountain,
+        Icy_Ground,
+        Maelstrom_environment,
+        Mursaat_Tower_skill,
+        Quicksand_environment_effect,
+        Curse_of_the_Bloodstone,
+        Chain_Lightning_environment,
+        Obelisk_Lightning,
+        Tar,
+        Siege_Attack,
+        Resurrect_Party,
+        Scepter_of_Orrs_Aura,
+        Scepter_of_Orrs_Power,
+        Burden_Totem,
+        Splinter_Mine_skill,
+        Entanglement,
+        Dwarven_Powder_Keg,
+        Seed_of_Resurrection,
+        Deafening_Roar,
+        Brutal_Mauling,
+        Crippling_Attack,
+        Charm_Animal_monster_skill,
+        Breaking_Charm,
+        Charr_Buff,
+        Claim_Resource,
+        Claim_Resource1,
+        Claim_Resource2,
+        Claim_Resource3,
+        Claim_Resource4,
+        Claim_Resource5,
+        Claim_Resource6,
+        Claim_Resource7,
+        Dozen_Shot,
+        Nibble,
+        Claim_Resource8,
+        Claim_Resource9,
+        Reflection,
+        Spectral_Agony,
+        Giant_Stomp,
+        Agnars_Rage,
+        Healing_Breeze_Agnars_Rage,
+        Crystal_Haze,
+        Crystal_Bonds,
+        Jagged_Crystal_Skin,
+        Crystal_Hibernation,
+        Stun_Immunity,
+        Invulnerability,
+        Hunger_of_the_Lich,
+        Embrace_the_Pain,
+        Life_Vortex,
+        Oracle_Link,
+        Guardian_Pacify,
+        Soul_Vortex,
+        Soul_Vortex2,
+        Spectral_Agony1,
+        Natural_Resistance,
+        Natural_Resistance1,
+        Guild_Lord_Aura,
+        Critical_Hit_Probability,
+        Stun_on_Critical_Hit,
+        Blood_Splattering,
+        Inanimate_Object,
+        Undead_sensitivity_to_Light,
+        Energy_Boost,
+        Health_Drain,
+        Immunity_to_Critical_Hits,
+        Titans_get_plus_Health_regen_and_set_enemies_on_fire_each_time_he_is_hit,
+        Undying,
+        Resurrect_Gargoyle,
+        Seal_Regen,
+        Lightning_Orb1,
+        Wurm_Siege_Dunes_of_Despair,
+        Wurm_Siege,
+        Claim_Resource10,
+        Shiver_Touch,
+        Spontaneous_Combustion,
+        Vanish,
+        Victory_or_Death,
+        Mark_of_Insecurity,
+        Disrupting_Dagger,
+        Deadly_Paradox,
+        Teleport_Players,
+        Quest_skill_for_Coastal_Exam,
+        Holy_Blessing,
+        Statues_Blessing,
+        Siege_Attack1,
+        Siege_Attack2,
+        Domain_of_Skill_Damage,
+        Domain_of_Energy_Draining,
+        Domain_of_Elements,
+        Domain_of_Health_Draining,
+        Domain_of_Slow,
+        Divine_Fire,
+        Swamp_Water,
+        Janthirs_Gaze,
+        Fake_Spell,
+        Charm_Animal_monster,
+        Stormcaller_skill,
+        Knock,
+        Quest_Skill,
+        Rurik_Must_Live,
+        Blessing_of_the_Kurzicks,
+        Lichs_Phylactery,
+        Restore_Life_monster_skill,
+        Chimera_of_Intensity,
+        Life_Draining = 657,
+        Jaundiced_Gaze = 763,
+        Wail_of_Doom,
+        Heros_Insight,
+        Gaze_of_Contempt,
+        Berserkers_Insight,
+        Slayers_Insight,
+        Vipers_Defense,
+        Return,
+        Aura_of_Displacement,
+        Generous_Was_Tsungrai,
+        Mighty_Was_Vorizun,
+        To_the_Death,
+        Death_Blossom,
+        Twisting_Fangs,
+        Horns_of_the_Ox,
+        Falling_Spider,
+        Black_Lotus_Strike,
+        Fox_Fangs,
+        Moebius_Strike,
+        Jagged_Strike,
+        Unsuspecting_Strike,
+        Entangling_Asp,
+        Mark_of_Death,
+        Iron_Palm,
+        Resilient_Weapon,
+        Blind_Was_Mingson,
+        Grasping_Was_Kuurong,
+        Vengeful_Was_Khanhei,
+        Flesh_of_My_Flesh,
+        Splinter_Weapon,
+        Weapon_of_Warding,
+        Wailing_Weapon,
+        Nightmare_Weapon,
+        Sorrows_Flame,
+        Sorrows_Fist,
+        Blast_Furnace,
+        Beguiling_Haze,
+        Enduring_Toxin,
+        Shroud_of_Silence,
+        Expose_Defenses,
+        Power_Leech,
+        Arcane_Languor,
+        Animate_Vampiric_Horror,
+        Cultists_Fervor,
+        Reapers_Mark = 808,
+        Shatterstone,
+        Protectors_Defense,
+        Run_as_One,
+        Defiant_Was_Xinrae,
+        Lyssas_Aura,
+        Shadow_Refuge,
+        Scorpion_Wire,
+        Mirrored_Stance,
+        Discord,
+        Well_of_Weariness,
+        Vampiric_Spirit,
+        Depravity,
+        Icy_Veins,
+        Weaken_Knees,
+        Burning_Speed,
+        Lava_Arrows,
+        Bed_of_Coals,
+        Shadow_Form,
+        Siphon_Strength,
+        Vile_Miasma,
+        Veratas_Promise,
+        Ray_of_Judgment,
+        Primal_Rage,
+        Animate_Flesh_Golem,
+        Borrowed_Energy,
+        Reckless_Haste,
+        Blood_Bond,
+        Ride_the_Lightning,
+        Energy_Boon,
+        Dwaynas_Sorrow,
+        Retreat,
+        Poisoned_Heart,
+        Fetid_Ground,
+        Arc_Lightning,
+        Gust,
+        Churning_Earth,
+        Liquid_Flame,
+        Steam,
+        Boon_Signet,
+        Reverse_Hex,
+        Lacerating_Chop,
+        Fierce_Blow,
+        Sun_and_Moon_Slash,
+        Splinter_Shot,
+        Melandrus_Shot,
+        Snare,
+        Chomper,
+        Kilroy_Stonekin,
+        Adventurers_Insight,
+        Dancing_Daggers,
+        Conjure_Nightmare,
+        Signet_of_Disruption,
+        Dissipation,
+        Ravenous_Gaze,
+        Order_of_Apostasy,
+        Oppressive_Gaze,
+        Lightning_Hammer,
+        Vapor_Blade,
+        Healing_Light,
+        Aim_True,
+        Coward,
+        Pestilence,
+        Shadowsong,
+        Shadowsong_attack,
+        Resurrect_monster_skill,
+        Consuming_Flames,
+        Chains_of_Enslavement,
+        Signet_of_Shadows,
+        Lyssas_Balance,
+        Visions_of_Regret,
+        Illusion_of_Pain,
+        Stolen_Speed,
+        Ether_Signet,
+        Signet_of_Disenchantment,
+        Vocal_Minority,
+        Searing_Flames,
+        Shield_Guardian,
+        Restful_Breeze,
+        Signet_of_Rejuvenation,
+        Whirling_Axe,
+        Forceful_Blow,
+        Headshot,
+        None_Shall_Pass,
+        Quivering_Blade,
+        Seeking_Arrows,
+        Rampagers_Insight,
+        Hunters_Insight,
+        Amulet_of_Protection,
+        Oath_of_Healing,
+        Overload,
+        Images_of_Remorse,
+        Shared_Burden,
+        Soul_Bind,
+        Blood_of_the_Aggressor,
+        Icy_Prism,
+        Furious_Axe,
+        Auspicious_Blow,
+        On_Your_Knees,
+        Dragon_Slash,
+        Marauders_Shot,
+        Focused_Shot,
+        Spirit_Rift,
+        Union,
+        Blessing_of_the_Kurzicks1,
+        Tranquil_Was_Tanasen,
+        Consume_Soul,
+        Spirit_Light,
+        Lamentation,
+        Rupture_Soul,
+        Spirit_to_Flesh,
+        Spirit_Burn,
+        Destruction,
+        Dissonance,
+        Dissonance_attack,
+        Disenchantment,
+        Disenchantment_attack,
+        Recall,
+        Sharpen_Daggers,
+        Shameful_Fear,
+        Shadow_Shroud,
+        Shadow_of_Haste,
+        Auspicious_Incantation,
+        Power_Return,
+        Complicate,
+        Shatter_Storm,
+        Unnatural_Signet,
+        Rising_Bile,
+        Envenom_Enchantments,
+        Shockwave,
+        Ward_of_Stability,
+        Icy_Shackles,
+        Cry_of_Lament,
+        Blessed_Light,
+        Withdraw_Hexes,
+        Extinguish,
+        Signet_of_Strength,
+        REMOVE_With_Haste,
+        Trappers_Focus,
+        Brambles,
+        Desperate_Strike,
+        Way_of_the_Fox,
+        Shadowy_Burden,
+        Siphon_Speed,
+        Deaths_Charge,
+        Power_Flux,
+        Expel_Hexes,
+        Rip_Enchantment,
+        Energy_Font,
+        Spell_Shield,
+        Healing_Whisper,
+        Ethereal_Light,
+        Release_Enchantments,
+        Lacerate,
+        Spirit_Transfer,
+        Restoration,
+        Vengeful_Weapon,
+        Archemorus_Strike,
+        Spear_of_Archemorus_Level_1,
+        Spear_of_Archemorus_Level_2,
+        Spear_of_Archemorus_Level_3,
+        Spear_of_Archemorus_Level_4,
+        Spear_of_Archemorus_Level_5,
+        Argos_Cry,
+        Jade_Fury,
+        Blinding_Powder,
+        Mantis_Touch,
+        Exhausting_Assault,
+        Repeating_Strike,
+        Way_of_the_Lotus,
+        Mark_of_Instability,
+        Mistrust,
+        Feast_of_Souls,
+        Recuperation,
+        Shelter,
+        Weapon_of_Shadow,
+        Torch_Enchantment,
+        Caltrops,
+        Nine_Tail_Strike,
+        Way_of_the_Empty_Palm,
+        Temple_Strike,
+        Golden_Phoenix_Strike,
+        Expunge_Enchantments,
+        Deny_Hexes,
+        Triple_Chop,
+        Enraged_Smash,
+        Renewing_Smash,
+        Tiger_Stance,
+        Standing_Slash,
+        Famine,
+        Torch_Hex,
+        Torch_Degeneration_Hex,
+        Blinding_Snow,
+        Avalanche_skill,
+        Snowball,
+        Mega_Snowball,
+        Yuletide,
+        Ice_Skates,
+        Ice_Fort,
+        Yellow_Snow,
+        Hidden_Rock,
+        Snow_Down_the_Shirt,
+        Mmmm_Snowcone,
+        Holiday_Blues,
+        Icicles,
+        Ice_Breaker,
+        Lets_Get_Em,
+        Flurry_of_Ice,
+        Snowball_NPC,
+        Undying1,
+        Critical_Eye,
+        Critical_Strike,
+        Blades_of_Steel,
+        Jungle_Strike,
+        Wild_Strike,
+        Leaping_Mantis_Sting,
+        Black_Mantis_Thrust,
+        Disrupting_Stab,
+        Golden_Lotus_Strike,
+        Critical_Defenses,
+        Way_of_Perfection,
+        Dark_Apostasy,
+        Locusts_Fury,
+        Shroud_of_Distress,
+        Heart_of_Shadow,
+        Impale,
+        Seeping_Wound,
+        Assassins_Promise,
+        Signet_of_Malice,
+        Dark_Escape,
+        Crippling_Dagger,
+        Star_Strike,
+        Spirit_Walk,
+        Unseen_Fury,
+        Flashing_Blades,
+        Dash,
+        Dark_Prison,
+        Palm_Strike,
+        Assassin_of_Lyssa,
+        Mesmer_of_Lyssa,
+        Revealed_Enchantment,
+        Revealed_Hex,
+        Disciple_of_Energy,
+        Empathy_Koro,
+        Accumulated_Pain,
+        Psychic_Distraction,
+        Ancestors_Visage,
+        Recurring_Insecurity,
+        Kitahs_Burden,
+        Psychic_Instability,
+        Chaotic_Power,
+        Hex_Eater_Signet,
+        Celestial_Haste,
+        Feedback,
+        Arcane_Larceny,
+        Chaotic_Ward,
+        Favor_of_the_Gods,
+        Dark_Aura_blessing,
+        Spoil_Victor,
+        Lifebane_Strike,
+        Bitter_Chill,
+        Taste_of_Pain,
+        Defile_Enchantments,
+        Shivers_of_Dread,
+        Star_Servant,
+        Necromancer_of_Grenth,
+        Ritualist_of_Grenth,
+        Vampiric_Swarm,
+        Blood_Drinker,
+        Vampiric_Bite,
+        Wallows_Bite,
+        Enfeebling_Touch,
+        Disciple_of_Ice,
+        Teinais_Wind,
+        Shock_Arrow,
+        Unsteady_Ground,
+        Sliver_Armor,
+        Ash_Blast,
+        Dragons_Stomp,
+        Unnatural_Resistance,
+        Second_Wind,
+        Cloak_of_Faith,
+        Smoldering_Embers,
+        Double_Dragon,
+        Disciple_of_the_Air,
+        Teinais_Heat,
+        Breath_of_Fire,
+        Star_Burst,
+        Glyph_of_Essence,
+        Teinais_Prison,
+        Mirror_of_Ice,
+        Teinais_Crystals,
+        Celestial_Storm,
+        Monk_of_Dwayna,
+        Aura_of_the_Grove,
+        Cathedral_Collapse,
+        Miasma,
+        Acid_Trap,
+        Shield_of_Saint_Viktor,
+        Urn_of_Saint_Viktor_Level_1,
+        Urn_of_Saint_Viktor_Level_2,
+        Urn_of_Saint_Viktor_Level_3,
+        Urn_of_Saint_Viktor_Level_4,
+        Urn_of_Saint_Viktor_Level_5,
+        Aura_of_Light,
+        Kirins_Wrath,
+        Spirit_Bond,
+        Air_of_Enchantment,
+        Warriors_Might,
+        Heavens_Delight,
+        Healing_Burst,
+        Kareis_Healing_Circle,
+        Jameis_Gaze,
+        Gift_of_Health,
+        Battle_Fervor,
+        Life_Sheath,
+        Star_Shine,
+        Disciple_of_Fire,
+        Empathic_Removal,
+        Warrior_of_Balthazar,
+        Resurrection_Chant,
+        Word_of_Censure,
+        Spear_of_Light,
+        Stonesoul_Strike,
+        Shielding_Branches,
+        Drunken_Blow,
+        Leviathans_Sweep,
+        Jaizhenju_Strike,
+        Penetrating_Chop,
+        Yeti_Smash,
+        Disciple_of_the_Earth,
+        Ranger_of_Melandru,
+        Storm_of_Swords,
+        You_Will_Die,
+        Auspicious_Parry,
+        Strength_of_the_Oak,
+        Silverwing_Slash,
+        Destroy_Enchantment,
+        Shove,
+        Base_Defense,
+        Carrier_Defense,
+        The_Chalice_of_Corruption,
+        Song_of_the_Mists = 1151,
+        Demonic_Agility,
+        Blessing_of_the_Kirin,
+        Emperor_Degen,
+        Juggernaut_Toss,
+        Aura_of_the_Juggernaut,
+        Star_Shards,
+        Turtle_Shell = 1172,
+        Exposed_Underbelly,
+        Cathedral_Collapse1,
+        Blood_of_zu_Heltzer,
+        Afflicted_Soul_Explosion,
+        Invincibility,
+        Last_Stand,
+        Dark_Chain_Lightning,
+        Seadragon_Health_Trigger,
+        Corrupted_Breath,
+        Renewing_Corruption,
+        Corrupted_Dragon_Spores,
+        Corrupted_Dragon_Scales,
+        Construct_Possession,
+        Siege_Turtle_Attack_The_Eternal_Grove,
+        Siege_Turtle_Attack_Fort_Aspenwood,
+        Siege_Turtle_Attack_Gyala_Hatchery,
+        Of_Royal_Blood,
+        Passage_to_Tahnnakai,
+        Sundering_Attack,
+        Zojuns_Shot,
+        Consume_Spirit,
+        Predatory_Bond,
+        Heal_as_One,
+        Zojuns_Haste,
+        Needling_Shot,
+        Broad_Head_Arrow,
+        Glass_Arrows,
+        Archers_Signet,
+        Savage_Pounce,
+        Enraged_Lunge,
+        Bestial_Mauling,
+        Energy_Drain_effect,
+        Poisonous_Bite,
+        Pounce,
+        Celestial_Stance,
+        Sheer_Exhaustion,
+        Bestial_Fury,
+        Life_Drain,
+        Vipers_Nest,
+        Equinox,
+        Tranquility,
+        Acute_Weakness,
+        Clamor_of_Souls,
+        Ritual_Lord = 1217,
+        Cruel_Was_Daoshen,
+        Protective_Was_Kaolai,
+        Attuned_Was_Songkai,
+        Resilient_Was_Xiko,
+        Lively_Was_Naomei,
+        Anguished_Was_Lingwah,
+        Draw_Spirit,
+        Channeled_Strike,
+        Spirit_Boon_Strike,
+        Essence_Strike,
+        Spirit_Siphon,
+        Explosive_Growth,
+        Boon_of_Creation,
+        Spirit_Channeling,
+        Armor_of_Unfeeling,
+        Soothing_Memories,
+        Mend_Body_and_Soul,
+        Dulled_Weapon,
+        Binding_Chains,
+        Painful_Bond,
+        Signet_of_Creation,
+        Signet_of_Spirits,
+        Soul_Twisting,
+        Celestial_Summoning,
+        Archemorus_Strike_Celestial_Summoning,
+        Shield_of_Saint_Viktor_Celestial_Summoning,
+        Ghostly_Haste,
+        Gaze_from_Beyond,
+        Ancestors_Rage,
+        Pain,
+        Pain_attack,
+        Displacement,
+        Preservation,
+        Life,
+        Earthbind,
+        Bloodsong,
+        Bloodsong_attack,
+        Wanderlust,
+        Wanderlust_attack,
+        Spirit_Light_Weapon,
+        Brutal_Weapon,
+        Guided_Weapon,
+        Meekness,
+        Frigid_Armor,
+        Healing_Ring,
+        Renew_Life,
+        Doom,
+        Wielders_Boon,
+        Soothing,
+        Vital_Weapon,
+        Weapon_of_Quickening,
+        Signet_of_Rage,
+        Fingers_of_Chaos,
+        Echoing_Banishment,
+        Suicidal_Impulse,
+        Impossible_Odds,
+        Battle_Scars,
+        Riposting_Shadows,
+        Meditation_of_the_Reaper,
+        Battle_Cry,
+        Elemental_Defense_Zone,
+        Melee_Defense_Zone,
+        Blessed_Water,
+        Defiled_Water,
+        Stone_Spores,
+        Turret_Arrow,
+        Blood_Flower_skill,
+        Fire_Flower_skill,
+        Poison_Arrow_flower,
+        Haiju_Lagoon_Water,
+        Aspect_of_Exhaustion,
+        Aspect_of_Exposure,
+        Aspect_of_Surrender,
+        Aspect_of_Death,
+        Aspect_of_Soothing,
+        Aspect_of_Pain,
+        Aspect_of_Lethargy,
+        Aspect_of_Depletion_energy_loss,
+        Aspect_of_Failure,
+        Aspect_of_Shadows,
+        Scorpion_Aspect,
+        Aspect_of_Fear,
+        Aspect_of_Depletion_energy_depletion_damage,
+        Aspect_of_Decay,
+        Aspect_of_Torment,
+        Nightmare_Aspect,
+        Spiked_Coral,
+        Shielding_Urn_skill,
+        Extensive_Plague_Exposure,
+        Forests_Binding,
+        Exploding_Spores,
+        Suicide_Energy,
+        Suicide_Health,
+        Nightmare_Refuge,
+        Oni_Health_Lock,
+        Oni_Shadow_Health_Lock,
+        Signet_of_Attainment,
+        Rage_of_the_Sea,
+        Meditation_of_the_Reaper1,
+        Fireball_obelisk = 1318,
+        Final_Thrust1,
+        Sugar_Rush_medium = 1323,
+        Torment_Slash,
+        Spirit_of_the_Festival,
+        Trade_Winds,
+        Dragon_Blast,
+        Imperial_Majesty,
+        Monster_doesnt_get_death_penalty,
+        Twisted_Spikes,
+        Marble_Trap,
+        Shadow_Tripwire,
+        Extend_Conditions,
+        Hypochondria,
+        Wastrels_Demise,
+        Spiritual_Pain,
+        Drain_Delusions,
+        Persistence_of_Memory,
+        Symbols_of_Inspiration,
+        Symbolic_Celerity,
+        Frustration,
+        Tease,
+        Ether_Phantom,
+        Web_of_Disruption,
+        Enchanters_Conundrum,
+        Signet_of_Illusions,
+        Discharge_Enchantment,
+        Hex_Eater_Vortex,
+        Mirror_of_Disenchantment,
+        Simple_Thievery,
+        Animate_Shambling_Horror,
+        Order_of_Undeath,
+        Putrid_Flesh,
+        Feast_for_the_Dead,
+        Jagged_Bones,
+        Contagion,
+        Bloodletting,
+        Ulcerous_Lungs,
+        Pain_of_Disenchantment,
+        Mark_of_Fury,
+        Recurring_Scourge,
+        Corrupt_Enchantment,
+        Signet_of_Sorrow,
+        Signet_of_Suffering,
+        Signet_of_Lost_Souls,
+        Well_of_Darkness,
+        Blinding_Surge,
+        Chilling_Winds,
+        Lightning_Bolt,
+        Storm_Djinns_Haste,
+        Stone_Striker,
+        Sandstorm,
+        Stone_Sheath,
+        Ebon_Hawk,
+        Stoneflesh_Aura,
+        Glyph_of_Restoration,
+        Ether_Prism,
+        Master_of_Magic,
+        Glowing_Gaze,
+        Savannah_Heat,
+        Flame_Djinns_Haste,
+        Freezing_Gust,
+        Rocky_Ground,
+        Sulfurous_Haze,
+        Siege_Attack3,
+        Sentry_Trap_skill,
+        Caltrops_monster,
+        Sacred_Branch,
+        Light_of_Seborhin,
+        Judges_Intervention,
+        Supportive_Spirit,
+        Watchful_Healing,
+        Healers_Boon,
+        Healers_Covenant,
+        Balthazars_Pendulum,
+        Words_of_Comfort,
+        Light_of_Deliverance,
+        Scourge_Enchantment,
+        Shield_of_Absorption,
+        Reversal_of_Damage,
+        Mending_Touch,
+        Critical_Chop,
+        Agonizing_Chop,
+        Flail,
+        Charging_Strike,
+        Headbutt,
+        Lions_Comfort,
+        Rage_of_the_Ntouka,
+        Mokele_Smash,
+        Overbearing_Smash,
+        Signet_of_Stamina,
+        Youre_All_Alone,
+        Burst_of_Aggression,
+        Enraging_Charge,
+        Crippling_Slash,
+        Barbarous_Slice,
+        Vial_of_Purified_Water,
+        Disarm_Trap,
+        Feeding_Frenzy_skill,
+        Quake_Of_Ahdashim,
+        Shield_of_Madness,
+        Create_Light_of_Seborhin,
+        Unlock_Cell,
+        Stop_Pump,
+        Shield_of_Madness1 = 1426,
+        Shield_of_Ether,
+        Shield_of_Iron,
+        Shield_of_Strength,
+        Wave_of_Torment,
+        Corsairs_Net = 1433,
+        Corrupted_Healing,
+        Corrupted_Roots,
+        Corrupted_Strength,
+        Desert_Wurm_disguise,
+        Junundu_Feast,
+        Junundu_Strike,
+        Junundu_Smash,
+        Junundu_Siege,
+        Junundu_Tunnel,
+        Leave_Junundu,
+        Summon_Torment,
+        Signal_Flare,
+        The_Elixir_of_Strength,
+        Ehzah_from_Above,
+        Last_Rites_of_Torment = 1449,
+        Abaddons_Conspiracy,
+        Hungers_Bite,
+        From_Hell,
+        Pains_Embrace,
+        Call_to_the_Torment,
+        Command_of_Torment,
+        Abaddons_Favor,
+        Abaddons_Chosen,
+        Enchantment_Collapse,
+        Call_of_Sacrifice,
+        Enemies_Must_Die,
+        Earth_Vortex,
+        Frost_Vortex,
+        Rough_Current,
+        Turbulent_Flow,
+        Prepared_Shot,
+        Burning_Arrow,
+        Arcing_Shot,
+        Strike_as_One,
+        Crossfire,
+        Barbed_Arrows,
+        Scavengers_Focus,
+        Toxicity,
+        Quicksand,
+        Storms_Embrace,
+        Trappers_Speed,
+        Tripwire,
+        Kournan_Guardsman,
+        Renewing_Surge,
+        Offering_of_Spirit,
+        Spirits_Gift,
+        Death_Pact_Signet,
+        Reclaim_Essence,
+        Banishing_Strike,
+        Mystic_Sweep,
+        Eremites_Attack,
+        Reap_Impurities,
+        Twin_Moon_Sweep,
+        Victorious_Sweep,
+        Irresistible_Sweep,
+        Pious_Assault,
+        Mystic_Twister,
+        REMOVE_Wind_Prayers_skill,
+        Grenths_Fingers,
+        REMOVE_Boon_of_the_Gods,
+        Aura_of_Thorns,
+        Balthazars_Rage,
+        Dust_Cloak,
+        Staggering_Force,
+        Pious_Renewal,
+        Mirage_Cloak,
+        REMOVE_Balthazars_Rage,
+        Arcane_Zeal,
+        Mystic_Vigor,
+        Watchful_Intervention,
+        Vow_of_Piety,
+        Vital_Boon,
+        Heart_of_Holy_Flame,
+        Extend_Enchantments,
+        Faithful_Intervention,
+        Sand_Shards,
+        Intimidating_Aura_beta_version,
+        Lyssas_Haste,
+        Guiding_Hands,
+        Fleeting_Stability,
+        Armor_of_Sanctity,
+        Mystic_Regeneration,
+        Vow_of_Silence,
+        Avatar_of_Balthazar,
+        Avatar_of_Dwayna,
+        Avatar_of_Grenth,
+        Avatar_of_Lyssa,
+        Avatar_of_Melandru,
+        Meditation,
+        Eremites_Zeal,
+        Natural_Healing,
+        Imbue_Health,
+        Mystic_Healing,
+        Dwaynas_Touch,
+        Pious_Restoration,
+        Signet_of_Pious_Light,
+        Intimidating_Aura,
+        Mystic_Sandstorm,
+        Winds_of_Disenchantment,
+        Rending_Touch,
+        Crippling_Sweep,
+        Wounding_Strike,
+        Wearying_Strike,
+        Lyssas_Assault,
+        Chilling_Victory,
+        Conviction,
+        Enchanted_Haste,
+        Pious_Concentration,
+        Pious_Haste,
+        Whirling_Charge,
+        Test_of_Faith,
+        Blazing_Spear,
+        Mighty_Throw,
+        Cruel_Spear,
+        Harriers_Toss,
+        Unblockable_Throw,
+        Spear_of_Lightning,
+        Wearying_Spear,
+        Anthem_of_Fury,
+        Crippling_Anthem,
+        Defensive_Anthem,
+        Godspeed,
+        Anthem_of_Flame,
+        Go_for_the_Eyes,
+        Anthem_of_Envy,
+        Song_of_Power,
+        Zealous_Anthem,
+        Aria_of_Zeal,
+        Lyric_of_Zeal,
+        Ballad_of_Restoration,
+        Chorus_of_Restoration,
+        Aria_of_Restoration,
+        Song_of_Concentration,
+        Anthem_of_Guidance,
+        Energizing_Chorus,
+        Song_of_Purification,
+        Hexbreaker_Aria,
+        Brace_Yourself,
+        Awe,
+        Enduring_Harmony,
+        Blazing_Finale,
+        Burning_Refrain,
+        Finale_of_Restoration,
+        Mending_Refrain,
+        Purifying_Finale,
+        Bladeturn_Refrain,
+        Glowing_Signet,
+        REMOVE_Leadership_skill,
+        Leaders_Zeal,
+        Leaders_Comfort,
+        Signet_of_Synergy,
+        Angelic_Protection,
+        Angelic_Bond,
+        Cautery_Signet,
+        Stand_Your_Ground,
+        Lead_the_Way,
+        Make_Haste,
+        We_Shall_Return,
+        Never_Give_Up,
+        Help_Me,
+        Fall_Back,
+        Incoming,
+        Theyre_on_Fire,
+        Never_Surrender,
+        Its_Just_a_Flesh_Wound,
+        Barbed_Spear,
+        Vicious_Attack,
+        Stunning_Strike,
+        Merciless_Spear,
+        Disrupting_Throw,
+        Wild_Throw,
+        Curse_of_the_Staff_of_the_Mists,
+        Aura_of_the_Staff_of_the_Mists,
+        Power_of_the_Staff_of_the_Mists,
+        Scepter_of_Ether,
+        Summoning_of_the_Scepter,
+        Rise_From_Your_Grave,
+        Sugar_Rush_long,
+        Corsair_disguise,
+        REMOVE_Queen_Wail,
+        REMOVE_Queen_Armor,
+        Queen_Heal,
+        Queen_Wail,
+        Queen_Armor,
+        Queen_Bite,
+        Queen_Thump,
+        Queen_Siege,
+        Junundu_Tunnel_monster_skill,
+        Skin_of_Stone,
+        Dervish_of_the_Mystic,
+        Dervish_of_the_Wind,
+        Paragon_of_Leadership,
+        Paragon_of_Motivation,
+        Dervish_of_the_Blade,
+        Paragon_of_Command,
+        Paragon_of_the_Spear,
+        Dervish_of_the_Earth,
+        Master_of_DPS,
+        Malicious_Strike,
+        Shattering_Assault,
+        Golden_Skull_Strike,
+        Black_Spider_Strike,
+        Golden_Fox_Strike,
+        Deadly_Haste,
+        Assassins_Remedy,
+        Foxs_Promise,
+        Feigned_Neutrality,
+        Hidden_Caltrops,
+        Assault_Enchantments,
+        Wastrels_Collapse,
+        Lift_Enchantment,
+        Augury_of_Death,
+        Signet_of_Toxic_Shock,
+        Signet_of_Twilight,
+        Way_of_the_Assassin,
+        Shadow_Walk,
+        Deaths_Retreat,
+        Shadow_Prison,
+        Swap,
+        Shadow_Meld,
+        Price_of_Pride,
+        Air_of_Disenchantment,
+        Signet_of_Clumsiness,
+        Symbolic_Posture,
+        Toxic_Chill,
+        Well_of_Silence,
+        Glowstone,
+        Mind_Blast,
+        Elemental_Flame,
+        Invoke_Lightning,
+        Battle_Cry1,
+        Mending_Shrine_Bonus,
+        Energy_Shrine_Bonus,
+        Northern_Health_Shrine_Bonus,
+        Southern_Health_Shrine_Bonus,
+        Siege_Attack_Bombardment,
+        Curse_of_Silence,
+        To_the_Pain_Hero_Battles,
+        Edge_of_Reason,
+        Depths_of_Madness_environment_effect,
+        Cower_in_Fear,
+        Dreadful_Pain,
+        Veiled_Nightmare,
+        Base_Protection,
+        Kournan_Siege_Flame,
+        Drake_Skin,
+        Skale_Vigor,
+        Pahnai_Salad_item_effect,
+        Pensive_Guardian,
+        Scribes_Insight,
+        Holy_Haste,
+        Glimmer_of_Light,
+        Zealous_Benediction,
+        Defenders_Zeal,
+        Signet_of_Mystic_Wrath,
+        Signet_of_Removal,
+        Dismiss_Condition,
+        Divert_Hexes,
+        Counterattack,
+        Magehunter_Strike,
+        Soldiers_Strike,
+        Decapitate,
+        Magehunters_Smash,
+        Soldiers_Stance,
+        Soldiers_Defense,
+        Frenzied_Defense,
+        Steady_Stance,
+        Steelfang_Slash,
+        Sunspear_Battle_Call,
+        Untouchable,
+        Earth_Shattering_Blow,
+        Corrupt_Power,
+        Words_of_Madness_Qwytzylkak,
+        Gaze_of_MoavuKaal,
+        Presence_of_the_Skale_Lord,
+        Madness_Dart,
+        The_Apocrypha_is_changing_to_another_form,
+        Reform_Carvings = 1715,
+        Sunspear_Siege = 1717,
+        Soul_Torture,
+        Screaming_Shot,
+        Keen_Arrow,
+        Rampage_as_One,
+        Forked_Arrow,
+        Disrupting_Accuracy,
+        Experts_Dexterity,
+        Roaring_Winds,
+        Magebane_Shot,
+        Natural_Stride,
+        Hekets_Rampage,
+        Smoke_Trap,
+        Infuriating_Heat,
+        Vocal_Was_Sogolon,
+        Destructive_Was_Glaive,
+        Wielders_Strike,
+        Gaze_of_Fury,
+        Gaze_of_Fury_attack,
+        Spirits_Strength,
+        Wielders_Zeal,
+        Sight_Beyond_Sight,
+        Renewing_Memories,
+        Wielders_Remedy,
+        Ghostmirror_Light,
+        Signet_of_Ghostly_Might,
+        Signet_of_Binding,
+        Caretakers_Charge,
+        Anguish,
+        Anguish_attack,
+        Empowerment,
+        Recovery,
+        Weapon_of_Fury,
+        Xinraes_Weapon,
+        Warmongers_Weapon,
+        Weapon_of_Remedy,
+        Rending_Sweep,
+        Onslaught,
+        Mystic_Corruption,
+        Grenths_Grasp,
+        Veil_of_Thorns,
+        Harriers_Grasp,
+        Vow_of_Strength,
+        Ebon_Dust_Aura,
+        Zealous_Vow,
+        Heart_of_Fury,
+        Zealous_Renewal,
+        Attackers_Insight,
+        Rending_Aura,
+        Featherfoot_Grace,
+        Reapers_Sweep,
+        Harriers_Haste,
+        Focused_Anger,
+        Natural_Temper,
+        Song_of_Restoration,
+        Lyric_of_Purification,
+        Soldiers_Fury,
+        Aggressive_Refrain,
+        Energizing_Finale,
+        Signet_of_Aggression,
+        Remedy_Signet,
+        Signet_of_Return,
+        Make_Your_Time,
+        Cant_Touch_This,
+        Find_Their_Weakness,
+        The_Power_Is_Yours,
+        Slayers_Spear,
+        Swift_Javelin,
+        Natures_Speed,
+        Weapon_of_Mastery,
+        Accelerated_Growth,
+        Forge_the_Way,
+        Anthem_of_Aggression,
+        Skale_Hunt,
+        Mandragor_Hunt,
+        Skree_Battle,
+        Insect_Hunt,
+        Corsair_Bounty,
+        Plant_Hunt,
+        Undead_Hunt,
+        Eternal_Suffering,
+        Eternal_Suffering1,
+        Eternal_Suffering2,
+        Eternal_Languor,
+        Eternal_Languor1,
+        Eternal_Languor2,
+        Eternal_Lethargy,
+        Eternal_Lethargy1,
+        Eternal_Lethargy2,
+        Thirst_of_the_Drought = 1808,
+        Thirst_of_the_Drought1,
+        Thirst_of_the_Drought2,
+        Thirst_of_the_Drought3,
+        Thirst_of_the_Drought4,
+        Lightbringer,
+        Lightbringers_Gaze,
+        Lightbringer_Signet,
+        Sunspear_Rebirth_Signet,
+        Wisdom,
+        Maddened_Strike,
+        Maddened_Stance,
+        Spirit_Form_Remains_of_Sahlahja,
+        Gods_Blessing,
+        Monster_Hunt,
+        Monster_Hunt1,
+        Monster_Hunt2,
+        Monster_Hunt3,
+        Elemental_Hunt,
+        Elemental_Hunt1,
+        Skree_Battle1,
+        Insect_Hunt1,
+        Insect_Hunt2,
+        Demon_Hunt,
+        Minotaur_Hunt,
+        Plant_Hunt1,
+        Plant_Hunt2,
+        Skale_Hunt1,
+        Skale_Hunt2,
+        Heket_Hunt,
+        Heket_Hunt1,
+        Kournan_Bounty,
+        Mandragor_Hunt1,
+        Mandragor_Hunt2,
+        Corsair_Bounty1,
+        Kournan_Bounty1,
+        Dhuum_Battle,
+        Menzies_Battle,
+        Elemental_Hunt2,
+        Monolith_Hunt,
+        Monolith_Hunt1,
+        Margonite_Battle,
+        Monster_Hunt4,
+        Titan_Hunt,
+        Mandragor_Hunt3,
+        Giant_Hunt,
+        Undead_Hunt1,
+        Kournan_Siege,
+        Lose_your_Head,
+        Wandering_Mind,
+        Altar_Buff = 1859,
+        Sugar_Rush_short,
+        Choking_Breath,
+        Junundu_Bite,
+        Blinding_Breath,
+        Burning_Breath,
+        Junundu_Wail,
+        Capture_Point,
+        Approaching_the_Vortex,
+        Avatar_of_Sweetness = 1871,
+        Corrupted_Lands = 1873,
+        Words_of_Madness = 1875,
+        Unknown_Junundu_Ability,
+        Torment_Slash_Smothering_Tendrils = 1880,
+        Bonds_of_Torment,
+        Shadow_Smash,
+        Bonds_of_Torment_effect,
+        Consume_Torment,
+        Banish_Enchantment,
+        Summoning_Shadows,
+        Lightbringers_Insight,
+        Repressive_Energy = 1889,
+        Enduring_Torment,
+        Shroud_of_Darkness,
+        Demonic_Miasma,
+        Enraged,
+        Touch_of_Aaaaarrrrrrggghhh,
+        Wild_Smash,
+        Unyielding_Anguish,
+        Jadoths_Storm_of_Judgment,
+        Anguish_Hunt,
+        Avatar_of_Holiday_Cheer,
+        Side_Step,
+        Jack_Frost,
+        Avatar_of_Grenth_snow_fighting_skill,
+        Avatar_of_Dwayna_snow_fighting_skill,
+        Steady_Aim,
+        Rudis_Red_Nose,
+        Charm_Animal_White_Mantle = 1910,
+        Volatile_Charr_Crystal,
+        Hard_mode,
+        Claim_Resource_Heroes_Ascent,
+        Hard_mode1,
+        Hard_Mode_NPC_Buff,
+        Sugar_Jolt_short,
+        Rollerbeetle_Racer,
+        Ram,
+        Harden_Shell,
+        Rollerbeetle_Dash,
+        Super_Rollerbeetle,
+        Rollerbeetle_Echo,
+        Distracting_Lunge,
+        Rollerbeetle_Blast,
+        Spit_Rocks,
+        Lunar_Blessing,
+        Lucky_Aura,
+        Spiritual_Possession,
+        Water,
+        Pig_Form,
+        Beetle_Metamorphosis,
+        Sugar_Jolt_long = 1933,
+        Golden_Egg_skill,
+        Torturous_Embers,
+        Test_Buff,
+        Infernal_Rage,
+        Putrid_Flames,
+        Shroud_of_Ash,
+        Flame_Call,
+        Torturers_Inferno,
+        Whirling_Fires,
+        Charr_Siege_Attack_What_Must_Be_Done,
+        Charr_Siege_Attack_Against_the_Charr,
+        Birthday_Cupcake_skill,
+        Blessing_of_the_Luxons = 1947,
+        Shadow_Sanctuary_luxon,
+        Ether_Nightmare_luxon,
+        Signet_of_Corruption_luxon,
+        Elemental_Lord_luxon,
+        Selfless_Spirit_luxon,
+        Triple_Shot_luxon,
+        Save_Yourselves_luxon,
+        Aura_of_Holy_Might_luxon,
+        Spear_of_Fury_luxon = 1957,
+        Attribute_Balance,
+        Monster_Hunt5,
+        Monster_Hunt6,
+        Mandragor_Hunt4,
+        Mandragor_Hunt5,
+        Giant_Hunt1,
+        Giant_Hunt2,
+        Skree_Battle2,
+        Skree_Battle3,
+        Insect_Hunt3,
+        Insect_Hunt4,
+        Minotaur_Hunt1,
+        Minotaur_Hunt2,
+        Corsair_Bounty2,
+        Corsair_Bounty3,
+        Plant_Hunt3,
+        Plant_Hunt4,
+        Skale_Hunt3,
+        Skale_Hunt4,
+        Heket_Hunt2,
+        Heket_Hunt3,
+        Kournan_Bounty2,
+        Kournan_Bounty3,
+        Undead_Hunt2,
+        Undead_Hunt3,
+        Fire_Dart,
+        Ice_Dart,
+        Poison_Dart,
+        Vampiric_Assault,
+        Lotus_Strike,
+        Golden_Fang_Strike,
+        Way_of_the_Mantis,
+        Falling_Lotus_Strike,
+        Sadists_Signet,
+        Signet_of_Distraction,
+        Signet_of_Recall,
+        Power_Lock,
+        Waste_Not_Want_Not,
+        Sum_of_All_Fears,
+        Withering_Aura,
+        Cacophony,
+        Winters_Embrace,
+        Earthen_Shackles,
+        Ward_of_Weakness,
+        Glyph_of_Swiftness,
+        Cure_Hex,
+        Smite_Condition,
+        Smiters_Boon,
+        Castigation_Signet,
+        Purifying_Veil,
+        Pulverizing_Smash,
+        Keen_Chop,
+        Knee_Cutter,
+        Grapple,
+        Radiant_Scythe,
+        Grenths_Aura,
+        Signet_of_Pious_Restraint,
+        Farmers_Scythe,
+        Energetic_Was_Lee_Sa,
+        Anthem_of_Weariness,
+        Anthem_of_Disruption,
+        Burning_Ground,
+        Freezing_Ground,
+        Poison_Ground,
+        Fire_Jet,
+        Ice_Jet,
+        Poison_Jet,
+        Lava_Pool,
+        Water_Pool,
+        Fire_Spout,
+        Ice_Spout,
+        Poison_Spout,
+        Dhuum_Battle1,
+        Dhuum_Battle2,
+        Elemental_Hunt3,
+        Elemental_Hunt4,
+        Monolith_Hunt2,
+        Monolith_Hunt3,
+        Margonite_Battle1,
+        Margonite_Battle2,
+        Menzies_Battle1,
+        Menzies_Battle2,
+        Anguish_Hunt1,
+        Titan_Hunt1,
+        Titan_Hunt2,
+        Monster_Hunt7,
+        Monster_Hunt8,
+        Sarcophagus_Spores,
+        Exploding_Barrel,
+        Greater_Hard_Mode_NPC_Buff,
+        Fire_Boulder,
+        Dire_Snowball,
+        Boulder,
+        Summon_Spirits_luxon,
+        Shadow_Fang,
+        Calculated_Risk,
+        Shrinking_Armor,
+        Aneurysm,
+        Wandering_Eye,
+        Foul_Feast,
+        Putrid_Bile,
+        Shell_Shock,
+        Glyph_of_Immolation,
+        Patient_Spirit,
+        Healing_Ribbon,
+        Aura_of_Stability,
+        Spotless_Mind,
+        Spotless_Soul,
+        Disarm,
+        I_Meant_to_Do_That,
+        Rapid_Fire,
+        Sloth_Hunters_Shot,
+        Aura_Slicer,
+        Zealous_Sweep,
+        Pure_Was_Li_Ming,
+        Weapon_of_Aggression,
+        Chest_Thumper,
+        Hasty_Refrain,
+        Drain_Minion,
+        Cracked_Armor,
+        Berserk,
+        Fleshreavers_Escape,
+        Chomp,
+        Twisting_Jaws,
+        Burning_Immunity,
+        Mandragors_Charge,
+        Rock_Slide,
+        Avalanche_effect,
+        Snaring_Web,
+        Ceiling_Collapse,
+        Trample,
+        Wurm_Bile,
+        Ground_Cover,
+        Shadow_Sanctuary_kurzick,
+        Ether_Nightmare_kurzick,
+        Signet_of_Corruption_kurzick,
+        Elemental_Lord_kurzick,
+        Selfless_Spirit_kurzick,
+        Triple_Shot_kurzick,
+        Save_Yourselves_kurzick,
+        Aura_of_Holy_Might_kurzick,
+        Spear_of_Fury_kurzick,
+        Summon_Spirits_kurzick,
+        Critical_Agility,
+        Cry_of_Pain,
+        Necrosis,
+        Intensity,
+        Seed_of_Life,
+        Call_of_the_Eye,
+        Whirlwind_Attack,
+        Never_Rampage_Alone,
+        Eternal_Aura,
+        Vampirism,
+        Vampirism_attack,
+        Theres_Nothing_to_Fear,
+        Ursan_Rage_Blood_Washes_Blood,
+        Ursan_Strike_Blood_Washes_Blood,
+        Sneak_Attack = 2116,
+        Firebomb_Explosion,
+        Firebomb,
+        Shield_of_Fire,
+        Respawn,
+        Marked_For_Death,
+        Spirit_World_Retreat,
+        Long_Claws,
+        Shattered_Spirit,
+        Spirit_Roar,
+        Spirit_Senses,
+        Unseen_Aggression,
+        Volfen_Pounce_Curse_of_the_Nornbear,
+        Volfen_Claw_Curse_of_the_Nornbear,
+        Volfen_Bloodlust_Curse_of_the_Nornbear = 2131,
+        Volfen_Agility_Curse_of_the_Nornbear,
+        Volfen_Blessing_Curse_of_the_Nornbear,
+        Charging_Spirit,
+        Trampling_Ox,
+        Smoke_Powder_Defense,
+        Confusing_Images,
+        Hexers_Vigor,
+        Masochism,
+        Piercing_Trap,
+        Companionship,
+        Feral_Aggression,
+        Disrupting_Shot,
+        Volley,
+        Expert_Focus,
+        Pious_Fury,
+        Crippling_Victory,
+        Sundering_Weapon,
+        Weapon_of_Renewal,
+        Maiming_Spear,
+        Temporal_Sheen,
+        Flux_Overload,
+        A_pool_of_water,
+        Phase_Shield_effect,
+        Phase_Shield_monster_skill,
+        Vitality_Transfer,
+        Golem_Strike,
+        Bloodstone_Slash,
+        Energy_Blast_golem,
+        Chaotic_Energy,
+        Golem_Fire_Shield,
+        The_Way_of_Duty,
+        The_Way_of_Kinship,
+        Diamondshard_Mist_environment_effect,
+        Diamondshard_Grave,
+        The_Way_of_Strength,
+        Diamondshard_Mist,
+        Raven_Blessing_A_Gate_Too_Far,
+        Raven_Flight_A_Gate_Too_Far = 2170,
+        Raven_Shriek_A_Gate_Too_Far,
+        Raven_Swoop_A_Gate_Too_Far,
+        Raven_Talons_A_Gate_Too_Far,
+        Aspect_of_Oak,
+        Long_Claws1,
+        Tremor,
+        Rage_of_the_Jotun,
+        Thundering_Roar,
+        Sundering_Soulcrush,
+        Pyroclastic_Shot,
+        Explosive_Force,
+        Rolling_Shift = 2184,
+        Powder_Keg_Explosion,
+        Signet_of_Deadly_Corruption,
+        Way_of_the_Master,
+        Defile_Defenses,
+        Angorodons_Gaze,
+        Magnetic_Surge,
+        Slippery_Ground,
+        Glowing_Ice,
+        Energy_Blast,
+        Distracting_Strike,
+        Symbolic_Strike,
+        Soldiers_Speed,
+        Body_Blow,
+        Body_Shot,
+        Poison_Tip_Signet,
+        Signet_of_Mystic_Speed,
+        Shield_of_Force,
+        Mending_Grip,
+        Spiritleech_Aura,
+        Rejuvenation,
+        Agony,
+        Ghostly_Weapon,
+        Inspirational_Speech,
+        Burning_Shield,
+        Holy_Spear,
+        Spear_Swipe,
+        Alkars_Alchemical_Acid,
+        Light_of_Deldrimor,
+        Ear_Bite,
+        Low_Blow,
+        Brawling_Headbutt,
+        Dont_Trip,
+        By_Urals_Hammer,
+        Drunken_Master,
+        Great_Dwarf_Weapon,
+        Great_Dwarf_Armor,
+        Breath_of_the_Great_Dwarf,
+        Snow_Storm,
+        Black_Powder_Mine,
+        Summon_Mursaat,
+        Summon_Ruby_Djinn,
+        Summon_Ice_Imp,
+        Summon_Naga_Shaman,
+        Deft_Strike,
+        Signet_of_Infection,
+        Tryptophan_Signet,
+        Ebon_Battle_Standard_of_Courage,
+        Ebon_Battle_Standard_of_Wisdom,
+        Ebon_Battle_Standard_of_Honor,
+        Ebon_Vanguard_Sniper_Support,
+        Ebon_Vanguard_Assassin_Support,
+        Well_of_Ruin,
+        Atrophy,
+        Spear_of_Redemption,
+        Gelatinous_Material_Explosion = 2240,
+        Gelatinous_Corpse_Consumption,
+        Gelatinous_Mutation,
+        Gelatinous_Absorption,
+        Unstable_Ooze_Explosion,
+        Golem_Shrapnel,
+        Unstable_Aura,
+        Unstable_Pulse,
+        Polymock_Power_Drain,
+        Polymock_Block,
+        Polymock_Glyph_of_Concentration,
+        Polymock_Ether_Signet,
+        Polymock_Glyph_of_Power,
+        Polymock_Overload,
+        Polymock_Glyph_Destabilization,
+        Polymock_Mind_Wreck,
+        Order_of_Unholy_Vigor,
+        Order_of_the_Lich,
+        Master_of_Necromancy,
+        Animate_Undead,
+        Polymock_Deathly_Chill,
+        Polymock_Rising_Bile,
+        Polymock_Rotting_Flesh,
+        Polymock_Lightning_Strike,
+        Polymock_Lightning_Orb,
+        Polymock_Lightning_Djinns_Haste,
+        Polymock_Flare,
+        Polymock_Immolate,
+        Polymock_Meteor,
+        Polymock_Ice_Spear,
+        Polymock_Icy_Prison,
+        Polymock_Mind_Freeze,
+        Polymock_Ice_Shard_Storm,
+        Polymock_Frozen_Trident,
+        Polymock_Smite,
+        Polymock_Smite_Hex,
+        Polymock_Bane_Signet,
+        Polymock_Stone_Daggers,
+        Polymock_Obsidian_Flame,
+        Polymock_Earthquake,
+        Polymock_Frozen_Armor,
+        Polymock_Glyph_Freeze,
+        Polymock_Fireball,
+        Polymock_Rodgorts_Invocation,
+        Polymock_Calculated_Risk,
+        Polymock_Recurring_Insecurity,
+        Polymock_Backfire,
+        Polymock_Guilt,
+        Polymock_Lamentation,
+        Polymock_Spirit_Rift,
+        Polymock_Painful_Bond,
+        Polymock_Signet_of_Clumsiness,
+        Polymock_Migraine,
+        Polymock_Glowing_Gaze,
+        Polymock_Searing_Flames,
+        Polymock_Signet_of_Revenge,
+        Polymock_Signet_of_Smiting,
+        Polymock_Stoning,
+        Polymock_Eruption,
+        Polymock_Shock_Arrow,
+        Polymock_Mind_Shock,
+        Polymock_Piercing_Light_Spear,
+        Polymock_Mind_Blast,
+        Polymock_Savannah_Heat,
+        Polymock_Diversion,
+        Polymock_Lightning_Blast,
+        Polymock_Poisoned_Ground,
+        Polymock_Icy_Bonds,
+        Polymock_Sandstorm,
+        Polymock_Banish,
+        Mergoyle_Form,
+        Skale_Form,
+        Gargoyle_Form,
+        Ice_Imp_Form,
+        Fire_Imp_Form,
+        Kappa_Form,
+        Aloe_Seed_Form,
+        Earth_Elemental_Form,
+        Fire_Elemental_Form,
+        Ice_Elemental_Form,
+        Mirage_Iboga_Form,
+        Wind_Rider_Form,
+        Naga_Shaman_Form,
+        Mantis_Dreamweaver_Form,
+        Ruby_Djinn_Form,
+        Gaki_Form,
+        Stone_Rain_Form,
+        Mursaat_Elementalist_Form,
+        Crystal_Shield,
+        Crystal_Snare,
+        Paranoid_Indignation,
+        Searing_Breath,
+        Kraks_Charge,
+        Brawling,
+        Brawling_Block,
+        Brawling_Jab,
+        Brawling_Jab1,
+        Brawling_Straight_Right,
+        Brawling_Hook,
+        Brawling_Hook1,
+        Brawling_Uppercut,
+        Brawling_Combo_Punch,
+        Brawling_Headbutt_Brawling_skill,
+        STAND_UP,
+        Call_of_Destruction,
+        Flame_Jet,
+        Lava_Ground,
+        Lava_Wave,
+        Spirit_Shield = 2349,
+        Summoning_Lord,
+        Charm_Animal_Ashlyn_Spiderfriend,
+        Charr_Siege_Attack_Assault_on_the_Stronghold,
+        Finish_Him,
+        Dodge_This,
+        I_Am_the_Strongest,
+        I_Am_Unstoppable,
+        A_Touch_of_Guile,
+        You_Move_Like_a_Dwarf,
+        You_Are_All_Weaklings,
+        Feel_No_Pain,
+        Club_of_a_Thousand_Bears,
+        Talon_Strike = 2363,
+        Lava_Blast,
+        Thunderfist_Strike,
+        Alkars_Concoction = 2367,
+        Murakais_Consumption,
+        Murakais_Censure,
+        Murakais_Calamity,
+        Murakais_Storm_of_Souls,
+        Edification,
+        Heart_of_the_Norn,
+        Ursan_Blessing,
+        Ursan_Strike,
+        Ursan_Rage,
+        Ursan_Roar,
+        Ursan_Force,
+        Volfen_Blessing,
+        Volfen_Claw,
+        Volfen_Pounce,
+        Volfen_Bloodlust,
+        Volfen_Agility,
+        Raven_Blessing,
+        Raven_Talons,
+        Raven_Swoop,
+        Raven_Shriek,
+        Raven_Flight,
+        Totem_of_Man,
+        Filthy_Explosion,
+        Murakais_Call,
+        Spawn_Pods,
+        Enraged_Blast,
+        Spawn_Hatchling,
+        Ursan_Roar_Blood_Washes_Blood,
+        Ursan_Force_Blood_Washes_Blood,
+        Ursan_Aura,
+        Consume_Flames,
+        Aura_of_the_Great_Destroyer,
+        Destroy_the_Humans,
+        Charr_Flame_Keeper_Form,
+        Titan_Form,
+        Skeletal_Mage_Form,
+        Smoke_Wraith_Form,
+        Bone_Dragon_Form,
+        Dwarven_Arcanist_Form = 2407,
+        Dolyak_Rider_Form,
+        Extract_Inscription,
+        Charr_Shaman_Form,
+        Mindbender,
+        Smooth_Criminal,
+        Technobabble,
+        Radiation_Field,
+        Asuran_Scan,
+        Air_of_Superiority,
+        Mental_Block,
+        Pain_Inverter,
+        Healing_Salve,
+        Ebon_Escape,
+        Weakness_Trap,
+        Winds,
+        Dwarven_Stability,
+        Stout_Hearted,
+        Inscribed_Ettin_Aura,
+        Decipher_Inscriptions,
+        Rebel_Yell,
+        Asuran_Flame_Staff = 2429,
+        Aura_of_the_Bloodstone,
+        Aura_of_the_Bloodstone1,
+        Aura_of_the_Bloodstone2,
+        Haunted_Ground,
+        Asuran_Bodyguard,
+        Asuran_Bodyguard1,
+        Asuran_Bodyguard2,
+        Energy_Channel,
+        Hunt_Rampage,
+        Boss_Bounty = 2440,
+        Hunt_Point_Bonus,
+        Hunt_Point_Bonus1,
+        Hunt_Point_Bonus2,
+        Time_Attack,
+        Dwarven_Raider,
+        Dwarven_Raider1,
+        Dwarven_Raider2,
+        Dwarven_Raider3,
+        Great_Dwarfs_Blessing,
+        Hunt_Rampage1,
+        Boss_Bounty1 = 2452,
+        Hunt_Point_Bonus3,
+        Hunt_Point_Bonus4,
+        Time_Attack1 = 2456,
+        Vanguard_Patrol,
+        Vanguard_Patrol1,
+        Vanguard_Patrol2,
+        Vanguard_Patrol3,
+        Vanguard_Commendation,
+        Hunt_Rampage2,
+        Boss_Bounty2 = 2464,
+        Norn_Hunting_Party = 2469,
+        Norn_Hunting_Party1,
+        Norn_Hunting_Party2,
+        Norn_Hunting_Party3,
+        Strength_of_the_Norn,
+        Hunt_Rampage3,
+        Asuran_Bodyguard3 = 2481,
+        Desperate_Howl,
+        Gloat,
+        Metamorphosis,
+        Inner_Fire,
+        Elemental_Shift,
+        Dryders_Feast,
+        Fungal_Explosion,
+        Blood_Rage,
+        Parasitic_Bite,
+        False_Death,
+        Ooze_Combination,
+        Ooze_Division,
+        Bear_Form,
+        Sweeping_Strikes,
+        Spore_Explosion,
+        Dormant_Husk,
+        Monkey_See_Monkey_Do,
+        Feeding_Frenzy,
+        Tengus_Mimicry,
+        Tongue_Lash,
+        Soulrending_Shriek,
+        Unreliable,
+        Siege_Devourer,
+        Siege_Devourer_Feast,
+        Devourer_Bite,
+        Siege_Devourer_Swipe,
+        Devourer_Siege,
+        HYAHHHHH,
+        HYAHHHHH1,
+        HYAHHHHH2,
+        HYAHHHHH3,
+        Dismount_Siege_Devourer,
+        The_Masters_Mark,
+        The_Snipers_Spear,
+        Mount,
+        Reverse_Polarity_Fire_Shield,
+        Tengus_Gaze,
+        Fix_Monster_Attributes,
+        Armor_of_Salvation_item_effect,
+        Grail_of_Might_item_effect,
+        Essence_of_Celerity_item_effect,
+        Stone_Dwarf_Transformation,
+        Forgewights_Blessing,
+        Selvetarms_Blessing,
+        Thommiss_Blessing,
+        Duncans_Defense,
+        Rands_Attack = 2529,
+        Selvetarms_Attack,
+        Thommiss_Attack,
+        Create_Spore,
+        Invigorating_Mist = 2536,
+        Courageous_Was_Saidra,
+        Animate_Undead_Palawa_Joko,
+        Order_of_Unholy_Vigor_Palawa_Joko,
+        Order_of_the_Lich_Palawa_Joko,
+        Golem_Boosters,
+        Charm_Animal_monster1,
+        Wurm_Siege_Eye_of_the_North,
+        Tongue_Whip,
+        Lit_Torch,
+        Dishonorable,
+        Hard_Mode_Dungeon_Boss,
+        Veteran_Asuran_Bodyguard,
+        Veteran_Dwarven_Raider,
+        Veteran_Vanguard_Patrol,
+        Veteran_Norn_Hunting_Party,
+        Dwarven_Raider4 = 2565,
+        Dwarven_Raider5,
+        Dwarven_Raider6,
+        Dwarven_Raider7,
+        Great_Dwarfs_Blessing1 = 2570,
+        Boss_Bounty3,
+        Hunt_Point_Bonus5 = 2574,
+        Hunt_Point_Bonus6,
+        Hunt_Rampage4,
+        Time_Attack2,
+        Vanguard_Patrol4,
+        Boss_Bounty4 = 2583,
+        Hunt_Point_Bonus7 = 2585,
+        Vanguard_Commendation1 = 2589,
+        Norn_Hunting_Party4 = 2591,
+        Norn_Hunting_Party5,
+        Norn_Hunting_Party6,
+        Norn_Hunting_Party7,
+        Boss_Bounty5 = 2596,
+        Strength_of_the_Norn1 = 2598,
+        Hunt_Point_Bonus8,
+        Hunt_Point_Bonus9 = 2601,
+        Hunt_Rampage5,
+        Time_Attack3,
+        Candy_Corn_skill,
+        Candy_Apple_skill,
+        Anton_Costume_Brawl_disguise,
+        Erys_Vasburg_Costume_Brawl_disguise,
+        Olias_Costume_Brawl_disguise,
+        Argo_Costume_Brawl_disguise,
+        Mhenlo_Costume_Brawl_disguise,
+        Lukas_Costume_Brawl_disguise,
+        Aidan_Costume_Brawl_disguise,
+        Kahmu_Costume_Brawl_disguise,
+        Razah_Costume_Brawl_disguise,
+        Morgahn_Costume_Brawl_disguise,
+        Nika_Costume_Brawl_disguise,
+        Seaguard_Hala_Costume_Brawl_disguise,
+        Livia_Costume_Brawl_disguise,
+        Cynn_Costume_Brawl_disguise,
+        Tahlkora_Costume_Brawl_disguise,
+        Devona_Costume_Brawl_disguise,
+        Zho_Costume_Brawl_disguise,
+        Melonni_Costume_Brawl_disguise,
+        Xandra_Costume_Brawl_disguise,
+        Hayda_Costume_Brawl_disguise,
+        UNUSED_Complicate,
+        UNUSED_Reapers_Mark,
+        UNUSED_Enfeeble,
+        UNUSED_Desecrate_Enchantments,
+        UNUSED_Signet_of_Lost_Souls,
+        UNUSED_Insidious_Parasite,
+        UNUSED_Searing_Flames,
+        UNUSED_Glowing_Gaze,
+        UNUSED_Steam,
+        UNUSED_Flame_Djinns_Haste,
+        UNUSED_Liquid_Flame,
+        UNUSED_Blessed_Light,
+        UNUSED_Shield_of_Absorption,
+        UNUSED_Smite_Condition,
+        UNUSED_Crippling_Slash,
+        UNUSED_Sun_and_Moon_Slash,
+        UNUSED_Enraging_Charge,
+        UNUSED_Tiger_Stance,
+        UNUSED_Burning_Arrow,
+        UNUSED_Natural_Stride,
+        UNUSED_Falling_Lotus_Strike,
+        UNUSED_Anthem_of_Weariness,
+        UNUSED_Pious_Fury,
+        Pie_Induced_Ecstasy,
+        Charm_Animal_Charr_Demolisher,
+        Togo_disguise,
+        Turai_Ossa_disguise,
+        Gwen_disguise,
+        Saul_DAlessio_disguise,
+        Dragon_Empire_Rage,
+        Call_to_the_Spirit_Realm,
+        Call_of_Haste_PvP,
+        Hide,
+        Feign_Death,
+        Flee,
+        Throw_Rock,
+        Nightmarish_Aura,
+        Siege_Strike,
+        Spike_Trap_spell,
+        Barbed_Bomb,
+        Fire_and_Brimstone,
+        Balm_Bomb,
+        Explosives,
+        Rations,
+        Form_Up_and_Advance,
+        Advance,
+        Spectral_Agony_Saul_DAlessio,
+        Stun_Bomb,
+        Banner_of_the_Unseen,
+        Signet_of_the_Unseen,
+        For_Elona,
+        Giant_Stomp_Turai_Ossa,
+        Whirlwind_Attack_Turai_Ossa,
+        Junundu_Siege1,
+        Distortion_Gwen,
+        Shared_Burden_Gwen,
+        Sum_of_All_Fears_Gwen,
+        Castigation_Signet_Saul_DAlessio,
+        Unnatural_Signet_Saul_DAlessio,
+        Dragon_Slash_Turai_Ossa,
+        Essence_Strike_Togo,
+        Spirit_Burn_Togo,
+        Spirit_Rift_Togo,
+        Mend_Body_and_Soul_Togo,
+        Offering_of_Spirit_Togo,
+        Disenchantment_Togo,
+        Fire_Dart1,
+        Corrupted_Haiju_Lagoon_Water = 2698,
+        Journey_to_the_North,
+        Rat_Form = 2701,
+        Ox_Form,
+        Tiger_Form,
+        Rabbit_Form,
+        Dragon_Form,
+        Snake_Form,
+        Horse_Form,
+        Sheep_Form,
+        Monkey_Form,
+        Rooster_Form,
+        Dog_Form,
+        Party_Time,
+        Victory_is_Ours,
+        Dark_Soul_Explosion,
+        Chaotic_Soul_Explosion,
+        Fiery_Soul_Explosion,
+        Rejuvenating_Soul_Explosion,
+        Plague_Spring,
+        Unbalancing_Soul_Explosion,
+        Shadowy_Soul_Explosion,
+        Ethereal_Soul_Explosion,
+        Redemption_of_Purity,
+        Purify_Energy,
+        Purifying_Flame,
+        Purifying_Prayer,
+        Strength_of_Purity,
+        Spring_of_Purity,
+        Way_of_the_Pure,
+        Purify_Soul,
+        Aura_of_Purity,
+        Anthem_of_Purity,
+        Falkens_Fire_Fist,
+        Falken_Quick,
+        Mind_Wrack_PvP,
+        Quickening_Terrain,
+        Massive_Damage,
+        Minion_Apocalypse,
+        Combat_Costume_Assassin = 2739,
+        Combat_Costume_Mesmer,
+        Combat_Costume_Necromancer,
+        Combat_Costume_Elementalist,
+        Combat_Costume_Monk,
+        Combat_Costume_Warrior,
+        Combat_Costume_Ranger,
+        Combat_Costume_Dervish,
+        Combat_Costume_Ritualist,
+        Combat_Costume_Paragon,
+        Jade_Brotherhood_Bomb = 2755,
+        Mad_Kings_Fan,
+        Candy_Corn_Strike = 2758,
+        Rocket_Propelled_Gobstopper,
+        Rain_of_Terror_spell,
+        Cry_of_Madness,
+        Sugar_Infusion,
+        Feast_of_Vengeance,
+        Animate_Candy_Minions,
+        Taste_of_Undeath,
+        Scourge_of_Candy,
+        Motivating_Insults,
+        Mad_King_Pony_Support,
+        Its_Good_to_Be_King,
+        Maddening_Laughter,
+        Mad_Kings_Influence,
+        Hidden_Talent = 2792,
+        Couriers_Haste,
+        Xinraes_Revenge,
+        Meek_Shall_Inherit = 2810,
+        Inverse_Ninja_Law = 2813,
+        Abyssal_Form = 2839,
+        Asura_Form,
+        Awakened_Head_Form,
+        Spider_Form,
+        Charr_Form,
+        Golem_Form,
+        Hellhound_Form,
+        Norn_Form,
+        Ooze_Form,
+        Rift_Warden_Form,
+        Yeti_Form = 2850,
+        Snowman_Form,
+        Energy_Drain_PvP,
+        Energy_Tap_PvP,
+        PvP_effect,
+        Ward_Against_Melee_PvP,
+        Lightning_Orb_PvP,
+        Aegis_PvP,
+        Watch_Yourself_PvP,
+        Enfeeble_PvP,
+        Ether_Renewal_PvP,
+        Penetrating_Attack_PvP,
+        Shadow_Form_PvP,
+        Discord_PvP,
+        Sundering_Attack_PvP,
+        Ritual_Lord_PvP,
+        Flesh_of_My_Flesh_PvP,
+        Ancestors_Rage_PvP,
+        Splinter_Weapon_PvP,
+        Assassins_Remedy_PvP,
+        Blinding_Surge_PvP,
+        Light_of_Deliverance_PvP,
+        Death_Pact_Signet_PvP,
+        Mystic_Sweep_PvP,
+        Eremites_Attack_PvP,
+        Harriers_Toss_PvP,
+        Defensive_Anthem_PvP,
+        Ballad_of_Restoration_PvP,
+        Song_of_Restoration_PvP,
+        Incoming_PvP,
+        Never_Surrender_PvP,
+        Mantra_of_Inscriptions_PvP = 2882,
+        For_Great_Justice_PvP,
+        Mystic_Regeneration_PvP,
+        Enfeebling_Blood_PvP,
+        Summoning_Sickness,
+        Signet_of_Judgment_PvP,
+        Chilling_Victory_PvP,
+        Unyielding_Aura_PvP = 2891,
+        Spirit_Bond_PvP,
+        Weapon_of_Warding_PvP,
+        Bamph_Lite,
+        Smiters_Boon_PvP,
+        Battle_Fervor_Deactivating_ROX,
+        Cloak_of_Faith_Deactivating_ROX,
+        Dark_Aura_Deactivating_ROX,
+        Chaotic_Power_Deactivating_ROX,
+        Strength_of_the_Oak_Deactivating_ROX,
+        Sinister_Golem_Form,
+        Reactor_Blast,
+        Reactor_Blast_Timer,
+        Jade_Brotherhood_Disguise,
+        Internal_Power_Engaged,
+        Target_Acquisition,
+        NOX_Beam,
+        NOX_Field_Dash,
+        NOXion_Buster,
+        Countdown,
+        Bit_Golem_Breaker,
+        Bit_Golem_Rectifier,
+        Bit_Golem_Crash,
+        Bit_Golem_Force,
+        NOX_Phantom = 2916,
+        NOX_Thunder,
+        NOX_Lock_On,
+        NOX_Driver,
+        NOX_Fire,
+        NOX_Knuckle,
+        NOX_Divider_Drive,
+        Yo_Ho_Ho_and_a_Bottle_of_Grog,
+        Oath_of_Protection,
+        Sloth_Hunters_Shot_PvP,
+        Bamph_Lifesteal,
+        Shrine_Backlash,
+        UNUSED_Amulet_of_Protection,
+        UNUSED_Eviscerate,
+        UNUSED_Rush,
+        UNUSED_Lions_Comfort,
+        UNUSED_Melandrus_Shot,
+        UNUSED_Sloth_Hunters_Shot,
+        UNUSED_Reversal_of_Damage,
+        UNUSED_Empathic_Removal,
+        UNUSED_Castigation_Signet,
+        UNUSED_Wail_of_Doom,
+        UNUSED_Rip_Enchantment,
+        UNUSED_Foul_Feast,
+        UNUSED_Plague_Sending,
+        UNUSED_Overload,
+        UNUSED_Wastrels_Worry,
+        UNUSED_Lyssas_Aura,
+        UNUSED_Empathy,
+        UNUSED_Shatterstone,
+        UNUSED_Glowing_Ice,
+        UNUSED_Freezing_Gust,
+        UNUSED_Glyph_of_Immolation,
+        UNUSED_Glyph_of_Restoration,
+        UNUSED_Hidden_Caltrops,
+        UNUSED_Black_Spider_Strike,
+        UNUSED_Caretakers_Charge,
+        UNUSED_Signet_of_Mystic_Speed,
+        UNUSED_Signet_of_Rage,
+        UNUSED_Signet_of_Judgement,
+        UNUSED_Vigorous_Spirit,
+        Western_Health_Shrine_Bonus,
+        Eastern_Health_Shrine_Bonus,
+        Experts_Dexterity_PvP,
+        Delayed_Blast_BAMPH = 2961,
+        Grentch_Form,
+        Snowball1 = 2964,
+        Signet_of_Spirits_PvP,
+        Signet_of_Ghostly_Might_PvP,
+        Avatar_of_Grenth_PvP,
+        Oversized_Tonic_Warning,
+        Read_the_Wind_PvP,
+        Mursaat_Form,
+        Blue_Rock_Candy_Rush,
+        Green_Rock_Candy_Rush,
+        Red_Rock_Candy_Rush,
+        Archer_Form,
+        Avatar_of_Balthazar_Form,
+        Champion_of_Balthazar_Form,
+        Priest_of_Balthazar_Form,
+        The_Black_Beast_of_Arrgh_Form,
+        Crystal_Guardian_Form,
+        Crystal_Spider_Form,
+        Bone_Dragon_Form1,
+        Saltspray_Dragon_Form,
+        Eye_of_Janthir_Form,
+        Footman_Form,
+        Ghostly_Hero_Form,
+        Guild_Lord_Form,
+        Gwen_Doll_Form,
+        Black_Moa_Form,
+        Black_Moa_Chick_Form,
+        Moa_Bird_Form,
+        White_Moa_Form,
+        Rainbow_Phoenix_Form,
+        Brown_Rabbit_Form,
+        White_Rabbit_Form,
+        Seer_Form,
+        Swarm_of_Bees_Form,
+        Seed_of_Resurrection1,
+        Fragility_PvP,
+        Strength_of_Honor_PvP,
+        Gunthers_Gaze,
+        Warriors_Endurance_PvP = 3002,
+        Armor_of_Unfeeling_PvP,
+        Signet_of_Creation_PvP,
+        Union_PvP,
+        Shadowsong_PvP,
+        Pain_PvP,
+        Destruction_PvP,
+        Soothing_PvP,
+        Displacement_PvP,
+        Preservation_PvP,
+        Life_PvP,
+        Recuperation_PvP,
+        Dissonance_PvP,
+        Earthbind_PvP,
+        Shelter_PvP,
+        Disenchantment_PvP,
+        Restoration_PvP,
+        Bloodsong_PvP,
+        Wanderlust_PvP,
+        Savannah_Heat_PvP,
+        Gaze_of_Fury_PvP,
+        Anguish_PvP,
+        Empowerment_PvP,
+        Recovery_PvP,
+        Go_for_the_Eyes_PvP,
+        Brace_Yourself_PvP,
+        Blazing_Finale_PvP,
+        Bladeturn_Refrain_PvP,
+        Signet_of_Return_PvP,
+        Cant_Touch_This_PvP,
+        Stand_Your_Ground_PvP,
+        We_Shall_Return_PvP,
+        Find_Their_Weakness_PvP,
+        Never_Give_Up_PvP,
+        Help_Me_PvP,
+        Fall_Back_PvP,
+        Agony_PvP,
+        Rejuvenation_PvP,
+        Anthem_of_Disruption_PvP,
+        Shadowsong_Master_Riyo,
+        Pain1,
+        Wanderlust1,
+        Spirit_Siphon_Master_Riyo,
+        Comfort_Animal_PvP,
+        Melandrus_Assault_PvP = 3047,
+        Shroud_of_Distress_PvP,
+        Unseen_Fury_PvP,
+        Predatory_Bond_PvP,
+        Enraged_Lunge_PvP,
+        Conviction_PvP,
+        Signet_of_Deadly_Corruption_PvP,
+        Masochism_PvP,
+        Pain_attack_Togo,
+        Pain_attack_Togo1,
+        Pain_attack_Togo2,
+        Unholy_Feast_PvP,
+        Signet_of_Agony_PvP,
+        Escape_PvP,
+        Death_Blossom_PvP,
+        Finale_of_Restoration_PvP,
+        Mantra_of_Resolve_PvP,
+        Lesser_Hard_Mode_NPC_Buff,
+        Charm_Animal1,
+        Charm_Animal2,
+        Henchman,
+        Charm_Animal_Codex,
+        Agent_of_the_Mad_King,
+        Sugar_Rush_Agent_of_the_Mad_King,
+        Sticky_Ground,
+        Sugar_Shock,
+        The_Mad_Kings_Influence,
+        Bone_Spike,
+        Flurry_of_Splinters,
+        Everlasting_Mobstopper_skill,
+        Weakened_by_Dhuum,
+        Curse_of_Dhuum,
+        Dhuums_Rest_Reaper_skill,
+        Dhuum_skill,
+        Summon_Champion,
+        Summon_Minions,
+        Touch_of_Dhuum,
+        Reaping_of_Dhuum,
+        Judgment_of_Dhuum,
+        Weight_of_Dhuum_hex,
+        Dhuums_Rest,
+        Spiritual_Healing,
+        Encase_Skeletal,
+        Reversal_of_Death,
+        Ghostly_Fury,
+        Henchman_Form_Pudash,
+        Henchman_Form_Dahlia,
+        Henchman_Form_Disenmaedel,
+        Henchman_Form_Errol_Hyl,
+        Henchman_Form_Lulu_Xan,
+        Henchman_Form_Tannaros,
+        Henchman_Form_Cassie_Santi,
+        Henchman_Form_Redemptor_Frohs,
+        Henchman_Form_Julyia,
+        Henchman_Form_Bellicus,
+        Henchman_Form_Dirk_Shadowrise,
+        Henchman_Form_Vincent_Evan,
+        Henchman_Form_Luzy_Fiera,
+        Henchman_Form_Motoko_Kai,
+        Henchman_Form_Hinata,
+        Henchman_Form_Kah_Xan,
+        Henchman_Form_Narcissia,
+        Henchman_Form_Zen_Siert,
+        Henchman_Form_Blenkeh,
+        Henchman_Form_Aurora_Allesandra,
+        Henchman_Form_Teena_the_Raptor,
+        Henchman_Form_Lora_Lanaya,
+        Henchman_Form_Adepte,
+        Henchman_Form_Haldibarn_Earendul,
+        Henchman_Form_Daky,
+        Henchman_Form_Syn_Spellstrike,
+        Henchman_Form_Divinus_Tutela,
+        Henchman_Form_Blahks,
+        Henchman_Form_Erick,
+        Henchman_Form_Ghavin,
+        Henchman_Form_Hobba_Inaste,
+        Henchman_Form_Bacchi_Coi,
+        Henchman_Form_Suzu,
+        Henchman_Form_Rollo_Lowlo,
+        Henchman_Form_Fuu_Rin,
+        Henchman_Form_Nuno,
+        Henchman_Form_Alsacien,
+        Henchman_Form_Uto_Wrotki,
+        Henchman_Form_Khai_Kemnebi,
+        Henchman_Form_Cole,
+        Weight_of_Dhuum = 3133,
+        Spirit_Form_disguise,
+        Spiritual_Healing_Reaper_skill,
+        Ghostly_Fury_Reaper_skill,
+        Reindeer_Form,
+        Reindeer_Form1,
+        Reindeer_Form2,
+        Staggering_Blow_PvP,
+        Lightning_Reflexes_PvP,
+        Fierce_Blow_PvP,
+        Renewing_Smash_PvP,
+        Heal_as_One_PvP,
+        Glass_Arrows_PvP,
+        Protective_Was_Kaolai_PvP,
+        Keen_Arrow_PvP,
+        Anthem_of_Envy_PvP,
+        Mending_Refrain_PvP,
+        Lesser_Flame_Sentinel_Resistance,
+        Empathy_PvP,
+        Crippling_Anguish_PvP,
+        Pain_attack_Signet_of_Spirits,
+        Pain_attack_Signet_of_Spirits1,
+        Pain_attack_Signet_of_Spirits2,
+        Soldiers_Stance_PvP,
+        Destructive_Was_Glaive_PvP,
+        Charm_Drake = 3159,
+        Theres_not_enough_time = 3162,
+        Keirans_Sniper_Shot,
+        Falken_Punch,
+        Golem_Pilebunker,
+        Drunken_Stumbling,
+        Koros_Gaze = 3170,
+        Ebon_Vanguard_Assassin_Support_NPC,
+        Ebon_Vanguard_Battle_Standard_of_Power,
+        Loose_Magic,
+        Well_Supplied,
+        Guild_Monument_Protected,
+        Strong_Natural_Resistance,
+        Elite_Regeneration,
+        Elite_Regeneration1,
+        Mantra_of_Signets_PvP,
+        Shatter_Delusions_PvP,
+        Illusionary_Weaponry_PvP,
+        Panic_PvP,
+        Migraine_PvP,
+        Accumulated_Pain_PvP,
+        Psychic_Instability_PvP,
+        Shared_Burden_PvP,
+        Stolen_Speed_PvP,
+        Unnatural_Signet_PvP,
+        Spiritual_Pain_PvP,
+        Frustration_PvP,
+        Mistrust_PvP,
+        Enchanters_Conundrum_PvP,
+        Signet_of_Clumsiness_PvP,
+        Mirror_of_Disenchantment_PvP,
+        Wandering_Eye_PvP,
+        Calculated_Risk_PvP,
+        Adoration,
+        Impending_Dhuum,
+        Sacrifice_Pawn,
+        Isaiahs_Balance,
+        Toriimos_Burning_Fury,
+        Oath_of_Protection1,
+        Defy_Pain_PvP = 3204,
+        Entourage,
+        Spectral_Infusion,
+        Entourage_Buffer,
+        Wastrels_Demise_PvP,
+        Shiro_Tagachi_Costume_Brawl_disguise = 3210,
+        Dunham_Costume_Brawl_disguise,
+        Palawa_Joko_Costume_Brawl_disguise,
+        Lawrence_Crafton_Costume_Brawl_disguise,
+        Saul_DAlessio_Costume_Brawl_disguise,
+        Turai_Ossa_Costume_Brawl_disguise,
+        Lieutenant_Thackeray_Costume_Brawl_disguise,
+        Gehraz_Costume_Brawl_disguise,
+        Master_Togo_Costume_Brawl_disguise,
+        Egil_Fireteller_Costume_Brawl_disguise,
+        Mysterious_Assassin_Costume_Brawl_disguise,
+        Gwen_Costume_Brawl_disguise,
+        Eve_Costume_Brawl_disguise,
+        Elementalist_Aziure_Costume_Brawl_disguise,
+        Jamei_Costume_Brawl_disguise,
+        Jora_Costume_Brawl_disguise,
+        Margrid_the_Sly_Costume_Brawl_disguise,
+        Varesh_Ossa_Costume_Brawl_disguise,
+        Headmaster_Quin_Costume_Brawl_disguise,
+        Kormir_Costume_Brawl_disguise,
+        Barbed_Signet_PvP = 3231,
+        Heal_Party_PvP,
+        Spoil_Victor_PvP,
+        Visions_of_Regret_PvP,
+        Keirans_Sniper_Shot_Hearts_of_the_North,
+        Gravestone_Marker,
+        Terminal_Velocity,
+        Relentless_Assault,
+        Natures_Blessing,
+        Find_Their_Weakness_Thackeray,
+        Theres_Nothing_to_Fear_Thackeray,
+        Coming_of_Spring,
+        Promise_of_Death,
+        Withering_Blade,
+        Deaths_Embrace,
+        Venom_Fang,
+        Survivors_Will,
+        Keiran_Thackeray_disguise,
+        Rain_of_Arrows,
+        Fox_Fangs_PvP = 3251,
+        Wild_Strike_PvP,
+        Ultra_Snowball,
+        Blizzard,
+        Ultra_Snowball1 = 3259,
+        Ultra_Snowball2,
+        Ultra_Snowball3,
+        Ultra_Snowball4,
+        Banishing_Strike_PvP,
+        Twin_Moon_Sweep_PvP,
+        Irresistible_Sweep_PvP,
+        Pious_Assault_PvP,
+        Ebon_Dust_Aura_PvP,
+        Heart_of_Holy_Flame_PvP,
+        Guiding_Hands_PvP,
+        Avatar_of_Dwayna_PvP,
+        Avatar_of_Melandru_PvP,
+        Mystic_Healing_PvP,
+        Signet_of_Pious_Restraint_PvP,
+        Vanguard_Initiate,
+        Victorious_Renewal = 3282,
+        A_Dying_Curse,
+        Rage_of_the_Djinn = 3288,
+        Fevered_Dreams_PvP,
+        Stun_Grenade,
+        Fragmentation_Grenade,
+        Tear_Gas,
+        Land_Mine,
+        Riot_Shield,
+        Club_Strike,
+        Bludgeon,
+        Tango_Down,
+        Ill_Be_Back,
+        Phased_Plasma_Burst,
+        Plasma_Shot,
+        Annihilator_Bash,
+        Sky_Net,
+        Damage_Assessment,
+        Going_Commando,
+        Koss_Form = 3306,
+        Dunkoro_Form,
+        Melonni_Form,
+        Acolyte_Jin_Form,
+        Acolyte_Sousuke_Form,
+        Tahlkora_Form,
+        Zhed_Shadowhoof_Form,
+        Margrid_the_Sly_Form,
+        Master_of_Whispers_Form,
+        Goren_Form,
+        Norgu_Form,
+        Morgahn_Form,
+        Razah_Form,
+        Olias_Form,
+        Zenmai_Form,
+        Ogden_Form,
+        Vekk_Form,
+        Gwen_Form,
+        Xandra_Form,
+        Kahmu_Form,
+        Jora_Form,
+        Pyre_Fierceshot_Form,
+        Anton_Form,
+        Hayda_Form,
+        Livia_Form,
+        Keiran_Thackeray_Form,
+        Miku_Form,
+        MOX_Form,
+        Shiro_Tagachi_Form,
+        Prince_Rurik_Form = 3336,
+        Margonite_Form,
+        Destroyer_Form,
+        Queen_Salma_Form,
+        Slightly_Mad_King_Thorn_Form,
+        Kuunavang_Form,
+        Lone_Wolf,
+        Stand_Together,
+        Unyielding_Spirit,
+        Reckless_Advance,
+        Aura_of_Thorns_PvP,
+        Dust_Cloak_PvP,
+        Lyssas_Haste_PvP,
+        Knight_Form,
+        Lord_Archer_Form,
+        Bodyguard_Form,
+        Guild_Thief_Form,
+        Ghostly_Priest_Form,
+        Flame_Sentinel_Form,
+        Solidarity = 3356,
+        There_Can_Be_Only_One,
+        Fight_Against_Despair,
+        Deaths_Succor,
+        Battle_of_Attrition,
+        Fight_or_Flight,
+        Renewing_Escape,
+        Battle_Frenzy,
+        The_Way_of_One,
+        Onslaught_PvP,
+        Heart_of_Fury_PvP,
+        Wounding_Strike_PvP,
+        Pious_Fury_PvP,
+        Party_Mode,
+        Smash_of_the_Titans,
+        Mirror_Shatter,
+        Illusion_of_Haste_PvP = 3373,
+        Illusion_of_Pain_PvP,
+        Aura_of_Restoration_PvP,
+        Shapeshift,
+        GOLEM_disguise,
+        Phase_Shield,
+        Reactor_Burst,
+        Ill_Be_Back1,
+        Annihilator_Strike,
+        Annihilator_Beam,
+        Annihilator_Knuckle,
+        Annihilator_Toss,
+        Web_of_Disruption_PvP = 3386,
+        Chain_Combo,
+        All_In = 3390,
+        Jack_of_All_Trades,
+        Amateur_Hour,
+        Odrans_Razor,
+        Like_a_Boss,
+        The_Boss,
+        Lightning_Hammer_PvP,
+        Elemental_Flame_PvP,
+        Slippery_Ground_PvP,
+        Disguised_when_using_everlasting_tonics_except_Everlasting_Legionnaire_Tonic,
+        Disguised_when_using_non_everlasting_tonics,
+        Disguised_verification_requested,
+        Tonic_Tipsiness,
+        Parting_Gift,
+        Gift_of_Battle,
+        Rolling_Start,
+        Disguised_when_using_Everlasting_Legionnaire_Tonic,
+        Time_Ward = 3422,
+        Soul_Taker,
+        Over_the_Limit,
+        Judgement_Strike,
+        Seven_Weapon_Stance,
+        Together_as_one,
+        Shadow_Theft,
+        Weapons_of_Three_Forges,
+        Vow_of_Revolution,
+        Heroic_Refrain,
+        Reforged_Mode = 0xD6A,
+        Dhuums_Covenant_Broken,
+        Count = 0xD6c,
+    }
+
+    public enum SkillType : int
+    {
+        Bounty = 1,
+        Scroll = 2,
+        Stance = 3,
+        Hex = 4,
+        Spell = 5,
+        Enchantment = 6,
+        Signet = 7,
+        Condition = 8,
+        Well = 9,
+        Skill = 10,
+        Ward = 11,
+        Glyph = 12,
+        Title = 13,
+        Attack = 14,
+        Shout = 15,
+        Skill2 = 16,
+        Passive = 17,
+        Environmental = 18,
+        Preparation = 19,
+        PetAttack = 20,
+        Trap = 21,
+        Ritual = 22,
+        EnvironmentalTrap = 23,
+        ItemSpell = 24,
+        WeaponSpell = 25,
+        Form = 26,
+        Chant = 27,
+        EchoRefrain = 28,
+        Disguise = 29,
+    }
+
+    public enum StoragePane : byte
+    {
+        Storage_1,
+        Storage_2,
+        Storage_3,
+        Storage_4,
+        Storage_5,
+        Storage_6,
+        Storage_7,
+        Storage_8,
+        Storage_9,
+        Storage_10,
+        Storage_11,
+        Storage_12,
+        Storage_13,
+        Storage_14,
+        Material_Storage,
+    }
+
+    public enum Tick : int
+    {
+        NOT_READY,
+        READY,
+    }
+
+    public enum TitleID : uint
+    {
+        Hero,
+        TyrianCarto,
+        CanthanCarto,
+        Gladiator,
+        Champion,
+        Kurzick,
+        Luxon,
+        Drunkard,
+        Deprecated_SkillHunter,
+        Survivor,
+        KoaBD,
+        Deprecated_TreasureHunter,
+        Deprecated_Wisdom,
+        ProtectorTyria,
+        ProtectorCantha,
+        Lucky,
+        Unlucky,
+        Sunspear,
+        ElonianCarto,
+        ProtectorElona,
+        Lightbringer,
+        LDoA,
+        Commander,
+        Gamer,
+        SkillHunterTyria,
+        VanquisherTyria,
+        SkillHunterCantha,
+        VanquisherCantha,
+        SkillHunterElona,
+        VanquisherElona,
+        LegendaryCarto,
+        LegendaryGuardian,
+        LegendarySkillHunter,
+        LegendaryVanquisher,
+        Sweets,
+        GuardianTyria,
+        GuardianCantha,
+        GuardianElona,
+        Asuran,
+        Deldrimor,
+        Vanguard,
+        Norn,
+        MasterOfTheNorth,
+        Party,
+        Zaishen,
+        TreasureHunter,
+        Wisdom,
+        Codex,
+        None = 0xff,
+    }
+
+    public enum CharSortOrder : uint
+    {
+        None,
+        Alphabetize,
+        PvPRP,
+    }
+
+    public enum TransactionType : uint
+    {
+        AccountName,
+        MerchantBuy,
+        CollectorBuy,
+        CrafterBuy,
+        WeaponsmithCustomize,
+        Services,
+        DonateFaction,
+        Unused,
+        GuildRegistration,
+        GuildCape,
+        SkillTrainer,
+        MerchantSell,
+        TraderBuy,
+        TraderSell,
+        UnlockHero,
+        UnlockItem,
+        UnlockSkill,
+    }
+
+    public enum Channel : int
+    {
+        CHANNEL_ALLIANCE = 0,
+        CHANNEL_ALLIES = 1,
+        CHANNEL_GWCA1 = 2,
+        CHANNEL_ALL = 3,
+        CHANNEL_GWCA2 = 4,
+        CHANNEL_MODERATOR = 5,
+        CHANNEL_EMOTE = 6,
+        CHANNEL_WARNING = 7,
+        CHANNEL_GWCA3 = 8,
+        CHANNEL_GUILD = 9,
+        CHANNEL_GLOBAL = 10,
+        CHANNEL_GROUP = 11,
+        CHANNEL_TRADE = 12,
+        CHANNEL_ADVISORY = 13,
+        CHANNEL_WHISPER = 14,
+        CHANNEL_COUNT,
+        CHANNEL_COMMAND,
+        CHANNEL_UNKNOW = -1,
+    }
+
+    public enum ControlAction : uint
+    {
+        ControlAction_None = 0,
+        ControlAction_Screenshot = 0xAE,
+        ControlAction_CloseAllPanels = 0x85,
+        ControlAction_ToggleInventoryWindow = 0x8B,
+        ControlAction_OpenScoreChart = 0xBD,
+        ControlAction_OpenTemplateManager = 0xD3,
+        ControlAction_OpenSaveEquipmentTemplate = 0xD4,
+        ControlAction_OpenSaveSkillTemplate = 0xD5,
+        ControlAction_OpenParty = 0xBF,
+        ControlAction_OpenGuild = 0xBA,
+        ControlAction_OpenFriends = 0xB9,
+        ControlAction_ToggleAllBags = 0xB8,
+        ControlAction_OpenMissionMap = 0xB6,
+        ControlAction_OpenBag2 = 0xB5,
+        ControlAction_OpenBag1 = 0xB4,
+        ControlAction_OpenBelt = 0xB3,
+        ControlAction_OpenBackpack = 0xB2,
+        ControlAction_OpenSkillsAndAttributes = 0x8F,
+        ControlAction_OpenQuestLog = 0x8E,
+        ControlAction_OpenWorldMap = 0x8C,
+        ControlAction_OpenOptions = 0x8D,
+        ControlAction_OpenHero = 0x8A,
+        ControlAction_CycleEquipment = 0x86,
+        ControlAction_ActivateWeaponSet1 = 0x81,
+        ControlAction_ActivateWeaponSet2,
+        ControlAction_ActivateWeaponSet3,
+        ControlAction_ActivateWeaponSet4,
+        ControlAction_DropItem = 0xCD,
+        ControlAction_ChatReply = 0xBE,
+        ControlAction_OpenChat = 0xA1,
+        ControlAction_OpenAlliance = 0x88,
+        ControlAction_ReverseCamera = 0x90,
+        ControlAction_StrafeLeft = 0x91,
+        ControlAction_StrafeRight = 0x92,
+        ControlAction_TurnLeft = 0xA2,
+        ControlAction_TurnRight = 0xA3,
+        ControlAction_MoveBackward = 0xAC,
+        ControlAction_MoveForward = 0xAD,
+        ControlAction_CancelAction = 0xAF,
+        ControlAction_Interact = 0x80,
+        ControlAction_ReverseDirection = 0xB1,
+        ControlAction_Autorun = 0xB7,
+        ControlAction_Follow = 0xCC,
+        ControlAction_TargetPartyMember1 = 0x96,
+        ControlAction_TargetPartyMember2,
+        ControlAction_TargetPartyMember3,
+        ControlAction_TargetPartyMember4,
+        ControlAction_TargetPartyMember5,
+        ControlAction_TargetPartyMember6,
+        ControlAction_TargetPartyMember7,
+        ControlAction_TargetPartyMember8,
+        ControlAction_TargetPartyMember9 = 0xC6,
+        ControlAction_TargetPartyMember10,
+        ControlAction_TargetPartyMember11,
+        ControlAction_TargetPartyMember12,
+        ControlAction_TargetNearestItem = 0xC3,
+        ControlAction_TargetNextItem = 0xC4,
+        ControlAction_TargetPreviousItem = 0xC5,
+        ControlAction_TargetPartyMemberNext = 0xCA,
+        ControlAction_TargetPartyMemberPrevious = 0xCB,
+        ControlAction_TargetAllyNearest = 0xBC,
+        ControlAction_ClearTarget = 0xE3,
+        ControlAction_TargetSelf = 0xA0,
+        ControlAction_TargetPriorityTarget = 0x9F,
+        ControlAction_TargetNearestEnemy = 0x93,
+        ControlAction_TargetNextEnemy = 0x95,
+        ControlAction_TargetPreviousEnemy = 0x9E,
+        ControlAction_ShowOthers = 0x89,
+        ControlAction_ShowTargets = 0x94,
+        ControlAction_CameraZoomIn = 0xCE,
+        ControlAction_CameraZoomOut = 0xCF,
+        ControlAction_ClearPartyCommands = 0xDB,
+        ControlAction_CommandParty = 0xD6,
+        ControlAction_CommandHero1,
+        ControlAction_CommandHero2,
+        ControlAction_CommandHero3,
+        ControlAction_CommandHero4 = 0x102,
+        ControlAction_CommandHero5,
+        ControlAction_CommandHero6,
+        ControlAction_CommandHero7,
+        ControlAction_OpenHero1PetCommander = 0xE0,
+        ControlAction_OpenHero2PetCommander,
+        ControlAction_OpenHero3PetCommander,
+        ControlAction_OpenHero4PetCommander = 0xFE,
+        ControlAction_OpenHero5PetCommander,
+        ControlAction_OpenHero6PetCommander,
+        ControlAction_OpenHero7PetCommander,
+        ControlAction_OpenHeroCommander1 = 0xDC,
+        ControlAction_OpenHeroCommander2,
+        ControlAction_OpenHeroCommander3,
+        ControlAction_OpenPetCommander,
+        ControlAction_OpenHeroCommander4 = 0x126,
+        ControlAction_OpenHeroCommander5,
+        ControlAction_OpenHeroCommander6,
+        ControlAction_OpenHeroCommander7,
+        ControlAction_Hero1Skill1 = 0xE5,
+        ControlAction_Hero1Skill2,
+        ControlAction_Hero1Skill3,
+        ControlAction_Hero1Skill4,
+        ControlAction_Hero1Skill5,
+        ControlAction_Hero1Skill6,
+        ControlAction_Hero1Skill7,
+        ControlAction_Hero1Skill8,
+        ControlAction_Hero2Skill1,
+        ControlAction_Hero2Skill2,
+        ControlAction_Hero2Skill3,
+        ControlAction_Hero2Skill4,
+        ControlAction_Hero2Skill5,
+        ControlAction_Hero2Skill6,
+        ControlAction_Hero2Skill7,
+        ControlAction_Hero2Skill8,
+        ControlAction_Hero3Skill1,
+        ControlAction_Hero3Skill2,
+        ControlAction_Hero3Skill3,
+        ControlAction_Hero3Skill4,
+        ControlAction_Hero3Skill5,
+        ControlAction_Hero3Skill6,
+        ControlAction_Hero3Skill7,
+        ControlAction_Hero3Skill8,
+        ControlAction_Hero4Skill1 = 0x106,
+        ControlAction_Hero4Skill2,
+        ControlAction_Hero4Skill3,
+        ControlAction_Hero4Skill4,
+        ControlAction_Hero4Skill5,
+        ControlAction_Hero4Skill6,
+        ControlAction_Hero4Skill7,
+        ControlAction_Hero4Skill8,
+        ControlAction_Hero5Skill1,
+        ControlAction_Hero5Skill2,
+        ControlAction_Hero5Skill3,
+        ControlAction_Hero5Skill4,
+        ControlAction_Hero5Skill5,
+        ControlAction_Hero5Skill6,
+        ControlAction_Hero5Skill7,
+        ControlAction_Hero5Skill8,
+        ControlAction_Hero6Skill1,
+        ControlAction_Hero6Skill2,
+        ControlAction_Hero6Skill3,
+        ControlAction_Hero6Skill4,
+        ControlAction_Hero6Skill5,
+        ControlAction_Hero6Skill6,
+        ControlAction_Hero6Skill7,
+        ControlAction_Hero6Skill8,
+        ControlAction_Hero7Skill1,
+        ControlAction_Hero7Skill2,
+        ControlAction_Hero7Skill3,
+        ControlAction_Hero7Skill4,
+        ControlAction_Hero7Skill5,
+        ControlAction_Hero7Skill6,
+        ControlAction_Hero7Skill7,
+        ControlAction_Hero7Skill8,
+        ControlAction_UseSkill1 = 0xA4,
+        ControlAction_UseSkill2,
+        ControlAction_UseSkill3,
+        ControlAction_UseSkill4,
+        ControlAction_UseSkill5,
+        ControlAction_UseSkill6,
+        ControlAction_UseSkill7,
+        ControlAction_UseSkill8,
+        ControlAction_ToggleGamepadCursorMode = 0x13d,
+    }
+
+    public enum EnumPreference : uint
+    {
+        CharSortOrder,
+        AntiAliasing,
+        Reflections,
+        ShaderQuality,
+        ShadowQuality,
+        TerrainQuality,
+        InterfaceSize,
+        FrameLimiter,
+        Count = 0x8,
+    }
+
+    public enum FlagPreference : uint
+    {
+        FlagPref_0x0,
+        FlagPref_0x1,
+        FlagPref_0x2,
+        FlagPref_0x3,
+        ChannelAlliance,
+        FlagPref_0x5,
+        ChannelEmotes,
+        ChannelGuild,
+        ChannelLocal,
+        ChannelGroup,
+        ChannelTrade,
+        FlagPref_0xb,
+        FlagPref_0xc,
+        FlagPref_0xd,
+        FlagPref_0xe,
+        FlagPref_0xf,
+        FlagPref_0x10,
+        ShowTextInSkillFloaters,
+        ShowKRGBRatingsInGame,
+        FlagPref_0x13,
+        AutoHideUIOnLoginScreen,
+        DoubleClickToInteract,
+        InvertMouseControlOfCamera,
+        DisableMouseWalking,
+        AutoCameraInObserveMode,
+        AutoHideUIInObserveMode,
+        FlagPref_0x1a,
+        FlagPref_0x1b,
+        FlagPref_0x1c,
+        FlagPref_0x1d,
+        FlagPref_0x1e,
+        FlagPref_0x1f,
+        FlagPref_0x20,
+        FlagPref_0x21,
+        FlagPref_0x22,
+        FlagPref_0x23,
+        FlagPref_0x24,
+        FlagPref_0x25,
+        FlagPref_0x26,
+        FlagPref_0x27,
+        FlagPref_0x28,
+        FlagPref_0x29,
+        FlagPref_0x2a,
+        FlagPref_0x2b,
+        FlagPref_0x2c,
+        RememberAccountName,
+        IsWindowed,
+        FlagPref_0x2f,
+        FlagPref_0x30,
+        ShowSpendAttributesButton,
+        ConciseSkillDescriptions,
+        DoNotShowSkillTipsOnEffectMonitor,
+        DoNotShowSkillTipsOnSkillBars,
+        FlagPref_0x35,
+        FlagPref_0x36,
+        MuteWhenGuildWarsIsInBackground,
+        FlagPref_0x38,
+        AutoTargetFoes,
+        AutoTargetNPCs,
+        AlwaysShowNearbyNamesPvP,
+        FadeDistantNameTags,
+        FlagPref_0x3d,
+        FlagPref_0x3e,
+        FlagPref_0x3f,
+        FlagPref_0x40,
+        WaitForVSync,
+        FlagPref_0x42,
+        FlagPref_0x43,
+        FlagPref_0x44,
+        DoNotCloseWindowsOnEscape,
+        ShowMinimapOnWorldMap,
+        FlagPref_0x47,
+        FlagPref_0x48,
+        FlagPref_0x49,
+        FlagPref_0x4a,
+        FlagPref_0x4b,
+        FlagPref_0x4c,
+        FlagPref_0x4d,
+        FlagPref_0x4e,
+        FlagPref_0x4f,
+        FlagPref_0x50,
+        FlagPref_0x51,
+        HighResolutionPlayerTextures,
+        FlagPref_0x53,
+        EnhancedDrawDistance,
+        WhispersFromFriendsEtcOnly,
+        ShowChatTimestamps,
+        ShowCollapsedBags,
+        ItemRarityBorder,
+        AlwaysShowAllyNames,
+        AlwaysShowFoeNames,
+        FlagPref_0x5b,
+        LockCompassRotation,
+        EnableGamepad,
+        DpiScaling,
+        FlagPref_0x5f,
+        FlagPref_0x60,
+        HdSkillIcons,
+        HdBloom,
+        FlagPref_0x63,
+        Ssao,
+        FlagPref_0x65,
+        FlagPref_0x66,
+        FlagPref_0x67,
+        FlagPref_0x68,
+        FlagPref_0x69,
+        FlagPref_0x6a,
+        FlagPref_0x6b,
+        Count,
+    }
+
+    public enum NumberCommandLineParameter : uint
+    {
+        Unk1,
+        Unk2,
+        Unk3,
+        FPS,
+        Count,
+    }
+
+    public enum NumberPreference : uint
+    {
+        AutoTournPartySort,
+        ChatState,
+        ChatTab,
+        DistrictLastVisitedLanguage,
+        DistrictLastVisitedLanguage2,
+        DistrictLastVisitedNonInternationalLanguage,
+        DistrictLastVisitedNonInternationalLanguage2,
+        FloaterScale,
+        FullscreenGamma,
+        InventoryBag,
+        Language,
+        LanguageAudio,
+        LastDevice,
+        Refresh,
+        ScreenSizeX,
+        ScreenSizeY,
+        SkillListFilterRarity,
+        SkillListSortMethod,
+        SkillListViewMode,
+        SoundQuality,
+        StorageBagPage,
+        TextureLod,
+        TexFilterMode,
+        VolBackground,
+        VolDialog,
+        VolEffect,
+        VolMusic,
+        VolUi,
+        Vote,
+        WindowPosX,
+        WindowPosY,
+        WindowSizeX,
+        WindowSizeY,
+        SealedSeed,
+        SealedCount,
+        CameraFov,
+        CameraRotationSpeed,
+        ScreenBorderless,
+        VolMaster,
+        ClockMode,
+        MobileUiScale,
+        GamepadCursorSpeed,
+        LastLoginMethod,
+        Count = 0x2b,
+    }
+
+    public enum StringPreference : uint
+    {
+        Unk1,
+        Unk2,
+        LastCharacterName,
+        Count = 0x3,
+    }
+
+    public enum TooltipType : uint
+    {
+        None = 0x0,
+        EncString1 = 0x4,
+        EncString2 = 0x6,
+        Item = 0x8,
+        WeaponSet = 0xC,
+        Skill = 0x14,
+        Attribute = 0x4000,
+    }
+
+    public enum UIMessage : uint
+    {
+        kNone = 0x0,
+        kFrameMessage_0x1,
+        kFrameMessage_0x2,
+        kFrameMessage_0x3,
+        kFrameMessage_0x4,
+        kFrameMessage_0x5,
+        kFrameMessage_0x6,
+        kFrameMessage_0x7,
+        kResize,
+        kInitFrame,
+        kFrameMessage_0xa,
+        kDestroyFrame,
+        kFrameDisabledChange,
+        kFrameMessage_0xd,
+        kFrameMessage_0xe,
+        kFrameMessage_0xf,
+        kFrameMessage_0x10,
+        kFrameMessage_0x11,
+        kFrameMessage_0x12,
+        kFrameMessage_0x13,
+        kFrameMessage_0x14,
+        kFrameMessage_0x15,
+        kFrameMessage_0x16,
+        kFrameMessage_0x17,
+        kFrameMessage_0x18,
+        kFrameMessage_0x19,
+        kFrameMessage_0x1a,
+        kFrameMessage_0x1b,
+        kFrameMessage_0x1c,
+        kFrameMessage_0x1d,
+        kKeyDown = 0x20,
+        kSetFocus,
+        kKeyUp,
+        kFrameMessage_0x21,
+        kMouseClick,
+        kFrameMessage_0x23,
+        kMouseCoordsClick,
+        kFrameMessage_0x25,
+        kMouseUp,
+        kFrameMessage_0x27,
+        kFrameMessage_0x28,
+        kFrameMessage_0x29,
+        kFrameMessage_0x2a,
+        kFrameMessage_0x2b,
+        kToggleButtonDown,
+        kFrameMessage_0x2d,
+        kMouseClick2 = 0x31,
+        kMouseAction,
+        kRenderFrame_0x30,
+        kRenderFrame_0x31 = 0x35,
+        kFrameVisibilityChanged,
+        kSetLayout,
+        kMeasureContent,
+        kFrameMessage_0x35,
+        kFrameMessage_0x36,
+        kRefreshContent,
+        kFrameMessage_0x38,
+        kFrameMessage_0x39,
+        kFrameMessage_0x3a,
+        kFrameMessage_0x3b,
+        kFrameMessage_0x3c = 0x44,
+        kFrameMessage_0x3d,
+        kFrameMessage_0x3e,
+        kFrameMessage_0x3f,
+        kFrameMessage_0x40,
+        kFrameMessage_0x41,
+        kFrameMessage_0x42,
+        kRenderFrame_0x43,
+        kFrameMessage_0x44 = 0x52,
+        kFrameMessage_0x45,
+        kFrameMessage_0x46 = 0x56,
+        kFrameMessage_0x47,
+        kFrameMessage_0x48,
+        kFrameMessage_0x49,
+        kFrameMessage_0x4a,
+        kFrameMessage_0x4b,
+        kFrameMessage_0x4c,
+        kFrameMessage_0x4d,
+        kFrameMessage_0x4e,
+        kFrameMessage_0x4f,
+        kFrameMessage_0x50,
+        kFrameMessage_0x51,
+        kFrameMessage_0x52,
+        kFrameMessage_0x53,
+        kFrameMessage_0x54,
+        kFrameMessage_0x55,
+        kFrameMessage_0x56,
+        kFrameMessage_0x57,
+        kMessage_0x10000000 = 0x10000000,
+        kMessage_0x10000001,
+        kMessage_0x10000002,
+        kMessage_0x10000003,
+        kMessage_0x10000004,
+        kMessage_0x10000005,
+        kMessage_0x10000006,
+        kAgentUpdate,
+        kAgentDestroy,
+        kUpdateAgentEffects,
+        kMessage_0x1000000a,
+        kMessage_0x1000000b,
+        kDialogueMessage,
+        kMessage_0x1000000d,
+        kMessage_0x1000000e,
+        kMessage_0x1000000f,
+        kMessage_0x10000010,
+        kMessage_0x10000011,
+        kMessage_0x10000012,
+        kMessage_0x10000013,
+        kMessage_0x10000014,
+        kMessage_0x10000015,
+        kMessage_0x10000016,
+        kAgentSpeechBubble,
+        kMessage_0x10000018,
+        kShowAgentNameTag,
+        kHideAgentNameTag,
+        kSetAgentNameTagAttribs,
+        kMessage_0x1000001c,
+        kSetAgentProfession,
+        kMessage_0x1000001e,
+        kMessage_0x1000001f,
+        kChangeTarget,
+        kMessage_0x10000021,
+        kMessage_0x10000022,
+        kMessage_0x10000023,
+        kAgentSkillActivated,
+        kAgentSkillActivatedInstantly,
+        kAgentSkillCancelled,
+        kAgentSkillStartedCast,
+        kMessage_0x10000028,
+        kShowMapEntryMessage,
+    }
+
+    public enum WindowID : uint
+    {
+        WindowID_Dialogue1 = 0x0,
+        WindowID_Dialogue2 = 0x1,
+        WindowID_MissionGoals = 0x2,
+        WindowID_DropBundle = 0x3,
+        WindowID_Chat = 0x4,
+        WindowID_InGameClock = 0x6,
+        WindowID_Compass = 0x7,
+        WindowID_DamageMonitor = 0x8,
+        WindowID_PerformanceMonitor = 0xB,
+        WindowID_EffectsMonitor = 0xC,
+        WindowID_Hints = 0xD,
+        WindowID_MissionStatusAndScoreDisplay = 0xF,
+        WindowID_Notifications = 0x11,
+        WindowID_Skillbar = 0x14,
+        WindowID_SkillMonitor = 0x15,
+        WindowID_UpkeepMonitor = 0x17,
+        WindowID_SkillWarmup = 0x18,
+        WindowID_Menu = 0x1A,
+        WindowID_EnergyBar = 0x1C,
+        WindowID_ExperienceBar = 0x1D,
+        WindowID_HealthBar = 0x1E,
+        WindowID_TargetDisplay = 0x1F,
+        WindowID_MissionProgress = 0xE,
+        WindowID_TradeButton = 0x21,
+        WindowID_WeaponBar = 0x22,
+        WindowID_Hero1 = 0x33,
+        WindowID_Hero2 = 0x34,
+        WindowID_Hero3 = 0x35,
+        WindowID_Hero = 0x36,
+        WindowID_SkillsAndAttributes = 0x38,
+        WindowID_Friends = 0x3A,
+        WindowID_Guild = 0x3B,
+        WindowID_Help = 0x3D,
+        WindowID_Inventory = 0x3E,
+        WindowID_VaultBox = 0x3F,
+        WindowID_InventoryBags = 0x40,
+        WindowID_MissionMap = 0x42,
+        WindowID_Observe = 0x44,
+        WindowID_Options = 0x45,
+        WindowID_PartyWindow = 0x48,
+        WindowID_PartySearch = 0x49,
+        WindowID_QuestLog = 0x4F,
+        WindowID_Merchant = 0x5C,
+        WindowID_Hero4 = 0x5E,
+        WindowID_Hero5 = 0x5F,
+        WindowID_Hero6 = 0x60,
+        WindowID_Hero7 = 0x61,
+        WindowID_Count = 0x69,
+    }
+
+    public enum ActionState : uint
+    {
+        MouseDown = 0x6,
+        MouseUp = 0x7,
+        MouseClick = 0x8,
+        MouseDoubleClick = 0x9,
+        DragRelease = 0xb,
+        KeyDown = 0xe,
+    }
+
+    public enum EventID : int
+    {
+        kRecvPing = 0x8,
+        kSendFriendState = 0x26,
+        kRecvFriendState = 0x2c,
+        kNone = 0xffff,
+    }
+
+    public enum Metric : uint
+    {
+        Metric0,
+        Metric1,
+        Metric2,
+        Metric3,
+        FullscreenGamma,
+        MultiSampling,
+        PosX,
+        PosY,
+        RefreshRate,
+        ShaderQuality,
+        SizeX,
+        SizeY,
+        TextureFiltering,
+        Metric13,
+        Metric14,
+        Vsync,
+        ScreenBorderless,
+        Metric17,
+        Metric18,
+        Metric19,
+        Metric20,
+        Metric21,
+        MonitorRefreshRate,
+        TextureMaxCX,
+        TextureMaxCY,
+        Metric25,
+        Count,
+    }
+
+    public enum Transform : int
+    {
+        TRANSFORM_PROJECTION_MATRIX = 0,
+        TRANSFORM_MODEL_MATRIX = 1,
+        TRANSFORM_COUNT = 5,
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x138)]
+    public unsafe struct AccountContext
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public nint AccountUnlockedCounts; // e.g. number of unlocked storage panes
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public fixed byte H0010[164];
+        [global::System.Runtime.InteropServices.FieldOffset(0x00B4)]
+        public nint UnlockedPvpHeros; // Unused, hero battles is no more :(
+        [global::System.Runtime.InteropServices.FieldOffset(0x00C4)]
+        public nint H00c4; // If an item is unlocked, the mod struct is stored here. Use unlocked_pvp_items_info to find the index. Idk why, chaos reigns I guess
+        [global::System.Runtime.InteropServices.FieldOffset(0x00E4)]
+        public nint UnlockedPvpItemInfo; // If an item is unlocked, the details are stored here
+        [global::System.Runtime.InteropServices.FieldOffset(0x00F4)]
+        public nint UnlockedPvpItems; // Bitwise array of which pvp items are unlocked
+        [global::System.Runtime.InteropServices.FieldOffset(0x0104)]
+        public fixed byte H0104[48]; // Some arrays, some linked lists, meh
+        [global::System.Runtime.InteropServices.FieldOffset(0x0134)]
+        public uint AccountFlags;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x1C)]
+    public unsafe struct AccountInfo
+    {
+        public nint AccountName;
+        public uint Wins;
+        public uint Losses;
+        public uint Rating;
+        public uint QualifierPoints;
+        public uint Rank;
+        public uint TournamentRewardPoints;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct AccountUnlockedCount
+    {
+        public uint Id;
+        public uint Unk1;
+        public uint Unk2;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct AccountUnlockedItemInfo
+    {
+        public uint NameId;
+        public uint ModStructIndex; // Used to find mod struct in unlocked_pvp_items_mod_structs...
+        public uint ModStructSize;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct AgentContext
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public nint H0000;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public fixed uint H0010[5];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
+        public uint H0024; // function
+        [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
+        public fixed uint H0028[2];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
+        public uint H0030; // function
+        [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
+        public fixed uint H0034[2];
+        [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
+        public uint H003C; // function
+        [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
+        public fixed uint H0040[2];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0048)]
+        public uint H0048; // function
+        [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
+        public fixed uint H004C[2];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0054)]
+        public uint H0054; // function
+        [global::System.Runtime.InteropServices.FieldOffset(0x0058)]
+        public fixed uint H0058[11];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0084)]
+        public nint H0084;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0094)]
+        public uint H0094; // this field and the next array are link together in a structure.
+        [global::System.Runtime.InteropServices.FieldOffset(0x0098)]
+        public nint AgentSummaryInfo; // elements are of size 12. {ptr, func, ptr}
+        [global::System.Runtime.InteropServices.FieldOffset(0x00A8)]
+        public nint H00A8;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00B8)]
+        public nint H00B8;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00C8)]
+        public uint Rand1; // Number seems to be randomized quite a bit o.o seems to be accessed by textparser.cpp
+        [global::System.Runtime.InteropServices.FieldOffset(0x00CC)]
+        public uint Rand2;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00D0)]
+        public fixed byte H00D0[24];
+        [global::System.Runtime.InteropServices.FieldOffset(0x00E8)]
+        public nint AgentMovement;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00F8)]
+        public nint H00F8;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0108)]
+        public fixed uint H0108[17];
+        [global::System.Runtime.InteropServices.FieldOffset(0x014C)]
+        public nint AgentArray1;
+        [global::System.Runtime.InteropServices.FieldOffset(0x015C)]
+        public nint AgentAsyncMovement;
+        [global::System.Runtime.InteropServices.FieldOffset(0x016C)]
+        public fixed uint H016C[16];
+        [global::System.Runtime.InteropServices.FieldOffset(0x01AC)]
+        public uint InstanceTimer;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x24)]
+    public unsafe struct AgentEffects
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint AgentId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public BuffArray Buffs;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public EffectArray Effects;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0xE4)]
+    public unsafe struct AgentGadget
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x00C4)]
+        public uint H00C4;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00C8)]
+        public uint H00C8;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00CC)]
+        public uint ExtraType;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00D0)]
+        public uint GadgetId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00D4)]
+        public fixed uint H00D4[4];
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x38)]
+    public unsafe struct AgentInfo
+    {
+        public fixed uint H0000[13];
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0xD4)]
+    public unsafe struct AgentItem
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x00C4)]
+        public uint Owner;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00C8)]
+        public uint ItemId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00CC)]
+        public uint H00CC;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00D0)]
+        public uint ExtraType;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x1C4)]
+    public unsafe struct AgentLiving
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x00C4)]
+        public uint Owner;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00C8)]
+        public uint H00C8;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00CC)]
+        public uint H00CC;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00D0)]
+        public uint H00D0;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00D4)]
+        public fixed uint H00D4[3];
+        [global::System.Runtime.InteropServices.FieldOffset(0x00E0)]
+        public float AnimationType;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00E4)]
+        public fixed uint H00E4[2];
+        [global::System.Runtime.InteropServices.FieldOffset(0x00EC)]
+        public float WeaponAttackSpeed; // The base attack speed in float of last attacks weapon. 1.33 = axe, sWORD, daggers etc.
+        [global::System.Runtime.InteropServices.FieldOffset(0x00F4)]
+        public ushort PlayerNumber; // Selfexplanatory. All non-players have identifiers for their type. Two of the same mob = same number
+        [global::System.Runtime.InteropServices.FieldOffset(0x00F6)]
+        public ushort AgentModelType; // Player = 0x3000, NPC = 0x2000
+        [global::System.Runtime.InteropServices.FieldOffset(0x00F8)]
+        public uint TransmogNpcId; // Actually, it's 0x20000000 | npc_id, It's not defined for npc, minipet, etc...
+        [global::System.Runtime.InteropServices.FieldOffset(0x00FC)]
+        public nint Equip;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0100)]
+        public uint H0100;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0104)]
+        public uint H0104; // New variable added here
+        [global::System.Runtime.InteropServices.FieldOffset(0x0108)]
+        public nint Tags; // struct { uint16_t guild_id, uint8_t primary, uint8_t secondary, uint16_t level
+        [global::System.Runtime.InteropServices.FieldOffset(0x010C)]
+        public ushort H010C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0110)]
+        public byte Level; // Duh!
+        [global::System.Runtime.InteropServices.FieldOffset(0x0111)]
+        public byte TeamId; // 0=None, 1=Blue, 2=Red, 3=Yellow
+        [global::System.Runtime.InteropServices.FieldOffset(0x0112)]
+        public fixed byte H0112[2];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0114)]
+        public uint H0114;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0118)]
+        public float EnergyRegen;
+        [global::System.Runtime.InteropServices.FieldOffset(0x011C)]
+        public uint H011C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0120)]
+        public float Energy; // Only works for yourself
+        [global::System.Runtime.InteropServices.FieldOffset(0x0124)]
+        public uint MaxEnergy; // Only works for yourself
+        [global::System.Runtime.InteropServices.FieldOffset(0x0128)]
+        public uint H0128;
+        [global::System.Runtime.InteropServices.FieldOffset(0x012C)]
+        public float HpPips; // Regen/degen as float
+        [global::System.Runtime.InteropServices.FieldOffset(0x0130)]
+        public uint H0130;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0134)]
+        public float Hp; // Health in % where 1=100% and 0=0%
+        [global::System.Runtime.InteropServices.FieldOffset(0x0138)]
+        public uint MaxHp; // Only works for yourself
+        [global::System.Runtime.InteropServices.FieldOffset(0x013C)]
+        public uint Effects; // Bitmap for effects to display when targetted. DOES include hexes
+        [global::System.Runtime.InteropServices.FieldOffset(0x0140)]
+        public uint H0140;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0145)]
+        public fixed byte H0145[19];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0158)]
+        public uint ModelState; // Different values for different states of the model.
+        [global::System.Runtime.InteropServices.FieldOffset(0x015C)]
+        public uint TypeMap; // Odd variable! 0x08 = dead, 0xC00 = boss, 0x40000 = spirit, 0x400000 = player
+        [global::System.Runtime.InteropServices.FieldOffset(0x0160)]
+        public fixed uint H0160[4];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0170)]
+        public uint InSpiritRange; // Tells if agent is within spirit range of you. Doesn't work anymore?
+        [global::System.Runtime.InteropServices.FieldOffset(0x0174)]
+        public VisibleEffectList VisibleEffects;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0180)]
+        public uint H0180;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0184)]
+        public uint LoginNumber; // Unique number in instance that only works for players
+        [global::System.Runtime.InteropServices.FieldOffset(0x0188)]
+        public float AnimationSpeed; // Speed of the current animation
+        [global::System.Runtime.InteropServices.FieldOffset(0x018C)]
+        public uint AnimationCode; // related to animations
+        [global::System.Runtime.InteropServices.FieldOffset(0x0190)]
+        public uint AnimationId; // Id of the current animation
+        [global::System.Runtime.InteropServices.FieldOffset(0x0194)]
+        public fixed byte H0194[32];
+        [global::System.Runtime.InteropServices.FieldOffset(0x01B4)]
+        public byte DaggerStatus; // 0x1 = used lead attack, 0x2 = used offhand attack, 0x3 = used dual attack
+        [global::System.Runtime.InteropServices.FieldOffset(0x01B5)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.Allegiance Allegiance; // 0x1 = ally/non-attackable, 0x2 = neutral, 0x3 = enemy, 0x4 = spirit/pet, 0x5 = minion, 0x6 = npc/minipet
+        [global::System.Runtime.InteropServices.FieldOffset(0x01B6)]
+        public ushort WeaponType; // 1=bow, 2=axe, 3=hammer, 4=daggers, 5=scythe, 6=spear, 7=sWORD, 10=wand, 12=staff, 14=staff
+        [global::System.Runtime.InteropServices.FieldOffset(0x01B8)]
+        public ushort Skill; // 0 = not using a skill. Anything else is the Id of that skill
+        [global::System.Runtime.InteropServices.FieldOffset(0x01BA)]
+        public ushort H01BA;
+        [global::System.Runtime.InteropServices.FieldOffset(0x01BC)]
+        public byte WeaponItemType;
+        [global::System.Runtime.InteropServices.FieldOffset(0x01BD)]
+        public byte OffhandItemType;
+        [global::System.Runtime.InteropServices.FieldOffset(0x01BE)]
+        public ushort WeaponItemId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x01C0)]
+        public ushort OffhandItemId;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct AgentMovement
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public fixed uint H0000[3];
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public uint AgentId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public fixed uint H0010[3];
+        [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
+        public uint AgentDef; // GW_AGENTDEF_CHAR = 1
+        [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
+        public fixed uint H0020[6];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0038)]
+        public uint Moving1; // tells if you are stuck even if your client doesn't know
+        [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
+        public fixed uint H003C[2];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0044)]
+        public uint Moving2; // exactly same as Moving1
+        [global::System.Runtime.InteropServices.FieldOffset(0x0048)]
+        public fixed uint H0048[7];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0064)]
+        public global::System.Numerics.Vector3 H0064;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0070)]
+        public uint H0070;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0074)]
+        public global::System.Numerics.Vector3 H0074;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x7C)]
+    public unsafe struct AreaInfo
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.Campaign Campaign;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public global::Daybreak.API.Interop.GWCA.GW.Continent Continent;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public global::Daybreak.API.Interop.GWCA.GW.Region Region;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public global::Daybreak.API.Interop.GWCA.GW.RegionType Type;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public uint Flags;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public uint ThumbnailId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public uint MinPartySize;
+        [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
+        public uint MaxPartySize;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
+        public uint MinPlayerSize;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
+        public uint MaxPlayerSize;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
+        public uint ControlledOutpostId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
+        public uint FractionMission;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
+        public uint MinLevel;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
+        public uint MaxLevel;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0038)]
+        public uint NeededPq;
+        [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
+        public uint MissionMapsTo;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
+        public uint X; // icon position on map.
+        [global::System.Runtime.InteropServices.FieldOffset(0x0044)]
+        public uint Y;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0048)]
+        public uint IconStartX;
+        [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
+        public uint IconStartY;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0050)]
+        public uint IconEndX;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0054)]
+        public uint IconEndY;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0058)]
+        public uint IconStartXDupe;
+        [global::System.Runtime.InteropServices.FieldOffset(0x005C)]
+        public uint IconStartYDupe;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0060)]
+        public uint IconEndXDupe;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0064)]
+        public uint IconEndYDupe;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0068)]
+        public uint FileId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x006C)]
+        public uint MissionChronology;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0070)]
+        public uint HaMapChronology;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0074)]
+        public uint NameId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0078)]
+        public uint DescriptionId;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x14)]
+    public unsafe struct AttributeInfo
+    {
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.Profession ProfessionId;
+        public global::Daybreak.API.Interop.GuildWars.Attribute AttributeId;
+        public uint NameId;
+        public uint DescId;
+        public uint IsPve;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x10)]
+    public unsafe struct Buff
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID SkillId; // skill id of the buff
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint H0004;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public uint BuffId; // id of buff in the buff array
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct Camera
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint LookAtAgentId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint H0004;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public float H0008;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public float H000C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public float MaxDistance;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public float H0014;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public float Yaw; // left/right camera angle, radians w/ origin @ east
+        [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
+        public float Pitch; // up/down camera angle, range of [-1,1]
+        [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
+        public float Distance; // current distance from players head.
+        [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
+        public fixed uint H0024[4];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
+        public float YawRightClick;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0038)]
+        public float YawRightClick2;
+        [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
+        public float PitchRightClick;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
+        public float Distance2;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0044)]
+        public float AccelerationConstant;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0048)]
+        public float TimeSinceLastKeyboardRotation; // In seconds it seems.
+        [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
+        public float TimeSinceLastMouseRotation;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0050)]
+        public float TimeSinceLastMouseMove;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0054)]
+        public float TimeSinceLastAgentSelection;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0058)]
+        public float TimeInTheMap;
+        [global::System.Runtime.InteropServices.FieldOffset(0x005C)]
+        public float TimeInTheDistrict;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0060)]
+        public float YawToGo;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0064)]
+        public float PitchToGo;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0068)]
+        public float DistToGo;
+        [global::System.Runtime.InteropServices.FieldOffset(0x006C)]
+        public float MaxDistance2;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0070)]
+        public fixed float H0070[2];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0078)]
+        public global::System.Numerics.Vector3 Position;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0084)]
+        public global::System.Numerics.Vector3 CameraPosToGo;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0090)]
+        public global::System.Numerics.Vector3 CamPosInverted;
+        [global::System.Runtime.InteropServices.FieldOffset(0x009C)]
+        public global::System.Numerics.Vector3 CamPosInvertedToGo;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00A8)]
+        public global::System.Numerics.Vector3 LookAtTarget;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00B4)]
+        public global::System.Numerics.Vector3 LookAtToGo;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00C0)]
+        public float FieldOfView;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00C4)]
+        public float FieldOfView2;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00C8)]
+        public uint H00C8;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00CC)]
+        public uint H00CC;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00D0)]
+        public uint H00D0;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00D4)]
+        public uint H00D4;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00D8)]
+        public uint H00D8; // Camera controller/mode handler pointer
+        [global::System.Runtime.InteropServices.FieldOffset(0x00DC)]
+        public uint H00DC;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00E0)]
+        public uint H00E0;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00E4)]
+        public uint H00E4;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00E8)]
+        public uint H00E8;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00EC)]
+        public uint H00EC;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00F0)]
+        public uint H00F0;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00F4)]
+        public uint H00F4;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00F8)]
+        public uint H00F8;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00FC)]
+        public uint H00FC;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0100)]
+        public uint H0100;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0104)]
+        public uint H0104;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0108)]
+        public uint H0108;
+        [global::System.Runtime.InteropServices.FieldOffset(0x010C)]
+        public uint H010C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0110)]
+        public uint H0110;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0114)]
+        public uint H0114;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0118)]
+        public uint H0118;
+        [global::System.Runtime.InteropServices.FieldOffset(0x011C)]
+        public uint CameraMode; // 0=default, 1=?, 2=follow, 3=unlocked, 4=?, 5=?, 6=?, 7=?, 8=?, 9=?
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x1C)]
+    public unsafe struct CapeDesign
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint CapeBgColor;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint CapeDetailColor;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public uint CapeEmblemColor;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public uint CapeShape;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public uint CapeDetail;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public uint CapeEmblem;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public uint CapeTrim;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct CharAdjustment
+    {
+        public byte Hue;
+        public byte Saturation;
+        public byte Lightness;
+        public byte Scale; // percent
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x438)]
+    public unsafe struct CharContext
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public nint H0000;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public uint H0010;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public nint H0014;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
+        public fixed uint H0024[4];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
+        public nint H0034;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0044)]
+        public nint H0044;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0054)]
+        public fixed uint H0054[4]; // load head variables
+        [global::System.Runtime.InteropServices.FieldOffset(0x0064)]
+        public fixed uint PlayerUuid[4]; // uuid
+        [global::System.Runtime.InteropServices.FieldOffset(0x0074)]
+        public fixed char PlayerName[20];
+        [global::System.Runtime.InteropServices.FieldOffset(0x009C)]
+        public fixed uint H009C[20];
+        [global::System.Runtime.InteropServices.FieldOffset(0x00EC)]
+        public nint H00EC;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00FC)]
+        public fixed uint H00FC[37]; // 40
+        [global::System.Runtime.InteropServices.FieldOffset(0x0190)]
+        public uint WorldFlags;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0194)]
+        public uint Token1; // world id
+        [global::System.Runtime.InteropServices.FieldOffset(0x0198)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID MapId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x019C)]
+        public uint IsExplorable;
+        [global::System.Runtime.InteropServices.FieldOffset(0x01A0)]
+        public fixed byte Host[24];
+        [global::System.Runtime.InteropServices.FieldOffset(0x01B8)]
+        public uint Token2; // player id
+        [global::System.Runtime.InteropServices.FieldOffset(0x01BC)]
+        public fixed uint H01BC[25];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0220)]
+        public uint DistrictNumber;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0224)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.Language Language;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0228)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID ObserveMapId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x022C)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID CurrentMapId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0230)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.InstanceType ObserveMapType;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0234)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.InstanceType CurrentMapType;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0238)]
+        public fixed uint H0238[5];
+        [global::System.Runtime.InteropServices.FieldOffset(0x024C)]
+        public nint ObserverMatches;
+        [global::System.Runtime.InteropServices.FieldOffset(0x025C)]
+        public fixed uint H025C[17];
+        [global::System.Runtime.InteropServices.FieldOffset(0x02A0)]
+        public uint PlayerFlags; // bitwise something
+        [global::System.Runtime.InteropServices.FieldOffset(0x02A4)]
+        public uint PlayerNumber;
+        [global::System.Runtime.InteropServices.FieldOffset(0x02A8)]
+        public fixed uint H02A8[40];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0348)]
+        public nint ProgressBar; // seems to never be nullptr
+        [global::System.Runtime.InteropServices.FieldOffset(0x034C)]
+        public fixed uint H034C[27];
+        [global::System.Runtime.InteropServices.FieldOffset(0x03B8)]
+        public fixed char PlayerEmail[64];
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct CharacterInformation
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public fixed uint H0000[2];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public fixed uint Uuid[4];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public fixed char Name[20];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
+        public fixed uint Props[17];
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct Cinematic
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint H0000;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint H0004; // pointer to data
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x30)]
+    public unsafe struct CompositeModelInfo
+    {
+        public uint ClassFlags;
+        public fixed uint FileIds[11];
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct ControlledMinions
+    {
+        public uint AgentId;
+        public uint MinionCount;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct DupeSkill
+    {
+        public uint SkillId;
+        public uint Count;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x3)]
+    public unsafe struct DyeInfo
+    {
+        public byte DyeTint;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x18)]
+    public unsafe struct EffectData
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID SkillId; // skill id of the effect
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint AttributeLevel; // attribute level for the skill used
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public uint EffectId; // unique identifier of effect
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public uint AgentId; // non-zero means maintained enchantment - caster id
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public float Duration; // non-zero if effect has a duration
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public uint Timestamp; // GW-timestamp of when effect was applied - only with duration
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct Friend
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public global::Daybreak.API.Interop.GWCA.GW.FriendType Type;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public global::Daybreak.API.Interop.GWCA.GW.FriendStatus Status;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public fixed byte Uuid[16];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public fixed char Alias[20];
+        [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
+        public fixed char Charname[20];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
+        public uint FriendId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0044)]
+        public uint ZoneId;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct GHKey
+    {
+        public fixed uint K[4];
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct GadgetContext
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public nint GadgetInfo;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct GadgetInfo
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint H0000;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint H0004;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public uint H0008;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public nint NameEnc;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct GameContext
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public nint H0000;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public nint H0004;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public nint Agent; // Most functions that access are prefixed with Agent.
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public nint Event;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public nint H0010;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public nint Map; // Static object/collision data
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public nint TextParser;
+        [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
+        public nint H001C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
+        public uint SomeNumber; // 0x30 for me at the moment.
+        [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
+        public nint H0024;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
+        public nint Account;
+        [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
+        public nint World; // Best name to fit it that I can think of.
+        [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
+        public nint Cinematic;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
+        public nint H0034;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0038)]
+        public nint Gadget;
+        [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
+        public nint Guild;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
+        public nint Items;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0044)]
+        public nint Character;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0048)]
+        public nint H0048;
+        [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
+        public nint Party;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0050)]
+        public nint H0050;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0054)]
+        public nint H0054;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0058)]
+        public nint Trade;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct GamePos
+    {
+        public float X;
+        public float Y;
+        public uint Zplane;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x78)]
+    public unsafe struct GameplayContext
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public fixed uint H0000[19];
+        public float MissionMapZoom;
+        public fixed uint Unk[10];
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0xAC)]
+    public unsafe struct Guild
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public global::Daybreak.API.Interop.GuildWars.GHKey Key;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public fixed uint H0010[5];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
+        public uint Index; // Same as PlayerGuildIndex
+        [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
+        public uint Rank;
+        [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
+        public uint Features;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
+        public fixed char Name[32];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0070)]
+        public uint Rating;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0074)]
+        public uint Faction; // 0=kurzick, 1=luxon
+        [global::System.Runtime.InteropServices.FieldOffset(0x0078)]
+        public uint FactionPoint;
+        [global::System.Runtime.InteropServices.FieldOffset(0x007C)]
+        public uint QualifierPoint;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0080)]
+        public fixed char Tag[8];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0090)]
+        public global::Daybreak.API.Interop.GuildWars.CapeDesign Cape;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct GuildContext
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint H0000;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint H0004;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public uint H0008;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public uint H000C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public uint H0010;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public uint H0014;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public uint H0018;
+        [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
+        public uint H001C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
+        public nint H0020;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
+        public uint H0030;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
+        public fixed char PlayerName[20];
+        [global::System.Runtime.InteropServices.FieldOffset(0x005C)]
+        public uint H005C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0060)]
+        public uint PlayerGuildIndex;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0064)]
+        public global::Daybreak.API.Interop.GuildWars.GHKey PlayerGhKey;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0074)]
+        public uint H0074;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0078)]
+        public fixed char Announcement[256];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0278)]
+        public fixed char AnnouncementAuthor[20];
+        [global::System.Runtime.InteropServices.FieldOffset(0x02A0)]
+        public uint PlayerGuildRank;
+        [global::System.Runtime.InteropServices.FieldOffset(0x02A4)]
+        public uint H02A4;
+        [global::System.Runtime.InteropServices.FieldOffset(0x02A8)]
+        public nint FactionsOutpostGuilds;
+        [global::System.Runtime.InteropServices.FieldOffset(0x02B8)]
+        public uint KurzickTownCount;
+        [global::System.Runtime.InteropServices.FieldOffset(0x02BC)]
+        public uint LuxonTownCount;
+        [global::System.Runtime.InteropServices.FieldOffset(0x02C0)]
+        public uint H02C0;
+        [global::System.Runtime.InteropServices.FieldOffset(0x02C4)]
+        public uint H02C4;
+        [global::System.Runtime.InteropServices.FieldOffset(0x02C8)]
+        public uint H02C8;
+        [global::System.Runtime.InteropServices.FieldOffset(0x02CC)]
+        public GuildHistory PlayerGuildHistory;
+        [global::System.Runtime.InteropServices.FieldOffset(0x02DC)]
+        public fixed uint H02DC[7];
+        [global::System.Runtime.InteropServices.FieldOffset(0x02F8)]
+        public GuildArray Guilds;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0308)]
+        public fixed uint H0308[4];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0318)]
+        public nint H0318;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0328)]
+        public uint H0328;
+        [global::System.Runtime.InteropServices.FieldOffset(0x032C)]
+        public nint H032C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x033C)]
+        public fixed uint H033C[7];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0358)]
+        public GuildRoster PlayerRoster;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x208)]
+    public unsafe struct GuildHistoryEvent
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint Time1; // Guessing one of these is time in ms
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint Time2;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public fixed char Name[256]; // Name of added/kicked person, then the adder/kicker, they seem to be in the same array
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x174)]
+    public unsafe struct GuildPlayer
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public nint Vtable;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public nint NamePtr; // ptr to invitedname, why? dunno
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public fixed char InvitedName[20]; // name of character that was invited in
+        [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
+        public fixed char CurrentName[20]; // name of character currently being played
+        [global::System.Runtime.InteropServices.FieldOffset(0x0058)]
+        public fixed char InviterName[20]; // name of character that invited player
+        [global::System.Runtime.InteropServices.FieldOffset(0x0080)]
+        public uint InviteTime; // time in ms from game creation ??
+        [global::System.Runtime.InteropServices.FieldOffset(0x0084)]
+        public fixed char PromoterName[20]; // name of player that last modified rank
+        [global::System.Runtime.InteropServices.FieldOffset(0x00AC)]
+        public fixed uint H00AC[12];
+        [global::System.Runtime.InteropServices.FieldOffset(0x00DC)]
+        public uint Offline;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00E0)]
+        public uint MemberType;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00E4)]
+        public uint Status;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00E8)]
+        public fixed uint H00E8[35];
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x34)]
+    public unsafe struct HenchmanPartyMember
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint AgentId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public fixed uint H0004[10];
+        [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.Profession Profession;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
+        public uint Level;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x18)]
+    public unsafe struct HeroConstData
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint H0000;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint H0004;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public uint H0008;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public uint NameId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public uint H0010;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public uint DescriptionId;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x24)]
+    public unsafe struct HeroFlag
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.HeroID HeroId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint AgentId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public uint Level;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public global::Daybreak.API.Interop.GWCA.GW.HeroBehavior HeroBehavior;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public global::System.Numerics.Vector2 Flag;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public uint H0018;
+        [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
+        public uint H001c;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
+        public uint LockedTargetId;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x9C)]
+    public unsafe struct HeroInfo
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.HeroID HeroId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint AgentId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public uint Level;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public uint Primary;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public uint Secondary;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public uint HeroFileId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public uint ModelFileId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
+        public uint H001C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
+        public uint H0020;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
+        public uint H0024;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
+        public uint H0028;
+        [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
+        public uint H002C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
+        public uint H0030;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
+        public uint H0034;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0038)]
+        public uint H0038;
+        [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
+        public uint H003C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
+        public uint H0040;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0044)]
+        public uint H0044;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0048)]
+        public uint H0048;
+        [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
+        public uint H004C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0050)]
+        public fixed char Name[20];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0078)]
+        public uint H0078;
+        [global::System.Runtime.InteropServices.FieldOffset(0x007C)]
+        public uint H007C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0080)]
+        public uint H0080;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0084)]
+        public uint H0084;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0088)]
+        public uint H0088;
+        [global::System.Runtime.InteropServices.FieldOffset(0x008C)]
+        public uint H008C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0090)]
+        public uint H0090;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0094)]
+        public uint H0094;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0098)]
+        public uint H0098;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x18)]
+    public unsafe struct HeroPartyMember
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint AgentId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint OwnerPlayerId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.HeroID HeroId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public uint H000C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public uint H0010;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public uint Level;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x98)]
+    public unsafe struct Inventory
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x005C)]
+        public nint Bundle;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0060)]
+        public uint StoragePanesUnlocked;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0084)]
+        public uint ActiveWeaponSet;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0088)]
+        public fixed uint H0088[2];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0090)]
+        public uint GoldCharacter;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0094)]
+        public uint GoldStorage;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x54)]
+    public unsafe struct ItemStruct
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint ItemId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint AgentId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public nint BagEquipped; // Only valid if Item is a equipped Bag
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public nint Bag;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public nint ModStruct; // Pointer to an array of mods.
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public uint ModStructSize; // Size of this array.
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public nint Customized;
+        [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
+        public uint ModelFileId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.ItemType Type;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0021)]
+        public global::Daybreak.API.Interop.GuildWars.DyeInfo Dye;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
+        public ushort Value;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0026)]
+        public ushort H0026;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
+        public uint Interaction;
+        [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
+        public uint ModelId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
+        public nint InfoString;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
+        public nint NameEnc;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0038)]
+        public nint CompleteNameEnc; // with color, quantity, etc.
+        [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
+        public nint SingleItemName; // with color, w/o quantity, named as single item
+        [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
+        public fixed uint H0040[2];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0048)]
+        public ushort ItemFormula;
+        [global::System.Runtime.InteropServices.FieldOffset(0x004B)]
+        public byte H004B; // probably used for quantity extension for new material storage
+        [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
+        public ushort Quantity;
+        [global::System.Runtime.InteropServices.FieldOffset(0x004E)]
+        public byte Equipped;
+        [global::System.Runtime.InteropServices.FieldOffset(0x004F)]
+        public byte Profession;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0050)]
+        public byte Slot;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct ItemContext
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public nint H0000;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public nint H0010;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
+        public uint H0020;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
+        public nint BagsArray;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
+        public fixed byte H0034[12];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
+        public nint H0040;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0050)]
+        public nint H0050;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0060)]
+        public fixed byte H0060[88];
+        [global::System.Runtime.InteropServices.FieldOffset(0x00B8)]
+        public nint ItemArray;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00C8)]
+        public fixed byte H00C8[48];
+        [global::System.Runtime.InteropServices.FieldOffset(0x00F8)]
+        public nint Inventory;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00FC)]
+        public nint H00FC;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x10)]
+    public unsafe struct ItemData
+    {
+        public uint ModelFileId;
+        public global::Daybreak.API.Interop.GuildWars.DyeInfo Dye;
+        public uint Value;
+        public uint Interaction;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x14)]
+    public unsafe struct ItemFormula
+    {
+        public uint H0000;
+        public uint GoldCost;
+        public uint SkillPointCost;
+        public uint MaterialCostCount;
+        public nint MaterialCostBuffer; // NB: The game stores a cached array of material amounts that the player has in inventory; we don't care about it though!
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct ItemModifier
+    {
+        public uint Mod;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct LoginCharacter
+    {
+        public uint Unk0; // Some kind of function call
+        public fixed char CharacterName[20];
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct MapAgent
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public float CurEnergy;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public float MaxEnergy;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public float EnergyRegen;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public uint SkillTimestamp;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public float H0010;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public float MaxEnergy2;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public float H0018;
+        [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
+        public uint H001C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
+        public float CurHealth;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
+        public float MaxHealth;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
+        public float HealthRegen;
+        [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
+        public uint H002C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
+        public uint Effects;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x138)]
+    public unsafe struct MapContext
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint MapType; // less than 4
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public global::System.Numerics.Vector2 StartPos;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public global::System.Numerics.Vector2 EndPos;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public fixed uint H0014[6];
+        [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
+        public nint Spawns1; // Seem to be arena spawns. struct is X,Y,unk 4 byte value,unk 4 byte value.
+        [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
+        public nint Spawns2; // Same as above
+        [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
+        public nint Spawns3; // Same as above
+        [global::System.Runtime.InteropServices.FieldOffset(0x005C)]
+        public fixed float H005C[6]; // Some trapezoid i think.
+        [global::System.Runtime.InteropServices.FieldOffset(0x0074)]
+        public nint Path;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0078)]
+        public nint PathEngine;
+        [global::System.Runtime.InteropServices.FieldOffset(0x007C)]
+        public nint Props;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0080)]
+        public uint H0080;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0084)]
+        public nint Terrain;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0088)]
+        public uint H0088;
+        [global::System.Runtime.InteropServices.FieldOffset(0x008C)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID MapId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0090)]
+        public uint H0090;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0094)]
+        public uint H0094;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0098)]
+        public uint H0098;
+        [global::System.Runtime.InteropServices.FieldOffset(0x009C)]
+        public uint H009C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00A0)]
+        public uint H00A0;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00A4)]
+        public uint H00A4;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00A8)]
+        public uint H00A8;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00AC)]
+        public uint H00AC;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00B0)]
+        public uint H00B0;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00B4)]
+        public uint H00B4;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00B8)]
+        public uint H00B8;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00BC)]
+        public uint H00BC;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00C0)]
+        public uint H00C0;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00C4)]
+        public uint H00C4;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00C8)]
+        public uint H00C8;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00CC)]
+        public uint H00CC;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00D0)]
+        public uint H00D0;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00D4)]
+        public uint H00D4;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00D8)]
+        public uint H00D8;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00DC)]
+        public uint H00DC;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00E0)]
+        public uint H00E0;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00E4)]
+        public uint H00E4;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00E8)]
+        public uint H00E8;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00EC)]
+        public uint H00EC;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00F0)]
+        public uint H00F0;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00F4)]
+        public uint H00F4;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00F8)]
+        public uint H00F8;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00FC)]
+        public uint H00FC;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0100)]
+        public uint H0100;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0104)]
+        public uint H0104;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0108)]
+        public uint H0108;
+        [global::System.Runtime.InteropServices.FieldOffset(0x010C)]
+        public uint H010C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0110)]
+        public uint H0110;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0114)]
+        public uint H0114;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0118)]
+        public uint H0118;
+        [global::System.Runtime.InteropServices.FieldOffset(0x011C)]
+        public uint H011C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0120)]
+        public uint H0120;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0124)]
+        public uint H0124;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0128)]
+        public uint H0128;
+        [global::System.Runtime.InteropServices.FieldOffset(0x012C)]
+        public uint H012C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0130)]
+        public nint Zones;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0134)]
+        public uint H0134;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x90)]
+    public unsafe struct MapProp
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public fixed uint H0000[5];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public uint UptimeSeconds; // time since spawned
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public uint H0018;
+        [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
+        public uint PropIndex;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
+        public global::System.Numerics.Vector3 Position;
+        [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
+        public uint ModelFileId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
+        public fixed uint H0030[2];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0038)]
+        public float RotationAngle;
+        [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
+        public float RotationCos;
+        [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
+        public float RotationSin;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
+        public fixed uint H0034[5];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0058)]
+        public nint InteractiveModel;
+        [global::System.Runtime.InteropServices.FieldOffset(0x005C)]
+        public fixed uint H005C[4];
+        [global::System.Runtime.InteropServices.FieldOffset(0x006C)]
+        public uint AppearanceBitmap; // Modified when animation changes
+        [global::System.Runtime.InteropServices.FieldOffset(0x0070)]
+        public uint AnimationBits;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0064)]
+        public fixed uint H0064[5];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0088)]
+        public nint PropObjectInfo;
+        [global::System.Runtime.InteropServices.FieldOffset(0x008C)]
+        public uint H008C;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct MapTypeInstanceInfo
+    {
+        public uint RequestInstanceMapType; // Used for auth server
+        public byte IsOutpost;
+        public global::Daybreak.API.Interop.GWCA.GW.RegionType MapRegionType;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct Mat4x3f
+    {
+        public float _11;
+        public float _12;
+        public float _13;
+        public float _14;
+        public float _21;
+        public float _22;
+        public float _23;
+        public float _24;
+        public float _31;
+        public float _32;
+        public float _33;
+        public float _34;
+        public uint Flags;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x10)]
+    public unsafe struct MaterialCost
+    {
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.MaterialSlot Material;
+        public uint Amount;
+        public uint H0008;
+        public uint H000c;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x48)]
+    public unsafe struct MissionMapContext
+    {
+        public global::System.Numerics.Vector2 Size; // Dimensions of the drawable area inside the mission map frame
+        public uint H0008;
+        public uint FrameId;
+        public nint H0020;
+        public uint H0030;
+        public uint H0034;
+        public uint H0038;
+        public nint H003c;
+        public uint H0040;
+        public uint H0044;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x28)]
+    public unsafe struct MissionMapIcon
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint Index;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public float X;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public float Y;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public uint H000C; // = 0
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public uint H0010; // = 0
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public uint Option; // Affilitation/color. gray = 0, blue, red, yellow, teal, purple, green, gray
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public uint H0018; // = 0
+        [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
+        public uint ModelId; // Model of the displayed icon in the Minimap
+        [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
+        public uint H0020; // = 0
+        [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
+        public uint H0024; // May concern the name
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct MissionMapSubContext
+    {
+        public fixed uint H0000[14]; // Could be 0x38, 0x3C or 0x68 depending on if observing etc.
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x58)]
+    public unsafe struct MissionMapSubContext2
+    {
+        public uint H0000;
+        public global::System.Numerics.Vector2 PlayerMissionMapPos;
+        public uint H000c;
+        public global::System.Numerics.Vector2 MissionMapSize;
+        public float Unk;
+        public global::System.Numerics.Vector2 MissionMapPanOffset;
+        public global::System.Numerics.Vector2 MissionMapPanOffset2;
+        public fixed float Unk2[2];
+        public fixed uint Unk3[9];
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0xC)]
+    public unsafe struct MissionObjective
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint ObjectiveId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public nint EncStr;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public uint Type; // completed, bullet, etc...
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x30)]
+    public unsafe struct NPC
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint ModelFileId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint SkinFileId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public global::Daybreak.API.Interop.GuildWars.CharAdjustment VisualAdjustment; // may be overridden
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public uint Appearance;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public uint NpcFlags; // uses CHAR_CLASS_FLAG_* constants
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.Profession Primary;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.Profession Secondary;
+        [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
+        public byte DefaultLevel;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
+        public nint NameEnc;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
+        public uint* ModelFiles;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
+        public uint FilesCount; // length of ModelFile
+        [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
+        public uint FilesCapacity; // capacity of ModelFile
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct Node
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint Type; // XNode = 0, YNode = 1, SinkNode = 2
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint Id;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0xC)]
+    public unsafe struct ObjectPool
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public nint FreeList; // This is a singly linked list of free object. The last object freed is always the pointer.
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public nint Blocks; // This is a singly linked list of blocks that were allocated. Every blocks will generally be for many elements.
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public uint Count;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x8)]
+    public unsafe struct ObjectPoolBlock
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public nint Next;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint H0004;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0xA4)]
+    public unsafe struct ObserverMatch
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint MatchId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint MatchIdDup;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID MapId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public uint Age; // Elapsed time since match started [minutes]
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public global::Daybreak.API.Interop.GWCA.GW.ObserverMatchType Type;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public uint MatchTitle; // eg. 19 - "Monthly Championship Guild Tournament Finals", 18 - "Semifinals", 17 - "Quarterfinals", 16 - "Playoffs", 0 - No title
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public uint H0018;
+        [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
+        public uint Count; // number of teams
+        [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
+        public global::Daybreak.API.Interop.GuildWars.ObserverMatchTeam Team; // [2]
+        [global::System.Runtime.InteropServices.FieldOffset(0x0078)]
+        public nint Team1NameDup;
+        [global::System.Runtime.InteropServices.FieldOffset(0x007C)]
+        public fixed uint H007C[10];
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x2C)]
+    public unsafe struct ObserverMatchTeam
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint Id; // 0 - gray, 1 - blue, 2 - red
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint H0004; // indicates something with the tabard
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public uint H0008; // same.
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public global::Daybreak.API.Interop.GuildWars.CapeDesign Cape; // aka. tabard in gw client
+        [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
+        public nint Name; // encoded name
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0xC)]
+    public unsafe struct PartyAlly
+    {
+        public uint AgentId;
+        public uint Unk;
+        public uint CompositeId;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x43C)]
+    public unsafe struct PartyAttribute
+    {
+        public uint AgentId;
+        public global::Daybreak.API.Interop.GuildWars.Attribute Attribute; // [54]
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct PartyMemberMoraleInfo
+    {
+        public uint AgentId;
+        public uint AgentIdDup;
+        public fixed uint Unk[4];
+        public uint Morale;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0xC)]
+    public unsafe struct PartyMoraleLink
+    {
+        public uint Unk;
+        public uint Unk2;
+        public nint PartyMemberInfo;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct PartySearch
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint PartySearchId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint PartySearchType;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public uint Hardmode;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public uint District;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public uint Language;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public uint PartySize;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public uint HeroCount;
+        [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
+        public fixed char Message[32];
+        [global::System.Runtime.InteropServices.FieldOffset(0x005C)]
+        public fixed char PartyLeader[20];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0084)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.Profession Primary;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0088)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.Profession Secondary;
+        [global::System.Runtime.InteropServices.FieldOffset(0x008C)]
+        public uint Level;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0090)]
+        public uint Timestamp;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct PartySearchContext
+    {
+        public uint H0000;
+        public uint H0004;
+        public uint H0008;
+        public uint H000c;
+        public uint Flags;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x18)]
+    public unsafe struct PathEngineContext
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public nint Vtable;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint H0004;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public uint H0008;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public nint UserData;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public nint HDll;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public uint PfnCreateInterface;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x18)]
+    public unsafe struct PathWaypoint
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public float X;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public float Y;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public float Width;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public float Height;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public uint Plane;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public nint NextTrap;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x30)]
+    public unsafe struct PathingTrapezoid
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint Id;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public ushort PortalLeft;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0016)]
+        public ushort PortalRight;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public float XTL;
+        [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
+        public float XTR;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
+        public float YT;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
+        public float XBL;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
+        public float XBR;
+        [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
+        public float YB;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x1C)]
+    public unsafe struct PetInfo
+    {
+        public uint AgentId;
+        public uint OwnerAgentId;
+        public nint PetName;
+        public uint ModelFileId1;
+        public uint ModelFileId2;
+        public global::Daybreak.API.Interop.GWCA.GW.HeroBehavior Behavior;
+        public uint LockedTargetId;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x50)]
+    public unsafe struct Player
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint AgentId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public fixed uint H0004[3];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public uint AppearanceBitmap;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public uint Flags; // Bitwise field
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public uint Primary;
+        [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
+        public uint Secondary;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
+        public uint H0020;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
+        public nint NameEnc;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
+        public nint Name;
+        [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
+        public uint PartyLeaderPlayerNumber;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
+        public uint ActiveTitleTier;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
+        public uint ReforgedOrDhuumsFlags;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0038)]
+        public uint PlayerNumber;
+        [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
+        public uint PartySize;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
+        public nint H0040;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x134)]
+    public unsafe struct PlayerControlledCharacter
+    {
+        public uint Field00x0;
+        public uint Field10x4;
+        public uint Field20x8;
+        public uint Field30xc;
+        public uint Field40x10;
+        public uint AgentId;
+        public uint CompositeId; // 0x30000000 | player_number
+        public uint Field70x1c;
+        public uint Field80x20;
+        public uint Field90x24;
+        public uint Field100x28;
+        public uint Field110x2c;
+        public uint Field120x30;
+        public uint Field130x34;
+        public uint Field140x38;
+        public uint Field150x3c;
+        public uint Field160x40;
+        public uint Field170x44;
+        public uint Field180x48;
+        public uint Field190x4c;
+        public uint Field200x50;
+        public uint Field210x54;
+        public uint Field220x58;
+        public uint Field230x5c;
+        public uint Field240x60;
+        public uint MoreFlags;
+        public uint Field260x68;
+        public uint Field270x6c;
+        public uint Field280x70;
+        public uint Field290x74;
+        public uint Field300x78;
+        public uint Field310x7c;
+        public uint Field320x80;
+        public uint Field330x84;
+        public uint Field340x88;
+        public uint Field350x8c;
+        public uint Field360x90;
+        public uint Field370x94;
+        public uint Field380x98;
+        public uint Field390x9c;
+        public uint Field400xa0;
+        public uint Field410xa4;
+        public uint Field420xa8;
+        public uint Field430xac;
+        public uint Field440xb0;
+        public uint Field450xb4;
+        public uint Field460xb8;
+        public uint Field470xbc;
+        public uint Field480xc0;
+        public uint Field490xc4;
+        public uint Field500xc8;
+        public uint Field510xcc;
+        public uint Field520xd0;
+        public uint Field530xd4;
+        public uint Field540xd8;
+        public uint Field550xdc;
+        public uint Field560xe0;
+        public uint Field570xe4;
+        public uint Field580xe8;
+        public uint Field590xec;
+        public uint Field600xf0;
+        public uint Field610xf4;
+        public uint Field620xf8;
+        public uint Field630xfc;
+        public uint Field640x100;
+        public uint Field650x104;
+        public uint Field660x108;
+        public uint Flags;
+        public uint Field680x110;
+        public uint Field690x114;
+        public uint Field700x118;
+        public uint Field710x11c;
+        public uint Field720x120;
+        public uint Field730x124;
+        public uint Field740x128;
+        public uint Field750x12c;
+        public uint Field760x130;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x3F8)]
+    public unsafe struct PlayerEquipment
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x010C)]
+        public uint H010C; // From constructor param_3
+        [global::System.Runtime.InteropServices.FieldOffset(0x03DC)]
+        public uint H03DC; // Initialized to 0
+        [global::System.Runtime.InteropServices.FieldOffset(0x03E4)]
+        public uint H03E4; // param_1 from constructor
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0xC)]
+    public unsafe struct PlayerPartyMember
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint LoginNumber;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint CalledTargetId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public uint State;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x14)]
+    public unsafe struct Portal
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public ushort PortalPlane;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0002)]
+        public ushort NeighborPlane;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint Flags; // 0x4 => "Not used for path finding"
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public nint Pair;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public uint Count;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public nint Trapezoids;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct PreGameContext
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint FrameId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public fixed uint H0004[72];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0124)]
+        public uint ChosenCharacterIndex;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0128)]
+        public fixed uint H0128[6];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0140)]
+        public uint Index1;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0144)]
+        public uint Index2;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0148)]
+        public nint Chars;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct PrioQ
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint MLinkOffset;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public nint MNodes;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x14)]
+    public unsafe struct ProfessionState
+    {
+        public uint AgentId;
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.Profession Primary;
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.Profession Secondary;
+        public uint UnlockedProfessions; // bitwise
+        public uint Unk;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct ProgressBarContext
+    {
+        public int Pips;
+        public fixed byte Color[4]; // RGBA
+        public fixed byte Background[4]; // RGBA
+        public fixed int Unk[7];
+        public float Progress; // 0 ... 1
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct PropByType
+    {
+        public uint ObjectId;
+        public uint PropIndex;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x18)]
+    public unsafe struct PropModelInfo
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint H0000;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint H0004;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public uint H0008;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public uint H000C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public uint H0010;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public uint H0014;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x24)]
+    public unsafe struct PvPItemInfo
+    {
+        public fixed uint Unk[9];
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x28)]
+    public unsafe struct PvPItemUpgradeInfo
+    {
+        public uint FileId;
+        public uint NameId;
+        public uint UpgradeType; // Axe, Bow, Inscription
+        public uint CampaignId;
+        public uint Interaction;
+        public uint IsDev; // boolean; if 1, then don't use in-game
+        public uint Profession; // if 0xb then is for all professions
+        public uint H0018;
+        public uint ModStructSize;
+        public uint* ModStruct;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x34)]
+    public unsafe struct Quest
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID QuestId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint LogState;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public nint Location; // quest category
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public nint Name; // quest name
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public nint Npc; // 
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID MapFrom;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public global::Daybreak.API.Interop.GuildWars.GamePos Marker;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
+        public uint H0024;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID MapTo;
+        [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
+        public nint Description; // namestring reward
+        [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
+        public nint Objectives; // namestring objective
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x24)]
+    public unsafe struct RecObject
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public nint Vtable;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint RefCount;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public uint AccessKey; // This is used by the game to make sure the data from the DAT matches the data in game
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public uint Standalone;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public uint FileId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public uint StreamId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public uint Flags;
+        [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
+        public uint Opened;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
+        public uint RefCount2;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x24)]
+    public unsafe struct SalvageSessionInfo
+    {
+        public nint Vtable;
+        public uint FrameId;
+        public uint ItemId;
+        public uint Salvagable1; // Prefix
+        public uint Salvagable2; // Suffix
+        public uint Salvagable3; // Inscription
+        public uint ChosenSalvagable; // 3 for materials
+        public uint H001c;
+        public uint KitId;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct ScannerSectionOffset
+    {
+        public nuint Start;
+        public nuint End;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0xC)]
+    public unsafe struct SinkNode
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public nint Trapezoid;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0xA4)]
+    public unsafe struct Skill
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID SkillId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint H0004;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.Campaign Campaign;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.SkillType Type;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public uint Special;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public uint ComboReq;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public uint Effect1;
+        [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
+        public uint Condition;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
+        public uint Effect2;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
+        public uint WeaponReq;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.ProfessionByte Profession;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0029)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.AttributeByte Attribute;
+        [global::System.Runtime.InteropServices.FieldOffset(0x002A)]
+        public ushort Title;
+        [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID SkillIdPvp;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
+        public byte Combo;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0031)]
+        public byte Target;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0032)]
+        public byte H0032;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0033)]
+        public byte SkillEquipType;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
+        public byte Overcast; // only if special flag has 0x000001 set
+        [global::System.Runtime.InteropServices.FieldOffset(0x0035)]
+        public byte EnergyCost;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0036)]
+        public byte HealthCost;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0037)]
+        public byte H0037;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0038)]
+        public uint Adrenaline;
+        [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
+        public float Activation;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
+        public float Aftercast;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0044)]
+        public uint Duration0;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0048)]
+        public uint Duration15;
+        [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
+        public uint Recharge;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0050)]
+        public fixed ushort H0050[4];
+        [global::System.Runtime.InteropServices.FieldOffset(0x005C)]
+        public uint Scale0;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0060)]
+        public uint Scale15;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0064)]
+        public uint BonusScale0;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0068)]
+        public uint BonusScale15;
+        [global::System.Runtime.InteropServices.FieldOffset(0x006C)]
+        public float AoeRange;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0070)]
+        public float ConstEffect;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0074)]
+        public uint CasterOverheadAnimationId; // 2077 == max == no animation
+        [global::System.Runtime.InteropServices.FieldOffset(0x0078)]
+        public uint CasterBodyAnimationId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x007C)]
+        public uint TargetBodyAnimationId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0080)]
+        public uint TargetOverheadAnimationId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0084)]
+        public uint ProjectileAnimation1Id;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0088)]
+        public uint ProjectileAnimation2Id;
+        [global::System.Runtime.InteropServices.FieldOffset(0x008C)]
+        public uint IconFileId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0090)]
+        public uint IconFileId2;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0094)]
+        public uint IconFileIdHiRes;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0098)]
+        public uint Name; // String id
+        [global::System.Runtime.InteropServices.FieldOffset(0x009C)]
+        public uint Concise; // String id
+        [global::System.Runtime.InteropServices.FieldOffset(0x00A0)]
+        public uint Description; // String id
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0xBC)]
+    public unsafe struct SkillbarData
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint AgentId; // id of the agent whose skillbar this is
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public global::Daybreak.API.Interop.GuildWars.SkillbarSkillData Skills; // [8]
+        [global::System.Runtime.InteropServices.FieldOffset(0x00A4)]
+        public uint Disabled;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00A8)]
+        public SkillbarCastArray CastArray;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00B8)]
+        public uint H00B8;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct SkillbarCast
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public ushort H0000;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID SkillId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public uint H0008;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x14)]
+    public unsafe struct SkillbarSkillData
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint AdrenalineA;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint AdrenalineB;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public uint Recharge;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID SkillId; // see GWConst::SkillIds
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public uint Event;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct SubStruct1
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint H0000;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct SubStructUnk
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint AsyncDecodeStrCallback;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint AsyncDecodeStrParam;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public uint BufferUsed; // if it's 1 then uses s1 & if it's 0 uses s2.
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public nint S1;
+        [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
+        public nint S2;
+        [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
+        public uint H002C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
+        public uint H0030; // tell us how many string will be enqueue before decoding.
+        [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
+        public uint H0034; // @0078B990
+        [global::System.Runtime.InteropServices.FieldOffset(0x0038)]
+        public fixed byte H0038[28];
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct TagInfo
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public ushort GuildId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0002)]
+        public byte Primary;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0003)]
+        public byte Secondary;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public ushort Level;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct TextCache
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint H0000;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct TextParser
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public fixed uint H0000[8];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
+        public nint DecStart;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
+        public nint DecEnd;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
+        public uint Substitute1; // related to h0020 & h0024
+        [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
+        public uint Substitute2; // related to h0020 & h0024
+        [global::System.Runtime.InteropServices.FieldOffset(0x0030)]
+        public nint Cache;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
+        public fixed uint H0034[75];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0160)]
+        public uint H0160; // @0078BEF5
+        [global::System.Runtime.InteropServices.FieldOffset(0x0164)]
+        public uint H0164;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0168)]
+        public uint H0168; // set to 0 @0078BF34
+        [global::System.Runtime.InteropServices.FieldOffset(0x016C)]
+        public fixed uint H016C[5];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0180)]
+        public nint SubStruct;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0184)]
+        public fixed uint H0184[19];
+        [global::System.Runtime.InteropServices.FieldOffset(0x01D0)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.Language LanguageId;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x2C)]
+    public unsafe struct Title
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint Props;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint CurrentPoints;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public uint CurrentTitleTierIndex;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public uint PointsNeededCurrentRank;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public uint H0010;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public uint NextTitleTierIndex;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public uint PointsNeededNextRank;
+        [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
+        public uint MaxTitleRank;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
+        public uint MaxTitleTierIndex;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
+        public nint PointsDesc; // Pretty sure these are ptrs to title hash strings
+        [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
+        public nint H0028; // Pretty sure these are ptrs to title hash strings
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct TitleClientData
+    {
+        public uint TitleFlags;
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.TitleID TitleId;
+        public uint NameId;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0xC)]
+    public unsafe struct TitleTier
+    {
+        public uint Props;
+        public uint TierNumber;
+        public nint TierNameEnc;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x78)]
+    public unsafe struct TownAlliance
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint Rank;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint Allegiance;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public uint Faction;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public fixed char Name[32];
+        [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
+        public fixed char Tag[5];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0056)]
+        public fixed byte Padding[2];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0058)]
+        public global::Daybreak.API.Interop.GuildWars.CapeDesign Cape;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0074)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID MapId;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct TradeContext
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint Flags; // this is actually a flags
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public fixed uint H0004[3]; // Seemingly 3 null dwords
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public global::Daybreak.API.Interop.GuildWars.TradePlayer Player;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
+        public global::Daybreak.API.Interop.GuildWars.TradePlayer Partner;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct TradeItem
+    {
+        public uint ItemId;
+        public uint Quantity;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct TradePlayer
+    {
+        public uint Gold;
+        public nint Items;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct Vector2
+    {
+        public float X;
+        public float Y;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct Vector3
+    {
+        public float X;
+        public float Y;
+        public float Z;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct VisibleEffect
+    {
+        public uint Unk; // enchantment = 1, weapon spell = 9
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.EffectID Id;
+        public uint HasEnded; // effect no longer active, effect ending animation plays.
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x8)]
+    public unsafe struct WeaponSet
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public nint Weapon;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public nint Offhand;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x854)]
+    public unsafe struct WorldContext
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public nint AccountInfo;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public nint MessageBuff;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public nint DialogBuff;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
+        public MerchItemArray MerchItems;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
+        public MerchItemArray MerchItems2;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0044)]
+        public uint AccumMapInitUnk0;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0048)]
+        public uint AccumMapInitUnk1;
+        [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
+        public uint AccumMapInitOffset;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0050)]
+        public uint AccumMapInitLength;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0054)]
+        public uint H0054;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0058)]
+        public uint AccumMapInitUnk2;
+        [global::System.Runtime.InteropServices.FieldOffset(0x005C)]
+        public fixed uint H005C[8];
+        [global::System.Runtime.InteropServices.FieldOffset(0x007C)]
+        public MapAgentArray MapAgents;
+        [global::System.Runtime.InteropServices.FieldOffset(0x008C)]
+        public nint PartyAllies; // List of allies added to the current party
+        [global::System.Runtime.InteropServices.FieldOffset(0x009C)]
+        public global::System.Numerics.Vector3 AllFlag;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00A8)]
+        public uint H00A8;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00AC)]
+        public PartyAttributeArray Attributes;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00BC)]
+        public fixed uint H00BC[255];
+        [global::System.Runtime.InteropServices.FieldOffset(0x04B8)]
+        public nint H04B8;
+        [global::System.Runtime.InteropServices.FieldOffset(0x04C8)]
+        public nint H04C8;
+        [global::System.Runtime.InteropServices.FieldOffset(0x04D8)]
+        public uint H04D8;
+        [global::System.Runtime.InteropServices.FieldOffset(0x04DC)]
+        public nint H04DC;
+        [global::System.Runtime.InteropServices.FieldOffset(0x04EC)]
+        public fixed uint H04EC[7];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0508)]
+        public AgentEffectsArray PartyEffects;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0518)]
+        public nint H0518;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0528)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID ActiveQuestId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x052C)]
+        public QuestLog QuestLog;
+        [global::System.Runtime.InteropServices.FieldOffset(0x053C)]
+        public fixed uint H053C[10];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0564)]
+        public nint MissionObjectives;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0574)]
+        public nint HenchmenAgentIds;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0584)]
+        public HeroFlagArray HeroFlags;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0594)]
+        public HeroInfoArray HeroInfo;
+        [global::System.Runtime.InteropServices.FieldOffset(0x05A4)]
+        public nint CartographedAreas; // Struct size = 0x20
+        [global::System.Runtime.InteropServices.FieldOffset(0x05B4)]
+        public fixed uint H05B4[2];
+        [global::System.Runtime.InteropServices.FieldOffset(0x05BC)]
+        public nint ControlledMinionCount;
+        [global::System.Runtime.InteropServices.FieldOffset(0x05CC)]
+        public nint MissionsCompleted;
+        [global::System.Runtime.InteropServices.FieldOffset(0x05DC)]
+        public nint MissionsBonus;
+        [global::System.Runtime.InteropServices.FieldOffset(0x05EC)]
+        public nint MissionsCompletedHm;
+        [global::System.Runtime.InteropServices.FieldOffset(0x05FC)]
+        public nint MissionsBonusHm;
+        [global::System.Runtime.InteropServices.FieldOffset(0x060C)]
+        public nint UnlockedMap;
+        [global::System.Runtime.InteropServices.FieldOffset(0x061C)]
+        public fixed uint H061C[2];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0624)]
+        public nint PlayerMoraleInfo;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0628)]
+        public uint H028C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x062C)]
+        public nint PartyMoraleRelated;
+        [global::System.Runtime.InteropServices.FieldOffset(0x063C)]
+        public fixed uint H063C[16];
+        [global::System.Runtime.InteropServices.FieldOffset(0x067C)]
+        public uint PlayerNumber;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0680)]
+        public nint PlayerControlledChar; // Struct size = 0x134 ?
+        [global::System.Runtime.InteropServices.FieldOffset(0x0684)]
+        public uint IsHardModeUnlocked;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0688)]
+        public fixed uint H0688[2];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0690)]
+        public uint SalvageSessionId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0694)]
+        public fixed uint H0694[5];
+        [global::System.Runtime.InteropServices.FieldOffset(0x06A8)]
+        public uint PlayerTeamToken;
+        [global::System.Runtime.InteropServices.FieldOffset(0x06AC)]
+        public nint Pets;
+        [global::System.Runtime.InteropServices.FieldOffset(0x06BC)]
+        public nint PartyProfessionStates; // Current state of primary/secondary/unlocked for current player and party heroes, used in skill window. aka attribStates
+        [global::System.Runtime.InteropServices.FieldOffset(0x06CC)]
+        public nint H06CC;
+        [global::System.Runtime.InteropServices.FieldOffset(0x06DC)]
+        public uint H06DC;
+        [global::System.Runtime.InteropServices.FieldOffset(0x06E0)]
+        public nint H06E0;
+        [global::System.Runtime.InteropServices.FieldOffset(0x06F0)]
+        public SkillbarArray Skillbar;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0700)]
+        public nint LearnableCharacterSkills; // populated at skill trainer and when using signet of capture
+        [global::System.Runtime.InteropServices.FieldOffset(0x0710)]
+        public nint UnlockedCharacterSkills; // bit field
+        [global::System.Runtime.InteropServices.FieldOffset(0x0720)]
+        public nint DuplicatedCharacterSkills; // When res signet is bought more than once, its mapped into this array. Used in skill window.
+        [global::System.Runtime.InteropServices.FieldOffset(0x0730)]
+        public nint H0730;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0740)]
+        public uint Experience;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0744)]
+        public uint ExperienceDupe;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0748)]
+        public uint CurrentKurzick;
+        [global::System.Runtime.InteropServices.FieldOffset(0x074C)]
+        public uint CurrentKurzickDupe;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0750)]
+        public uint TotalEarnedKurzick;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0754)]
+        public uint TotalEarnedKurzickDupe;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0758)]
+        public uint CurrentLuxon;
+        [global::System.Runtime.InteropServices.FieldOffset(0x075C)]
+        public uint CurrentLuxonDupe;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0760)]
+        public uint TotalEarnedLuxon;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0764)]
+        public uint TotalEarnedLuxonDupe;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0768)]
+        public uint CurrentImperial;
+        [global::System.Runtime.InteropServices.FieldOffset(0x076C)]
+        public uint CurrentImperialDupe;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0770)]
+        public uint TotalEarnedImperial;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0774)]
+        public uint TotalEarnedImperialDupe;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0778)]
+        public uint UnkFaction4;
+        [global::System.Runtime.InteropServices.FieldOffset(0x077C)]
+        public uint UnkFaction4Dupe;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0780)]
+        public uint UnkFaction5;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0784)]
+        public uint UnkFaction5Dupe;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0788)]
+        public uint Level;
+        [global::System.Runtime.InteropServices.FieldOffset(0x078C)]
+        public uint LevelDupe;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0790)]
+        public uint Morale;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0794)]
+        public uint MoraleDupe;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0798)]
+        public uint CurrentBalth;
+        [global::System.Runtime.InteropServices.FieldOffset(0x079C)]
+        public uint CurrentBalthDupe;
+        [global::System.Runtime.InteropServices.FieldOffset(0x07A0)]
+        public uint TotalEarnedBalth;
+        [global::System.Runtime.InteropServices.FieldOffset(0x07A4)]
+        public uint TotalEarnedBalthDupe;
+        [global::System.Runtime.InteropServices.FieldOffset(0x07A8)]
+        public uint CurrentSkillPoints;
+        [global::System.Runtime.InteropServices.FieldOffset(0x07AC)]
+        public uint CurrentSkillPointsDupe;
+        [global::System.Runtime.InteropServices.FieldOffset(0x07B0)]
+        public uint TotalEarnedSkillPoints;
+        [global::System.Runtime.InteropServices.FieldOffset(0x07B4)]
+        public uint TotalEarnedSkillPointsDupe;
+        [global::System.Runtime.InteropServices.FieldOffset(0x07B8)]
+        public uint MaxKurzick;
+        [global::System.Runtime.InteropServices.FieldOffset(0x07BC)]
+        public uint MaxLuxon;
+        [global::System.Runtime.InteropServices.FieldOffset(0x07C0)]
+        public uint MaxBalth;
+        [global::System.Runtime.InteropServices.FieldOffset(0x07C4)]
+        public uint MaxImperial;
+        [global::System.Runtime.InteropServices.FieldOffset(0x07C8)]
+        public uint EquipmentStatus;
+        [global::System.Runtime.InteropServices.FieldOffset(0x07CC)]
+        public AgentInfoArray AgentInfos;
+        [global::System.Runtime.InteropServices.FieldOffset(0x07DC)]
+        public nint H07DC;
+        [global::System.Runtime.InteropServices.FieldOffset(0x07EC)]
+        public MissionMapIconArray MissionMapIcons;
+        [global::System.Runtime.InteropServices.FieldOffset(0x07FC)]
+        public NPCArray Npcs;
+        [global::System.Runtime.InteropServices.FieldOffset(0x080C)]
+        public PlayerArray Players;
+        [global::System.Runtime.InteropServices.FieldOffset(0x081C)]
+        public TitleArray Titles;
+        [global::System.Runtime.InteropServices.FieldOffset(0x082C)]
+        public nint TitleTiers;
+        [global::System.Runtime.InteropServices.FieldOffset(0x083C)]
+        public nint VanquishedAreas;
+        [global::System.Runtime.InteropServices.FieldOffset(0x084C)]
+        public uint FoesKilled;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0850)]
+        public uint FoesToKill;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x224)]
+    public unsafe struct WorldMapContext
+    {
+        public uint FrameId;
+        public global::Daybreak.API.Interop.GWCA.GW.Continent Continent;
+        public uint H0008;
+        public float H000c;
+        public float H0010;
+        public uint H0014;
+        public float H0018;
+        public float H001c;
+        public float H0020;
+        public float H0024;
+        public float H0028;
+        public float H002c;
+        public float H0030;
+        public float H0034;
+        public float Zoom; // 1.0f if zoomed in, 0.0f if zoomed out
+        public global::System.Numerics.Vector2 TopLeft; // Viewport position relative to world map, start
+        public global::System.Numerics.Vector2 BottomRight; // Viewport position relative to world map, end
+        public fixed uint H004c[7];
+        public float H0068;
+        public float H006c;
+        public fixed uint Params[109];
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x20)]
+    public unsafe struct XNode
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public global::System.Numerics.Vector2 Pos;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public global::System.Numerics.Vector2 Dir;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public nint Left;
+        [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
+        public nint Right;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x18)]
+    public unsafe struct YNode
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public global::System.Numerics.Vector2 Pos;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public nint Above;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public nint Below;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct QuoteInfo
+    {
+        public uint Unknown;
+        public uint ItemCount;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct TransactionInfo
+    {
+        public uint ItemCount;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct ChatBuffer
+    {
+        public uint Next;
+        public uint Unk1;
+        public uint Unk2;
+        public fixed nint Messages[1];
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct ChatMessage
+    {
+        public uint Channel;
+        public uint Unk1;
+        public ulong Timestamp;
+        // Flexible array member: char Message[0]
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x8C)]
+    public unsafe struct SkillTemplate
+    {
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.Profession Primary;
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.Profession Secondary;
+        public uint AttributesCount;
+        public global::Daybreak.API.Interop.GuildWars.Attribute AttributeIds; // [12]
+        public fixed uint AttributeValues[12];
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID Skills; // [8]
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct AgentNameTagInfo
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint AgentId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint H0002;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public uint H0003;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public nint NameEnc;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public byte H0010;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0011)]
+        public byte H0012;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0012)]
+        public byte H0013;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0013)]
+        public byte BackgroundAlpha; // ARGB, NB: Actual color is ignored, only alpha is used
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public uint TextColor; // ARGB
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public uint LabelAttributes; // bold/size etc
+        [global::System.Runtime.InteropServices.FieldOffset(0x001E)]
+        public byte H001E;
+        [global::System.Runtime.InteropServices.FieldOffset(0x001F)]
+        public byte H001F;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
+        public nint ExtraInfoEnc; // Title etc
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct ChatTemplate
+    {
+        public uint AgentId;
+        public uint Type; // 0 = build, 1 = equipment
+        public nint Code;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct CompassPoint
+    {
+        public int X;
+        public int Y;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct DialogBodyInfo
+    {
+        public uint Type;
+        public uint AgentId;
+        public nint MessageEnc;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct DialogButtonInfo
+    {
+        public uint ButtonIcon; // byte
+        public nint Message;
+        public uint DialogId;
+        public uint SkillId; // Default 0xFFFFFFF
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x24)]
+    public unsafe struct FloatingWindow
+    {
+        public nint Unk1; // Some kind of function call
+        public nint Name;
+        public uint Unk2;
+        public uint Unk3;
+        public uint SavePreference; // 1 or 0; if 1, will save to UI layout preferences.
+        public uint Unk4;
+        public uint Unk5;
+        public uint Unk6;
+        public uint WindowId; // Maps to window array
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x1C8)]
+    public unsafe struct Frame
+    {
+        public uint Field10x0;
+        public uint Field20x4;
+        public uint FrameLayout;
+        public uint Field30xc;
+        public uint Field40x10;
+        public uint Field50x14;
+        public uint VisibilityFlags;
+        public uint Field70x1c;
+        public uint Type;
+        public uint TemplateType;
+        public uint Field100x28;
+        public uint Field110x2c;
+        public uint Field120x30;
+        public uint Field130x34;
+        public uint Field140x38;
+        public uint Field150x3c;
+        public uint Field160x40;
+        public uint Field170x44;
+        public uint Field180x48;
+        public uint Field190x4c;
+        public uint Field200x50;
+        public uint Field210x54;
+        public uint Field220x58;
+        public uint Field230x5c;
+        public uint Field240x60;
+        public uint Field24a0x64;
+        public uint Field24b0x68;
+        public uint Field250x6c;
+        public uint Field260x70;
+        public uint Field270x74;
+        public uint Field280x78;
+        public uint Field290x7c;
+        public uint Field300x80;
+        public nint Field310x84;
+        public uint Field320x94;
+        public uint Field330x98;
+        public uint Field340x9c;
+        public uint Field350xa0;
+        public uint Field360xa4;
+        public nint FrameCallbacks;
+        public uint ChildOffsetId; // Offset of this child in relation to its parent
+        public uint FrameId; // Offset in the global frame array
+        public uint Field400xc0;
+        public uint Field410xc4;
+        public uint Field420xc8;
+        public uint Field430xcc;
+        public uint Field440xd0;
+        public uint Field450xd4;
+        public global::Daybreak.API.Interop.GuildWars.FramePositionData Position;
+        public uint Field630x11c;
+        public uint Field640x120;
+        public uint Field650x124;
+        public FrameRelation Relation;
+        public uint Field730x144;
+        public uint Field740x148;
+        public uint Field750x14c;
+        public uint Field760x150;
+        public uint Field770x154;
+        public uint Field780x158;
+        public uint Field790x15c;
+        public uint Field800x160;
+        public uint Field810x164;
+        public uint Field820x168;
+        public uint Field830x16c;
+        public uint Field840x170;
+        public uint Field850x174;
+        public uint Field860x178;
+        public uint Field870x17c;
+        public uint Field880x180;
+        public uint Field890x184;
+        public uint Field900x188;
+        public uint FrameState;
+        public uint Field920x190;
+        public uint Field930x194;
+        public uint Field940x198;
+        public uint Field950x19c;
+        public uint Field960x1a0;
+        public uint Field970x1a4;
+        public uint Field980x1a8;
+        public nint TooltipInfo;
+        public uint Field1000x1b0;
+        public uint Field1010x1b4;
+        public uint Field1020x1b8;
+        public uint Field1030x1bc;
+        public uint Field1040x1c0;
+        public uint Field1050x1c4;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct FramePositionData
+    {
+        public uint Flags;
+        public float Left;
+        public float Bottom;
+        public float Right;
+        public float Top;
+        public float ContentLeft;
+        public float ContentBottom;
+        public float ContentRight;
+        public float ContentTop;
+        public float Unk;
+        public float ScaleFactor; // Depends on UI scale
+        public float ViewportWidth; // Width in px of available screen height; this may sometimes be scaled down, too!
+        public float ViewportHeight; // Height in px of available screen height; this may sometimes be scaled down, too!
+        public float ScreenLeft;
+        public float ScreenBottom;
+        public float ScreenRight;
+        public float ScreenTop;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct InteractionMessage
+    {
+        public uint FrameId;
+        public global::Daybreak.API.Models.UIMessage MessageId; // Same as UIMessage from UIMgr, but includes things like mouse move, click etc
+        public nint WParam;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct MapEntryMessage
+    {
+        public nint Title;
+        public nint Subtitle;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct UIChatMessage
+    {
+        public uint Channel;
+        public nint Message;
+        public uint Channel2;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct WindowPositionData
+    {
+        public uint State; // & 0x1 == visible
+        public global::System.Numerics.Vector2 P1;
+        public global::System.Numerics.Vector2 P2;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kAgentSkillPacket
+    {
+        public uint AgentId;
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID SkillId;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kAgentSkillStartedCast
+    {
+        public uint AgentId;
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID SkillId;
+        public float Duration;
+        public uint H000c;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kAgentSpeechBubble
+    {
+        public uint AgentId;
+        public nint Message;
+        public uint H0008;
+        public uint H000c;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kAllyOrGuildMessage
+    {
+        public global::Daybreak.API.Models.Channel Channel;
+        public nint Message;
+        public nint Sender;
+        public nint GuildTag;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kChangeTarget
+    {
+        public uint EvaluatedTargetId;
+        public byte HasEvaluatedTargetChanged;
+        public uint AutoTargetId;
+        public byte HasAutoTargetChanged;
+        public uint ManualTargetId;
+        public byte HasManualTargetChanged;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kCompassDraw
+    {
+        public uint PlayerNumber;
+        public uint SessionId;
+        public uint NumberOfPoints;
+        public nint Points;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kDialogueMessage
+    {
+        public uint AgentId;
+        public nint Sender;
+        public nint Message;
+        public uint Duration;
+        public uint IsDialogue1Or2;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kEffectAdd
+    {
+        public uint AgentId;
+        public nint Effect;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kErrorMessage
+    {
+        public uint ErrorId;
+        public nint Message;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kGetColor
+    {
+        public uint* Color;
+        public global::Daybreak.API.Models.Channel Channel;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kInteractAgent
+    {
+        public uint AgentId;
+        public byte CallTarget;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kInventorySlotUpdated
+    {
+        public uint Unk;
+        public uint ItemId;
+        public uint BagIndex;
+        public uint SlotId;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kItemUpdated
+    {
+        public uint ItemId;
+        public uint ModelFileId;
+        public uint Type;
+        public uint Unk1;
+        public uint ExtraId; // Dye color
+        public uint Materials;
+        public uint Unk2;
+        public uint Interaction; // Flags
+        public uint Price;
+        public uint ModelId;
+        public uint Quantity;
+        public nint EncName;
+        public uint ModStructSize;
+        public uint* ModStruct;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kKeyAction
+    {
+        public uint GwKey;
+        public uint Modifiers;
+        public uint StateFlags; // shift held = 0x4, ctrl = 0x2, alt = 0x1
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x20)]
+    public unsafe struct kLoadMapContext
+    {
+        public nint FileName;
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID MapId;
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.InstanceType MapType;
+        public global::System.Numerics.Vector2 SpawnPoint;
+        public uint H0014;
+        public uint H0018;
+        public nint Success;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kLogChatMessage
+    {
+        public nint Message;
+        public global::Daybreak.API.Models.Channel Channel;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x8)]
+    public unsafe struct kLogout
+    {
+        public uint Unknown;
+        public uint CharacterSelect;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kMeasureContent
+    {
+        public float MaxWidth; // Maximum width constraint
+        public float MaxHeight; // Maximum height constraint
+        public float* SizeOutput; // Pointer to output buffer for calculated size
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kMouseAction
+    {
+        public uint FrameId;
+        public uint ChildOffsetId;
+        public global::Daybreak.API.Interop.GWCA.GW.UIPacket.ActionState CurrentState;
+        public nint Wparam;
+        public nint Lparam;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kMouseClick
+    {
+        public uint MouseButton; // 0x0 = left, 0x1 = middle, 0x2 = right
+        public uint IsDoubleclick;
+        public uint UnknownTypeScreenPos;
+        public uint H000c;
+        public uint H0010;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kMouseCoordsClick
+    {
+        public float OffsetX;
+        public float OffsetY;
+        public uint H0008;
+        public uint H000c;
+        public uint* H0010;
+        public uint H0014;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kMoveItem
+    {
+        public uint ItemId;
+        public uint ToBagIndex;
+        public uint ToSlot;
+        public uint Prompt;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kObjectiveAdd
+    {
+        public uint ObjectiveId;
+        public nint Name;
+        public uint Type;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kObjectiveComplete
+    {
+        public uint ObjectiveId;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kObjectiveUpdated
+    {
+        public uint ObjectiveId;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kPartySearchInvite
+    {
+        public uint SourcePartySearchId;
+        public uint DestPartySearchId;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kPartyShowConfirmDialog
+    {
+        public uint UiMessageToSendToPartyFrame;
+        public uint PromptIdentitifier;
+        public nint PromptEncStr;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kPlayerChatMessage
+    {
+        public global::Daybreak.API.Models.Channel Channel;
+        public nint Message;
+        public uint PlayerNumber;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kPostProcessingEffect
+    {
+        public uint Tint;
+        public float Amount;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kPreStartSalvage
+    {
+        public uint ItemId;
+        public uint KitId;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kPreferenceEnumChanged
+    {
+        public global::Daybreak.API.Interop.GWCA.GW.UI.EnumPreference PreferenceId;
+        public uint EnumIndex;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kPreferenceFlagChanged
+    {
+        public global::Daybreak.API.Interop.GWCA.GW.UI.FlagPreference PreferenceId;
+        public uint NewValue;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kPreferenceValueChanged
+    {
+        public global::Daybreak.API.Interop.GWCA.GW.UI.NumberPreference PreferenceId;
+        public uint NewValue;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kPrintChatMessage
+    {
+        public global::Daybreak.API.Models.Channel Channel;
+        public nint Message;
+        public ulong Timestamp;
+        public uint IsReprint;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kRecvWhisper
+    {
+        public uint TransactionId;
+        public nint From;
+        public nint Message;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kResize
+    {
+        public uint H0000;
+        public float ContentWidth;
+        public float ContentHeight;
+        public float H000c;
+        public float H0010;
+        public float ContentWidth2;
+        public float ContentHeight2;
+        public float MarginX;
+        public float MarginY;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kSendCallTarget
+    {
+        public global::Daybreak.API.Interop.GWCA.GW.CallTargetType CallType;
+        public uint AgentId;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kSendChangeTarget
+    {
+        public uint TargetId;
+        public uint AutoTargetId;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kSendChatMessage
+    {
+        public nint Message;
+        public uint AgentId;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kSendLoadSkillTemplate
+    {
+        public uint AgentId;
+        public nint SkillTemplate;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kSendMerchantRequestQuote
+    {
+        public global::Daybreak.API.Interop.GWCA.GW.Merchant.TransactionType Type;
+        public uint ItemId;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kSendMerchantTransactItem
+    {
+        public global::Daybreak.API.Interop.GWCA.GW.Merchant.TransactionType Type;
+        public uint H0004;
+        public global::Daybreak.API.Interop.GuildWars.QuoteInfo Give;
+        public uint GoldRecv;
+        public global::Daybreak.API.Interop.GuildWars.QuoteInfo Recv;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kSendMoveItem
+    {
+        public uint ItemId;
+        public uint Quantity;
+        public uint BagIndex;
+        public uint Slot;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kSendPingWeaponSet
+    {
+        public uint AgentId;
+        public uint WeaponItemId;
+        public uint OffhandItemId;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kSendUseItem
+    {
+        public uint ItemId;
+        public ushort Quantity; // Unused, but would be cool
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kSendWorldAction
+    {
+        public global::Daybreak.API.Interop.GWCA.GW.WorldActionId ActionId;
+        public uint AgentId;
+        public byte SuppressCallTarget; // 1 to block "I'm targetting X", but will also only trigger if the key thing is down
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kServerActiveQuestChanged
+    {
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID QuestId;
+        public global::Daybreak.API.Interop.GuildWars.GamePos Marker;
+        public uint H0024;
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID MapId;
+        public uint LogState;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kSetAgentProfession
+    {
+        public uint AgentId;
+        public uint Primary;
+        public uint Secondary;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kSetLayout
+    {
+        public float Field0x0;
+        public float Field0x4;
+        public float Field0x8;
+        public float Field0xc;
+        public float AvailableWidth;
+        public float AvailableHeight;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kSetRendererValue
+    {
+        public uint RendererMode; // 0 for window, 2 for full screen
+        public uint MetricId; // TODO: Enum this!
+        public uint Value;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kShowXunlaiChest
+    {
+        public uint H0000;
+        public byte StoragePaneUnlocked;
+        public byte AnniversaryPaneUnlocked;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kStartWhisper
+    {
+        public nint PlayerName;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kTomeSkillSelection
+    {
+        public uint ItemId;
+        public uint H0004;
+        public uint H0008;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kUIPositionChanged
+    {
+        public uint WindowId;
+        public nint Position;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kUseKitOnItem
+    {
+        public uint ItemId;
+        public uint KitId;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kVendorItems
+    {
+        public global::Daybreak.API.Interop.GWCA.GW.Merchant.TransactionType TransactionType;
+        public uint ItemIdsCount;
+        public uint* ItemIdsBuffer1; // world->merchant_items.buffer
+        public uint* ItemIdsBuffer2; // world->merchant_items2.buffer
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kVendorQuote
+    {
+        public uint ItemId;
+        public uint Price;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kVendorWindow
+    {
+        public global::Daybreak.API.Interop.GWCA.GW.Merchant.TransactionType TransactionType;
+        public uint Unk;
+        public uint MerchantAgentId;
+        public uint IsPending;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kWeaponSetChanged
+    {
+        public uint H0000;
+        public uint H0004;
+        public uint H0008;
+        public uint H000c;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kWeaponSwap
+    {
+        public uint WeaponBarFrameId;
+        public uint WeaponSetId;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kWriteToChatLog
+    {
+        public global::Daybreak.API.Models.Channel Channel;
+        public nint Message;
+        public global::Daybreak.API.Models.Channel ChannelDupe;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kWriteToChatLogWithSender
+    {
+        public uint Channel;
+        public nint Message;
+        public nint SenderEnc;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct PacketBase
+    {
+        public uint Header;
+    }
+    public unsafe struct KeyCallback { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<uint32_t> Value; }
+    public unsafe struct AgentArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Value; }
+    public unsafe struct AgentEffectsArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.AgentEffects> Value; }
+    public unsafe struct AgentInfoArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.AgentInfo> Value; }
+    public unsafe struct AgentList { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<Agent> Value; }
+    public unsafe struct AgentMovementArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Value; }
+    public unsafe struct BlockedPlaneArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<uint32_t> Value; }
+    public unsafe struct BuffArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.Buff> Value; }
+    public unsafe struct EffectArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.EffectData> Value; }
+    public unsafe struct FriendsListArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Value; }
+    public unsafe struct GuildArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Value; }
+    public unsafe struct GuildHistory { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Value; }
+    public unsafe struct GuildRoster { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Value; }
+    public unsafe struct HenchmanPartyMemberArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.HenchmanPartyMember> Value; }
+    public unsafe struct HeroFlagArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.HeroFlag> Value; }
+    public unsafe struct HeroInfoArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.HeroInfo> Value; }
+    public unsafe struct HeroPartyMemberArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.HeroPartyMember> Value; }
+    public unsafe struct ItemArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Value; }
+    public unsafe struct MapAgentArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.MapAgent> Value; }
+    public unsafe struct MerchItemArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<ItemID> Value; }
+    public unsafe struct MissionMapIconArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.MissionMapIcon> Value; }
+    public unsafe struct NPCArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.NPC> Value; }
+    public unsafe struct PartyAttributeArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.PartyAttribute> Value; }
+    public unsafe struct PathNodeArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Value; }
+    public unsafe struct PathingMapArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<PathingMap> Value; }
+    public unsafe struct PlayerArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.Player> Value; }
+    public unsafe struct PlayerPartyMemberArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.PlayerPartyMember> Value; }
+    public unsafe struct QuestLog { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.Quest> Value; }
+    public unsafe struct SkillbarArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.SkillbarData> Value; }
+    public unsafe struct SkillbarCastArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.SkillbarCast> Value; }
+    public unsafe struct TitleArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.Title> Value; }
+    public unsafe struct VisibleEffectList { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.VisibleEffect> Value; }
+    public unsafe struct PacketCallback { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Value; }
 }
