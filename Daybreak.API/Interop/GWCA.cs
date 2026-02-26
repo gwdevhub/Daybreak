@@ -62,24 +62,24 @@ public static unsafe partial class GWCA
     // [NAMESPACE] GWCA.GW.UI.UIPacket popped at line 29
     // [NAMESPACE] GWCA.GW.UIPacket popped at line 966
     // [NAMESPACE] GWCA.GWCA popped at line 15
-    // GWCA.GW.AccountContext: 8 fields [OK]
+    // GWCA.GW.AccountContext: 9 fields [OK]
     // GWCA.GW.AccountInfo: 7 fields [OK]
     // GWCA.GW.AccountUnlockedCount: 3 fields [OK]
     // GWCA.GW.AccountUnlockedItemInfo: 3 fields [OK]
-    // GWCA.GW.Agent: 36 fields [OK]
+    // GWCA.GW.Agent: 43 fields [OK]
     // GWCA.GW.AgentContext: 27 fields [OK]
     // GWCA.GW.AgentEffects: 3 fields [OK]
     // GWCA.GW.AgentGadget: 5 fields [OK]
     // GWCA.GW.AgentInfo: 1 fields [OK]
     // GWCA.GW.AgentItem: 4 fields [OK]
-    // GWCA.GW.AgentLiving: 52 fields [OK]
+    // GWCA.GW.AgentLiving: 56 fields [OK]
     // GWCA.GW.AgentMovement: 12 fields [OK]
     // GWCA.GW.AgentSummaryInfo: 10 fields [SKIP: mixed offset fields]
     // GWCA.GW.AreaInfo: 31 fields [OK]
-    // GWCA.GW.Attribute: 4 fields [OK]
+    // GWCA.GW.Attribute: 5 fields [OK]
     // GWCA.GW.AttributeInfo: 5 fields [OK]
     // GWCA.GW.Bag: 7 fields [OK]
-    // GWCA.GW.Buff: 3 fields [OK]
+    // GWCA.GW.Buff: 4 fields [OK]
     // GWCA.GW.ButtonFrame: 0 fields [SKIP: no fields]
     // GWCA.GW.Camera: 56 fields [OK]
     // GWCA.GW.CapeDesign: 7 fields [OK]
@@ -115,7 +115,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.HeroInfo: 30 fields [OK]
     // GWCA.GW.HeroPartyMember: 6 fields [OK]
     // GWCA.GW.Inventory: 39 fields [OK]
-    // GWCA.GW.Item: 25 fields [OK]
+    // GWCA.GW.Item: 26 fields [OK]
     // GWCA.GW.ItemContext: 12 fields [OK]
     // GWCA.GW.ItemData: 4 fields [OK]
     // GWCA.GW.ItemFormula: 5 fields [OK]
@@ -130,7 +130,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.MaterialCost: 4 fields [OK]
     // GWCA.GW.Merchant.QuoteInfo: 2 fields [OK]
     // GWCA.GW.Merchant.TransactionInfo: 1 fields [OK]
-    // GWCA.GW.MissionMapContext: 10 fields [OK]
+    // GWCA.GW.MissionMapContext: 12 fields [OK]
     // GWCA.GW.MissionMapIcon: 10 fields [OK]
     // GWCA.GW.MissionMapSubContext: 1 fields [OK]
     // GWCA.GW.MissionMapSubContext2: 9 fields [OK]
@@ -139,7 +139,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.Node: 2 fields [OK]
     // GWCA.GW.NodeCache: 3 fields [SKIP: complex template in field buffer: BaseArray<uint32_t>]
     // GWCA.GW.NPC: 12 fields [OK]
-    // GWCA.GW.NPCEquipment: 36 fields [SKIP: vtable in field vtable: EquipmentVTable*]
+    // GWCA.GW.NPCEquipment: 39 fields [SKIP: vtable in field vtable: EquipmentVTable*]
     // GWCA.GW.ObjectPool: 3 fields [OK]
     // GWCA.GW.ObjectPoolBlock: 2 fields [OK]
     // GWCA.GW.ObserverMatch: 11 fields [OK]
@@ -162,12 +162,12 @@ public static unsafe partial class GWCA
     // GWCA.GW.PetInfo: 7 fields [OK]
     // GWCA.GW.Player: 15 fields [OK]
     // GWCA.GW.PlayerControlledCharacter: 77 fields [OK]
-    // GWCA.GW.PlayerEquipment: 3 fields [OK]
+    // GWCA.GW.PlayerEquipment: 7 fields [OK]
     // GWCA.GW.PlayerPartyMember: 3 fields [OK]
     // GWCA.GW.Portal: 6 fields [OK]
     // GWCA.GW.PreGameContext: 7 fields [OK]
     // GWCA.GW.PrioQ: 2 fields [OK]
-    // GWCA.GW.PrioQLink: 3 fields [SKIP: template param T in field pq]
+    // GWCA.GW.PrioQLink: 4 fields [SKIP: template param T in field pq]
     // GWCA.GW.ProfessionState: 5 fields [OK]
     // GWCA.GW.ProgressBarContext: 5 fields [OK]
     // GWCA.GW.PropByType: 2 fields [OK]
@@ -182,7 +182,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.ScannerSectionOffset: 2 fields [OK]
     // GWCA.GW.ScrollableFrame: 0 fields [SKIP: no fields]
     // GWCA.GW.SinkNode: 1 fields [OK]
-    // GWCA.GW.Skill: 47 fields [OK]
+    // GWCA.GW.Skill: 48 fields [OK]
     // GWCA.GW.Skillbar: 5 fields [OK]
     // GWCA.GW.SkillbarCast: 3 fields [OK]
     // GWCA.GW.SkillbarMgr.Attribute: 1 fields [OK]
@@ -205,7 +205,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.TradeContext: 4 fields [OK]
     // GWCA.GW.TradeItem: 2 fields [OK]
     // GWCA.GW.TradePlayer: 2 fields [OK]
-    // GWCA.GW.UI.AgentNameTagInfo: 13 fields [OK]
+    // GWCA.GW.UI.AgentNameTagInfo: 15 fields [OK]
     // GWCA.GW.UI.ChatTemplate: 3 fields [OK]
     // GWCA.GW.UI.CompassPoint: 2 fields [OK]
     // GWCA.GW.UI.CreateUIComponentPacket: 6 fields [SKIP: unresolved typedef in field event_callback: UI::UIInteractionCallback]
@@ -238,7 +238,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.UIPacket.kLoadMapContext: 7 fields [OK]
     // GWCA.GW.UIPacket.kLogChatMessage: 2 fields [OK]
     // GWCA.GW.UIPacket.kLogout: 2 fields [OK]
-    // GWCA.GW.UIPacket.kMeasureContent: 3 fields [OK]
+    // GWCA.GW.UIPacket.kMeasureContent: 4 fields [OK]
     // GWCA.GW.UIPacket.kMouseAction: 5 fields [OK]
     // GWCA.GW.UIPacket.kMouseClick: 5 fields [OK]
     // GWCA.GW.UIPacket.kMouseCoordsClick: 6 fields [OK]
@@ -14195,6 +14195,8 @@ namespace Daybreak.API.Interop.GuildWars
         public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<uint> UnlockedPvpItems; // Bitwise array of which pvp items are unlocked
         [global::System.Runtime.InteropServices.FieldOffset(0x0104)]
         public fixed byte H0104[48]; // Some arrays, some linked lists, meh
+        [global::System.Runtime.InteropServices.FieldOffset(0x0124)]
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<uint> UnlockedAccountSkills; // List of skills unlocked (but not learnt) for this account, i.e. skills that heros can use, tomes can unlock
         [global::System.Runtime.InteropServices.FieldOffset(0x0134)]
         public uint AccountFlags;
     }
@@ -14238,6 +14240,8 @@ namespace Daybreak.API.Interop.GuildWars
         public uint H0008;
         [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
         public fixed uint H000C[2];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public uint Timer; // Agent Instance Timer (in Frames)
         [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
         public uint Timer2;
         [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
@@ -14252,6 +14256,16 @@ namespace Daybreak.API.Interop.GuildWars
         public float Width1; // Width of the model's box
         [global::System.Runtime.InteropServices.FieldOffset(0x0038)]
         public float Height1; // Height of the model's box
+        [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
+        public float Width2; // Width of the model's box (same as 1)
+        [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
+        public float Height2; // Height of the model's box (same as 1)
+        [global::System.Runtime.InteropServices.FieldOffset(0x0044)]
+        public float Width3; // Width of the model's box (usually same as 1)
+        [global::System.Runtime.InteropServices.FieldOffset(0x0048)]
+        public float Height3; // Height of the model's box (usually same as 1)
+        [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
+        public float RotationAngle; // Rotation in radians from East (-pi to pi)
         [global::System.Runtime.InteropServices.FieldOffset(0x0050)]
         public float RotationCos; // cosine of rotation
         [global::System.Runtime.InteropServices.FieldOffset(0x0054)]
@@ -14282,6 +14296,8 @@ namespace Daybreak.API.Interop.GuildWars
         public float NameTagY; // Exactly the same as Y above
         [global::System.Runtime.InteropServices.FieldOffset(0x008C)]
         public float NameTagZ; // Z coord in float
+        [global::System.Runtime.InteropServices.FieldOffset(0x0090)]
+        public ushort VisualEffects; // Number of Visual Effects of Agent (Skills, Weapons); 1 = Always set;
         [global::System.Runtime.InteropServices.FieldOffset(0x0092)]
         public ushort H0092;
         [global::System.Runtime.InteropServices.FieldOffset(0x0094)]
@@ -14427,6 +14443,8 @@ namespace Daybreak.API.Interop.GuildWars
         public fixed uint H00E4[2];
         [global::System.Runtime.InteropServices.FieldOffset(0x00EC)]
         public float WeaponAttackSpeed; // The base attack speed in float of last attacks weapon. 1.33 = axe, sWORD, daggers etc.
+        [global::System.Runtime.InteropServices.FieldOffset(0x00F0)]
+        public float AttackSpeedModifier; // Attack speed modifier of the last attack. 0.67 = 33% increase (1-.33)
         [global::System.Runtime.InteropServices.FieldOffset(0x00F4)]
         public ushort PlayerNumber; // Selfexplanatory. All non-players have identifiers for their type. Two of the same mob = same number
         [global::System.Runtime.InteropServices.FieldOffset(0x00F6)]
@@ -14443,6 +14461,10 @@ namespace Daybreak.API.Interop.GuildWars
         public global::Daybreak.API.Interop.GuildWars.TagInfo* Tags; // struct { uint16_t guild_id, uint8_t primary, uint8_t secondary, uint16_t level
         [global::System.Runtime.InteropServices.FieldOffset(0x010C)]
         public ushort H010C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x010E)]
+        public byte Primary; // Primary profession 0-10 (None,W,R,Mo,N,Me,E,A,Rt,P,D)
+        [global::System.Runtime.InteropServices.FieldOffset(0x010F)]
+        public byte Secondary; // Secondary profession 0-10 (None,W,R,Mo,N,Me,E,A,Rt,P,D)
         [global::System.Runtime.InteropServices.FieldOffset(0x0110)]
         public byte Level; // Duh!
         [global::System.Runtime.InteropServices.FieldOffset(0x0111)]
@@ -14473,6 +14495,8 @@ namespace Daybreak.API.Interop.GuildWars
         public uint Effects; // Bitmap for effects to display when targetted. DOES include hexes
         [global::System.Runtime.InteropServices.FieldOffset(0x0140)]
         public uint H0140;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0144)]
+        public byte Hex; // Bitmap for the hex effect when targetted (apparently obsolete!) (yes)
         [global::System.Runtime.InteropServices.FieldOffset(0x0145)]
         public fixed byte H0145[19];
         [global::System.Runtime.InteropServices.FieldOffset(0x0158)]
@@ -14618,6 +14642,8 @@ namespace Daybreak.API.Interop.GuildWars
     {
         [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
         public global::Daybreak.API.Interop.GWCA.GW.Constants.Attribute Id; // ID of attribute
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public uint LevelBase; // Level of attribute without modifiers (runes,pcons,etc)
         [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
         public uint Level; // Level with modifiers
         [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
@@ -14664,6 +14690,8 @@ namespace Daybreak.API.Interop.GuildWars
         public uint H0004;
         [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
         public uint BuffId; // id of buff in the buff array
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public uint TargetAgentId; // agent id of the target (0 if no target)
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
@@ -15455,6 +15483,8 @@ namespace Daybreak.API.Interop.GuildWars
         public fixed uint H0040[2];
         [global::System.Runtime.InteropServices.FieldOffset(0x0048)]
         public ushort ItemFormula;
+        [global::System.Runtime.InteropServices.FieldOffset(0x004A)]
+        public byte IsMaterialSalvageable; // Only valid for type 11 (Materials)
         [global::System.Runtime.InteropServices.FieldOffset(0x004B)]
         public byte H004B; // probably used for quantity extension for new material storage
         [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
@@ -15759,7 +15789,9 @@ namespace Daybreak.API.Interop.GuildWars
     {
         public global::Daybreak.API.Interop.GuildWars.Vec2fStruct Size; // Dimensions of the drawable area inside the mission map frame
         public uint H0008;
+        public global::Daybreak.API.Interop.GuildWars.Vec2fStruct LastMouseLocation; // Percentage offset (-1.f to 1.f) relative to player_mission_map_pos
         public uint FrameId;
+        public global::Daybreak.API.Interop.GuildWars.Vec2fStruct PlayerMissionMapPos; // Position of player on the top down view of mission map (not in gwinches). Mission map centers on this point
         public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H0020;
         public uint H0030;
         public uint H0034;
@@ -16218,10 +16250,18 @@ namespace Daybreak.API.Interop.GuildWars
     {
         [global::System.Runtime.InteropServices.FieldOffset(0x010C)]
         public uint H010C; // From constructor param_3
+        [global::System.Runtime.InteropServices.FieldOffset(0x0110)]
+        public fixed uint H0110[178]; // Padding (178 uint32_t = 0x2C8 bytes)
+        [global::System.Runtime.InteropServices.FieldOffset(0x03D8)]
+        public uint EquipmentFlags; // Equipment redraw flags (0xFFFFFFFF = needs draw, 0x00000000 = fully drawn)
         [global::System.Runtime.InteropServices.FieldOffset(0x03DC)]
         public uint H03DC; // Initialized to 0
+        [global::System.Runtime.InteropServices.FieldOffset(0x03E0)]
+        public uint VisibilityFlags; // Equipment visibility flags (0xFFFFFFFF initial)
         [global::System.Runtime.InteropServices.FieldOffset(0x03E4)]
         public uint H03E4; // param_1 from constructor
+        [global::System.Runtime.InteropServices.FieldOffset(0x03E8)]
+        public fixed uint H03E8[4]; // Padding to reach 0x3F8 (16 bytes)
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0xC)]
@@ -16484,6 +16524,8 @@ namespace Daybreak.API.Interop.GuildWars
         public uint Recharge;
         [global::System.Runtime.InteropServices.FieldOffset(0x0050)]
         public fixed ushort H0050[4];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0058)]
+        public uint SkillArguments; // 1 - duration set, 2 - scale set, 4 - bonus scale set (3 would mean duration and scale is set/used by the skill)
         [global::System.Runtime.InteropServices.FieldOffset(0x005C)]
         public uint Scale0;
         [global::System.Runtime.InteropServices.FieldOffset(0x0060)]
@@ -17109,6 +17151,10 @@ namespace Daybreak.API.Interop.GuildWars
         public uint TextColor; // ARGB
         [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
         public uint LabelAttributes; // bold/size etc
+        [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
+        public byte FontStyle; // Text style (bitmask) / bold | 0x1 / strikthrough | 0x80
+        [global::System.Runtime.InteropServices.FieldOffset(0x001D)]
+        public byte Underline; // Text underline (bool) = 0x01 - 0xFF
         [global::System.Runtime.InteropServices.FieldOffset(0x001E)]
         public byte H001E;
         [global::System.Runtime.InteropServices.FieldOffset(0x001F)]
@@ -17376,6 +17422,7 @@ namespace Daybreak.API.Interop.GuildWars
         public float MaxWidth; // Maximum width constraint
         public float MaxHeight; // Maximum height constraint
         public float* SizeOutput; // Pointer to output buffer for calculated size
+        public uint Flags; // Layout flags (similar to the 0x100 flag we saw)
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
@@ -17774,3 +17821,527 @@ namespace Daybreak.API.Interop.GuildWars
     public unsafe struct VisibleEffectList { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.VisibleEffect> Value; }
     public unsafe struct PacketCallback { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Value; }
 }
+
+// ═══════════ PARSER DEBUG LINES ═══════════
+// [STRUCT-START] line 614: kDialogueMessage (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 620: kDialogueMessage with 5 fields
+// [STRUCT-START] line 621: kErrorMessage (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 624: kErrorMessage with 2 fields
+// [STRUCT-START] line 625: kAgentSkillPacket (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 628: kAgentSkillPacket with 2 fields
+// [STRUCT-START] line 629: kLoadMapContext (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 637: kLoadMapContext with 7 fields
+// [STRUCT-START] line 639: kMouseCoordsClick (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 646: kMouseCoordsClick with 6 fields
+// [STRUCT-START] line 647: kUseKitOnItem (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 650: kUseKitOnItem with 2 fields
+// [STRUCT-START] line 651: kShowXunlaiChest (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 655: kShowXunlaiChest with 3 fields
+// [STRUCT-START] line 656: kMoveItem (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 661: kMoveItem with 4 fields
+// [STRUCT-START] line 662: kResize (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 673: kResize with 9 fields
+// [STRUCT-START] line 674: kTomeSkillSelection (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 678: kTomeSkillSelection with 3 fields
+// [STRUCT-START] line 679: kMeasureContent (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 684: kMeasureContent with 4 fields
+// [STRUCT-START] line 685: kSetLayout (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 692: kSetLayout with 6 fields
+// [STRUCT-START] line 693: kSetAgentProfession (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 697: kSetAgentProfession with 3 fields
+// [STRUCT-START] line 698: kWeaponSwap (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 701: kWeaponSwap with 2 fields
+// [STRUCT-START] line 702: kWeaponSetChanged (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 707: kWeaponSetChanged with 4 fields
+// [STRUCT-START] line 708: kChangeTarget (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 715: kChangeTarget with 6 fields
+// [STRUCT-START] line 716: kSendLoadSkillTemplate (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 719: kSendLoadSkillTemplate with 2 fields
+// [STRUCT-START] line 720: kVendorWindow (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 725: kVendorWindow with 4 fields
+// [STRUCT-START] line 726: kVendorQuote (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 729: kVendorQuote with 2 fields
+// [STRUCT-START] line 730: kVendorItems (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 735: kVendorItems with 4 fields
+// [STRUCT-START] line 736: kSetRendererValue (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 740: kSetRendererValue with 3 fields
+// [STRUCT-START] line 741: kEffectAdd (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 744: kEffectAdd with 2 fields
+// [STRUCT-START] line 745: kAgentSpeechBubble (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 750: kAgentSpeechBubble with 4 fields
+// [STRUCT-START] line 751: kAgentSkillStartedCast (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 756: kAgentSkillStartedCast with 4 fields
+// [STRUCT-START] line 757: kPreStartSalvage (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 760: kPreStartSalvage with 2 fields
+// [STRUCT-START] line 761: kServerActiveQuestChanged (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 767: kServerActiveQuestChanged with 5 fields
+// [STRUCT-START] line 768: kPrintChatMessage (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 773: kPrintChatMessage with 4 fields
+// [STRUCT-START] line 774: kPartyShowConfirmDialog (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 778: kPartyShowConfirmDialog with 3 fields
+// [STRUCT-START] line 779: kUIPositionChanged (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 782: kUIPositionChanged with 2 fields
+// [STRUCT-START] line 783: kPreferenceFlagChanged (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 786: kPreferenceFlagChanged with 2 fields
+// [STRUCT-START] line 787: kPreferenceValueChanged (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 790: kPreferenceValueChanged with 2 fields
+// [STRUCT-START] line 791: kPreferenceEnumChanged (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 794: kPreferenceEnumChanged with 2 fields
+// [STRUCT-START] line 795: kPartySearchInvite (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 798: kPartySearchInvite with 2 fields
+// [STRUCT-START] line 799: kPostProcessingEffect (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 802: kPostProcessingEffect with 2 fields
+// [STRUCT-START] line 803: kLogout (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 806: kLogout with 2 fields
+// [STRUCT-START] line 809: kKeyAction (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 813: kKeyAction with 3 fields
+// [STRUCT-START] line 814: kMouseClick (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 820: kMouseClick with 5 fields
+// [STRUCT-START] line 829: kMouseAction (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 835: kMouseAction with 5 fields
+// [STRUCT-START] line 836: kWriteToChatLog (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 840: kWriteToChatLog with 3 fields
+// [STRUCT-START] line 841: kPlayerChatMessage (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 845: kPlayerChatMessage with 3 fields
+// [STRUCT-START] line 847: kInteractAgent (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 850: kInteractAgent with 2 fields
+// [STRUCT-START] line 852: kSendChangeTarget (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 855: kSendChangeTarget with 2 fields
+// [STRUCT-START] line 857: kSendCallTarget (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 860: kSendCallTarget with 2 fields
+// [STRUCT-START] line 862: kGetColor (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 865: kGetColor with 2 fields
+// [STRUCT-START] line 867: kWriteToChatLogWithSender (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 871: kWriteToChatLogWithSender with 3 fields
+// [STRUCT-START] line 873: kSendPingWeaponSet (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 877: kSendPingWeaponSet with 3 fields
+// [STRUCT-START] line 878: kSendMoveItem (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 883: kSendMoveItem with 4 fields
+// [STRUCT-START] line 884: kSendMerchantRequestQuote (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 887: kSendMerchantRequestQuote with 2 fields
+// [STRUCT-START] line 888: kSendMerchantTransactItem (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 894: kSendMerchantTransactItem with 5 fields
+// [STRUCT-START] line 895: kSendUseItem (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 898: kSendUseItem with 2 fields
+// [STRUCT-START] line 899: kSendChatMessage (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 902: kSendChatMessage with 2 fields
+// [STRUCT-START] line 903: kLogChatMessage (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 906: kLogChatMessage with 2 fields
+// [STRUCT-START] line 907: kRecvWhisper (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 911: kRecvWhisper with 3 fields
+// [STRUCT-START] line 912: kStartWhisper (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 914: kStartWhisper with 1 fields
+// [STRUCT-START] line 915: kCompassDraw (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 920: kCompassDraw with 4 fields
+// [STRUCT-START] line 921: kObjectiveAdd (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 925: kObjectiveAdd with 3 fields
+// [STRUCT-START] line 926: kObjectiveComplete (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 928: kObjectiveComplete with 1 fields
+// [STRUCT-START] line 929: kObjectiveUpdated (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 931: kObjectiveUpdated with 1 fields
+// [STRUCT-START] line 933: kItemUpdated (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 948: kItemUpdated with 14 fields
+// [STRUCT-START] line 949: kInventorySlotUpdated (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 954: kInventorySlotUpdated with 4 fields
+// [STRUCT-START] line 955: kSendWorldAction (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 959: kSendWorldAction with 3 fields
+// [STRUCT-START] line 960: kAllyOrGuildMessage (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 965: kAllyOrGuildMessage with 4 fields
+// [STRUCT-START] line 10: AccountUnlockedCount (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 14: AccountUnlockedCount with 3 fields
+// [STRUCT-START] line 16: AccountUnlockedItemInfo (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 20: AccountUnlockedItemInfo with 3 fields
+// [STRUCT-START] line 22: AccountContext (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 32: AccountContext with 9 fields
+// [STRUCT-START] line 13: AgentSummaryInfo (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 27: AgentSummaryInfo with 10 fields
+// [STRUCT-START] line 29: AgentContext (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 58: AgentContext with 27 fields
+// [STRUCT-START] line 17: ProgressBarContext (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 24: ProgressBarContext with 5 fields
+// [STRUCT-START] line 26: CharContext (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 61: CharContext with 34 fields
+// [STRUCT-START] line 4: Cinematic (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 8: Cinematic with 2 fields
+// [STRUCT-START] line 6: GadgetInfo (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 11: GadgetInfo with 4 fields
+// [STRUCT-START] line 13: GadgetContext (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 16: GadgetContext with 1 fields
+// [STRUCT-START] line 22: GameContext (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 46: GameContext with 23 fields
+// [STRUCT-START] line 10: GameplayContext (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 14: GameplayContext with 3 fields
+// [STRUCT-START] line 15: GuildContext (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 51: GuildContext with 34 fields
+// [STRUCT-START] line 14: ItemContext (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 27: ItemContext with 12 fields
+// [STRUCT-START] line 20: PropsContext (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 27: PropsContext with 6 fields
+// [STRUCT-START] line 30: MapStaticData (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 68: MapStaticData with 37 fields
+// [STRUCT-START] line 77: PathNode (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 84: PathNode with 6 fields
+// [STRUCT-START] line 90: NodeCache (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 94: NodeCache with 3 fields
+// [STRUCT-START] line 97: PathWaypoint (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 104: PathWaypoint with 6 fields
+// [STRUCT-START] line 107: PathContext (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 123: PathContext with 15 fields
+// [STRUCT-START] line 129: PathEngineContext (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 136: PathEngineContext with 6 fields
+// [STRUCT-START] line 139: MapContext (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 197: MapContext with 57 fields
+// [STRUCT-START] line 14: PartySearchContext (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 20: PartySearchContext with 5 fields
+// [STRUCT-START] line 22: PartyContext (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 43: PartyContext with 16 fields
+// [STRUCT-START] line 12: LoginCharacter (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 15: LoginCharacter with 2 fields
+// [STRUCT-START] line 18: CharacterInformation (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 30: CharacterInformation with 4 fields
+// [STRUCT-START] line 31: PreGameContext (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 39: PreGameContext with 7 fields
+// [STRUCT-START] line 9: TextCache (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 11: TextCache with 1 fields
+// [STRUCT-START] line 13: SubStruct1 (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 15: SubStruct1 with 1 fields
+// [STRUCT-START] line 18: SubStructUnk (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 28: SubStructUnk with 9 fields
+// [STRUCT-START] line 30: TextParser (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 45: TextParser with 14 fields
+// [STRUCT-START] line 10: TradeItem (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 13: TradeItem with 2 fields
+// [STRUCT-START] line 14: TradePlayer (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 17: TradePlayer with 2 fields
+// [STRUCT-START] line 19: TradeContext (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 38: TradeContext with 4 fields
+// [STRUCT-START] line 48: PartyAlly (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 52: PartyAlly with 3 fields
+// [STRUCT-START] line 59: ControlledMinions (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 62: ControlledMinions with 2 fields
+// [STRUCT-START] line 63: DupeSkill (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 66: DupeSkill with 2 fields
+// [STRUCT-START] line 67: ProfessionState (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 77: ProfessionState with 5 fields
+// [STRUCT-START] line 80: AccountInfo (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 88: AccountInfo with 7 fields
+// [STRUCT-START] line 91: PartyMemberMoraleInfo (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 97: PartyMemberMoraleInfo with 4 fields
+// [STRUCT-START] line 99: PartyMoraleLink (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 103: PartyMoraleLink with 3 fields
+// [STRUCT-START] line 106: PetInfo (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 115: PetInfo with 7 fields
+// [STRUCT-START] line 118: PlayerControlledCharacter (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 196: PlayerControlledCharacter with 77 fields
+// [STRUCT-START] line 200: WorldContext (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 309: WorldContext with 107 fields
+// [STRUCT-END] line 19: Mat4x3f with 13 fields
+// [STRUCT-START] line 21: Vec2f (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 37: Vec2f with 2 fields
+// [STRUCT-START] line 39: Vec3f (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 62: Vec3f with 3 fields
+// [STRUCT-START] line 245: GamePos (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 267: GamePos with 3 fields
+// [STRUCT-START] line 16: THash (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 22: THash with 5 fields
+// [STRUCT-END] line 33: THashLink with 6 fields
+// [STRUCT-START] line 6: TLink (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 49: TLink with 2 fields
+// [STRUCT-START] line 52: TList (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 121: TList with 2 fields
+// [STRUCT-START] line 4: ObjectPoolBlock (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 7: ObjectPoolBlock with 2 fields
+// [STRUCT-START] line 10: ObjectPool (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 14: ObjectPool with 3 fields
+// [STRUCT-START] line 5: PrioQ (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 8: PrioQ with 2 fields
+// [STRUCT-START] line 12: PrioQLink (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 18: PrioQLink with 4 fields
+// [STRUCT-START] line 22: VisibleEffect (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 26: VisibleEffect with 3 fields
+// [STRUCT-START] line 31: EquipmentVTable (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 40: EquipmentVTable with 0 fields
+// [STRUCT-START] line 42: NPCEquipment (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 104: NPCEquipment with 39 fields
+// [STRUCT-START] line 107: PlayerEquipment (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 130: PlayerEquipment with 7 fields
+// [STRUCT-START] line 134: TagInfo (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 140: TagInfo with 4 fields
+// [STRUCT-START] line 146: Agent (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 211: Agent with 43 fields
+// [STRUCT-START] line 213: AgentItem (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 218: AgentItem with 4 fields
+// [STRUCT-START] line 222: AgentGadget (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 228: AgentGadget with 5 fields
+// [STRUCT-START] line 232: AgentLiving (inSkip=False, freeBrace=0)
+// [BRACE] line 292: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 293: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 294: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 295: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 296: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 297: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 298: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 299: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 300: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 301: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 302: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 305: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 306: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 307: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 308: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 309: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 310: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 311: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 312: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 313: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 316: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 317: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 318: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 319: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 320: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 323: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 325: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 326: AgentLiving depth 1->1 (open=1, close=1)
+// [BRACE] line 327: AgentLiving depth 1->0 (open=0, close=1)
+// [STRUCT-END] line 327: AgentLiving with 56 fields
+// [OUT-OF-LINE] line 331: AgentItem* Agent::GetAsAgentItem() {... braces=1
+// [OUT-OF-LINE] line 338: AgentGadget* Agent::GetAsAgentGadget() {... braces=1
+// [OUT-OF-LINE] line 345: AgentLiving* Agent::GetAsAgentLiving() {... braces=1
+// [OUT-OF-LINE] line 352: const AgentItem* Agent::GetAsAgentItem() const {... braces=1
+// [OUT-OF-LINE] line 359: const AgentGadget* Agent::GetAsAgentGadget() const... braces=1
+// [OUT-OF-LINE] line 366: const AgentLiving* Agent::GetAsAgentLiving() const... braces=1
+// [STRUCT-START] line 373: MapAgent (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 399: MapAgent with 13 fields
+// [STRUCT-START] line 401: AgentMovement (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 414: AgentMovement with 12 fields
+// [STRUCT-START] line 416: AgentInfo (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 419: AgentInfo with 1 fields
+// [STRUCT-START] line 11: Attribute (inSkip=False, freeBrace=0)
+// [ATTR-CHECK] line 12: "/* +h0000 */ Constants::Attribute id; // ID of attribute..."
+// [ATTR-LINE] line 12: depth=1, trimmed="/* +h0000 */ Constants::Attribute id; // ID of attribute..."
+// [ATTR-MATCH] line 12: offset=0000, typeAndName="Constants::Attribute id"
+// [ATTR-CHECK] line 13: "/* +h0004 */ uint32_t level_base; // Level of attribute with..."
+// [ATTR-LINE] line 13: depth=1, trimmed="/* +h0004 */ uint32_t level_base; // Level of attribute with..."
+// [ATTR-MATCH] line 13: offset=0004, typeAndName="uint32_t level_base"
+// [ATTR-CHECK] line 14: "/* +h0008 */ uint32_t level; // Level with modifiers..."
+// [ATTR-LINE] line 14: depth=1, trimmed="/* +h0008 */ uint32_t level; // Level with modifiers..."
+// [ATTR-MATCH] line 14: offset=0008, typeAndName="uint32_t level"
+// [ATTR-CHECK] line 15: "/* +h000C */ uint32_t decrement_points; // Points that you w..."
+// [ATTR-LINE] line 15: depth=1, trimmed="/* +h000C */ uint32_t decrement_points; // Points that you w..."
+// [ATTR-MATCH] line 15: offset=000C, typeAndName="uint32_t decrement_points"
+// [ATTR-CHECK] line 16: "/* +h0010 */ uint32_t increment_points; // Points you will n..."
+// [ATTR-LINE] line 16: depth=1, trimmed="/* +h0010 */ uint32_t increment_points; // Points you will n..."
+// [ATTR-MATCH] line 16: offset=0010, typeAndName="uint32_t increment_points"
+// [STRUCT-END] line 17: Attribute with 5 fields
+// [STRUCT-START] line 19: AttributeInfo (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 25: AttributeInfo with 5 fields
+// [STRUCT-START] line 29: PartyAttribute (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 32: PartyAttribute with 2 fields
+// [STRUCT-START] line 6: Camera (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 112: Camera with 56 fields
+// [STRUCT-START] line 19: ButtonFrame (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 26: ButtonFrame with 0 fields
+// [STRUCT-START] line 28: TabsFrame (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 42: TabsFrame with 0 fields
+// [STRUCT-START] line 43: ScrollableFrame (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 76: ScrollableFrame with 0 fields
+// [STRUCT-START] line 79: FrameWithValue (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 89: FrameWithValue with 0 fields
+// [STRUCT-START] line 91: EditableTextFrame (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 97: EditableTextFrame with 0 fields
+// [STRUCT-START] line 148: TextLabelFrame (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 154: TextLabelFrame with 0 fields
+// [STRUCT-START] line 22: Friend (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 30: Friend with 7 fields
+// [STRUCT-START] line 34: FriendList (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 43: FriendList with 8 fields
+// [STRUCT-START] line 10: GHKey (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 16: GHKey with 1 fields
+// [STRUCT-START] line 17: GuildPlayer (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 30: GuildPlayer with 12 fields
+// [STRUCT-START] line 35: GuildHistoryEvent (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 39: GuildHistoryEvent with 3 fields
+// [STRUCT-START] line 44: CapeDesign (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 52: CapeDesign with 7 fields
+// [STRUCT-START] line 55: Guild (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 68: Guild with 12 fields
+// [STRUCT-START] line 73: TownAlliance (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 82: TownAlliance with 8 fields
+// [STRUCT-START] line 16: HeroFlag (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 25: HeroFlag with 8 fields
+// [STRUCT-START] line 28: HeroInfo (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 59: HeroInfo with 30 fields
+// [STRUCT-START] line 62: HeroConstData (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 69: HeroConstData with 6 fields
+// [STRUCT-START] line 42: DyeInfo (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 48: DyeInfo with 1 fields
+// [STRUCT-START] line 51: ItemData (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 57: ItemData with 4 fields
+// [STRUCT-START] line 60: MaterialCost (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 65: MaterialCost with 4 fields
+// [STRUCT-START] line 68: ItemFormula (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 74: ItemFormula with 5 fields
+// [STRUCT-START] line 77: Bag (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 101: Bag with 7 fields
+// [STRUCT-START] line 104: ItemModifier (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 112: ItemModifier with 1 fields
+// [STRUCT-START] line 114: Item (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 153: Item with 26 fields
+// [STRUCT-START] line 156: WeaponSet (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 159: WeaponSet with 2 fields
+// [STRUCT-START] line 162: Inventory (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 210: Inventory with 39 fields
+// [STRUCT-START] line 214: PvPItemUpgradeInfo (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 225: PvPItemUpgradeInfo with 10 fields
+// [STRUCT-START] line 228: PvPItemInfo (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 230: PvPItemInfo with 1 fields
+// [STRUCT-START] line 233: CompositeModelInfo (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 236: CompositeModelInfo with 2 fields
+// [STRUCT-START] line 240: SalvageSessionInfo (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 250: SalvageSessionInfo with 9 fields
+// [STRUCT-START] line 9: MissionMapIcon (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 20: MissionMapIcon with 10 fields
+// [STRUCT-START] line 91: AreaInfo (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 135: AreaInfo with 31 fields
+// [STRUCT-START] line 24: ObserverMatchTeam (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 30: ObserverMatchTeam with 5 fields
+// [STRUCT-START] line 33: ObserverMatch (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 45: ObserverMatch with 11 fields
+// [STRUCT-START] line 11: CharAdjustment (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 16: CharAdjustment with 4 fields
+// [STRUCT-START] line 18: NPC (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 40: NPC with 12 fields
+// [STRUCT-START] line 14: PlayerPartyMember (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 21: PlayerPartyMember with 3 fields
+// [STRUCT-START] line 24: HeroPartyMember (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 31: HeroPartyMember with 6 fields
+// [STRUCT-START] line 34: HenchmanPartyMember (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 39: HenchmanPartyMember with 4 fields
+// [STRUCT-START] line 46: PartyInfo (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 59: PartyInfo with 7 fields
+// [STRUCT-START] line 70: PartySearch (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 84: PartySearch with 13 fields
+// [STRUCT-START] line 6: PathingTrapezoid (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 25: PathingTrapezoid with 14 fields
+// [STRUCT-START] line 28: Node (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 31: Node with 2 fields
+// [STRUCT-START] line 33: XNode (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 38: XNode with 4 fields
+// [STRUCT-START] line 41: YNode (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 45: YNode with 3 fields
+// [STRUCT-START] line 48: SinkNode (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 50: SinkNode with 1 fields
+// [STRUCT-START] line 53: Portal (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 60: Portal with 6 fields
+// [STRUCT-START] line 63: PathingMap (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 83: PathingMap with 19 fields
+// [STRUCT-START] line 86: PropByType (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 89: PropByType with 2 fields
+// [STRUCT-START] line 91: PropModelInfo (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 98: PropModelInfo with 6 fields
+// [STRUCT-START] line 101: RecObject (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 111: RecObject with 9 fields
+// [STRUCT-START] line 114: MapProp (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 133: MapProp with 18 fields
+// [STRUCT-START] line 8: Player (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 29: Player with 15 fields
+// [STRUCT-START] line 12: Quest (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 29: Quest with 11 fields
+// [STRUCT-START] line 32: MissionObjective (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 36: MissionObjective with 3 fields
+// [STRUCT-START] line 14: Skill (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 86: Skill with 48 fields
+// [STRUCT-START] line 89: SkillbarSkill (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 97: SkillbarSkill with 5 fields
+// [STRUCT-START] line 100: SkillbarCast (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 104: SkillbarCast with 3 fields
+// [STRUCT-START] line 108: Skillbar (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 118: Skillbar with 5 fields
+// [STRUCT-START] line 123: Effect (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 133: Effect with 6 fields
+// [STRUCT-START] line 136: Buff (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 141: Buff with 4 fields
+// [STRUCT-START] line 147: AgentEffects (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 151: AgentEffects with 3 fields
+// [STRUCT-START] line 11: Title (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 27: Title with 11 fields
+// [STRUCT-START] line 30: TitleTier (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 35: TitleTier with 3 fields
+// [STRUCT-START] line 38: TitleClientData (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 42: TitleClientData with 3 fields
+// [STRUCT-START] line 16: ChatMessage (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 21: ChatMessage with 4 fields
+// [STRUCT-START] line 25: ChatBuffer (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 30: ChatBuffer with 4 fields
+// [STRUCT-START] line 29: MapTypeInstanceInfo (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 33: MapTypeInstanceInfo with 3 fields
+// [STRUCT-START] line 36: MissionMapSubContext (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 38: MissionMapSubContext with 1 fields
+// [STRUCT-START] line 39: MissionMapSubContext2 (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 49: MissionMapSubContext2 with 9 fields
+// [STRUCT-START] line 52: MissionMapContext (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 65: MissionMapContext with 12 fields
+// [STRUCT-START] line 68: WorldMapContext (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 90: WorldMapContext with 21 fields
+// [STRUCT-START] line 18: TransactionInfo (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 22: TransactionInfo with 1 fields
+// [STRUCT-START] line 24: QuoteInfo (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 28: QuoteInfo with 2 fields
+// [STRUCT-START] line 4: Module (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 15: Module with 0 fields
+// [STRUCT-END] line 37: Mat4x3f with 13 fields
+// [STRUCT-START] line 24: Attribute (inSkip=False, freeBrace=0)
+// [ATTR-CHECK] line 25: "Constants::Attribute attribute = (Constants::Attribute)0xFF;..."
+// [ATTR-SKIP-FUNC] line 25
+// [ATTR-CHECK] line 26: "uint32_t points{};..."
+// [ATTR-LINE] line 26: depth=1, trimmed="uint32_t points{};..."
+// [STRUCT-END] line 27: Attribute with 1 fields
+// [STRUCT-START] line 28: SkillTemplate (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 35: SkillTemplate with 6 fields
+// [UNMATCHED-METHOD] line 47: [handler](HookStatus *status, Packet::StoC::PacketBase *pak)
+// [UNMATCHED-METHOD] line 58: [handler](HookStatus* status, Packet::StoC::PacketBase* pak)
+// [UNMATCHED-METHOD] line 84: bool EmulatePacket(Packet::StoC::Packet<T> *packet) {
+// [STRUCT-START] line 46: CompassPoint (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 51: CompassPoint with 2 fields
+// [STRUCT-START] line 55: ChatTemplate (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 60: ChatTemplate with 3 fields
+// [STRUCT-START] line 62: UIChatMessage (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 66: UIChatMessage with 3 fields
+// [STRUCT-START] line 68: InteractionMessage (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 72: InteractionMessage with 3 fields
+// [STRUCT-START] line 79: FrameRelation (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 87: FrameRelation with 5 fields
+// [STRUCT-START] line 91: FramePosition (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 119: FramePosition with 17 fields
+// [STRUCT-START] line 121: FrameInteractionCallback (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 125: FrameInteractionCallback with 3 fields
+// [STRUCT-START] line 127: Frame (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 227: Frame with 86 fields
+// [STRUCT-START] line 232: AgentNameTagInfo (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 248: AgentNameTagInfo with 15 fields
+// [STRUCT-START] line 251: WindowPosition (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 266: WindowPosition with 3 fields
+// [STRUCT-START] line 268: MapEntryMessage (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 271: MapEntryMessage with 2 fields
+// [STRUCT-START] line 273: DialogBodyInfo (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 277: DialogBodyInfo with 3 fields
+// [STRUCT-START] line 278: DialogButtonInfo (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 283: DialogButtonInfo with 4 fields
+// [STRUCT-START] line 708: FloatingWindow (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 718: FloatingWindow with 9 fields
+// [STRUCT-START] line 733: TooltipInfo (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 742: TooltipInfo with 8 fields
+// [STRUCT-START] line 744: CreateUIComponentPacket (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 751: CreateUIComponentPacket with 6 fields
+// [STRUCT-START] line 28: PacketBase (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 30: PacketBase with 1 fields
+// [STRUCT-START] line 102: Packet (inSkip=False, freeBrace=0)
+// [STRUCT-START] line 990: ItemGeneral_ReuseID (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 1098: ItemGeneral_ReuseID with 0 fields
+// [STRUCT-START] line 7: HookEntry (inSkip=False, freeBrace=1)
+// [STRUCT-END] line 16: HookEntry with 0 fields
+// [UNMATCHED-METHOD] line 23: return [=]<typename... Args>(Args&&... args) { return (c->*m
+// [UNMATCHED-METHOD] line 30: return [=]<typename... Args>(Args&&... args) { return (c->*m
+// [STRUCT-START] line 12: ScannerSectionOffset (inSkip=False, freeBrace=0)
+// [STRUCT-END] line 15: ScannerSectionOffset with 2 fields
+// ═══════════ END DEBUG LINES ═══════════

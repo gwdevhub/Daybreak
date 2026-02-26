@@ -284,7 +284,13 @@ internal static class CppHeaderParser
                     continue;
 
                 // Skip lines with function bodies or method declarations
-                if (trimmed.Contains("(") && (trimmed.Contains(")") || trimmed.Contains("{")))
+                // Strip trailing // comment before checking - comments can contain parentheses like "(runes,pcons,etc)"
+                var trimmedWithoutTrailingComment = trimmed;
+                var trailingCommentIdx = trimmed.IndexOf("//");
+                if (trailingCommentIdx > 0)
+                    trimmedWithoutTrailingComment = trimmed.Substring(0, trailingCommentIdx).TrimEnd();
+                    
+                if (trimmedWithoutTrailingComment.Contains("(") && (trimmedWithoutTrailingComment.Contains(")") || trimmedWithoutTrailingComment.Contains("{")))
                     continue;
 
                 // Skip bitfield declarations (e.g., DyeColor dye1 : 4;)
