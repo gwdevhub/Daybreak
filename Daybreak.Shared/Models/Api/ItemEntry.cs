@@ -2,6 +2,7 @@ using Daybreak.Shared.Converters;
 using Daybreak.Shared.Models.Guildwars;
 using System.Text.Json.Serialization;
 
+
 namespace Daybreak.Shared.Models.Api;
 
 public sealed record ItemEntry(
@@ -18,6 +19,7 @@ public sealed record ItemEntry(
     [property: JsonConverter(typeof(HexUIntArrayJsonConverter))] uint[] Modifiers,
     ItemProperty[] Properties,
     uint Interaction,
-    uint ModelFileId)
+    uint ModelFileId,
+    byte DyeTint)
 {
 }

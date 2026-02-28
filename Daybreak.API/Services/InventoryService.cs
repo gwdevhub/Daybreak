@@ -41,17 +41,17 @@ public sealed class InventoryService(
                     return default;
                 }
 
-                var itemTuples = new List<(GWCA.GW.Constants.BagType Type, List<(uint ModelId, string EncodedCompleteName, string EncodedSingleName, string EncodedName, bool Inscribable, int Quantity, uint[] Modifiers, ItemType ItemType, uint Interaction, uint ModelFileId)>)>();
-                var bags = (BagStruct**)Unsafe.AsPointer(ref inventory->Bags);
+                var itemTuples = new List<(GWCA.GW.Constants.BagType Type, List<(uint ModelId, string EncodedCompleteName, string EncodedSingleName, string EncodedName, bool Inscribable, int Quantity, uint[] Modifiers, ItemType ItemType, uint Interaction, uint ModelFileId, Byte DyeTint)>)>();
                 for (var i = 0; i < 23; i++)
                 {
-                    var bag = bags[i];
+                    // Use GWCA helper to fetch bag pointers by index — safer than reading an inline array directly.
+                    var bag = GWCA.GW.Items.GetBagByIndex((uint)i);
                     if (bag is null)
                     {
                         continue;
                     }
 
-                    var retBag = new List<(uint ModelId, string EncodedCompleteName, string EncodedSingleName, string EncodedName, bool Inscribable, int Quantity, uint[] Modifiers, ItemType ItemType, uint Interaction, uint ModelFileId)>();
+                    var retBag = new List<(uint ModelId, string EncodedCompleteName, string EncodedSingleName, string EncodedName, bool Inscribable, int Quantity, uint[] Modifiers, ItemType ItemType, uint Interaction, uint ModelFileId, Byte DyeTint)>();
                     itemTuples.Add((bag->BagType, retBag));
                     if (bag->ItemsCount is 0)
                     {
@@ -75,7 +75,7 @@ public sealed class InventoryService(
                             modifiers[j] = item->ModStruct[j].Mod;
                         }
 
-                        retBag.Add((item->ModelId, completeNameEncoded, singleItemName, nameEncoded, (item->Interaction & 0x08000000) != 0, item->Quantity, modifiers, (ItemType)item->Type, item->Interaction, item->ModelFileId));
+                        retBag.Add((item->ModelId, completeNameEncoded, singleItemName, nameEncoded, (item->Interaction & 0x08000000) != 0, item->Quantity, modifiers, (ItemType)item->Type, item->Interaction, item->ModelFileId, item->Dye.DyeTint));
                     }
                 }
 
@@ -90,16 +90,16 @@ public sealed class InventoryService(
 
         // Decode strings sequentially to avoid race conditions with the game's TextParser language field.
         // Parallel decoding causes crashes because multiple operations race to set/restore the language.
-        var decodedItemTuples = new List<(GWCA.GW.Constants.BagType Type, List<(uint ModelId, string EncodedName, string? DecodedName, string EncodedSingleName, string? DecodedSingleName, string EncodedCompleteName, string? DecodedCompleteName, bool Inscribable, int Quantity, uint[] Modifiers, ItemType ItemType, uint Interaction, uint ModelFileId)> Items)>();
+        var decodedItemTuples = new List<(GWCA.GW.Constants.BagType Type, List<(uint ModelId, string EncodedName, string? DecodedName, string EncodedSingleName, string? DecodedSingleName, string EncodedCompleteName, string? DecodedCompleteName, bool Inscribable, int Quantity, uint[] Modifiers, ItemType ItemType, uint Interaction, uint ModelFileId, byte DyeTint)> Items)>();
         foreach (var tuple in itemTuples)
         {
-            var decodedItems = new List<(uint ModelId, string EncodedName, string? DecodedName, string EncodedSingleName, string? DecodedSingleName, string EncodedCompleteName, string? DecodedCompleteName, bool Inscribable, int Quantity, uint[] Modifiers, ItemType ItemType, uint Interaction, uint ModelFileId)>();
+            var decodedItems = new List<(uint ModelId, string EncodedName, string? DecodedName, string EncodedSingleName, string? DecodedSingleName, string EncodedCompleteName, string? DecodedCompleteName, bool Inscribable, int Quantity, uint[] Modifiers, ItemType ItemType, uint Interaction, uint ModelFileId, byte DyeTint)>();
             foreach (var item in tuple.Item2)
             {
                 var decodedName = await this.uIService.DecodeString(item.EncodedName, (GWCA.GW.Constants.Language)Language.English, cancellationToken);
                 var decodedCompleteName = await this.uIService.DecodeString(item.EncodedCompleteName, (GWCA.GW.Constants.Language)Language.English, cancellationToken);
                 var decodedSingleName = await this.uIService.DecodeString(item.EncodedSingleName, (GWCA.GW.Constants.Language)Language.English, cancellationToken);
-                decodedItems.Add((item.ModelId, item.EncodedName, decodedName, item.EncodedSingleName, decodedSingleName, item.EncodedCompleteName, decodedCompleteName, item.Inscribable, item.Quantity, item.Modifiers, item.ItemType, item.Interaction, item.ModelFileId));
+                decodedItems.Add((item.ModelId, item.EncodedName, decodedName, item.EncodedSingleName, decodedSingleName, item.EncodedCompleteName, decodedCompleteName, item.Inscribable, item.Quantity, item.Modifiers, item.ItemType, item.Interaction, item.ModelFileId, item.DyeTint));
             }
 
             decodedItemTuples.Add((tuple.Type, decodedItems));
@@ -124,7 +124,8 @@ public sealed class InventoryService(
                             Properties: [.. ItemProperty.ParseItemModifiers([.. item.Modifiers.Select(m => (Shared.Models.Guildwars.ItemModifier)m)])],
                             ItemType: item.ItemType.ToString(),
                             Interaction: item.Interaction,
-                            ModelFileId: item.ModelFileId))]))]);
+                            ModelFileId: item.ModelFileId,
+                            DyeTint: item.DyeTint))]))]);
     }
 
     private static string ToBase64(string encoded)
