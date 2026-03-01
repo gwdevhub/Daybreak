@@ -21,6 +21,13 @@ namespace Daybreak.API;
 
 public class EntryPoint
 {
+    private const bool IsDebug =
+#if DEBUG
+        true;
+#else
+        false;
+#endif
+
     private const int StartPort = 5080;
     private static readonly TimeSpan InitializationTimeout = TimeSpan.FromSeconds(5);
     private static readonly CancellationTokenSource CancellationTokenSource = new();
@@ -34,9 +41,16 @@ public class EntryPoint
     {
         Environment.SetEnvironmentVariable("ASPNETCORE_HOSTINGSTARTUPASSEMBLIES", null, EnvironmentVariableTarget.Process);
         Environment.SetEnvironmentVariable("ASPNETCORE_PREVENTHOSTINGSTARTUP", "true", EnvironmentVariableTarget.Process);
-#if DEBUG
-        ConsoleExtensions.AllocateAnsiConsole();
-#endif
+
+        // Enable console if GW was launched with --debug-api or if we're running a debug build
+        var args = Environment.GetCommandLineArgs();
+        if (IsDebug ||
+            args.Any(arg => arg.Equals("--debug-api", StringComparison.OrdinalIgnoreCase) || 
+                            arg.Equals("-debug-api", StringComparison.OrdinalIgnoreCase)))
+        {
+            NativeMethods.AllocConsole();
+        }
+
         var port = FindAvailablePort(StartPort);
         var app = CreateApplication(port);
         var runTask = Task.Run(() => StartServer(app), CancellationTokenSource.Token);

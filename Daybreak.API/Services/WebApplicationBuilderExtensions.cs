@@ -21,7 +21,6 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddSingleton<LoginService>();
         builder.Services.AddSingleton<InventoryService>();
         builder.Services.AddSingleton<GameThreadService>();
-        builder.Services.AddSingleton<SkillbarContextService>();
         builder.Services.AddSingleton<GameContextService>();
         builder.Services.AddSingleton<InstanceContextService>();
         builder.Services.AddSingleton<AgentContextService>();
@@ -29,6 +28,10 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddSingleton<PartyContextService>();
         builder.Services.AddSingleton<PreferencesService>();
         builder.Services.AddSingleton<UIContextService>();
+
+        builder.Services.AddSingleton<SkillbarContextService>();
+        builder.Services.AddHostedService(sp => sp.GetRequiredService<SkillbarContextService>());
+        builder.Services.AddSingleton<IInteropHealthService>(sp => sp.GetRequiredService<SkillbarContextService>());
         return builder;
     }
 }

@@ -224,6 +224,35 @@ public sealed unsafe class MemoryScanningService(
         return FindInRange(prologue, mask, 0, start, end);
     }
 
+    /// <summary>
+    /// Finds the start of a function by scanning backwards from <paramref name="addressInFunction"/>
+    /// for <c>CC CC</c> padding bytes (INT 3) that MSVC emits between functions.
+    /// Requires at least 2 consecutive <c>CC</c> bytes to avoid false positives from
+    /// single <c>CC</c> bytes that appear in instruction encodings.
+    /// Unlike <see cref="ToFunctionStart"/>, this works even when a previous hook
+    /// (e.g. GWCA) has overwritten the prologue with a JMP.
+    /// </summary>
+    public nuint ToFunctionStartFromPadding(nuint addressInFunction, uint scanRange = 0x500)
+    {
+        if (addressInFunction is 0)
+        {
+            return 0;
+        }
+
+        var p = (byte*)addressInFunction;
+        var limit = p - scanRange;
+        for (var scan = p - 1; scan > limit; scan--)
+        {
+            // Need at least 2 consecutive CC bytes (real inter-function padding)
+            if (*scan == 0xCC && *(scan - 1) == 0xCC && *(scan + 1) != 0xCC)
+            {
+                return (nuint)(scan + 1);
+            }
+        }
+
+        return 0;
+    }
+
     public nuint FindNthUseOfString(string str, uint nth, int offset = 0, bool useTextSection = true)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
