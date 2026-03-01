@@ -5,6 +5,7 @@ using Daybreak.API.Models;
 using Daybreak.API.Services.Interop;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Api;
+using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.BuildTemplates;
 using System.Core.Extensions;
@@ -41,14 +42,22 @@ public sealed class PartyService(
     private readonly GameContextService gameContextService = gameContextService.ThrowIfNull();
     private readonly ILogger<PartyService> logger = logger.ThrowIfNull();
 
-    public async Task<bool> SetPartyLoadout(PartyLoadout partyLoadout, CancellationToken cancellationToken)
+    public async Task<bool> SetPartyLoadout(string partyLoadoutTemplate, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        
+
         if (!await this.IsInValidOutpost(cancellationToken))
         {
             scopedLogger.LogError("Could not set party loadout. Not in a valid outpost");
             await this.chatService.AddMessageAsync("Cannot set party loadout. Not in a valid outpost.", "Daybreak.API", Channel.CHANNEL_MODERATOR, cancellationToken);
+            return false;
+        }
+
+        if (!this.buildTemplateManager.TryDecodeTemplate(partyLoadoutTemplate, out var build) ||
+                build is not TeamBuildEntry teamBuild)
+        {
+            scopedLogger.LogError("Could not set party loadout. Not a valid party loadout");
+            await this.chatService.AddMessageAsync("Cannot set party loadout. Not a valid party loadout.", "Daybreak.API", Channel.CHANNEL_MODERATOR, cancellationToken);
             return false;
         }
 
@@ -59,7 +68,7 @@ public sealed class PartyService(
             return false;
         }
 
-        if (!await this.gameThreadService.QueueOnGameThread(() => this.SpawnHeroes(partyLoadout), cancellationToken))
+        if (!await this.gameThreadService.QueueOnGameThread(() => this.SpawnHeroes(teamBuild), cancellationToken))
         {
             scopedLogger.LogError("Could not set party loadout. Could not spawn heroes");
             await this.chatService.AddMessageAsync("Cannot set party loadout. Could not spawn heroes.", "Daybreak.API", Channel.CHANNEL_MODERATOR, cancellationToken);
@@ -68,14 +77,14 @@ public sealed class PartyService(
 
         await Task.Delay(HeroSpawnDelay, cancellationToken);
 
-        if (!await this.gameThreadService.QueueOnGameThread(() => this.ApplyBuilds(partyLoadout), cancellationToken))
+        if (!await this.gameThreadService.QueueOnGameThread(() => this.ApplyBuilds(teamBuild), cancellationToken))
         {
             scopedLogger.LogError("Could not set party loadout. Could not apply builds");
             await this.chatService.AddMessageAsync("Cannot set party loadout. Could not apply builds.", "Daybreak.API", Channel.CHANNEL_MODERATOR, cancellationToken);
             return false;
         }
 
-        var heroBehaviorSetup = await this.gameThreadService.QueueOnGameThread(() => this.GetHeroBehaviorSetup(partyLoadout), cancellationToken);
+        var heroBehaviorSetup = await this.gameThreadService.QueueOnGameThread(() => this.GetHeroBehaviorSetup(teamBuild), cancellationToken);
         foreach (var (AgentId, Behavior) in heroBehaviorSetup ?? [])
         {
             if (!await this.SetHeroBehavior(AgentId, Behavior, cancellationToken))
@@ -89,10 +98,10 @@ public sealed class PartyService(
         return true;
     }
 
-    public Task<PartyLoadout?> GetPartyLoadout(CancellationToken cancellationToken)
+    public async Task<string?> GetPartyLoadout(CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        return this.gameThreadService.QueueOnGameThread(() =>
+        var teamBuild = await this.gameThreadService.QueueOnGameThread(() =>
         {
             unsafe
             {
@@ -133,25 +142,47 @@ public sealed class PartyService(
                     .OfType<(uint AgentId, BuildEntry BuildEntry, API.Interop.GWCA.GW.HeroBehavior Behavior)>()
                     .ToList();
 
-                return new PartyLoadout(
-                    [.. buildTuples.Select(t =>
-                    {
-                        if (t.AgentId == playerId)
-                        {
-                            return new PartyLoadoutEntry(0, Shared.Models.Api.HeroBehavior.Undefined, t.BuildEntry);
-                        }
-                        else if (heroes.Value.FirstOrDefault(h => h.AgentId == t.AgentId) is HeroPartyMember hero &&
-                                hero.AgentId == t.AgentId)
-                        {
-                            return new PartyLoadoutEntry((int)hero.HeroId, (Shared.Models.Api.HeroBehavior)t.Behavior, t.BuildEntry);
-                        }
+                var teamBuildEntry = this.buildTemplateManager.CreateTeamBuild();
+                teamBuildEntry.Builds.Clear();
+                var partyComposition = new List<PartyCompositionMetadataEntry>();
 
-                        return default;
-                    })
-                    .Where(t => t is not null)
-                    .OfType<PartyLoadoutEntry>()]);
+                foreach (var t in buildTuples.OrderBy(t => t.AgentId == playerId ? 0 : 1))
+                {
+                    var singleBuild = this.buildTemplateManager.CreateSingleBuild(t.BuildEntry);
+                    teamBuildEntry.Builds.Add(singleBuild);
+
+                    if (t.AgentId == playerId)
+                    {
+                        partyComposition.Add(new PartyCompositionMetadataEntry
+                        {
+                            Type = PartyCompositionMemberType.MainPlayer,
+                            Index = teamBuildEntry.Builds.Count - 1
+                        });
+                    }
+                    else if (heroes.Value.FirstOrDefault(h => h.AgentId == t.AgentId) is HeroPartyMember hero &&
+                             hero.AgentId == t.AgentId)
+                    {
+                        partyComposition.Add(new PartyCompositionMetadataEntry
+                        {
+                            Type = PartyCompositionMemberType.Hero,
+                            Index = teamBuildEntry.Builds.Count - 1,
+                            HeroId = (int)hero.HeroId,
+                            Behavior = (Shared.Models.Api.HeroBehavior)t.Behavior
+                        });
+                    }
+                }
+
+                teamBuildEntry.PartyComposition = partyComposition;
+                return teamBuildEntry;
             }
         }, cancellationToken);
+
+        if (teamBuild is null)
+        {
+            return default;
+        }
+
+        return this.buildTemplateManager.EncodeTemplate(teamBuild);
     }
 
     public async Task<bool> KickAllHeroes(CancellationToken cancellationToken)
@@ -240,21 +271,25 @@ public sealed class PartyService(
         }, cancellationToken);
     }
 
-    private unsafe bool SpawnHeroes(PartyLoadout partyLoadout)
+    private bool SpawnHeroes(TeamBuildEntry partyLoadout)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        scopedLogger.LogDebug("Spawning {heroCount} heroes for party loadout", partyLoadout.Entries.AsValueEnumerable().Count(c => c.HeroId != 0));
-        foreach (var entry in partyLoadout.Entries.AsValueEnumerable().OrderBy(e => e.Build.Primary))
+        scopedLogger.LogDebug("Spawning {heroCount} heroes for party loadout", partyLoadout.PartyComposition?.AsValueEnumerable().Count(c => c.HeroId != 0) ?? 0);
+        foreach ((var index, var entry) in partyLoadout.Builds.AsValueEnumerable().OrderBy(e => e.Primary.Id)
+                    .Select((e, i) => (e, partyLoadout.PartyComposition?.First(e => e.Index == i)))
+                    .OfType<(SingleBuildEntry, PartyCompositionMetadataEntry)>()
+                    .Where(t => t.Item2.Type is PartyCompositionMemberType.Hero))
         {
-            if (entry.HeroId != 0 &&
-                Hero.TryParse(entry.HeroId, out var hero))
+            if (entry.HeroId is not null &&
+                entry.HeroId != 0 &&
+                Hero.TryParse(entry.HeroId.Value, out var hero))
             {
-                scopedLogger.LogInformation("Adding hero [{heroId}] [{heroName}] with behavior {behavior}", entry.HeroId, hero.Name, entry.HeroBehavior);
+                scopedLogger.LogInformation("Adding hero [{heroId}] [{heroName}] with behavior {behavior}", entry.HeroId, hero.Name, entry.Behavior ?? Shared.Models.Api.HeroBehavior.Guard);
                 this.partyContextService.AddHero((uint)entry.HeroId);
             }
             else
             {
-                scopedLogger.LogWarning("Invalid hero entry in party loadout: {heroId}", entry.HeroId);
+                scopedLogger.LogWarning("Invalid hero entry in party loadout: {heroId}", entry.HeroId ?? -1);
                 continue;
             }
         }
@@ -262,7 +297,7 @@ public sealed class PartyService(
         return true;
     }
 
-    private unsafe bool ApplyBuilds(PartyLoadout partyLoadout)
+    private unsafe bool ApplyBuilds(TeamBuildEntry partyLoadout)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         scopedLogger.LogDebug("Applying builds");
@@ -299,107 +334,102 @@ public sealed class PartyService(
             return false;
         }
 
-        var parsedEntries = partyLoadout.Entries.AsValueEnumerable()
-            .Select(entry =>
+        for (var buildIndex = 0; buildIndex < partyLoadout.Builds.Count; buildIndex++)
+        {
+            var build = partyLoadout.Builds[buildIndex];
+            var composition = partyLoadout.PartyComposition?.FirstOrDefault(c => c.Index == buildIndex);
+            if (composition is null)
             {
-                if (entry.HeroId is 0)
+                continue;
+            }
+
+            uint agentId;
+            if (composition.HeroId is 0 or null)
+            {
+                agentId = playerId.Value;
+            }
+            else
+            {
+                var hero = heroes.Value.AsValueEnumerable().FirstOrDefault(h => (int)h.HeroId == composition.HeroId.GetValueOrDefault());
+                agentId = hero.AgentId;
+            }
+
+            var professionContext = professions.Value.AsValueEnumerable().FirstOrDefault(p => p.AgentId == agentId);
+
+            var validSkills = agentId == playerId
+                ? unlockedSkills
+                : accountContext.Pointer->UnlockedAccountSkills;
+
+            var unlockedProfessionsFlags = agentId == playerId
+                ? playerProfessionContext.UnlockedProfessions
+                : uint.MaxValue;
+
+            if (!this.buildTemplateManager.CanTemplateApply(
+                new BuildTemplateValidationRequest(
+                    (uint)build.Primary.Id,
+                    (uint)build.Secondary.Id,
+                    [.. build.Skills.Select(s => (uint)s.Id)],
+                    (uint)(int)professionContext.Primary,
+                    unlockedProfessionsFlags,
+                    [.. validSkills])))
+            {
+                if (composition.HeroId is 0 or null)
                 {
-                    return (entry, playerId);
+                    scopedLogger.LogError("Cannot apply build for player");
                 }
                 else
                 {
-                    var hero = heroes.Value.AsValueEnumerable().FirstOrDefault(h => (int)h.HeroId == entry.HeroId);
-                    return (entry, hero.AgentId);
-                }
-            })
-            .Select(t => (t.entry, t.playerId, professions.Value.AsValueEnumerable().FirstOrDefault(p => p.AgentId == t.playerId)))
-            .Select(t =>
-            {
-                var validSkills = t.playerId == playerId
-                    ? unlockedSkills
-                    : accountContext.Pointer->UnlockedAccountSkills;
-
-                var unlockedProfessionsFlags = t.playerId == playerId
-                    ? playerProfessionContext.UnlockedProfessions
-                    : uint.MaxValue;
-
-                if (!this.buildTemplateManager.CanTemplateApply(
-                    new BuildTemplateValidationRequest(
-                        (uint)t.entry.Build.Primary,
-                        (uint)t.entry.Build.Secondary,
-                        [.. t.entry.Build.Skills],
-                        (uint)t.Item3.Primary,
-                        unlockedProfessionsFlags,
-                        [.. validSkills])))
-                {
-                    return (t.entry, t.playerId, t.Item3, false);
+                    scopedLogger.LogError("Cannot apply build for hero {heroId}", composition.HeroId);
                 }
 
-                return (t.entry, t.playerId, t.Item3, true);
-            })
-            .Where(t =>
-            {
-                if (!t.Item4)
-                {
-                    if (t.entry.HeroId is 0)
-                    {
-                        scopedLogger.LogError("Cannot apply build for player");
-                    }
-                    else
-                    {
-                        scopedLogger.LogError("Cannot apply build for hero {heroId}", t.entry.HeroId);
-                    }
-                }
-
-                return t.Item4;
-            });
-
-        foreach (var (entry, maybeAgentId, _, _) in parsedEntries)
-        {
-            if (maybeAgentId is not uint agentId)
-            {
                 continue;
             }
 
             var attributeIds = new AttributeArray12();
             var attributeValues = new Array12Uint();
-            for (var i = 0; i < entry.Build.Attributes.Count && i < 12; i++)
+            for (var i = 0; i < build.Attributes.Count && i < 12; i++)
             {
-                attributeIds[i] = (GWCA.GW.Constants.Attribute)entry.Build.Attributes[i].Id;
-                attributeValues[i] = (uint)entry.Build.Attributes[i].BasePoints;
+                attributeIds[i] = (GWCA.GW.Constants.Attribute)(build.Attributes[i].Attribute?.Id ?? 0);
+                attributeValues[i] = (uint)build.Attributes[i].Points;
             }
 
             var skills = new SkillIDArray8();
-            for (var i = 0; i < entry.Build.Skills.Count && i < 8; i++)
+            for (var i = 0; i < build.Skills.Count && i < 8; i++)
             {
-                skills[i] = (GWCA.GW.Constants.SkillID)entry.Build.Skills[i];
+                skills[i] = (GWCA.GW.Constants.SkillID)build.Skills[i].Id;
             }
 
             var skillTemplate = new SkillTemplate
             {
-                Primary = (GWCA.GW.Constants.Profession)entry.Build.Primary,
-                Secondary = (GWCA.GW.Constants.Profession)entry.Build.Secondary,
-                AttributesCount = (uint)entry.Build.Attributes.Count,
+                Primary = (GWCA.GW.Constants.Profession)build.Primary.Id,
+                Secondary = (GWCA.GW.Constants.Profession)build.Secondary.Id,
+                AttributesCount = (uint)Math.Min(build.Attributes.Count, 12),
                 AttributeIds = attributeIds,
                 Skills = skills
             };
             Unsafe.CopyBlock(skillTemplate.AttributeValues, Unsafe.AsPointer(ref attributeValues), (uint)(12 * sizeof(uint)));
-            scopedLogger.LogInformation("Applying build for agent {agentId} with primary {primary} and secondary {secondary}", agentId, entry.Build.Primary, entry.Build.Secondary);
+            scopedLogger.LogInformation("Applying build for agent {agentId} with primary {primary} and secondary {secondary}", agentId, build.Primary, build.Secondary);
             this.skillbarContextService.LoadBuild(agentId, &skillTemplate);
         }
 
         return true;
     }
 
-    private unsafe List<(uint AgentId, Shared.Models.Api.HeroBehavior Behavior)>? GetHeroBehaviorSetup(PartyLoadout partyLoadout)
+    private unsafe List<(uint AgentId, Shared.Models.Api.HeroBehavior Behavior)>? GetHeroBehaviorSetup(TeamBuildEntry teamBuild)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         scopedLogger.LogDebug("Getting hero behavior setup");
-        
+
         if (!this.gameContextService.GetGameContext().TryGetPlayerParty(out _, out _, out var heroes, out _) ||
             !heroes.HasValue)
         {
             scopedLogger.LogError("Failed to get player party");
+            return default;
+        }
+
+        if (teamBuild.PartyComposition is null)
+        {
+            scopedLogger.LogWarning("No party composition metadata in team build");
             return default;
         }
 
@@ -411,14 +441,14 @@ public sealed class PartyService(
                     return default;
                 }
 
-                var entry = partyLoadout.Entries.AsValueEnumerable().FirstOrDefault(e => e.HeroId == (int)h.HeroId);
+                var entry = teamBuild.PartyComposition.AsValueEnumerable().FirstOrDefault(e => e.HeroId == (int)h.HeroId);
                 if (entry is null)
                 {
                     scopedLogger.LogWarning("No entry found for hero {heroId}", h.HeroId);
                     return default;
                 }
 
-                return (h.AgentId, entry.HeroBehavior);
+                return (h.AgentId, entry.Behavior ?? Shared.Models.Api.HeroBehavior.Guard);
             })
             .Where(t => t.AgentId is not 0)
             .ToList();
@@ -469,7 +499,7 @@ public sealed class PartyService(
                 var playerParty = GWCA.GW.PartyMgr.GetPartyInfo(0);
                 var playerId = charContext->PlayerNumber;
                 var offset = 0;
-                foreach(var hero in playerParty->Heroes)
+                foreach (var hero in playerParty->Heroes)
                 {
                     if (hero.OwnerPlayerId == playerId)
                     {

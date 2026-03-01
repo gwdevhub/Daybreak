@@ -235,8 +235,8 @@ public sealed class FocusViewModel(
         }
         else if (buildEntry is TeamBuildEntry teamBuild)
         {
-            var partyLoadout = this.buildTemplateManager.ConvertToPartyLoadout(teamBuild);
-            await this.apiContext.PostPartyLoadout(partyLoadout, this.cancellationSource?.Token ?? CancellationToken.None);
+            var code = this.buildTemplateManager.EncodeTemplate(teamBuild);
+            await this.apiContext.PostPartyLoadout(code, this.cancellationSource?.Token ?? CancellationToken.None);
         }
     }
 
@@ -270,7 +270,12 @@ public sealed class FocusViewModel(
             return;
         }
 
-        var teamBuildEntry = this.buildTemplateManager.CreateTeamBuild(loadout);
+        if (!this.buildTemplateManager.TryDecodeTemplate(loadout, out var build) ||
+            build is not TeamBuildEntry teamBuildEntry)
+        {
+            return;
+        }
+
         this.viewManager.ShowView<BuildRoutingView>((nameof(BuildRoutingView.BuildName), Uri.EscapeDataString(teamBuildEntry.Name ?? throw new InvalidOperationException())));
     }
 

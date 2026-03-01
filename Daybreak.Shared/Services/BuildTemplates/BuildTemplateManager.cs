@@ -109,17 +109,6 @@ public sealed class BuildTemplateManager(
         return entry;
     }
 
-    public TeamBuildEntry CreateTeamBuild(PartyLoadout partyLoadout)
-    {
-        var entry = this.CreateTeamBuild();
-        return this.PopulateTeamBuild(entry, partyLoadout);
-    }
-
-    public TeamBuildEntry CreateTeamBuild(PartyLoadout partyLoadout, string name)
-    {
-        var entry = this.CreateTeamBuild(name);
-        return this.PopulateTeamBuild(entry, partyLoadout);
-    }
 
     public SingleBuildEntry ConvertToSingleBuildEntry(TeamBuildEntry teamBuildEntry)
     {
@@ -154,32 +143,6 @@ public sealed class BuildTemplateManager(
         };
 
         return teamBuildEntry;
-    }
-
-    public PartyLoadout ConvertToPartyLoadout(TeamBuildEntry teamBuildEntry)
-    {
-        if (teamBuildEntry.PartyComposition is not List<PartyCompositionMetadataEntry> partyComposition ||
-            partyComposition.Count != teamBuildEntry.Builds.Count)
-        {
-            throw new InvalidOperationException("Invalid team build entry. Team build entry contains invalid party composition metadata");
-        }
-
-        if (partyComposition.Any(c => c.Type is PartyCompositionMemberType.Hero && (c.HeroId is null || c.Behavior is null)))
-        {
-            throw new InvalidOperationException("Invalid team build entry. Hero entries without specified heroes and behaviors are not currently supported");
-        }
-
-        var loadoutEntryComposition = teamBuildEntry.Builds.Select((build, index) =>
-        {
-            var compositionEntry = partyComposition.First(c => c.Index == index);
-            return (build, compositionEntry, index);
-        });
-
-        return new PartyLoadout(
-            Entries: [.. loadoutEntryComposition.Select(entry => new PartyLoadoutEntry(
-                HeroId: entry.compositionEntry.Type is PartyCompositionMemberType.MainPlayer ? 0 : entry.compositionEntry.HeroId ?? throw new InvalidOperationException(),
-                HeroBehavior: entry.compositionEntry.Behavior ?? HeroBehavior.Guard,
-                Build: this.ConvertToBuildEntry(entry.build)))]);
     }
 
     public BuildEntry ConvertToBuildEntry(SingleBuildEntry singleBuildEntry)
@@ -474,40 +437,6 @@ public sealed class BuildTemplateManager(
         }
 
         throw new InvalidOperationException($"Unknown build entry of type {build.GetType().Name}");
-    }
-
-    private TeamBuildEntry PopulateTeamBuild(TeamBuildEntry teamBuildEntry, PartyLoadout partyLoadout)
-    {
-        teamBuildEntry.Builds.Clear();
-        var partyCompositionMetadata = new List<PartyCompositionMetadataEntry>();
-        foreach (var entry in partyLoadout.Entries.OrderBy(e => e.HeroId))
-        {
-            var build = entry.Build;
-            var buildEntry = this.CreateSingleBuild();
-            this.PopulateSingleBuild(buildEntry, build);
-
-            var partyCompositionEntry = new PartyCompositionMetadataEntry
-            {
-                Type = entry.HeroId is 0 ? PartyCompositionMemberType.MainPlayer : PartyCompositionMemberType.Hero,
-                Index = entry.HeroId is 0 ? 0 : teamBuildEntry.Builds.Count,
-                Behavior = entry.HeroId is 0 ? default : (HeroBehavior)entry.HeroBehavior,
-                HeroId = entry.HeroId is 0 ? default : entry.HeroId
-            };
-
-            if (partyCompositionEntry.Type is PartyCompositionMemberType.MainPlayer)
-            {
-                teamBuildEntry.Builds.Insert(0, buildEntry);
-                partyCompositionMetadata.Insert(0, partyCompositionEntry);
-            }
-            else
-            {
-                teamBuildEntry.Builds.Add(buildEntry);
-                partyCompositionMetadata.Add(partyCompositionEntry);
-            }
-        }
-
-        teamBuildEntry.PartyComposition = partyCompositionMetadata;
-        return teamBuildEntry;
     }
 
     private SingleBuildEntry PopulateSingleBuild(SingleBuildEntry singleBuildEntry, BuildEntry buildEntry)

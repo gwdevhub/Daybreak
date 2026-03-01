@@ -17,9 +17,7 @@ public interface IBuildTemplateManager
     SingleBuildEntry CreateSingleBuild(string name, BuildEntry buildEntry);
     TeamBuildEntry CreateTeamBuild();
     TeamBuildEntry CreateTeamBuild(string name);
-    TeamBuildEntry CreateTeamBuild(PartyLoadout partyLoadout);
-    TeamBuildEntry CreateTeamBuild(PartyLoadout partyLoadout, string name);
-    PartyLoadout ConvertToPartyLoadout(TeamBuildEntry teamBuildEntry);
+
     BuildEntry ConvertToBuildEntry(SingleBuildEntry singleBuildEntry);
     bool CanApply(MainPlayerBuildContext mainPlayerBuildContext, TeamBuildEntry teamBuildEntry);
     bool CanApply(MainPlayerBuildContext mainPlayerBuildContext, SingleBuildEntry singleBuildEntry);

@@ -2,9 +2,11 @@
 
 namespace Daybreak.API.Models;
 
-public sealed class CallbackRegistration(Guid uid, Action onDispose) : IDisposable
+public sealed class CallbackRegistration<T>(Guid uid, T callback, Action onDispose) : IDisposable
+    where T : Delegate
 {
-    private readonly Guid uid = uid;
+    public Guid Uid { get; } = uid;
+    public T Callback { get; } = callback.ThrowIfNull();
     private readonly Action onDispose = onDispose.ThrowIfNull();
 
     public void Dispose()

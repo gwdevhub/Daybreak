@@ -14,12 +14,6 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
 {
     private const string Base64Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private unsafe delegate byte DecodeTemplateHeaderDelegate(SkillTemplate* outTemplate, BitReader* bitReader);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private unsafe delegate void LoadSkillTemplateDelegate(int targetAgentId, SkillTemplate* templateData);
-
     private static readonly byte[] DecodeTemplateHeaderSignature =
     [
         0x55, 0x8B, 0xEC, 0x56,
@@ -39,6 +33,12 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
     private const string LoadSkillTemplateAssertionFile = "TemplatesHelpers.cpp";
     private const string LoadSkillTemplateAssertionMessage = "targetPrimaryProf == templateData.profPrimary";
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private unsafe delegate byte DecodeTemplateHeaderDelegate(SkillTemplate* outTemplate, BitReader* bitReader);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private unsafe delegate void LoadSkillTemplateDelegate(int targetAgentId, SkillTemplate* templateData);
+
     private readonly ChatService chatService;
     private readonly MemoryScanningService memoryScanningService;
     private readonly IBuildTemplateManager templateManager;
@@ -47,6 +47,8 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
     private readonly GWAddressCache loadSkillTemplateAddressCache;
     private readonly GWHook<LoadSkillTemplateDelegate> loadSkillTemplateHook;
     private readonly ILogger<SkillbarContextService> logger;
+    private readonly List<CallbackRegistration<Func<string, bool>>> decodeTemplateHeaderCallbacks = [];
+    private readonly List<CallbackRegistration<Func<SkillTemplate, bool>>> loadSkillTemplateCallbacks = [];
 
     public unsafe SkillbarContextService(
         ChatService chatService,
@@ -90,15 +92,6 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
             this.logger.LogInformation(
                 "DecodeTemplateHeader hook installed at 0x{target:X8}",
                 this.decodeTemplateHeaderHook.TargetAddress);
-
-            while (!this.loadSkillTemplateHook.EnsureInitialized())
-            {
-                await Task.Delay(500, cancellationToken);
-            }
-
-            this.logger.LogInformation(
-                "LoadSkillTemplate hook installed at 0x{target:X8}",
-                this.loadSkillTemplateHook.TargetAddress);
         }, cancellationToken);
         return Task.CompletedTask;
     }
@@ -106,7 +99,6 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
     public Task StopAsync(CancellationToken cancellationToken)
     {
         this.decodeTemplateHeaderHook.Dispose();
-        this.loadSkillTemplateHook.Dispose();
         return Task.CompletedTask;
     }
 
@@ -116,59 +108,56 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
             "DecodeTemplateHeader",
             $"0x{this.decodeTemplateHeaderHook.TargetAddress:X8}",
             this.decodeTemplateHeaderHook.Hooked);
-        yield return new AddressHealth(
-            "LoadSkillTemplate",
-            $"0x{this.loadSkillTemplateHook.TargetAddress:X8}",
-            this.loadSkillTemplateHook.Hooked);
     }
 
-    /// <summary>
-    /// Last decoded party loadout, stashed for LoadSkillTemplateDetour to consume.
-    /// </summary>
-    private volatile TeamBuildEntry? pendingPartyLoadout;
+    public CallbackRegistration<Func<string, bool>> RegisterDecodeTemplateHeaderHandler(Func<string, bool> callback)
+    {
+        var uid = Guid.NewGuid();
+        var registration =
+            new CallbackRegistration<Func<string, bool>>(uid, callback, () => this.decodeTemplateHeaderCallbacks.RemoveAll(r => r.Uid == uid));
+        this.decodeTemplateHeaderCallbacks.Add(registration);
+        return registration;
+    }
+
+    public CallbackRegistration<Func<SkillTemplate, bool>> RegisterLoadSkillTemplateHandler(Func<SkillTemplate, bool> callback)
+    {
+        var uid = Guid.NewGuid();
+        var registration =
+            new CallbackRegistration<Func<SkillTemplate, bool>>(uid, callback, () => this.loadSkillTemplateCallbacks.RemoveAll(r => r.Uid == uid));
+        this.loadSkillTemplateCallbacks.Add(registration);
+        return registration;
+    }
 
     private unsafe byte DecodeTemplateHeaderDetour(SkillTemplate* outTemplate, BitReader* bitReader)
     {
-        var scopedLogger = this.logger.CreateScopedLogger();
-
-        // Read the full raw buffer before the game consumes it
-        var rawBytes = ReadBitReaderBuffer(bitReader);
-        var templateString = ReencodeToBase64(rawBytes);
-        if (!this.templateManager.TryDecodeTemplate(templateString, out var parsedBuild))
+        if (this.decodeTemplateHeaderCallbacks.Count > 0)
         {
-            return this.decodeTemplateHeaderHook.Continue(outTemplate, bitReader);
+            var scopedLogger = this.logger.CreateScopedLogger();
+
+            // Read the full raw buffer before the game consumes it
+            var rawBytes = ReadBitReaderBuffer(bitReader);
+            var templateString = ReencodeToBase64(rawBytes);
+            if (this.decodeTemplateHeaderCallbacks.Any(r => r.Callback(templateString)))
+            {
+                scopedLogger.LogDebug("DecodeTemplateHeader callback handled template: {template}", templateString);
+                return 1;
+            }
         }
 
-        // Normal skill template — let the game handle it
-        if (parsedBuild is not TeamBuildEntry teamBuild || teamBuild.Builds.Count == 0)
-        {
-            return this.decodeTemplateHeaderHook.Continue(outTemplate, bitReader);
-        }
-
-        // Party loadout detected — fill outTemplate with member[0]'s build for hover preview
-        scopedLogger.LogInformation("Party loadout detected with {count} members", teamBuild.Builds.Count);
-        var playerBuild = teamBuild.Builds[0];
-        FillSkillTemplate(outTemplate, playerBuild);
-
-        // Stash for LoadSkillTemplateDetour
-        this.pendingPartyLoadout = teamBuild;
-
-        return 1; // Success — GW will use outTemplate for preview/load
+        return this.decodeTemplateHeaderHook.Continue(outTemplate, bitReader);
     }
 
     private unsafe void LoadSkillTemplateDetour(int targetAgentId, SkillTemplate* templateData)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         scopedLogger.LogDebug("LoadSkillTemplateDetour called for agent {agentId}", targetAgentId);
-        if (this.pendingPartyLoadout is null)
+        if (this.loadSkillTemplateCallbacks.Any(r => r.Callback(*templateData)))
         {
-            this.loadSkillTemplateHook.Continue(targetAgentId, templateData);
+            scopedLogger.LogDebug("LoadSkillTemplate callback handled loading for agent {agentId}", targetAgentId);
             return;
         }
 
-        var teamBuild = this.pendingPartyLoadout;
-        this.pendingPartyLoadout = null;
-        Task.Run(() => this.chatService.AddMessageAsync($"Applying party loadout with {teamBuild.Builds.Count} members", "Daybreak.API", Channel.CHANNEL_MODERATOR, CancellationToken.None));
+        this.loadSkillTemplateHook.Continue(targetAgentId, templateData);
     }
 
     /// <summary>
@@ -224,42 +213,5 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
         }
 
         return new string(chars);
-    }
-
-    /// <summary>
-    /// Fills a native SkillTemplate struct from a managed SingleBuildEntry.
-    /// Follows the same pattern as MainPlayerService.SetCurrentBuild.
-    /// </summary>
-    private static unsafe void FillSkillTemplate(SkillTemplate* outTemplate, SingleBuildEntry build)
-    {
-        var attributeIds = new AttributeArray12();
-        var attributeValues = new Array12Uint();
-        var skills = new SkillIDArray8();
-
-        for (var i = 0; i < build.Attributes.Count && i < 12; i++)
-        {
-            if (build.Attributes[i].Attribute is null)
-            {
-                continue;
-            }
-
-            attributeIds[i] = (GWCA.GW.Constants.Attribute)build.Attributes[i].Attribute!.Id;
-            attributeValues[i] = (uint)build.Attributes[i].Points;
-        }
-
-        for (var i = 0; i < build.Skills.Count && i < 8; i++)
-        {
-            skills[i] = (GWCA.GW.Constants.SkillID)build.Skills[i].Id;
-        }
-
-        *outTemplate = new SkillTemplate
-        {
-            Primary = (GWCA.GW.Constants.Profession)build.Primary.Id,
-            Secondary = (GWCA.GW.Constants.Profession)build.Secondary.Id,
-            AttributesCount = (uint)Math.Min(build.Attributes.Count, 12),
-            AttributeIds = attributeIds,
-            Skills = skills,
-        };
-        Unsafe.CopyBlock(outTemplate->AttributeValues, Unsafe.AsPointer(ref attributeValues), (uint)(12 * sizeof(uint)));
     }
 }
