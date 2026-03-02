@@ -92,6 +92,15 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
             this.logger.LogInformation(
                 "DecodeTemplateHeader hook installed at 0x{target:X8}",
                 this.decodeTemplateHeaderHook.TargetAddress);
+
+            while (!this.loadSkillTemplateHook.EnsureInitialized())
+            {
+                await Task.Delay(500, cancellationToken);
+            }
+
+            this.logger.LogInformation(
+                "LoadSkillTemplate hook installed at 0x{target:X8}",
+                this.loadSkillTemplateHook.TargetAddress);
         }, cancellationToken);
         return Task.CompletedTask;
     }
@@ -99,6 +108,7 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
     public Task StopAsync(CancellationToken cancellationToken)
     {
         this.decodeTemplateHeaderHook.Dispose();
+        this.loadSkillTemplateHook.Dispose();
         return Task.CompletedTask;
     }
 
@@ -108,6 +118,10 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
             "DecodeTemplateHeader",
             $"0x{this.decodeTemplateHeaderHook.TargetAddress:X8}",
             this.decodeTemplateHeaderHook.Hooked);
+        yield return new AddressHealth(
+            "LoadSkillTemplate",
+            $"0x{this.loadSkillTemplateHook.TargetAddress:X8}",
+            this.loadSkillTemplateHook.Hooked);
     }
 
     public CallbackRegistration<Func<string, WrappedPointer<SkillTemplate>, bool>> RegisterDecodeTemplateHeaderHandler(Func<string, WrappedPointer<SkillTemplate>, bool> callback)
