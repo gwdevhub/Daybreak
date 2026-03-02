@@ -28,16 +28,29 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
     private const string DecodeTemplateHeaderMask = "xxxxxxxxxxxx????xxxxxxxxx?xxxxxx";
     private const int DecodeTemplateHeaderOffset = 0x0;
 
-    // GWCA hooks LoadSkillTemplate first (patching the prologue), so byte-pattern scan fails.
-    // Use the same assertion-based scan that GWCA uses to find the function reliably.
     private const string LoadSkillTemplateAssertionFile = "TemplatesHelpers.cpp";
     private const string LoadSkillTemplateAssertionMessage = "targetPrimaryProf == templateData.profPrimary";
+
+    private static readonly byte[] PopulateSkillDataSignature =
+    [
+        0x55, 0x8B, 0xEC, 0x81,
+        0xEC, 0x50, 0x01, 0x00,
+        0x00, 0xA1, 0x00, 0x00,
+        0x00, 0x00, 0x33, 0xC5,
+        0x89, 0x45, 0xFC, 0x53,
+        0x56, 0x8B, 0x75, 0x08
+    ];
+    private const string PopulateSkillDataMask = "xxxxxxxxxx????xxxxxxxxxx";
+    private const int PopulateSkillDataOffset = 0x0;
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private unsafe delegate byte DecodeTemplateHeaderDelegate(SkillTemplate* outTemplate, BitReader* bitReader);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private unsafe delegate void LoadSkillTemplateDelegate(int targetAgentId, SkillTemplate* templateData);
+
+    [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
+    private unsafe delegate void PopulateSkillDataDelegate(nint thisPtr, SkillTemplate* skillTemplateData);
 
     private readonly ChatService chatService;
     private readonly MemoryScanningService memoryScanningService;
@@ -46,9 +59,12 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
     private readonly GWHook<DecodeTemplateHeaderDelegate> decodeTemplateHeaderHook;
     private readonly GWAddressCache loadSkillTemplateAddressCache;
     private readonly GWHook<LoadSkillTemplateDelegate> loadSkillTemplateHook;
+    private readonly GWAddressCache populateSkillDataAddressCache;
+    private readonly GWHook<PopulateSkillDataDelegate> populateSkillDataHook;
     private readonly ILogger<SkillbarContextService> logger;
     private readonly List<CallbackRegistration<Func<string, WrappedPointer<SkillTemplate>, bool>>> decodeTemplateHeaderCallbacks = [];
     private readonly List<CallbackRegistration<Func<SkillTemplate, bool>>> loadSkillTemplateCallbacks = [];
+    private readonly List<CallbackRegistration<Func<nint, WrappedPointer<SkillTemplate>, bool>>> populateSkillDataCallbacks = [];
 
     public unsafe SkillbarContextService(
         ChatService chatService,
@@ -75,6 +91,11 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
         this.loadSkillTemplateHook = new GWHook<LoadSkillTemplateDelegate>(
             this.loadSkillTemplateAddressCache,
             this.LoadSkillTemplateDetour);
+        this.populateSkillDataAddressCache = new GWAddressCache(() =>
+            this.memoryScanningService.FindAddress(PopulateSkillDataSignature, PopulateSkillDataMask, PopulateSkillDataOffset));
+        this.populateSkillDataHook = new GWHook<PopulateSkillDataDelegate>(
+            this.populateSkillDataAddressCache,
+            this.PopulateSkillDataDetour);
         this.logger = logger;
     }
 
@@ -101,6 +122,15 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
             this.logger.LogInformation(
                 "LoadSkillTemplate hook installed at 0x{target:X8}",
                 this.loadSkillTemplateHook.TargetAddress);
+
+            while (!this.populateSkillDataHook.EnsureInitialized())
+            {
+                await Task.Delay(500, cancellationToken);
+            }
+
+            this.logger.LogInformation(
+                "PopulateSkillData hook installed at 0x{target:X8}",
+                this.populateSkillDataHook.TargetAddress);
         }, cancellationToken);
         return Task.CompletedTask;
     }
@@ -109,6 +139,7 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
     {
         this.decodeTemplateHeaderHook.Dispose();
         this.loadSkillTemplateHook.Dispose();
+        this.populateSkillDataHook.Dispose();
         return Task.CompletedTask;
     }
 
@@ -122,6 +153,10 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
             "LoadSkillTemplate",
             $"0x{this.loadSkillTemplateHook.TargetAddress:X8}",
             this.loadSkillTemplateHook.Hooked);
+        yield return new AddressHealth(
+            "PopulateSkillData",
+            $"0x{this.populateSkillDataHook.TargetAddress:X8}",
+            this.populateSkillDataHook.Hooked);
     }
 
     public CallbackRegistration<Func<string, WrappedPointer<SkillTemplate>, bool>> RegisterDecodeTemplateHeaderHandler(Func<string, WrappedPointer<SkillTemplate>, bool> callback)
@@ -139,6 +174,15 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
         var registration =
             new CallbackRegistration<Func<SkillTemplate, bool>>(uid, callback, () => this.loadSkillTemplateCallbacks.RemoveAll(r => r.Uid == uid));
         this.loadSkillTemplateCallbacks.Add(registration);
+        return registration;
+    }
+
+    public CallbackRegistration<Func<nint, WrappedPointer<SkillTemplate>, bool>> RegisterPopulateSkillDataHandler(Func<nint, WrappedPointer<SkillTemplate>, bool> callback)
+    {
+        var uid = Guid.NewGuid();
+        var registration =
+            new CallbackRegistration<Func<nint, WrappedPointer<SkillTemplate>, bool>>(uid, callback, () => this.populateSkillDataCallbacks.RemoveAll(r => r.Uid == uid));
+        this.populateSkillDataCallbacks.Add(registration);
         return registration;
     }
 
@@ -168,6 +212,16 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
         }
 
         this.loadSkillTemplateHook.Continue(targetAgentId, templateData);
+    }
+
+    private unsafe void PopulateSkillDataDetour(nint thisPtr, SkillTemplate* skillTemplateData)
+    {
+        if (this.populateSkillDataCallbacks.Any(r => r.Callback(thisPtr, skillTemplateData)))
+        {
+            return;
+        }
+
+        this.populateSkillDataHook.Continue(thisPtr, skillTemplateData);
     }
 
     /// <summary>
