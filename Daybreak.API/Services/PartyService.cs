@@ -33,6 +33,7 @@ public sealed class PartyService : IHostedService
     private readonly ILogger<PartyService> logger;
     private readonly CallbackRegistration<Func<string, WrappedPointer<SkillTemplate>, bool>> decodeTemplateHeaderCallbackRegistration;
     private readonly CallbackRegistration<Func<SkillTemplate, bool>> loadSkillTemplateCallbackRegistration;
+    private readonly CallbackRegistration<Func<nint, WrappedPointer<SkillTemplate>, bool>> populateSkillDataCallbackRegistration;
 
     private string? cachedTemplateCode;
 
@@ -60,6 +61,7 @@ public sealed class PartyService : IHostedService
         this.logger = logger.ThrowIfNull();
         this.decodeTemplateHeaderCallbackRegistration = this.skillbarContextService.RegisterDecodeTemplateHeaderHandler(this.DecodeTemplateHeader);
         this.loadSkillTemplateCallbackRegistration = this.skillbarContextService.RegisterLoadSkillTemplateHandler(this.LoadSkillTemplate);
+        this.populateSkillDataCallbackRegistration = this.skillbarContextService.RegisterPopulateSkillDataHandler(this.PopulateSkillData);
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -72,6 +74,7 @@ public sealed class PartyService : IHostedService
     {
         this.decodeTemplateHeaderCallbackRegistration.Dispose();
         this.loadSkillTemplateCallbackRegistration.Dispose();
+        this.populateSkillDataCallbackRegistration.Dispose();
         return Task.CompletedTask;
     }
 
@@ -329,6 +332,35 @@ public sealed class PartyService : IHostedService
         // Returning true would block the original LoadSkillTemplate call chain,
         // leaving the game with uninitialized template data and causing
         // TemplatesSkillsCanApply assertion failures.
+        return false;
+    }
+
+    /// <summary>
+    /// Intercepts TemplatesSummary_PopulateSkillData when a team build is cached.
+    /// Instead of showing only the first build, populates the summary frame with
+    /// each build in the team loadout by calling the original function per build.
+    /// </summary>
+    private unsafe bool PopulateSkillData(nint frameDataPtr, WrappedPointer<SkillTemplate> skillTemplateData)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        if (this.cachedTemplateCode is null)
+        {
+            return false;
+        }
+
+        if (!this.buildTemplateManager.TryDecodeTemplate(this.cachedTemplateCode, out var build) ||
+            build is not TeamBuildEntry teamBuild ||
+            teamBuild.Builds.Count is 0)
+        {
+            return false;
+        }
+
+        scopedLogger.LogDebug(
+            "PopulateSkillData intercepted for team build with {count} builds",
+            teamBuild.Builds.Count);
+
+        // TODO: For now, just let the original handle the first build.
+        // Future: create/clone frames for each build row and call original per build.
         return false;
     }
 
