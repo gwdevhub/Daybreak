@@ -3,9 +3,13 @@
     "configurations": [
         {
             "name": "Debug Daybreak.Linux",
-            "type": "dotnet",
+            "type": "coreclr",
             "request": "launch",
-            "projectPath": "${workspaceFolder}/Daybreak.Linux/Daybreak.Linux.csproj"
+            "program": "${workspaceFolder}/Daybreak.Linux/bin/x64/Debug/net10.0/linux-x64/Daybreak.dll",
+            "cwd": "${workspaceFolder}/Daybreak.Linux/bin/x64/Debug/net10.0/linux-x64",
+            "preLaunchTask": "build-linux",
+            "console": "integratedTerminal",
+            "stopAtEntry": false
         },
         {
             "name": "Debug Daybreak.Windows",

@@ -144,10 +144,9 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
 
     private unsafe byte DecodeTemplateHeaderDetour(SkillTemplate* outTemplate, BitReader* bitReader)
     {
+        var scopedLogger = this.logger.CreateScopedLogger();
         if (this.decodeTemplateHeaderCallbacks.Count > 0)
         {
-            var scopedLogger = this.logger.CreateScopedLogger();
-
             // Read the full raw buffer before the game consumes it
             var rawBytes = ReadBitReaderBuffer(bitReader);
             var templateString = ReencodeToBase64(rawBytes);

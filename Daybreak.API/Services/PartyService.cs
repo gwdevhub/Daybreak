@@ -299,6 +299,7 @@ public sealed class PartyService : IHostedService
     private unsafe bool DecodeTemplateHeader(string templateCode, WrappedPointer<SkillTemplate> skillTemplate)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
+        this.cachedTemplateCode = default;
         if (!this.buildTemplateManager.TryDecodeTemplate(templateCode, out var build) ||
             build is not TeamBuildEntry teamBuildEntry ||
             teamBuildEntry.Builds.Count is 0)
@@ -324,7 +325,11 @@ public sealed class PartyService : IHostedService
         this.cachedTemplateCode = default;
         scopedLogger.LogDebug("Loading skill template from cached template code: {templateCode}", pendingLoadout);
         Task.Run(async () => await this.SetPartyLoadout(pendingLoadout, CancellationToken.None));
-        return true;
+        // Return false to allow the normal template loading to continue.
+        // Returning true would block the original LoadSkillTemplate call chain,
+        // leaving the game with uninitialized template data and causing
+        // TemplatesSkillsCanApply assertion failures.
+        return false;
     }
 
     private async Task<bool> IsInValidOutpost(CancellationToken cancellationToken)
