@@ -1,4 +1,5 @@
-﻿using Daybreak.API.Services.Interop;
+﻿using System.Diagnostics.CodeAnalysis;
+using Daybreak.API.Services.Interop;
 using Daybreak.Shared.Services.BuildTemplates;
 using Daybreak.Shared.Services.BuildTemplates.Parsers;
 
@@ -16,7 +17,6 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddSingleton<ChatService>();
         builder.Services.AddSingleton<MainPlayerService>();
         builder.Services.AddSingleton<CharacterSelectService>();
-        builder.Services.AddSingleton<PartyService>();
         builder.Services.AddSingleton<UIService>();
         builder.Services.AddSingleton<LoginService>();
         builder.Services.AddSingleton<InventoryService>();
@@ -28,10 +28,18 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddSingleton<PartyContextService>();
         builder.Services.AddSingleton<PreferencesService>();
         builder.Services.AddSingleton<UIContextService>();
-
-        builder.Services.AddSingleton<SkillbarContextService>();
-        builder.Services.AddHostedService(sp => sp.GetRequiredService<SkillbarContextService>());
+        builder.Services.AddHostedSingleton<PartyService>();
+        builder.Services.AddHostedSingleton<SkillbarContextService>();
         builder.Services.AddSingleton<IInteropHealthService>(sp => sp.GetRequiredService<SkillbarContextService>());
+        
         return builder;
+    }
+
+    public static IServiceCollection AddHostedSingleton<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TService>(this IServiceCollection services)
+        where TService : class, IHostedService
+    {
+        services.AddSingleton<TService>();
+        services.AddHostedService(sp => sp.GetRequiredService<TService>());
+        return services;
     }
 }

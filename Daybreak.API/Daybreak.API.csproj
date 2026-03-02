@@ -6,7 +6,6 @@
     <Nullable>enable</Nullable>
     <OutputType>Library</OutputType>
     <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win-x86</RuntimeIdentifier>
-    <StripSymbols>true</StripSymbols>
     <InteropExports>true</InteropExports>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <EnableRequestDelegateGenerator>true</EnableRequestDelegateGenerator>
@@ -27,7 +26,14 @@
     <ResolveStaticWebAssetsInputsDependsOn>RemoveDuplicateStaticWebAssets;$(ResolveStaticWebAssetsInputsDependsOn)</ResolveStaticWebAssetsInputsDependsOn>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <!-- Faster ILC compilation for iterative development -->
+    <IlcOptimizationPreference>None</IlcOptimizationPreference>
+    <IlcTrimMetadata>false</IlcTrimMetadata>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <StripSymbols>true</StripSymbols>
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>

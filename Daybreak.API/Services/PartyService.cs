@@ -17,30 +17,63 @@ using InstanceType = Daybreak.API.Interop.GuildWars.InstanceType;
 
 namespace Daybreak.API.Services;
 
-public sealed class PartyService(
-    ChatService chatService,
-    IBuildTemplateManager buildTemplateManager,
-    UIService uiService,
-    UIContextService uIContextService,
-    SkillbarContextService skillbarContextService,
-    InstanceContextService instanceContextService,
-    PartyContextService partyContextService,
-    GameThreadService gameThreadService,
-    GameContextService gameContextService,
-    ILogger<PartyService> logger)
+public sealed class PartyService : IHostedService
 {
     private static readonly TimeSpan HeroSpawnDelay = TimeSpan.FromSeconds(1);
 
-    private readonly ChatService chatService = chatService.ThrowIfNull();
-    private readonly IBuildTemplateManager buildTemplateManager = buildTemplateManager.ThrowIfNull();
-    private readonly UIService uiService = uiService.ThrowIfNull();
-    private readonly UIContextService uIContextService = uIContextService.ThrowIfNull();
-    private readonly SkillbarContextService skillbarContextService = skillbarContextService.ThrowIfNull();
-    private readonly InstanceContextService instanceContextService = instanceContextService.ThrowIfNull();
-    private readonly PartyContextService partyContextService = partyContextService.ThrowIfNull();
-    private readonly GameThreadService gameThreadService = gameThreadService.ThrowIfNull();
-    private readonly GameContextService gameContextService = gameContextService.ThrowIfNull();
-    private readonly ILogger<PartyService> logger = logger.ThrowIfNull();
+    private readonly ChatService chatService;
+    private readonly IBuildTemplateManager buildTemplateManager;
+    private readonly UIService uiService;
+    private readonly UIContextService uIContextService;
+    private readonly SkillbarContextService skillbarContextService;
+    private readonly InstanceContextService instanceContextService;
+    private readonly PartyContextService partyContextService;
+    private readonly GameThreadService gameThreadService;
+    private readonly GameContextService gameContextService;
+    private readonly ILogger<PartyService> logger;
+    private readonly CallbackRegistration<Func<string, WrappedPointer<SkillTemplate>, bool>> decodeTemplateHeaderCallbackRegistration;
+    private readonly CallbackRegistration<Func<SkillTemplate, bool>> loadSkillTemplateCallbackRegistration;
+
+    private string? cachedTemplateCode;
+
+    public PartyService(
+        ChatService chatService,
+        IBuildTemplateManager buildTemplateManager,
+        UIService uiService,
+        UIContextService uIContextService,
+        SkillbarContextService skillbarContextService,
+        InstanceContextService instanceContextService,
+        PartyContextService partyContextService,
+        GameThreadService gameThreadService,
+        GameContextService gameContextService,
+        ILogger<PartyService> logger)
+    {
+        this.chatService = chatService.ThrowIfNull();
+        this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
+        this.uiService = uiService.ThrowIfNull();
+        this.uIContextService = uIContextService.ThrowIfNull();
+        this.skillbarContextService = skillbarContextService.ThrowIfNull();
+        this.instanceContextService = instanceContextService.ThrowIfNull();
+        this.partyContextService = partyContextService.ThrowIfNull();
+        this.gameThreadService = gameThreadService.ThrowIfNull();
+        this.gameContextService = gameContextService.ThrowIfNull();
+        this.logger = logger.ThrowIfNull();
+        this.decodeTemplateHeaderCallbackRegistration = this.skillbarContextService.RegisterDecodeTemplateHeaderHandler(this.DecodeTemplateHeader);
+        this.loadSkillTemplateCallbackRegistration = this.skillbarContextService.RegisterLoadSkillTemplateHandler(this.LoadSkillTemplate);
+    }
+
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        // Needed to be a hosted service so that we can register the callbacks in the constructor.
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        this.decodeTemplateHeaderCallbackRegistration.Dispose();
+        this.loadSkillTemplateCallbackRegistration.Dispose();
+        return Task.CompletedTask;
+    }
 
     public async Task<bool> SetPartyLoadout(string partyLoadoutTemplate, CancellationToken cancellationToken)
     {
@@ -263,6 +296,37 @@ public sealed class PartyService(
         return result;
     }
 
+    private unsafe bool DecodeTemplateHeader(string templateCode, WrappedPointer<SkillTemplate> skillTemplate)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        if (!this.buildTemplateManager.TryDecodeTemplate(templateCode, out var build) ||
+            build is not TeamBuildEntry teamBuildEntry ||
+            teamBuildEntry.Builds.Count is 0)
+        {
+            return false;
+        }
+
+        this.cachedTemplateCode = templateCode;
+        PopulateSkillTemplate(teamBuildEntry.Builds[0], skillTemplate);
+        scopedLogger.LogDebug("Decoded skill template from template code: {templateCode}", templateCode);
+        return true;
+    }
+
+    private bool LoadSkillTemplate(SkillTemplate template)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        if (this.cachedTemplateCode is null)
+        {
+            return false;
+        }
+
+        var pendingLoadout = this.cachedTemplateCode;
+        this.cachedTemplateCode = default;
+        scopedLogger.LogDebug("Loading skill template from cached template code: {templateCode}", pendingLoadout);
+        Task.Run(async () => await this.SetPartyLoadout(pendingLoadout, CancellationToken.None));
+        return true;
+    }
+
     private async Task<bool> IsInValidOutpost(CancellationToken cancellationToken)
     {
         return await this.gameThreadService.QueueOnGameThread(() =>
@@ -385,29 +449,8 @@ public sealed class PartyService(
                 continue;
             }
 
-            var attributeIds = new AttributeArray12();
-            var attributeValues = new Array12Uint();
-            for (var i = 0; i < build.Attributes.Count && i < 12; i++)
-            {
-                attributeIds[i] = (GWCA.GW.Constants.Attribute)(build.Attributes[i].Attribute?.Id ?? 0);
-                attributeValues[i] = (uint)build.Attributes[i].Points;
-            }
-
-            var skills = new SkillIDArray8();
-            for (var i = 0; i < build.Skills.Count && i < 8; i++)
-            {
-                skills[i] = (GWCA.GW.Constants.SkillID)build.Skills[i].Id;
-            }
-
-            var skillTemplate = new SkillTemplate
-            {
-                Primary = (GWCA.GW.Constants.Profession)build.Primary.Id,
-                Secondary = (GWCA.GW.Constants.Profession)build.Secondary.Id,
-                AttributesCount = (uint)Math.Min(build.Attributes.Count, 12),
-                AttributeIds = attributeIds,
-                Skills = skills
-            };
-            Unsafe.CopyBlock(skillTemplate.AttributeValues, Unsafe.AsPointer(ref attributeValues), (uint)(12 * sizeof(uint)));
+            var skillTemplate = new SkillTemplate();
+            PopulateSkillTemplate(build, &skillTemplate);
             scopedLogger.LogInformation("Applying build for agent {agentId} with primary {primary} and secondary {secondary}", agentId, build.Primary, build.Secondary);
             this.skillbarContextService.LoadBuild(agentId, &skillTemplate);
         }
@@ -536,5 +579,29 @@ public sealed class PartyService(
                 (uint)skillbar.Skills[6].SkillId,
                 (uint)skillbar.Skills[7].SkillId
             ]);
+    }
+
+    private static unsafe void PopulateSkillTemplate(SingleBuildEntry build, SkillTemplate* skillTemplate)
+    {
+        var attributeIds = new AttributeArray12();
+            var attributeValues = new Array12Uint();
+            for (var i = 0; i < build.Attributes.Count && i < 12; i++)
+            {
+                attributeIds[i] = (GWCA.GW.Constants.Attribute)(build.Attributes[i].Attribute?.Id ?? 0);
+                attributeValues[i] = (uint)build.Attributes[i].Points;
+            }
+
+            var skills = new SkillIDArray8();
+            for (var i = 0; i < build.Skills.Count && i < 8; i++)
+            {
+                skills[i] = (GWCA.GW.Constants.SkillID)build.Skills[i].Id;
+            }
+
+            skillTemplate->Primary = (GWCA.GW.Constants.Profession)build.Primary.Id;
+            skillTemplate->Secondary = (GWCA.GW.Constants.Profession)build.Secondary.Id;
+            skillTemplate->AttributesCount = (uint)Math.Min(build.Attributes.Count, 12);
+            skillTemplate->AttributeIds = attributeIds;
+            skillTemplate->Skills = skills;
+            Unsafe.CopyBlock(skillTemplate->AttributeValues, Unsafe.AsPointer(ref attributeValues), (uint)(12 * sizeof(uint)));
     }
 }

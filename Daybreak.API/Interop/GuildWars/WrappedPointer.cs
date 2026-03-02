@@ -1,11 +1,11 @@
 ﻿namespace Daybreak.API.Interop.GuildWars;
 
-public readonly unsafe struct WrappedPointer<T>(T* pointer)
+public unsafe readonly struct WrappedPointer<T>(T* pointer)
     where T : unmanaged
 {
     public readonly T* Pointer = pointer;
 
-    public bool IsNull => this.Pointer is null;
+    public readonly bool IsNull => this.Pointer is null;
 
     public static implicit operator WrappedPointer<T>(T* pointer) => new(pointer);
 

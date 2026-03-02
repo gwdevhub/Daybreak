@@ -47,7 +47,7 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
     private readonly GWAddressCache loadSkillTemplateAddressCache;
     private readonly GWHook<LoadSkillTemplateDelegate> loadSkillTemplateHook;
     private readonly ILogger<SkillbarContextService> logger;
-    private readonly List<CallbackRegistration<Func<string, bool>>> decodeTemplateHeaderCallbacks = [];
+    private readonly List<CallbackRegistration<Func<string, WrappedPointer<SkillTemplate>, bool>>> decodeTemplateHeaderCallbacks = [];
     private readonly List<CallbackRegistration<Func<SkillTemplate, bool>>> loadSkillTemplateCallbacks = [];
 
     public unsafe SkillbarContextService(
@@ -110,11 +110,11 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
             this.decodeTemplateHeaderHook.Hooked);
     }
 
-    public CallbackRegistration<Func<string, bool>> RegisterDecodeTemplateHeaderHandler(Func<string, bool> callback)
+    public CallbackRegistration<Func<string, WrappedPointer<SkillTemplate>, bool>> RegisterDecodeTemplateHeaderHandler(Func<string, WrappedPointer<SkillTemplate>, bool> callback)
     {
         var uid = Guid.NewGuid();
         var registration =
-            new CallbackRegistration<Func<string, bool>>(uid, callback, () => this.decodeTemplateHeaderCallbacks.RemoveAll(r => r.Uid == uid));
+            new CallbackRegistration<Func<string, WrappedPointer<SkillTemplate>, bool>>(uid, callback, () => this.decodeTemplateHeaderCallbacks.RemoveAll(r => r.Uid == uid));
         this.decodeTemplateHeaderCallbacks.Add(registration);
         return registration;
     }
@@ -137,7 +137,7 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
             // Read the full raw buffer before the game consumes it
             var rawBytes = ReadBitReaderBuffer(bitReader);
             var templateString = ReencodeToBase64(rawBytes);
-            if (this.decodeTemplateHeaderCallbacks.Any(r => r.Callback(templateString)))
+            if (this.decodeTemplateHeaderCallbacks.Any(r => r.Callback(templateString, outTemplate)))
             {
                 scopedLogger.LogDebug("DecodeTemplateHeader callback handled template: {template}", templateString);
                 return 1;
