@@ -1,5 +1,4 @@
 using System.Runtime.InteropServices;
-using System.Text;
 using MinHook;
 
 namespace Daybreak.API.Interop;
@@ -27,7 +26,6 @@ public sealed class GWHook<T>(
     private HookEngine? engine;
     private bool usedJmpPatch;  // true if we patched an existing JMP instead of using MinHook
     private int originalRel32;  // saved rel32 for restoration when usedJmpPatch
-    private byte[]? prologueBytes; // first N bytes of target for diagnostics
 
     /// <summary>Delegate that calls the next hook / real function.</summary>
     public T Continue => this.cont ??
@@ -37,23 +35,6 @@ public sealed class GWHook<T>(
     public nuint TargetAddress { get; private set; }
     public nuint ContinueAddress { get; private set; }
     public nuint DetourAddress { get; private set; }
-    public bool UsedJmpPatch => this.usedJmpPatch;
-
-    /// <summary>Returns diagnostic info about the hook for logging.</summary>
-    public string GetDiagnosticInfo()
-    {
-        var sb = new StringBuilder();
-        sb.AppendLine($"  Hooked: {this.Hooked}");
-        sb.AppendLine($"  Method: {(this.usedJmpPatch ? "JMP patch" : "MinHook")}");
-        sb.AppendLine($"  Target: 0x{this.TargetAddress:X8}");
-        sb.AppendLine($"  Continue: 0x{this.ContinueAddress:X8}");
-        sb.AppendLine($"  Detour: 0x{this.DetourAddress:X8}");
-        if (this.prologueBytes is not null)
-        {
-            sb.AppendLine($"  Prologue (before hook): {BitConverter.ToString(this.prologueBytes)}");
-        }
-        return sb.ToString();
-    }
 
     /// <summary>Installs the hook exactly once (thread-safe).</summary>
     public bool EnsureInitialized()
@@ -85,9 +66,6 @@ public sealed class GWHook<T>(
             {
                 return false;
             }
-
-            // Capture prologue bytes for diagnostics before any patching
-            this.prologueBytes = ReadBytes(target, 16);
 
             // If not bypassing previous hooks and target starts with JMP, use our JMP patching
             // This handles the case where GWCA already hooked the function
@@ -261,19 +239,5 @@ public sealed class GWHook<T>(
 
         var rel = *(int*)(p + 1);
         return (nuint)(p + 5 + rel);
-    }
-
-    /// <summary>
-    /// Reads N bytes from the given address for diagnostic purposes.
-    /// </summary>
-    private static unsafe byte[] ReadBytes(nuint addr, int count)
-    {
-        var bytes = new byte[count];
-        var p = (byte*)addr;
-        for (var i = 0; i < count; i++)
-        {
-            bytes[i] = p[i];
-        }
-        return bytes;
     }
 }
