@@ -92,6 +92,7 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
             this.logger.LogInformation(
                 "DecodeTemplateHeader hook installed at 0x{target:X8}",
                 this.decodeTemplateHeaderHook.TargetAddress);
+            this.logger.LogDebug("DecodeTemplateHeader hook diagnostics:\n{diagnostics}", this.decodeTemplateHeaderHook.GetDiagnosticInfo());
 
             while (!this.loadSkillTemplateHook.EnsureInitialized())
             {
@@ -101,6 +102,7 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
             this.logger.LogInformation(
                 "LoadSkillTemplate hook installed at 0x{target:X8}",
                 this.loadSkillTemplateHook.TargetAddress);
+            this.logger.LogDebug("LoadSkillTemplate hook diagnostics:\n{diagnostics}", this.loadSkillTemplateHook.GetDiagnosticInfo());
         }, cancellationToken);
         return Task.CompletedTask;
     }
@@ -163,14 +165,37 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
     private unsafe void LoadSkillTemplateDetour(int targetAgentId, SkillTemplate* templateData)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        scopedLogger.LogDebug("LoadSkillTemplateDetour called for agent {agentId}", targetAgentId);
+        scopedLogger.LogDebug(
+            "LoadSkillTemplateDetour called for agent {agentId}, templateData at 0x{addr:X8}",
+            targetAgentId,
+            (nuint)templateData);
+        
+        // Log template data for debugging
+        if (templateData != null)
+        {
+            scopedLogger.LogDebug(
+                "SkillTemplate: Primary={primary}, Secondary={secondary}",
+                templateData->Primary,
+                templateData->Secondary);
+        }
+        else
+        {
+            scopedLogger.LogWarning("templateData is null!");
+        }
+
         if (this.loadSkillTemplateCallbacks.Any(r => r.Callback(*templateData)))
         {
             scopedLogger.LogDebug("LoadSkillTemplate callback handled loading for agent {agentId}", targetAgentId);
             return;
         }
 
+        scopedLogger.LogDebug(
+            "Calling Continue at 0x{continueAddr:X8}",
+            this.loadSkillTemplateHook.ContinueAddress);
+        
         this.loadSkillTemplateHook.Continue(targetAgentId, templateData);
+        
+        scopedLogger.LogDebug("Continue returned successfully");
     }
 
     /// <summary>

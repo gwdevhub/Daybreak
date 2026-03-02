@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+using System.Text;
 using MinHook;
 
 namespace Daybreak.API.Interop;
@@ -5,7 +7,7 @@ namespace Daybreak.API.Interop;
 /// <summary>
 /// A thin convenience wrapper around MinHook that
 /// resolves the target address lazily through <see cref="GWAddressCache"/>
-/// unwraps an existing “CALL/JMP rel32” stub so we patch the real code
+/// unwraps an existing "CALL/JMP rel32" stub so we patch the real code
 /// exposes <see cref="Original"/> so your detour can chain
 /// </summary>
 public sealed class GWHook<T>(
@@ -14,13 +16,18 @@ public sealed class GWHook<T>(
     bool bypassPreviousHooks = false)
     where T : Delegate
 {
+    private const uint PAGE_EXECUTE_READWRITE = 0x40;
+
     private readonly bool bypassPreviousHooks = bypassPreviousHooks;
     private readonly GWAddressCache addressCache = funcAddress ?? throw new ArgumentNullException(nameof(funcAddress));
     private readonly T detour = detour ?? throw new ArgumentNullException(nameof(detour));
     private readonly SemaphoreSlim semaphore = new(1, 1);
 
-    private T? cont;          // trampoline returned by MinHook
+    private T? cont;          // trampoline returned by MinHook, or previous hook's detour
     private HookEngine? engine;
+    private bool usedJmpPatch;  // true if we patched an existing JMP instead of using MinHook
+    private int originalRel32;  // saved rel32 for restoration when usedJmpPatch
+    private byte[]? prologueBytes; // first N bytes of target for diagnostics
 
     /// <summary>Delegate that calls the next hook / real function.</summary>
     public T Continue => this.cont ??
@@ -30,6 +37,23 @@ public sealed class GWHook<T>(
     public nuint TargetAddress { get; private set; }
     public nuint ContinueAddress { get; private set; }
     public nuint DetourAddress { get; private set; }
+    public bool UsedJmpPatch => this.usedJmpPatch;
+
+    /// <summary>Returns diagnostic info about the hook for logging.</summary>
+    public string GetDiagnosticInfo()
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine($"  Hooked: {this.Hooked}");
+        sb.AppendLine($"  Method: {(this.usedJmpPatch ? "JMP patch" : "MinHook")}");
+        sb.AppendLine($"  Target: 0x{this.TargetAddress:X8}");
+        sb.AppendLine($"  Continue: 0x{this.ContinueAddress:X8}");
+        sb.AppendLine($"  Detour: 0x{this.DetourAddress:X8}");
+        if (this.prologueBytes is not null)
+        {
+            sb.AppendLine($"  Prologue (before hook): {BitConverter.ToString(this.prologueBytes)}");
+        }
+        return sb.ToString();
+    }
 
     /// <summary>Installs the hook exactly once (thread-safe).</summary>
     public bool EnsureInitialized()
@@ -62,17 +86,32 @@ public sealed class GWHook<T>(
                 return false;
             }
 
-            this.engine = new HookEngine();
-            this.cont = this.engine.CreateHook((nint)target, this.detour);
-            this.engine.EnableHooks();
-            this.TargetAddress = target;
-            this.ContinueAddress = (nuint)this.cont.Method.MethodHandle.GetFunctionPointer();
-            this.DetourAddress = (nuint)this.detour.Method.MethodHandle.GetFunctionPointer();
-            this.Hooked = true;
-            return true;
-        }
-        catch (Exception)
-        {
+            // Capture prologue bytes for diagnostics before any patching
+            this.prologueBytes = ReadBytes(target, 16);
+
+            // If not bypassing previous hooks and target starts with JMP, use our JMP patching
+            // This handles the case where GWCA already hooked the function
+            if (!this.bypassPreviousHooks && StartsWithJmp(target))
+            {
+                if (this.TryPatchExistingJmp(target))
+                {
+                    return true;
+                }
+            }
+
+            // Try MinHook for normal (unhooked) functions
+            if (this.TryMinHook(target))
+            {
+                return true;
+            }
+
+            // Fallback: try JMP patching even if we didn't detect JMP initially
+            // (in case StartsWithJmp was wrong or MinHook failed for other reasons)
+            if (this.TryPatchExistingJmp(target))
+            {
+                return true;
+            }
+
             return false;
         }
         finally
@@ -86,14 +125,21 @@ public sealed class GWHook<T>(
         this.semaphore.Wait();
         try
         {
-            if (!this.Hooked ||
-                this.engine is null)
+            if (!this.Hooked)
             {
                 return;
             }
 
-            this.engine.DisableHooks();
-            this.engine.Dispose();
+            if (this.usedJmpPatch)
+            {
+                // Restore the original JMP target
+                RestoreJmpRel32(this.TargetAddress, this.originalRel32);
+            }
+            else if (this.engine is not null)
+            {
+                this.engine.DisableHooks();
+                this.engine.Dispose();
+            }
 
             this.cont = null;
             this.Hooked = false;
@@ -101,6 +147,105 @@ public sealed class GWHook<T>(
         finally
         {
             this.semaphore.Release();
+        }
+    }
+
+    private bool TryMinHook(nuint target)
+    {
+        try
+        {
+            this.engine = new HookEngine();
+            this.cont = this.engine.CreateHook((nint)target, this.detour);
+            this.engine.EnableHooks();
+            this.TargetAddress = target;
+            this.ContinueAddress = (nuint)this.cont.Method.MethodHandle.GetFunctionPointer();
+            this.DetourAddress = (nuint)this.detour.Method.MethodHandle.GetFunctionPointer();
+            this.Hooked = true;
+            this.usedJmpPatch = false;
+            return true;
+        }
+        catch
+        {
+            this.engine?.Dispose();
+            this.engine = null;
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// If the target starts with JMP rel32 (0xE9), another hook is already installed.
+    /// We patch that JMP to point to our detour, and call the previous hook's detour as Continue.
+    /// </summary>
+    private unsafe bool TryPatchExistingJmp(nuint target)
+    {
+        var p = (byte*)target;
+        if (*p != 0xE9)
+        {
+            return false;
+        }
+
+        // Read the existing rel32 offset (points to previous hook's detour)
+        var existingRel32 = *(int*)(p + 1);
+        var previousDetourAddr = (nuint)(p + 5 + existingRel32);
+
+        // Create a delegate to call the previous hook
+        this.cont = Marshal.GetDelegateForFunctionPointer<T>((nint)previousDetourAddr);
+
+        // Calculate new rel32 to point to our detour
+        var ourDetourPtr = Marshal.GetFunctionPointerForDelegate(this.detour);
+        var newRel32 = (int)((nint)ourDetourPtr - (nint)(p + 5));
+
+        // Patch the JMP
+        if (!PatchJmpRel32(target, newRel32))
+        {
+            this.cont = null;
+            return false;
+        }
+
+        this.originalRel32 = existingRel32;
+        this.TargetAddress = target;
+        this.ContinueAddress = previousDetourAddr;
+        this.DetourAddress = (nuint)ourDetourPtr;
+        this.Hooked = true;
+        this.usedJmpPatch = true;
+        return true;
+    }
+
+    private static unsafe bool PatchJmpRel32(nuint jmpAddr, int newRel32)
+    {
+        var rel32Ptr = (byte*)(jmpAddr + 1);
+        if (!NativeMethods.VirtualProtect(rel32Ptr, 4, PAGE_EXECUTE_READWRITE, out var oldProtect))
+        {
+            return false;
+        }
+
+        try
+        {
+            *(int*)rel32Ptr = newRel32;
+            return true;
+        }
+        finally
+        {
+            NativeMethods.VirtualProtect(rel32Ptr, 4, oldProtect, out _);
+        }
+    }
+
+    /// <summary>
+    /// Checks if the target address starts with a JMP rel32 instruction (0xE9).
+    /// </summary>
+    private static unsafe bool StartsWithJmp(nuint addr)
+    {
+        var p = (byte*)addr;
+        return *p == 0xE9;
+    }
+
+    private static unsafe void RestoreJmpRel32(nuint jmpAddr, int originalRel32)
+    {
+        var rel32Ptr = (byte*)(jmpAddr + 1);
+        if (NativeMethods.VirtualProtect(rel32Ptr, 4, PAGE_EXECUTE_READWRITE, out var oldProtect))
+        {
+            *(int*)rel32Ptr = originalRel32;
+            NativeMethods.VirtualProtect(rel32Ptr, 4, oldProtect, out _);
         }
     }
 
@@ -118,4 +263,17 @@ public sealed class GWHook<T>(
         return (nuint)(p + 5 + rel);
     }
 
+    /// <summary>
+    /// Reads N bytes from the given address for diagnostic purposes.
+    /// </summary>
+    private static unsafe byte[] ReadBytes(nuint addr, int count)
+    {
+        var bytes = new byte[count];
+        var p = (byte*)addr;
+        for (var i = 0; i < count; i++)
+        {
+            bytes[i] = p[i];
+        }
+        return bytes;
+    }
 }

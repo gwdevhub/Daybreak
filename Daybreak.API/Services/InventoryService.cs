@@ -4,6 +4,7 @@ using Daybreak.API.Services.Interop;
 using Daybreak.Shared.Models.Api;
 using Daybreak.Shared.Models.Guildwars;
 using System.Extensions.Core;
+using System.Logging;
 using System.Runtime.CompilerServices;
 using System.Text;
 

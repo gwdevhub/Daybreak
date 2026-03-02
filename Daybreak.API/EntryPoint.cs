@@ -19,7 +19,7 @@ using Net.Sdk.Web;
 
 namespace Daybreak.API;
 
-public class EntryPoint
+public static class EntryPoint
 {
     private const bool IsDebug =
 #if DEBUG
@@ -31,6 +31,12 @@ public class EntryPoint
     private const int StartPort = 5080;
     private static readonly TimeSpan InitializationTimeout = TimeSpan.FromSeconds(5);
     private static readonly CancellationTokenSource CancellationTokenSource = new();
+
+    // GWCA log handler - must be static to prevent GC
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void GWCALogHandler(nint context, int level, nint msg, nint file, uint line, nint function);
+    private static GWCALogHandler? gwcaLogHandlerDelegate;
+    private static ILogger? gwcaLogger;
 
     [UnmanagedCallersOnly(EntryPoint = "ThreadInit"), STAThread]
     [RequiresUnreferencedCode("The handler uses a static method that gets referenced, so there's no unreferenced code to worry about")]
@@ -54,14 +60,14 @@ public class EntryPoint
         var port = FindAvailablePort(StartPort);
         var app = CreateApplication(port);
         var runTask = Task.Run(() => StartServer(app), CancellationTokenSource.Token);
-        var scopedLogger = app.Services.GetRequiredService<ILogger<EntryPoint>>().CreateScopedLogger();
+        var scopedLogger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger(nameof(EntryPoint));
         var healthCheck = app.Services.GetRequiredService<HealthCheckService>();
         var sw = Stopwatch.StartNew();
         var healthy = false;
         while (sw.Elapsed < InitializationTimeout)
         {
             var status = Task.Run(() => healthCheck.CheckHealthAsync()).Result;
-            scopedLogger.LogWarning("HealthCheck status: {status} in {duration}. Report: {report}", status.Status, status.TotalDuration, string.Join("\n", status.Entries.Select(e => $"{e.Key}: {e.Value.Status}")));
+            scopedLogger.LogWarning("{methodName}: HealthCheck status: {status} in {duration}. Report: {report}", nameof(ThreadInit), status.Status, status.TotalDuration, string.Join("\n", status.Entries.Select(e => $"{e.Key}: {e.Value.Status}")));
             if (status.Status is HealthStatus.Healthy)
             {
                 healthy = true;
@@ -75,12 +81,12 @@ public class EntryPoint
 
         if (healthy)
         {
-            scopedLogger.LogInformation("Daybreak API is healthy on port {port}. Initialization succeeded in {duration}", port, sw.Elapsed);
+            scopedLogger.LogInformation("{methodName}: Daybreak API is healthy on port {port}. Initialization succeeded in {duration}", nameof(ThreadInit), port, sw.Elapsed);
             return port;
         }
         else
         {
-            scopedLogger.LogError("Daybreak API failed to initialize in {duration}", sw.Elapsed);
+            scopedLogger.LogError("{methodName}: Daybreak API failed to initialize in {duration}", nameof(ThreadInit), sw.Elapsed);
             CancellationTokenSource.Cancel();
             return -1;
         }
@@ -147,20 +153,52 @@ public class EntryPoint
 
     private static async Task StartServer(WebApplication app)
     {
-        var scopedLogger = app.Services.GetRequiredService<ILogger<EntryPoint>>().CreateScopedLogger();
+        var scopedLogger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger(nameof(EntryPoint));
         try
         {
-            scopedLogger.LogDebug("Initializing GWCA");
+            scopedLogger.LogDebug("{methodName}: Initializing GWCA", nameof(StartServer));
             PreloadNativeDependencies(scopedLogger);
+
+            SetupGWCALogging(app);
+            scopedLogger.LogDebug("{methodName}: GWCA log handler registered", nameof(StartServer));
+            
             var result = GWCA.GW.Initialize();
-            scopedLogger.LogDebug($"GWCA.GW.Initialize() returned: {result}");
+            scopedLogger.LogDebug("{methodName}: GWCA.GW.Initialize() returned: {result}", nameof(StartServer), result);
             await app.RunAsync();
         }
         catch (Exception ex)
         {
-            scopedLogger.LogCritical(ex, $"Encountered fatal error while starting API server {ex}");
+            scopedLogger.LogCritical(ex, "{methodName}: Encountered fatal error while starting API server {exception}", nameof(StartServer), ex);
             throw;
         }
+    }
+
+    private static void SetupGWCALogging(WebApplication app)
+    {
+        gwcaLogger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("GWCA");
+        gwcaLogHandlerDelegate = OnGWCALog;
+        var handlerPtr = Marshal.GetFunctionPointerForDelegate(gwcaLogHandlerDelegate);
+        GWCA.GW.RegisterLogHandler(handlerPtr, nint.Zero);
+    }
+
+    private static void OnGWCALog(nint context, int level, nint msg, nint file, uint line, nint function)
+    {
+        var msgStr = msg != nint.Zero ? Marshal.PtrToStringAnsi(msg) : "<null>";
+        var fileStr = file != nint.Zero ? Marshal.PtrToStringAnsi(file) : "<null>";
+        var funcStr = function != nint.Zero ? Marshal.PtrToStringAnsi(function) : "<null>";
+
+        var logLevel = level switch
+        {
+            0 => LogLevel.Trace,    // LEVEL_TRACE
+            1 => LogLevel.Debug,    // LEVEL_DEBUG
+            2 => LogLevel.Information, // LEVEL_INFO
+            3 => LogLevel.Warning,  // LEVEL_WARN
+            4 => LogLevel.Error,    // LEVEL_ERR
+            5 => LogLevel.Critical, // LEVEL_CRITICAL
+            _ => LogLevel.Debug
+        };
+
+        gwcaLogger?.Log(logLevel, "{gwcaSource}: {file}:{line} ({function}) {message}", nameof(GWCA), fileStr, line, funcStr, msgStr);
     }
 
     private static int FindAvailablePort(int startPort)
@@ -196,7 +234,7 @@ public class EntryPoint
         return true;
     }
 
-    private static void PreloadNativeDependencies(ScopedLogger<EntryPoint> logger)
+    private static void PreloadNativeDependencies(ILogger logger)
     {
         foreach (ProcessModule module in Process.GetCurrentProcess().Modules)
         {
@@ -207,11 +245,11 @@ public class EntryPoint
                 if (File.Exists(gwcaPath))
                 {
                     NativeLibrary.Load(gwcaPath);
-                    logger.LogDebug($"Preloaded gwca.dll from {gwcaPath}");
+                    logger.LogDebug("{methodName}: Preloaded gwca.dll from {path}", nameof(PreloadNativeDependencies), gwcaPath);
                 }
                 else
                 {
-                    logger.LogError($"gwca.dll not found at {gwcaPath}");
+                    logger.LogError("{methodName}: gwca.dll not found at {path}", nameof(PreloadNativeDependencies), gwcaPath);
                 }
 
                 break;
