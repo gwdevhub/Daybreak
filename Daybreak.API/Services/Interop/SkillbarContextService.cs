@@ -50,7 +50,7 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
     private unsafe delegate void LoadSkillTemplateDelegate(int targetAgentId, SkillTemplate* templateData);
 
     [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
-    private unsafe delegate void PopulateSkillDataDelegate(nint thisPtr, SkillTemplate* skillTemplateData);
+    private unsafe delegate void PopulateSkillDataDelegate(TemplateSummaryFrameData* thisPtr, SkillTemplate* skillTemplateData);
 
     private readonly ChatService chatService;
     private readonly MemoryScanningService memoryScanningService;
@@ -64,7 +64,7 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
     private readonly ILogger<SkillbarContextService> logger;
     private readonly List<CallbackRegistration<Func<string, WrappedPointer<SkillTemplate>, bool>>> decodeTemplateHeaderCallbacks = [];
     private readonly List<CallbackRegistration<Func<SkillTemplate, bool>>> loadSkillTemplateCallbacks = [];
-    private readonly List<CallbackRegistration<Func<nint, WrappedPointer<SkillTemplate>, bool>>> populateSkillDataCallbacks = [];
+    private readonly List<CallbackRegistration<Func<WrappedPointer<TemplateSummaryFrameData>, WrappedPointer<SkillTemplate>, bool>>> populateSkillDataCallbacks = [];
 
     public unsafe SkillbarContextService(
         ChatService chatService,
@@ -100,6 +100,11 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
     }
 
     public unsafe void LoadBuild(uint agentId, SkillTemplate* template) => GWCA.GW.SkillbarMgr.LoadSkillTemplate(agentId, template);
+
+    public unsafe void CallOriginalPopulateSkillData(TemplateSummaryFrameData* frameData, SkillTemplate* skillTemplateData)
+    {
+        this.populateSkillDataHook.Continue(frameData, skillTemplateData);
+    }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
@@ -177,11 +182,11 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
         return registration;
     }
 
-    public CallbackRegistration<Func<nint, WrappedPointer<SkillTemplate>, bool>> RegisterPopulateSkillDataHandler(Func<nint, WrappedPointer<SkillTemplate>, bool> callback)
+    public CallbackRegistration<Func<WrappedPointer<TemplateSummaryFrameData>, WrappedPointer<SkillTemplate>, bool>> RegisterPopulateSkillDataHandler(Func<WrappedPointer<TemplateSummaryFrameData>, WrappedPointer<SkillTemplate>, bool> callback)
     {
         var uid = Guid.NewGuid();
         var registration =
-            new CallbackRegistration<Func<nint, WrappedPointer<SkillTemplate>, bool>>(uid, callback, () => this.populateSkillDataCallbacks.RemoveAll(r => r.Uid == uid));
+            new CallbackRegistration<Func<WrappedPointer<TemplateSummaryFrameData>, WrappedPointer<SkillTemplate>, bool>>(uid, callback, () => this.populateSkillDataCallbacks.RemoveAll(r => r.Uid == uid));
         this.populateSkillDataCallbacks.Add(registration);
         return registration;
     }
@@ -214,7 +219,7 @@ public sealed class SkillbarContextService : IHostedService, IInteropHealthServi
         this.loadSkillTemplateHook.Continue(targetAgentId, templateData);
     }
 
-    private unsafe void PopulateSkillDataDetour(nint thisPtr, SkillTemplate* skillTemplateData)
+    private unsafe void PopulateSkillDataDetour(TemplateSummaryFrameData* thisPtr, SkillTemplate* skillTemplateData)
     {
         if (this.populateSkillDataCallbacks.Any(r => r.Callback(thisPtr, skillTemplateData)))
         {

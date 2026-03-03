@@ -33,9 +33,12 @@ public sealed class PartyService : IHostedService
     private readonly ILogger<PartyService> logger;
     private readonly CallbackRegistration<Func<string, WrappedPointer<SkillTemplate>, bool>> decodeTemplateHeaderCallbackRegistration;
     private readonly CallbackRegistration<Func<SkillTemplate, bool>> loadSkillTemplateCallbackRegistration;
-    private readonly CallbackRegistration<Func<nint, WrappedPointer<SkillTemplate>, bool>> populateSkillDataCallbackRegistration;
+    private readonly CallbackRegistration<Func<WrappedPointer<TemplateSummaryFrameData>, WrappedPointer<SkillTemplate>, bool>> populateSkillDataCallbackRegistration;
 
     private string? cachedTemplateCode;
+    private readonly List<uint> extraSummaryFrameIds = [];
+    private readonly List<(uint FrameId, float OriginalBottom)> expandedAncestors = [];
+    private bool isPopulatingExtraBuilds;
 
     public PartyService(
         ChatService chatService,
@@ -337,31 +340,340 @@ public sealed class PartyService : IHostedService
 
     /// <summary>
     /// Intercepts TemplatesSummary_PopulateSkillData when a team build is cached.
-    /// Instead of showing only the first build, populates the summary frame with
-    /// each build in the team loadout by calling the original function per build.
+    /// Creates additional skill summary child frames under the same parent,
+    /// one per build in the team loadout, so all builds are displayed vertically.
     /// </summary>
-    private unsafe bool PopulateSkillData(nint frameDataPtr, WrappedPointer<SkillTemplate> skillTemplateData)
+    private unsafe bool PopulateSkillData(WrappedPointer<TemplateSummaryFrameData> frameData, WrappedPointer<SkillTemplate> skillTemplateData)
     {
+        // Reentrancy guard — our SendFrameUIMessage(0x55) calls re-enter this hook
+        if (this.isPopulatingExtraBuilds)
+        {
+            return false;
+        }
+
         var scopedLogger = this.logger.CreateScopedLogger();
         if (this.cachedTemplateCode is null)
         {
+            this.CleanupExtraSummaryFrames();
             return false;
         }
 
         if (!this.buildTemplateManager.TryDecodeTemplate(this.cachedTemplateCode, out var build) ||
             build is not TeamBuildEntry teamBuild ||
-            teamBuild.Builds.Count is 0)
+            teamBuild.Builds.Count <= 1)
         {
+            this.CleanupExtraSummaryFrames();
             return false;
         }
 
-        scopedLogger.LogDebug(
-            "PopulateSkillData intercepted for team build with {count} builds",
-            teamBuild.Builds.Count);
+        // Clean up any previously created extra frames
+        this.CleanupExtraSummaryFrames();
 
-        // TODO: For now, just let the original handle the first build.
-        // Future: create/clone frames for each build row and call original per build.
+        var childFramePtr = GWCA.GW.UI.GetFrameById(frameData.Pointer->FrameId);
+        if (childFramePtr is null)
+        {
+            scopedLogger.LogWarning("Could not resolve child frame from FrameId");
+            return false;
+        }
+
+        // Extract the SkillFrameHandler address from the child frame's callback table.
+        // Frame + 0xA8 = GW::Array<FrameInteractionCallback>
+        // Array.m_buffer at offset 0, FrameInteractionCallback[0].callback at offset 0
+        var callbackBuffer = *(nint*)((byte*)childFramePtr + 0xA8);
+        if (callbackBuffer == 0)
+        {
+            scopedLogger.LogWarning("Could not read frame callback buffer");
+            return false;
+        }
+
+        var handlerAddress = *(nint*)callbackBuffer;
+
+        // Get parent frame and its FrameId for CreateUIComponent
+        var parentFrame = GWCA.GW.UI.GetParentFrame(childFramePtr);
+        if (parentFrame is null)
+        {
+            scopedLogger.LogWarning("Could not get parent frame");
+            return false;
+        }
+
+        var parentFrameId = parentFrame->FrameId;
+
+        scopedLogger.LogDebug(
+            "Creating {count} extra skill summary frames under parent FrameId={parentFrameId}",
+            teamBuild.Builds.Count - 1, parentFrameId);
+
+        this.isPopulatingExtraBuilds = true;
+        try
+        {
+            for (var i = 1; i < teamBuild.Builds.Count; i++)
+            {
+                // Use child offset IDs starting at 100 to avoid conflicting with existing children
+                var childId = (uint)(100 + i);
+
+                var newFrameId = GWCA.GW.UI.CreateUIComponent(
+                    parentFrameId, 0x300, childId,
+                    handlerAddress, 0, null);
+
+                if (newFrameId is 0)
+                {
+                    scopedLogger.LogWarning("Failed to create extra summary frame for build {index}", i);
+                    continue;
+                }
+
+                this.extraSummaryFrameIds.Add(newFrameId);
+
+                var newFrame = GWCA.GW.UI.GetFrameById(newFrameId);
+                if (newFrame is null)
+                {
+                    scopedLogger.LogWarning("Failed to get frame for build {index}", i);
+                    continue;
+                }
+
+                // Get the TemplateSummaryFrameData* allocated by the frame handler on create (msg 0x09)
+                var newFrameData = (TemplateSummaryFrameData*)GWCA.GW.UI.GetFrameContext(newFrame);
+                if (newFrameData is null)
+                {
+                    scopedLogger.LogWarning("Failed to get frame context for build {index}", i);
+                    continue;
+                }
+
+                // Build the SkillTemplate for this build entry
+                var template = new SkillTemplate();
+                PopulateSkillTemplate(teamBuild.Builds[i], &template);
+
+                // Call the original PopulateSkillData directly on the new frame's data
+                this.skillbarContextService.CallOriginalPopulateSkillData(newFrameData, &template);
+
+                scopedLogger.LogDebug(
+                    "Created and populated frame {index}: FrameId={frameId}",
+                    i, newFrameId);
+            }
+
+            // Defer positioning to the next game tick. Right now all position data is zero
+            // because PopulateSkillData fires during frame creation, before the layout pass.
+            // On the next tick, ProcessLayoutQueue will have computed screen coordinates
+            // for the original frame, so we can read its position and stack our frames below it.
+            // We use forceEnqueue: true so the callback is deferred to the next game loop
+            // iteration rather than executing immediately (which would still be before layout).
+            var originalFrameId = frameData.Pointer->FrameId;
+            var extraFrameIds = this.extraSummaryFrameIds.ToArray();
+            _ = this.gameThreadService.QueueOnGameThread(() =>
+            {
+                this.PositionExtraFrames(originalFrameId, extraFrameIds, retriesRemaining: 20);
+            }, CancellationToken.None, forceEnqueue: true);
+        }
+        finally
+        {
+            this.isPopulatingExtraBuilds = false;
+        }
+
+        // Let the original proceed for build 0 on the existing frame
         return false;
+    }
+
+    /// <summary>
+    /// Deferred callback that runs on a later game tick after PopulateSkillData.
+    /// After the layout pass, FramePositionData at offset 0xD8 will have valid Screen*
+    /// coordinates. We read the original frame's position data and replicate it on
+    /// extra frames, shifting each one down to stack vertically.
+    ///
+    /// Uses an iterative approach:
+    ///   1. Wait for the original frame to have valid layout data
+    ///   2. Position all extras below the original
+    ///   3. Check if the lowest extra overflows the parent's content area
+    ///   4. If it overflows, expand ancestors by exactly the overflow amount, wait a tick, repeat from 2
+    ///   5. If everything fits, we're done
+    /// </summary>
+    private unsafe void PositionExtraFrames(uint originalFrameId, uint[] extraFrameIds, int retriesRemaining)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        var origFrame = GWCA.GW.UI.GetFrameById(originalFrameId);
+        if (origFrame is null)
+        {
+            scopedLogger.LogWarning("Original frame {frameId} no longer valid for positioning", originalFrameId);
+            return;
+        }
+
+        // Read FramePositionData at offset 0xD8 (the Position field on Frame struct).
+        // After the layout pass, Screen* fields should be non-zero for visible frames.
+        var origPos = (FramePositionData*)((byte*)origFrame + 0xD8);
+
+        var screenHeight = origPos->ScreenTop - origPos->ScreenBottom;
+
+        scopedLogger.LogDebug(
+            "Iter {iter}: FrameId={fid} " +
+            "Pos=[flags={pf:X}, L={pl}, B={pb}, R={pr}, T={pt}] " +
+            "Content=[L={cl}, B={cb}, R={cr}, T={ct}] " +
+            "Screen=[L={sl}, B={sb}, R={sr}, T={st}]",
+            20 - retriesRemaining, originalFrameId,
+            origPos->Flags, origPos->Left, origPos->Bottom, origPos->Right, origPos->Top,
+            origPos->ContentLeft, origPos->ContentBottom, origPos->ContentRight, origPos->ContentTop,
+            origPos->ScreenLeft, origPos->ScreenBottom, origPos->ScreenRight, origPos->ScreenTop);
+
+        if (screenHeight <= 0f)
+        {
+            if (retriesRemaining <= 0)
+            {
+                scopedLogger.LogWarning(
+                    "Original frame still has no layout dimensions after all retries, giving up");
+                return;
+            }
+
+            // Re-queue for the next game tick with forceEnqueue so we actually wait
+            _ = this.gameThreadService.QueueOnGameThread(() =>
+            {
+                this.PositionExtraFrames(originalFrameId, extraFrameIds, retriesRemaining - 1);
+            }, CancellationToken.None, forceEnqueue: true);
+            return;
+        }
+
+        // The original frame's position data has valid layout coordinates.
+        // Position fields (Left/Bottom/Right/Top) are relative to the parent's content rect.
+        var rowHeight = origPos->Top - origPos->Bottom;
+
+        scopedLogger.LogDebug(
+            "Positioning: origPos=[L={l}, B={b}, R={r}, T={t}] rowH={rh} extras={n}",
+            origPos->Left, origPos->Bottom, origPos->Right, origPos->Top,
+            rowHeight, extraFrameIds.Length);
+
+        // Position all extra frames below the original, stacking downward.
+        for (var i = 0; i < extraFrameIds.Length; i++)
+        {
+            var extraFrame = GWCA.GW.UI.GetFrameById(extraFrameIds[i]);
+            if (extraFrame is null)
+            {
+                continue;
+            }
+
+            var extraPos = (FramePositionData*)((byte*)extraFrame + 0xD8);
+
+            // In GW's coordinate system, Y increases upward, so we subtract
+            // to place frames below the original.
+            extraPos->Flags = origPos->Flags;
+            extraPos->Left = origPos->Left;
+            extraPos->Right = origPos->Right;
+            extraPos->Bottom = origPos->Bottom - ((i + 1) * rowHeight);
+            extraPos->Top = origPos->Top - ((i + 1) * rowHeight);
+
+            scopedLogger.LogDebug(
+                "Extra {index} (id={fid}): Pos=[L={l}, B={b}, R={r}, T={t}]",
+                i + 1, extraFrameIds[i],
+                extraPos->Left, extraPos->Bottom, extraPos->Right, extraPos->Top);
+
+            GWCA.GW.UI.TriggerFrameRedraw(extraFrame);
+        }
+
+        // Now check if the lowest extra frame overflows the parent's content area.
+        // The lowest extra has Bottom = origBottom - (count * rowHeight).
+        // If that Bottom is negative (below the parent's content origin at 0), the
+        // parent's content area doesn't extend far enough. We need to check against
+        // the parent's actual content rect.
+        var lowestBottom = origPos->Bottom - (extraFrameIds.Length * rowHeight);
+        var parentFrame = GWCA.GW.UI.GetParentFrame(origFrame);
+
+        if (parentFrame is null)
+        {
+            scopedLogger.LogDebug("No parent frame, skipping overflow check");
+            return;
+        }
+
+        var parentPos = (FramePositionData*)((byte*)parentFrame + 0xD8);
+
+        // The parent's content rect in its own coordinate space: children are
+        // positioned relative to (ContentLeft, ContentBottom). A child at Bottom=0
+        // sits at the parent's ContentBottom edge. The usable height is
+        // ContentTop - ContentBottom. Children are placed from Top downward, so
+        // the lowest child's Bottom must be >= 0 in the parent's content space.
+        // Since position values are relative to the parent content rect, Bottom < 0
+        // means the child extends below the parent's content area.
+        var overflow = -lowestBottom; // positive if lowestBottom < 0
+
+        scopedLogger.LogDebug(
+            "Overflow check: lowestBottom={lb}, overflow={ov}, " +
+            "parent(id={pid}) Content=[L={cl}, B={cb}, R={cr}, T={ct}] " +
+            "Pos=[L={pl}, B={pb}, R={pr}, T={pt}]",
+            lowestBottom, overflow,
+            parentFrame->FrameId,
+            parentPos->ContentLeft, parentPos->ContentBottom, parentPos->ContentRight, parentPos->ContentTop,
+            parentPos->Left, parentPos->Bottom, parentPos->Right, parentPos->Top);
+
+        if (overflow <= 0f)
+        {
+            // Everything fits, we're done!
+            scopedLogger.LogDebug("All extras fit within parent bounds, done");
+            return;
+        }
+
+        if (retriesRemaining <= 0)
+        {
+            scopedLogger.LogWarning(
+                "Still overflowing by {overflow} after all retries, giving up", overflow);
+            return;
+        }
+
+        // Expand ancestor frames by exactly the overflow amount.
+        // Walk up 2 levels (content container + dialog frame). Skip deeper ancestors
+        // to avoid pushing the entire viewport.
+        scopedLogger.LogDebug("Expanding ancestors by {overflow} to fit content", overflow);
+        var ancestorFrame = parentFrame;
+        for (var depth = 0; depth < 2 && ancestorFrame is not null; depth++)
+        {
+            var ancestorPos = (FramePositionData*)((byte*)ancestorFrame + 0xD8);
+
+            // Only record the original Bottom on the first expansion so we can
+            // restore it during cleanup. If we've already recorded this ancestor,
+            // don't overwrite the original value.
+            if (!this.expandedAncestors.Any(a => a.Item1 == ancestorFrame->FrameId))
+            {
+                this.expandedAncestors.Add((ancestorFrame->FrameId, ancestorPos->Bottom));
+            }
+
+            ancestorPos->Bottom -= overflow;
+
+            scopedLogger.LogDebug(
+                "Expanded ancestor depth {depth} (id={fid}): Bottom -> {newB}",
+                depth, ancestorFrame->FrameId, ancestorPos->Bottom);
+
+            GWCA.GW.UI.TriggerFrameRedraw(ancestorFrame);
+            ancestorFrame = GWCA.GW.UI.GetParentFrame(ancestorFrame);
+        }
+
+        // Wait a tick for the layout system to process the expansion, then re-check.
+        // The layout pass may reposition the original frame, so we need to re-read
+        // its position and re-stack the extras.
+        _ = this.gameThreadService.QueueOnGameThread(() =>
+        {
+            this.PositionExtraFrames(originalFrameId, extraFrameIds, retriesRemaining - 1);
+        }, CancellationToken.None, forceEnqueue: true);
+    }
+
+    private unsafe void CleanupExtraSummaryFrames()
+    {
+        // Restore ancestor frame positions that we expanded
+        foreach (var (frameId, originalBottom) in this.expandedAncestors)
+        {
+            var frame = GWCA.GW.UI.GetFrameById(frameId);
+            if (frame is not null)
+            {
+                var pos = (FramePositionData*)((byte*)frame + 0xD8);
+                pos->Bottom = originalBottom;
+                GWCA.GW.UI.TriggerFrameRedraw(frame);
+            }
+        }
+
+        this.expandedAncestors.Clear();
+
+        // Destroy extra child frames
+        foreach (var frameId in this.extraSummaryFrameIds)
+        {
+            var frame = GWCA.GW.UI.GetFrameById(frameId);
+            if (frame is not null)
+            {
+                GWCA.GW.UI.DestroyUIComponent(frame);
+            }
+        }
+
+        this.extraSummaryFrameIds.Clear();
     }
 
     private async Task<bool> IsInValidOutpost(CancellationToken cancellationToken)

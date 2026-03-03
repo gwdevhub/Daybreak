@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using Daybreak.API.Interop.GuildWars;
 
 namespace Daybreak.API.Interop;
 
@@ -18,11 +19,14 @@ public readonly struct Frame
     [FieldOffset(0x0024)]
     public readonly uint TemplateType;
 
-    [FieldOffset(0x00b8)]
+    [FieldOffset(0x00B8)]
     public readonly uint ChildOffsetId;
 
-    [FieldOffset(0x00bc)]
+    [FieldOffset(0x00BC)]
     public readonly uint FrameId;
+
+    [FieldOffset(0x00D8)]
+    public readonly FramePositionData Position;
 
     [FieldOffset(0x018C)]
     public readonly uint FrameState;
@@ -30,5 +34,5 @@ public readonly struct Frame
     public bool IsCreated => (this.FrameState & 0x4) != 0;
     public bool IsHidden => (this.FrameState & 0x200) != 0;
     public bool IsVisible => !this.IsHidden;
-    public bool IsDIsabled => (this.FrameState & 0x10) != 0;
+    public bool IsDisabled => (this.FrameState & 0x10) != 0;
 }

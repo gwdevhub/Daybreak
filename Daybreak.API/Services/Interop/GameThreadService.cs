@@ -15,7 +15,7 @@ public sealed class GameThreadService
     // Prevent GC of delegates passed to native code
     private readonly ConcurrentDictionary<GameThreadCallback, bool> prevent_GC_callbacks = [];
 
-    public Task QueueOnGameThread(Action action, CancellationToken cancellationToken)
+    public Task QueueOnGameThread(Action action, CancellationToken cancellationToken, bool forceEnqueue = false)
     {
         var taskCompletionSource = new TaskCompletionSource();
         var item = new WorkItem(action, taskCompletionSource, cancellationToken);
@@ -47,12 +47,12 @@ public sealed class GameThreadService
         this.prevent_GC_callbacks[callback] = true;
 
         var funcPtr = Marshal.GetFunctionPointerForDelegate(callback);
-        GWCA.GW.GameThread.Enqueue(funcPtr, false);
+        GWCA.GW.GameThread.Enqueue(funcPtr, forceEnqueue);
 
         return taskCompletionSource.Task;
     }
 
-    public Task<T> QueueOnGameThread<T>(Func<T> action, CancellationToken cancellationToken)
+    public Task<T> QueueOnGameThread<T>(Func<T> action, CancellationToken cancellationToken, bool forceEnqueue = false)
     {
         var taskCompletionSource = new TaskCompletionSource<T>();
         var item = new WorkItem<T>(action, taskCompletionSource, cancellationToken);
@@ -85,7 +85,7 @@ public sealed class GameThreadService
         this.prevent_GC_callbacks[callback] = true;
 
         var funcPtr = Marshal.GetFunctionPointerForDelegate(callback);
-        GWCA.GW.GameThread.Enqueue(funcPtr, false);
+        GWCA.GW.GameThread.Enqueue(funcPtr, forceEnqueue);
 
         return taskCompletionSource.Task;
     }
