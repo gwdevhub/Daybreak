@@ -394,6 +394,10 @@ public sealed class PartyService : IHostedService
 
             this.floatingPreviewFrame = (nint)floatingFrame;
 
+            scopedLogger.LogDebug(
+                "Floating frame created: FrameId={frameId}, IsCreated={isCreated}, IsVisible={isVisible}, IsHidden={isHidden}, State=0x{state:X}",
+                floatingFrame->FrameId, floatingFrame->IsCreated, floatingFrame->IsVisible, floatingFrame->IsHidden, floatingFrame->FrameState);
+
             this.isPopulatingExtraBuilds = true;
             try
             {
@@ -421,13 +425,51 @@ public sealed class PartyService : IHostedService
 
             // Trigger the container's built-in layout handler to compute
             // child sizes and stack them vertically before positioning.
-            GWCA.GW.FrameMgr.LayoutContainer(floatingFrame);
+            var layoutResult = GWCA.GW.FrameMgr.LayoutContainer(floatingFrame);
+            var desiredW = GWCA.GW.FrameMgr.GetContainerDesiredWidth(floatingFrame);
+            var desiredH = GWCA.GW.FrameMgr.GetContainerDesiredHeight(floatingFrame);
+
+            scopedLogger.LogDebug(
+                "Post-layout: LayoutResult={layoutResult}, DesiredSize={w}x{h}",
+                layoutResult, desiredW, desiredH);
+
+            // Dump frame position data after layout
+            var pos = &floatingFrame->Position;
+            scopedLogger.LogDebug(
+                "Floating frame position: Flags=0x{flags:X}, " +
+                "Pos=[L={left}, B={bottom}, R={right}, T={top}], " +
+                "Content=[L={cl}, B={cb}, R={cr}, T={ct}], " +
+                "Screen=[L={sl}, B={sb}, R={sr}, T={st}], " +
+                "State=0x{state:X}, IsVisible={vis}",
+                pos->Flags, pos->Left, pos->Bottom, pos->Right, pos->Top,
+                pos->ContentLeft, pos->ContentBottom, pos->ContentRight, pos->ContentTop,
+                pos->ScreenLeft, pos->ScreenBottom, pos->ScreenRight, pos->ScreenTop,
+                floatingFrame->FrameState, floatingFrame->IsVisible);
 
             // Position the floating preview relative to the template dialog
             var dialogFrame = GWCA.GW.FrameMgr.GetTemplateDialogFrame();
             if (dialogFrame is not null)
             {
-                GWCA.GW.FrameMgr.PositionRelativeTo(floatingFrame, dialogFrame, 0f, -1f);
+                var dialogPos = &dialogFrame->Position;
+                scopedLogger.LogDebug(
+                    "Dialog frame: FrameId={fid}, " +
+                    "Screen=[L={sl}, B={sb}, R={sr}, T={st}], " +
+                    "State=0x{state:X}, IsVisible={vis}",
+                    dialogFrame->FrameId,
+                    dialogPos->ScreenLeft, dialogPos->ScreenBottom, dialogPos->ScreenRight, dialogPos->ScreenTop,
+                    dialogFrame->FrameState, dialogFrame->IsVisible);
+
+                var posResult = GWCA.GW.FrameMgr.PositionRelativeTo(floatingFrame, dialogFrame, 0f, -1f);
+                scopedLogger.LogDebug("PositionRelativeTo result: {result}", posResult);
+
+                // Re-read position after positioning
+                scopedLogger.LogDebug(
+                    "After positioning: Screen=[L={sl}, B={sb}, R={sr}, T={st}]",
+                    pos->ScreenLeft, pos->ScreenBottom, pos->ScreenRight, pos->ScreenTop);
+            }
+            else
+            {
+                scopedLogger.LogWarning("GetTemplateDialogFrame returned null");
             }
         }
 
