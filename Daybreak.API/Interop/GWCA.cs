@@ -13,7 +13,7 @@ namespace Daybreak.API.Interop
 {
 
 /// <summary>
-/// P/Invoke bindings for 543 C++ exports from gwca.dll (0 skipped).
+/// P/Invoke bindings for 546 C++ exports from gwca.dll (0 skipped).
 /// Nested classes mirror the C++ namespace hierarchy (e.g. GW::Agents → GWCA.GW.Agents).
 /// Types annotated with [GWCAEquivalent] are used in signatures where available.
 /// </summary>
@@ -948,6 +948,14 @@ public static unsafe partial class GWCA
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool DestroyFloatingFrame(global::Daybreak.API.Interop.Frame* frame);
 
+            // GW::FrameMgr::GetContainerDesiredHeight
+            [LibraryImport(DllName, EntryPoint = "?GetContainerDesiredHeight@FrameMgr@GW@@YAMPBUFrame@UI@2@@Z")]
+            public static partial float GetContainerDesiredHeight(global::Daybreak.API.Interop.Frame* frame);
+
+            // GW::FrameMgr::GetContainerDesiredWidth
+            [LibraryImport(DllName, EntryPoint = "?GetContainerDesiredWidth@FrameMgr@GW@@YAMPBUFrame@UI@2@@Z")]
+            public static partial float GetContainerDesiredWidth(global::Daybreak.API.Interop.Frame* frame);
+
             // GW::FrameMgr::GetFrameScreenRect | screenPosition2: TODO: map struct GW::FrameMgr::ScreenPosition
             // [LibraryImport(DllName, EntryPoint = "?GetFrameScreenRect@FrameMgr@GW@@YA_NPBUFrame@UI@2@PAUScreenPosition@12@@Z")]
             // [return: MarshalAs(UnmanagedType.U1)]
@@ -956,6 +964,11 @@ public static unsafe partial class GWCA
             // GW::FrameMgr::GetTemplateDialogFrame
             [LibraryImport(DllName, EntryPoint = "?GetTemplateDialogFrame@FrameMgr@GW@@YAPAUFrame@UI@2@XZ")]
             public static partial global::Daybreak.API.Interop.Frame* GetTemplateDialogFrame();
+
+            // GW::FrameMgr::LayoutContainer
+            [LibraryImport(DllName, EntryPoint = "?LayoutContainer@FrameMgr@GW@@YA_NPAUFrame@UI@2@@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool LayoutContainer(global::Daybreak.API.Interop.Frame* frame);
 
             // GW::FrameMgr::PopulateSkillTemplatePreview
             [LibraryImport(DllName, EntryPoint = "?PopulateSkillTemplatePreview@FrameMgr@GW@@YA_NPAUFrame@UI@2@ABUSkillTemplate@SkillbarMgr@2@I@Z")]

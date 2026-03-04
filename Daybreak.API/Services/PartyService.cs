@@ -419,6 +419,10 @@ public sealed class PartyService : IHostedService
                 this.isPopulatingExtraBuilds = false;
             }
 
+            // Trigger the container's built-in layout handler to compute
+            // child sizes and stack them vertically before positioning.
+            GWCA.GW.FrameMgr.LayoutContainer(floatingFrame);
+
             // Position the floating preview relative to the template dialog
             var dialogFrame = GWCA.GW.FrameMgr.GetTemplateDialogFrame();
             if (dialogFrame is not null)
