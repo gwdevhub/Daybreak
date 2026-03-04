@@ -13,7 +13,7 @@ namespace Daybreak.API.Interop
 {
 
 /// <summary>
-/// P/Invoke bindings for 523 C++ exports from gwca.dll (0 skipped).
+/// P/Invoke bindings for 543 C++ exports from gwca.dll (0 skipped).
 /// Nested classes mirror the C++ namespace hierarchy (e.g. GW::Agents → GWCA.GW.Agents).
 /// Types annotated with [GWCAEquivalent] are used in signatures where available.
 /// </summary>
@@ -443,6 +443,10 @@ public static unsafe partial class GWCA
             [LibraryImport(DllName, EntryPoint = "?GetAgentByID@Agents@GW@@YAPAUAgent@2@I@Z")]
             public static partial global::Daybreak.API.Interop.GuildWars.Agent* GetAgentByID(uint value);
 
+            // GW::Agents::GetAgentCharData | returns TODO: map struct GW::AgentCharData
+            // [LibraryImport(DllName, EntryPoint = "?GetAgentCharData@Agents@GW@@YAPAUAgentCharData@2@I@Z")]
+            // public static partial AgentCharData* GetAgentCharData(uint value);
+
             // GW::Agents::GetAgentEncName
             [LibraryImport(DllName, EntryPoint = "?GetAgentEncName@Agents@GW@@YAPA_WI@Z")]
             public static partial ushort* GetAgentEncName(uint value);
@@ -454,6 +458,14 @@ public static unsafe partial class GWCA
             // GW::Agents::GetAgentIdByLoginNumber
             [LibraryImport(DllName, EntryPoint = "?GetAgentIdByLoginNumber@Agents@GW@@YAII@Z")]
             public static partial uint GetAgentIdByLoginNumber(uint value);
+
+            // GW::Agents::GetAgentPrimary
+            [LibraryImport(DllName, EntryPoint = "?GetAgentPrimary@Agents@GW@@YA?AW4ProfessionByte@Constants@2@I@Z")]
+            public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.ProfessionByte GetAgentPrimary(uint value);
+
+            // GW::Agents::GetAgentSecondary
+            [LibraryImport(DllName, EntryPoint = "?GetAgentSecondary@Agents@GW@@YA?AW4ProfessionByte@Constants@2@I@Z")]
+            public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.ProfessionByte GetAgentSecondary(uint value);
 
             // GW::Agents::GetAmountOfPlayersInInstance
             [LibraryImport(DllName, EntryPoint = "?GetAmountOfPlayersInInstance@Agents@GW@@YAIXZ")]
@@ -909,6 +921,80 @@ public static unsafe partial class GWCA
             // GW::EventMgr::RemoveEventCallback
             [LibraryImport(DllName, EntryPoint = "?RemoveEventCallback@EventMgr@GW@@YAXPAUHookEntry@2@W4EventID@12@@Z")]
             public static partial void RemoveEventCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, global::Daybreak.API.Interop.GWCA.GW.EventMgr.EventID eventID2);
+        }
+
+        public static partial class FrameMgr
+        {
+
+            // GW::FrameMgr::ClearChildren
+            [LibraryImport(DllName, EntryPoint = "?ClearChildren@FrameMgr@GW@@YA_NPAUFrame@UI@2@@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool ClearChildren(global::Daybreak.API.Interop.Frame* frame);
+
+            // GW::FrameMgr::CreateChildFrame
+            [LibraryImport(DllName, EntryPoint = "?CreateChildFrame@FrameMgr@GW@@YAPAUFrame@UI@2@PAU342@IIP6AXPAUInteractionMessage@42@PAX2@Z2PB_W@Z")]
+            public static partial global::Daybreak.API.Interop.Frame* CreateChildFrame(global::Daybreak.API.Interop.Frame* frame1, uint value2, uint value3, nint callback4, nint ptr5, ushort* ptr6);
+
+            // GW::FrameMgr::CreateContainerFrame
+            [LibraryImport(DllName, EntryPoint = "?CreateContainerFrame@FrameMgr@GW@@YAPAUFrame@UI@2@PB_WMMM@Z")]
+            public static partial global::Daybreak.API.Interop.Frame* CreateContainerFrame(ushort* ptr1, float value2, float value3, float value4);
+
+            // GW::FrameMgr::CreateFloatingFrame
+            [LibraryImport(DllName, EntryPoint = "?CreateFloatingFrame@FrameMgr@GW@@YAPAUFrame@UI@2@PB_WP6AXPAUInteractionMessage@42@PAX2@Z2@Z")]
+            public static partial global::Daybreak.API.Interop.Frame* CreateFloatingFrame(ushort* ptr1, nint callback2, nint ptr3);
+
+            // GW::FrameMgr::DestroyFloatingFrame
+            [LibraryImport(DllName, EntryPoint = "?DestroyFloatingFrame@FrameMgr@GW@@YA_NPAUFrame@UI@2@@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool DestroyFloatingFrame(global::Daybreak.API.Interop.Frame* frame);
+
+            // GW::FrameMgr::GetFrameScreenRect | screenPosition2: TODO: map struct GW::FrameMgr::ScreenPosition
+            // [LibraryImport(DllName, EntryPoint = "?GetFrameScreenRect@FrameMgr@GW@@YA_NPBUFrame@UI@2@PAUScreenPosition@12@@Z")]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool GetFrameScreenRect(global::Daybreak.API.Interop.Frame* frame1, ScreenPosition* screenPosition2);
+
+            // GW::FrameMgr::GetTemplateDialogFrame
+            [LibraryImport(DllName, EntryPoint = "?GetTemplateDialogFrame@FrameMgr@GW@@YAPAUFrame@UI@2@XZ")]
+            public static partial global::Daybreak.API.Interop.Frame* GetTemplateDialogFrame();
+
+            // GW::FrameMgr::PopulateSkillTemplatePreview
+            [LibraryImport(DllName, EntryPoint = "?PopulateSkillTemplatePreview@FrameMgr@GW@@YA_NPAUFrame@UI@2@ABUSkillTemplate@SkillbarMgr@2@I@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool PopulateSkillTemplatePreview(global::Daybreak.API.Interop.Frame* frame1, global::Daybreak.API.Interop.GuildWars.SkillTemplate* skillTemplate2, uint value3);
+
+            // GW::FrameMgr::PositionRelativeTo
+            [LibraryImport(DllName, EntryPoint = "?PositionRelativeTo@FrameMgr@GW@@YA_NPAUFrame@UI@2@PBU342@MM@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool PositionRelativeTo(global::Daybreak.API.Interop.Frame* frame1, global::Daybreak.API.Interop.Frame* frame2, float value3, float value4);
+
+            // GW::FrameMgr::RegisterPopulateSkillDataCallback | function2: TODO: map struct function
+            // [LibraryImport(DllName, EntryPoint = "?RegisterPopulateSkillDataCallback@FrameMgr@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUHookStatus@GW@@PAUFrame@UI@2@PBUSkillTemplate@SkillbarMgr@2@@Z@std@@H@Z")]
+            // public static partial void RegisterPopulateSkillDataCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, global::Daybreak.API.Interop.Frame* frame3, global::Daybreak.API.Interop.GuildWars.SkillTemplate* skillTemplate4);
+
+            // GW::FrameMgr::RegisterTemplateDialogCallback | function2: TODO: map struct function
+            // [LibraryImport(DllName, EntryPoint = "?RegisterTemplateDialogCallback@FrameMgr@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUHookStatus@GW@@PAUFrame@UI@2@PBUChatTemplate@42@@Z@std@@H@Z")]
+            // public static partial void RegisterTemplateDialogCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, global::Daybreak.API.Interop.Frame* frame3, global::Daybreak.API.Interop.GuildWars.ChatTemplate* chatTemplate4);
+
+            // GW::FrameMgr::RegisterTemplateDialogClosedCallback | function2: TODO: map struct function
+            // [LibraryImport(DllName, EntryPoint = "?RegisterTemplateDialogClosedCallback@FrameMgr@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUHookStatus@GW@@PAUFrame@UI@2@@Z@std@@H@Z")]
+            // public static partial void RegisterTemplateDialogClosedCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, global::Daybreak.API.Interop.Frame* frame3);
+
+            // GW::FrameMgr::RemovePopulateSkillDataCallback
+            [LibraryImport(DllName, EntryPoint = "?RemovePopulateSkillDataCallback@FrameMgr@GW@@YAXPAUHookEntry@2@@Z")]
+            public static partial void RemovePopulateSkillDataCallback(global::Daybreak.API.Interop.HookEntry* hookEntry);
+
+            // GW::FrameMgr::RemoveTemplateDialogCallback
+            [LibraryImport(DllName, EntryPoint = "?RemoveTemplateDialogCallback@FrameMgr@GW@@YAXPAUHookEntry@2@@Z")]
+            public static partial void RemoveTemplateDialogCallback(global::Daybreak.API.Interop.HookEntry* hookEntry);
+
+            // GW::FrameMgr::RemoveTemplateDialogClosedCallback
+            [LibraryImport(DllName, EntryPoint = "?RemoveTemplateDialogClosedCallback@FrameMgr@GW@@YAXPAUHookEntry@2@@Z")]
+            public static partial void RemoveTemplateDialogClosedCallback(global::Daybreak.API.Interop.HookEntry* hookEntry);
+
+            // GW::FrameMgr::SetFramePosition | screenPosition2: TODO: map struct GW::FrameMgr::ScreenPosition
+            // [LibraryImport(DllName, EntryPoint = "?SetFramePosition@FrameMgr@GW@@YA_NPAUFrame@UI@2@ABUScreenPosition@12@@Z")]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool SetFramePosition(global::Daybreak.API.Interop.Frame* frame1, ScreenPosition* screenPosition2);
         }
 
         public static partial class FriendListMgr
@@ -2684,6 +2770,11 @@ public static unsafe partial class GWCA
             [LibraryImport(DllName, EntryPoint = "?SetFrameMargins@UI@GW@@YA_NPAUFrame@12@IQAM1I@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool SetFrameMargins(global::Daybreak.API.Interop.Frame* frame1, uint value2, float* ptr3, nint ptr4, uint value5);
+
+            // GW::UI::SetFramePosition
+            [LibraryImport(DllName, EntryPoint = "?SetFramePosition@UI@GW@@YA_NPAUFrame@12@AAUFramePosition@12@@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool SetFramePosition(global::Daybreak.API.Interop.Frame* frame1, global::Daybreak.API.Interop.GuildWars.FramePositionData* framePositionData2);
 
             // GW::UI::SetFrameTitle
             [LibraryImport(DllName, EntryPoint = "?SetFrameTitle@UI@GW@@YA_NPAUFrame@12@PB_W@Z")]
