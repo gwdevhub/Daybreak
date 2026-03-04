@@ -397,24 +397,17 @@ public sealed class PartyService : IHostedService
             this.isPopulatingExtraBuilds = true;
             try
             {
-                // Create a child frame for each build beyond the first and populate it
+                // PopulateSkillTemplatePreview now handles the full lifecycle:
+                // creates a child frame with SkillFrameHandler, allocates context,
+                // creates sub-children (skill icons, labels), then populates with template data.
                 for (var i = 1; i < teamBuild.Builds.Count; i++)
                 {
-                    var childFrame = GWCA.GW.FrameMgr.CreateChildFrame(
-                        floatingFrame, 0, (uint)i, 0, 0, null);
-
-                    if (childFrame is null)
-                    {
-                        scopedLogger.LogWarning("Failed to create child frame for build {index}", i);
-                        continue;
-                    }
-
                     var template = new SkillTemplate();
                     PopulateSkillTemplate(teamBuild.Builds[i], &template);
 
-                    if (!GWCA.GW.FrameMgr.PopulateSkillTemplatePreview(childFrame, &template, 0))
+                    if (!GWCA.GW.FrameMgr.PopulateSkillTemplatePreview(floatingFrame, &template, (uint)i))
                     {
-                        scopedLogger.LogWarning("Failed to populate preview for build {index}", i);
+                        scopedLogger.LogWarning("Failed to create and populate preview for build {index}", i);
                         continue;
                     }
 
