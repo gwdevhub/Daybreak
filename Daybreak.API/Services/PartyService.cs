@@ -307,6 +307,8 @@ public sealed class PartyService : IHostedService
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         this.cachedTemplateCode = default;
+        // Clean up any previous floating preview when a new template is being decoded
+        this.CleanupFloatingPreview();
         if (!this.buildTemplateManager.TryDecodeTemplate(templateCode, out var build) ||
             build is not TeamBuildEntry teamBuildEntry ||
             teamBuildEntry.Builds.Count is 0)
@@ -368,8 +370,11 @@ public sealed class PartyService : IHostedService
             return false;
         }
 
-        // Clean up any previous floating preview
-        this.CleanupFloatingPreview();
+        // If we already have a floating preview for this template, don't recreate
+        if (this.floatingPreviewFrame != 0)
+        {
+            return false;
+        }
 
         scopedLogger.LogDebug(
             "Creating floating preview for {count} extra builds",
