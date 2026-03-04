@@ -37,6 +37,7 @@ public sealed class PartyService : IHostedService
 
     private string? cachedTemplateCode;
     private nint floatingPreviewFrame;
+    private bool isPopulatingExtraBuilds;
 
     public PartyService(
         ChatService chatService,
@@ -345,6 +346,13 @@ public sealed class PartyService : IHostedService
     /// </summary>
     private unsafe bool PopulateSkillData(WrappedPointer<TemplateSummaryFrameData> frameData, WrappedPointer<SkillTemplate> skillTemplateData)
     {
+        // Reentrancy guard — PopulateSkillTemplatePreview internally calls the game's
+        // PopulateSkillData which re-enters this hook for each child frame we create.
+        if (this.isPopulatingExtraBuilds)
+        {
+            return false;
+        }
+
         var scopedLogger = this.logger.CreateScopedLogger();
         if (this.cachedTemplateCode is null)
         {
@@ -381,28 +389,36 @@ public sealed class PartyService : IHostedService
 
             this.floatingPreviewFrame = (nint)floatingFrame;
 
-            // Create a child frame for each build beyond the first and populate it
-            for (var i = 1; i < teamBuild.Builds.Count; i++)
+            this.isPopulatingExtraBuilds = true;
+            try
             {
-                var childFrame = GWCA.GW.FrameMgr.CreateChildFrame(
-                    floatingFrame, 0, (uint)i, 0, 0, null);
-
-                if (childFrame is null)
+                // Create a child frame for each build beyond the first and populate it
+                for (var i = 1; i < teamBuild.Builds.Count; i++)
                 {
-                    scopedLogger.LogWarning("Failed to create child frame for build {index}", i);
-                    continue;
+                    var childFrame = GWCA.GW.FrameMgr.CreateChildFrame(
+                        floatingFrame, 0, (uint)i, 0, 0, null);
+
+                    if (childFrame is null)
+                    {
+                        scopedLogger.LogWarning("Failed to create child frame for build {index}", i);
+                        continue;
+                    }
+
+                    var template = new SkillTemplate();
+                    PopulateSkillTemplate(teamBuild.Builds[i], &template);
+
+                    if (!GWCA.GW.FrameMgr.PopulateSkillTemplatePreview(childFrame, &template, 0))
+                    {
+                        scopedLogger.LogWarning("Failed to populate preview for build {index}", i);
+                        continue;
+                    }
+
+                    scopedLogger.LogDebug("Created and populated preview for build {index}", i);
                 }
-
-                var template = new SkillTemplate();
-                PopulateSkillTemplate(teamBuild.Builds[i], &template);
-
-                if (!GWCA.GW.FrameMgr.PopulateSkillTemplatePreview(childFrame, &template, 0))
-                {
-                    scopedLogger.LogWarning("Failed to populate preview for build {index}", i);
-                    continue;
-                }
-
-                scopedLogger.LogDebug("Created and populated preview for build {index}", i);
+            }
+            finally
+            {
+                this.isPopulatingExtraBuilds = false;
             }
 
             // Position the floating preview relative to the template dialog
