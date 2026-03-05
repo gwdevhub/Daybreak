@@ -380,11 +380,14 @@ public sealed class PartyService : IHostedService
             "Creating floating preview for {count} extra builds",
             teamBuild.Builds.Count - 1);
 
-        // Create a floating frame to hold the extra build previews
+        // Create a container frame to hold the extra build previews.
+        // CreateContainerFrame installs the ContainerFrameHandler which handles
+        // layout (kSetLayout) and measure (kMeasureContent) messages, and allocates
+        // a ContainerContext to track child count, height, and spacing.
         fixed (char* label = "DaybreakTeamPreview")
         {
-            var floatingFrame = GWCA.GW.FrameMgr.CreateFloatingFrame(
-                (ushort*)label, 0, 0);
+            var floatingFrame = GWCA.GW.FrameMgr.CreateContainerFrame(
+                (ushort*)label, 50f, 2f, 4f);
 
             if (floatingFrame is null)
             {
