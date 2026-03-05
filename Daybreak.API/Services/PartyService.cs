@@ -343,8 +343,9 @@ public sealed class PartyService : IHostedService
 
     /// <summary>
     /// Intercepts TemplatesSummary_PopulateSkillData when a team build is cached.
-    /// Creates an independent floating frame with skill template previews for
-    /// each build beyond the first, positioned relative to the template dialog.
+    /// Blocks the game's own rendering and creates our own floating frame
+    /// containing ALL builds (0 through N-1), positioned near the template dialog.
+    /// Returns true to suppress the game's PopulateSkillData entirely.
     /// </summary>
     private unsafe bool PopulateSkillData(WrappedPointer<TemplateSummaryFrameData> frameData, WrappedPointer<SkillTemplate> skillTemplateData)
     {
@@ -370,20 +371,17 @@ public sealed class PartyService : IHostedService
             return false;
         }
 
-        // If we already have a floating preview for this template, don't recreate
+        // If we already have a floating preview for this template, suppress the game's draw
         if (this.floatingPreviewFrame != 0)
         {
-            return false;
+            return true;
         }
 
         scopedLogger.LogDebug(
-            "Creating floating preview for {count} extra builds",
-            teamBuild.Builds.Count - 1);
+            "Creating floating preview for all {count} builds",
+            teamBuild.Builds.Count);
 
-        // Create a container frame to hold the extra build previews.
-        // CreateContainerFrame installs the ContainerFrameHandler which handles
-        // layout (kSetLayout) and measure (kMeasureContent) messages, and allocates
-        // a ContainerContext to track child count, height, and spacing.
+        // Create a container frame for ALL builds (including build 0).
         fixed (char* label = "DaybreakTeamPreview")
         {
             var floatingFrame = GWCA.GW.FrameMgr.CreateContainerFrame(
@@ -397,17 +395,11 @@ public sealed class PartyService : IHostedService
 
             this.floatingPreviewFrame = (nint)floatingFrame;
 
-            scopedLogger.LogDebug(
-                "Floating frame created: FrameId={frameId}, IsCreated={isCreated}, IsVisible={isVisible}, IsHidden={isHidden}, State=0x{state:X}",
-                floatingFrame->FrameId, floatingFrame->IsCreated, floatingFrame->IsVisible, floatingFrame->IsHidden, floatingFrame->FrameState);
-
             this.isPopulatingExtraBuilds = true;
             try
             {
-                // PopulateSkillTemplatePreview now handles the full lifecycle:
-                // creates a child frame with SkillFrameHandler, allocates context,
-                // creates sub-children (skill icons, labels), then populates with template data.
-                for (var i = 1; i < teamBuild.Builds.Count; i++)
+                // Create and populate a child frame for EVERY build in the team
+                for (var i = 0; i < teamBuild.Builds.Count; i++)
                 {
                     var template = new SkillTemplate();
                     PopulateSkillTemplate(teamBuild.Builds[i], &template);
@@ -417,8 +409,6 @@ public sealed class PartyService : IHostedService
                         scopedLogger.LogWarning("Failed to create and populate preview for build {index}", i);
                         continue;
                     }
-
-                    scopedLogger.LogDebug("Created and populated preview for build {index}", i);
                 }
             }
             finally
@@ -426,33 +416,14 @@ public sealed class PartyService : IHostedService
                 this.isPopulatingExtraBuilds = false;
             }
 
-            // Trigger the container's built-in layout handler to compute
-            // child sizes and stack them vertically before positioning.
-            var layoutResult = GWCA.GW.FrameMgr.LayoutContainer(floatingFrame);
+            // Compute desired height for all builds
             var desiredH = GWCA.GW.FrameMgr.GetContainerDesiredHeight(floatingFrame);
+            scopedLogger.LogDebug("Container created with {count} builds, desiredHeight={h}",
+                teamBuild.Builds.Count, desiredH);
 
-            scopedLogger.LogDebug(
-                "Post-layout: LayoutResult={layoutResult}, DesiredHeight={h}",
-                layoutResult, desiredH);
-
-            // Dump frame position data after layout
-            var pos = &floatingFrame->Position;
-            scopedLogger.LogDebug(
-                "Floating frame position: Flags=0x{flags:X}, " +
-                "Pos=[L={left}, B={bottom}, R={right}, T={top}], " +
-                "Content=[L={cl}, B={cb}, R={cr}, T={ct}], " +
-                "Screen=[L={sl}, B={sb}, R={sr}, T={st}], " +
-                "State=0x{state:X}, IsVisible={vis}",
-                pos->Flags, pos->Left, pos->Bottom, pos->Right, pos->Top,
-                pos->ContentLeft, pos->ContentBottom, pos->ContentRight, pos->ContentTop,
-                pos->ScreenLeft, pos->ScreenBottom, pos->ScreenRight, pos->ScreenTop,
-                floatingFrame->FrameState, floatingFrame->IsVisible);
-
-            // Position relative to the original template summary frame.
-            // PopulateSkillData fires during message 0x55 processing, BEFORE
-            // the layout pass runs. The original frame's screen coordinates are
-            // all zeros at this point. Defer positioning to the next game tick
-            // when ProcessLayoutQueue will have computed valid screen coords.
+            // Defer positioning until the game's layout pass has computed
+            // screen coordinates for the original summary frame. We use that
+            // frame's position as an anchor even though we're replacing its content.
             var origFrameId = frameData.Pointer->FrameId;
             var floatingFramePtr = floatingFrame;
             var height = desiredH;
@@ -462,31 +433,15 @@ public sealed class PartyService : IHostedService
             }, CancellationToken.None, forceEnqueue: true);
         }
 
-        // Let the original proceed for build 0 on the existing frame
-        return false;
-    }
-
-    private static unsafe void SetFallbackPosition(Frame* frame, float desiredH)
-    {
-        var fpos = (FramePositionData*)((byte*)frame + 0xD8);
-        fpos->Flags = 0;
-        fpos->Left = 100f;
-        fpos->Bottom = 100f;
-        fpos->Right = 500f;
-        fpos->Top = 100f + desiredH;
-        fpos->ScreenLeft = 100f;
-        fpos->ScreenBottom = 100f;
-        fpos->ScreenRight = 500f;
-        fpos->ScreenTop = 100f + desiredH;
-        GWCA.GW.UI.TriggerFrameRedraw(frame);
-        GWCA.GW.FrameMgr.LayoutContainer(frame);
+        // Return true to suppress the game's own PopulateSkillData for build 0.
+        // We're drawing everything ourselves.
+        return true;
     }
 
     /// <summary>
     /// Deferred positioning callback. Waits for the original summary frame
     /// to have valid screen coordinates after the layout pass, then positions
-    /// the floating preview below it. Retries on subsequent game ticks if
-    /// the layout hasn't settled yet.
+    /// the floating preview at the same location (replacing it visually).
     /// </summary>
     private unsafe void PositionFloatingPreview(uint origFrameId, Frame* floatingFrame, float desiredH, int retriesRemaining)
     {
@@ -495,7 +450,6 @@ public sealed class PartyService : IHostedService
         if (origFrame is null)
         {
             scopedLogger.LogWarning("Original frame {fid} no longer valid", origFrameId);
-            SetFallbackPosition(floatingFrame, desiredH);
             return;
         }
 
@@ -508,11 +462,9 @@ public sealed class PartyService : IHostedService
             if (retriesRemaining <= 0)
             {
                 scopedLogger.LogWarning("Original frame still has zero dimensions after all retries");
-                SetFallbackPosition(floatingFrame, desiredH);
                 return;
             }
 
-            // Layout hasn't settled yet — try again next tick
             _ = this.gameThreadService.QueueOnGameThread(() =>
             {
                 this.PositionFloatingPreview(origFrameId, floatingFrame, desiredH, retriesRemaining - 1);
@@ -520,29 +472,28 @@ public sealed class PartyService : IHostedService
             return;
         }
 
-        scopedLogger.LogDebug(
-            "Positioning below origFrame={fid}, Screen=[L={sl}, B={sb}, R={sr}, T={st}]",
-            origFrameId,
-            origPos->ScreenLeft, origPos->ScreenBottom, origPos->ScreenRight, origPos->ScreenTop);
-
-        // Position our container directly below the original summary frame.
+        // Position our container at the same location as the original summary frame,
+        // extending downward to fit all builds.
         var fpos = (FramePositionData*)((byte*)floatingFrame + 0xD8);
         fpos->Flags = 0;
         fpos->Left = origPos->ScreenLeft;
-        fpos->Bottom = origPos->ScreenBottom - desiredH;
-        fpos->Right = origPos->ScreenLeft + origWidth;
-        fpos->Top = origPos->ScreenBottom;
+        fpos->Top = origPos->ScreenTop;
+        fpos->Right = origPos->ScreenRight;
+        fpos->Bottom = origPos->ScreenTop - desiredH;
         fpos->ScreenLeft = origPos->ScreenLeft;
-        fpos->ScreenBottom = origPos->ScreenBottom - desiredH;
-        fpos->ScreenRight = origPos->ScreenLeft + origWidth;
-        fpos->ScreenTop = origPos->ScreenBottom;
+        fpos->ScreenTop = origPos->ScreenTop;
+        fpos->ScreenRight = origPos->ScreenRight;
+        fpos->ScreenBottom = origPos->ScreenTop - desiredH;
         GWCA.GW.UI.TriggerFrameRedraw(floatingFrame);
 
-        // Re-layout children with the actual container width
+        // Hide the original frame since we're replacing it
+        GWCA.GW.UI.SetFrameVisible(origFrame, false);
+
+        // Layout children within the now-sized container
         GWCA.GW.FrameMgr.LayoutContainer(floatingFrame);
 
         scopedLogger.LogDebug(
-            "Positioned: Screen=[L={sl}, B={sb}, R={sr}, T={st}]",
+            "Positioned at Screen=[L={sl}, B={sb}, R={sr}, T={st}], origFrame hidden",
             fpos->ScreenLeft, fpos->ScreenBottom, fpos->ScreenRight, fpos->ScreenTop);
     }
 
