@@ -463,16 +463,33 @@ public sealed class PartyService : IHostedService
 
                 var posResult = GWCA.GW.FrameMgr.PositionRelativeTo(floatingFrame, dialogFrame, 0f, -1f);
                 scopedLogger.LogDebug("PositionRelativeTo result: {result}", posResult);
-
-                // Re-read position after positioning
-                scopedLogger.LogDebug(
-                    "After positioning: Screen=[L={sl}, B={sb}, R={sr}, T={st}]",
-                    pos->ScreenLeft, pos->ScreenBottom, pos->ScreenRight, pos->ScreenTop);
             }
             else
             {
-                scopedLogger.LogWarning("GetTemplateDialogFrame returned null");
+                scopedLogger.LogWarning("GetTemplateDialogFrame returned null, using fallback position");
+
+                // Fallback: manually set position so we can verify frames render.
+                // Place at a known screen position with known dimensions.
+                var fpos = (FramePositionData*)((byte*)floatingFrame + 0xD8);
+                fpos->Flags = 0;
+                fpos->Left = 100f;
+                fpos->Bottom = 100f;
+                fpos->Right = 500f;
+                fpos->Top = 100f + desiredH;
+                fpos->ScreenLeft = 100f;
+                fpos->ScreenBottom = 100f;
+                fpos->ScreenRight = 500f;
+                fpos->ScreenTop = 100f + desiredH;
+                GWCA.GW.UI.TriggerFrameRedraw(floatingFrame);
+
+                // Re-layout children now that the container has actual dimensions
+                GWCA.GW.FrameMgr.LayoutContainer(floatingFrame);
             }
+
+            // Re-read position after positioning
+            scopedLogger.LogDebug(
+                "Final position: Screen=[L={sl}, B={sb}, R={sr}, T={st}]",
+                pos->ScreenLeft, pos->ScreenBottom, pos->ScreenRight, pos->ScreenTop);
         }
 
         // Let the original proceed for build 0 on the existing frame
