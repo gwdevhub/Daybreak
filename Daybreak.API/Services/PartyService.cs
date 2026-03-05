@@ -448,52 +448,102 @@ public sealed class PartyService : IHostedService
                 pos->ScreenLeft, pos->ScreenBottom, pos->ScreenRight, pos->ScreenTop,
                 floatingFrame->FrameState, floatingFrame->IsVisible);
 
-            // Position the floating preview relative to the template dialog
-            var dialogFrame = GWCA.GW.FrameMgr.GetTemplateDialogFrame();
-            if (dialogFrame is not null)
+            // Position relative to the original template summary frame.
+            // PopulateSkillData fires during message 0x55 processing, BEFORE
+            // the layout pass runs. The original frame's screen coordinates are
+            // all zeros at this point. Defer positioning to the next game tick
+            // when ProcessLayoutQueue will have computed valid screen coords.
+            var origFrameId = frameData.Pointer->FrameId;
+            var floatingFramePtr = floatingFrame;
+            var height = desiredH;
+            _ = this.gameThreadService.QueueOnGameThread(() =>
             {
-                var dialogPos = &dialogFrame->Position;
-                scopedLogger.LogDebug(
-                    "Dialog frame: FrameId={fid}, " +
-                    "Screen=[L={sl}, B={sb}, R={sr}, T={st}], " +
-                    "State=0x{state:X}, IsVisible={vis}",
-                    dialogFrame->FrameId,
-                    dialogPos->ScreenLeft, dialogPos->ScreenBottom, dialogPos->ScreenRight, dialogPos->ScreenTop,
-                    dialogFrame->FrameState, dialogFrame->IsVisible);
-
-                var posResult = GWCA.GW.FrameMgr.PositionRelativeTo(floatingFrame, dialogFrame, 0f, -1f);
-                scopedLogger.LogDebug("PositionRelativeTo result: {result}", posResult);
-            }
-            else
-            {
-                scopedLogger.LogWarning("GetTemplateDialogFrame returned null, using fallback position");
-
-                // Fallback: manually set position so we can verify frames render.
-                // Place at a known screen position with known dimensions.
-                var fpos = (FramePositionData*)((byte*)floatingFrame + 0xD8);
-                fpos->Flags = 0;
-                fpos->Left = 100f;
-                fpos->Bottom = 100f;
-                fpos->Right = 500f;
-                fpos->Top = 100f + desiredH;
-                fpos->ScreenLeft = 100f;
-                fpos->ScreenBottom = 100f;
-                fpos->ScreenRight = 500f;
-                fpos->ScreenTop = 100f + desiredH;
-                GWCA.GW.UI.TriggerFrameRedraw(floatingFrame);
-
-                // Re-layout children now that the container has actual dimensions
-                GWCA.GW.FrameMgr.LayoutContainer(floatingFrame);
-            }
-
-            // Re-read position after positioning
-            scopedLogger.LogDebug(
-                "Final position: Screen=[L={sl}, B={sb}, R={sr}, T={st}]",
-                pos->ScreenLeft, pos->ScreenBottom, pos->ScreenRight, pos->ScreenTop);
+                this.PositionFloatingPreview(origFrameId, floatingFramePtr, height, retriesRemaining: 10);
+            }, CancellationToken.None, forceEnqueue: true);
         }
 
         // Let the original proceed for build 0 on the existing frame
         return false;
+    }
+
+    private static unsafe void SetFallbackPosition(Frame* frame, float desiredH)
+    {
+        var fpos = (FramePositionData*)((byte*)frame + 0xD8);
+        fpos->Flags = 0;
+        fpos->Left = 100f;
+        fpos->Bottom = 100f;
+        fpos->Right = 500f;
+        fpos->Top = 100f + desiredH;
+        fpos->ScreenLeft = 100f;
+        fpos->ScreenBottom = 100f;
+        fpos->ScreenRight = 500f;
+        fpos->ScreenTop = 100f + desiredH;
+        GWCA.GW.UI.TriggerFrameRedraw(frame);
+        GWCA.GW.FrameMgr.LayoutContainer(frame);
+    }
+
+    /// <summary>
+    /// Deferred positioning callback. Waits for the original summary frame
+    /// to have valid screen coordinates after the layout pass, then positions
+    /// the floating preview below it. Retries on subsequent game ticks if
+    /// the layout hasn't settled yet.
+    /// </summary>
+    private unsafe void PositionFloatingPreview(uint origFrameId, Frame* floatingFrame, float desiredH, int retriesRemaining)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        var origFrame = GWCA.GW.UI.GetFrameById(origFrameId);
+        if (origFrame is null)
+        {
+            scopedLogger.LogWarning("Original frame {fid} no longer valid", origFrameId);
+            SetFallbackPosition(floatingFrame, desiredH);
+            return;
+        }
+
+        var origPos = (FramePositionData*)((byte*)origFrame + 0xD8);
+        var origHeight = origPos->ScreenTop - origPos->ScreenBottom;
+        var origWidth = origPos->ScreenRight - origPos->ScreenLeft;
+
+        if (origHeight <= 0f || origWidth <= 0f)
+        {
+            if (retriesRemaining <= 0)
+            {
+                scopedLogger.LogWarning("Original frame still has zero dimensions after all retries");
+                SetFallbackPosition(floatingFrame, desiredH);
+                return;
+            }
+
+            // Layout hasn't settled yet — try again next tick
+            _ = this.gameThreadService.QueueOnGameThread(() =>
+            {
+                this.PositionFloatingPreview(origFrameId, floatingFrame, desiredH, retriesRemaining - 1);
+            }, CancellationToken.None, forceEnqueue: true);
+            return;
+        }
+
+        scopedLogger.LogDebug(
+            "Positioning below origFrame={fid}, Screen=[L={sl}, B={sb}, R={sr}, T={st}]",
+            origFrameId,
+            origPos->ScreenLeft, origPos->ScreenBottom, origPos->ScreenRight, origPos->ScreenTop);
+
+        // Position our container directly below the original summary frame.
+        var fpos = (FramePositionData*)((byte*)floatingFrame + 0xD8);
+        fpos->Flags = 0;
+        fpos->Left = origPos->ScreenLeft;
+        fpos->Bottom = origPos->ScreenBottom - desiredH;
+        fpos->Right = origPos->ScreenLeft + origWidth;
+        fpos->Top = origPos->ScreenBottom;
+        fpos->ScreenLeft = origPos->ScreenLeft;
+        fpos->ScreenBottom = origPos->ScreenBottom - desiredH;
+        fpos->ScreenRight = origPos->ScreenLeft + origWidth;
+        fpos->ScreenTop = origPos->ScreenBottom;
+        GWCA.GW.UI.TriggerFrameRedraw(floatingFrame);
+
+        // Re-layout children with the actual container width
+        GWCA.GW.FrameMgr.LayoutContainer(floatingFrame);
+
+        scopedLogger.LogDebug(
+            "Positioned: Screen=[L={sl}, B={sb}, R={sr}, T={st}]",
+            fpos->ScreenLeft, fpos->ScreenBottom, fpos->ScreenRight, fpos->ScreenTop);
     }
 
     private unsafe void CleanupFloatingPreview()
