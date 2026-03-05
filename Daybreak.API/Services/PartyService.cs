@@ -429,12 +429,11 @@ public sealed class PartyService : IHostedService
             // Trigger the container's built-in layout handler to compute
             // child sizes and stack them vertically before positioning.
             var layoutResult = GWCA.GW.FrameMgr.LayoutContainer(floatingFrame);
-            var desiredW = GWCA.GW.FrameMgr.GetContainerDesiredWidth(floatingFrame);
             var desiredH = GWCA.GW.FrameMgr.GetContainerDesiredHeight(floatingFrame);
 
             scopedLogger.LogDebug(
-                "Post-layout: LayoutResult={layoutResult}, DesiredSize={w}x{h}",
-                layoutResult, desiredW, desiredH);
+                "Post-layout: LayoutResult={layoutResult}, DesiredHeight={h}",
+                layoutResult, desiredH);
 
             // Dump frame position data after layout
             var pos = &floatingFrame->Position;
