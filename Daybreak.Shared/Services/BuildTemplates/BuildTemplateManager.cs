@@ -398,6 +398,7 @@ public sealed class BuildTemplateManager(
                     teamBuild.Name = randomName;
                     teamBuild.PreviousName = randomName;
                     build = teamBuild;
+                    this.BuildMemoryCache.Add(build);
                     return true;
                 }
 
@@ -413,6 +414,8 @@ public sealed class BuildTemplateManager(
                         Attributes = single.Attributes,
                         Skills = single.Skills
                     };
+
+                    this.BuildMemoryCache.Add(build);
                     return true;
                 }
 
@@ -421,7 +424,7 @@ public sealed class BuildTemplateManager(
                 {
                     Name = randomName,
                     PreviousName = randomName,
-                    Builds = maybeBuilds.OfType<SingleBuildEntry>().Select(b => new SingleBuildEntry
+                    Builds = [.. maybeBuilds.OfType<SingleBuildEntry>().Select(b => new SingleBuildEntry
                     {
                         Name = randomName,
                         PreviousName = randomName,
@@ -429,9 +432,10 @@ public sealed class BuildTemplateManager(
                         Secondary = b.Secondary,
                         Attributes = b.Attributes,
                         Skills = b.Skills
-                    }).ToList()
+                    })]
                 };
 
+                this.BuildMemoryCache.Add(build);
                 return true;
             }
         }
