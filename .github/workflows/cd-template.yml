@@ -49,7 +49,7 @@ jobs:
         shell: pwsh
 
       - name: Upload x86 artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: x86-components
           path: |
@@ -99,7 +99,7 @@ jobs:
         shell: pwsh
 
       - name: Upload Windows build
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: windows-build
           path: Publish/
@@ -149,7 +149,7 @@ jobs:
           chmod +x Publish/Installer/Daybreak.Installer
 
       - name: Upload Linux build
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: linux-build
           path: Publish/
@@ -206,7 +206,7 @@ jobs:
           cd linux-publish && zip -r ../daybreakv${{ env.Version }}-linux.zip . && cd ..
 
       - name: Upload release artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: release-zips
           path: |
