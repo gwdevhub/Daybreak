@@ -14,6 +14,7 @@ namespace GW {
     struct Player;
     struct MapAgent;
     struct AgentLiving;
+    struct AgentCharData;
 
     typedef Array<NPC> NPCArray;
     typedef Array<Agent *> AgentArray;
@@ -90,8 +91,11 @@ namespace GW {
         GWCA_API MapAgentArray* GetMapAgentArray();
         GWCA_API uint32_t CountAllegianceInRange(GW::Constants::Allegiance allegiance, float sqr_range);
 
+        GWCA_API AgentCharData* GetAgentCharData(uint32_t agent_id);
         GWCA_API MapAgent* GetMapAgentByID(uint32_t agent_id);
 
+        GWCA_API GW::Constants::ProfessionByte GetAgentPrimary(uint32_t agent_id);
+        GWCA_API GW::Constants::ProfessionByte GetAgentSecondary(uint32_t agent_id);
         // === Other Arrays ===
         GWCA_API PlayerArray* GetPlayerArray();
 
