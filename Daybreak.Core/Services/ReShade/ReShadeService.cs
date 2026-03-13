@@ -187,6 +187,11 @@ internal sealed class ReShadeService(
 
     public Task OnGuildWarsStarting(GuildWarsStartingContext guildWarsStartingContext, CancellationToken cancellationToken)
     {
+        if (!this.IsInstalled)
+        {
+            return Task.CompletedTask;
+        }
+
         var destinationDirectory = Path.GetFullPath(new FileInfo(guildWarsStartingContext.ApplicationLauncherContext.ExecutablePath).DirectoryName!);
         EnsureFileExistsInGuildwarsDirectory(ReShadeLog, destinationDirectory);
         EnsureFileExistsInGuildwarsDirectory(ReShadePreset, destinationDirectory);
@@ -198,11 +203,16 @@ internal sealed class ReShadeService(
 
     public Task OnGuildWarsStartingDisabled(GuildWarsStartingDisabledContext guildWarsStartingDisabledContext, CancellationToken cancellationToken)
     {
+        if (!this.IsInstalled)
+        {
+            return Task.CompletedTask;
+        }
+
         var destinationDirectory = Path.GetFullPath(new FileInfo(guildWarsStartingDisabledContext.ApplicationLauncherContext.ExecutablePath).DirectoryName!);
         var destination = Path.Combine(Path.GetFullPath(destinationDirectory), PresetsFolder);
         if (Directory.Exists(destination))
         {
-            Directory.Delete(destination);
+            Directory.Delete(destination, true);
         }
 
         return Task.CompletedTask;
