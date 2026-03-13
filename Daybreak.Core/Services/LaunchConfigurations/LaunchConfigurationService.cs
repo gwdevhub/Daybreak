@@ -94,24 +94,6 @@ internal sealed class LaunchConfigurationService(
         return this.IsValidInternal(launchConfiguration);
     }
 
-    public LaunchConfigurationWithCredentials? GetLastLaunchConfigurationWithCredentials()
-    {
-        return this.GetLaunchConfigurations().LastOrDefault();
-    }
-
-    public void SetLastLaunchConfigurationWithCredentials(LaunchConfigurationWithCredentials launchConfigurationWithCredentials)
-    {
-        var configs = this.liveUpdateableOptions.CurrentValue.LaunchConfigurations;
-        var maybeConfig = configs
-            .FirstOrDefault(l => l.CredentialsIdentifier == launchConfigurationWithCredentials.Credentials?.Identifier &&
-                                 l.Executable == launchConfigurationWithCredentials.ExecutablePath) ?? throw new InvalidOperationException("Provided launch configuration is not part of the known list of launch configurations");
-        configs.Remove(maybeConfig);
-        configs.Add(maybeConfig);
-        var options = this.liveUpdateableOptions.CurrentValue;
-        options.LaunchConfigurations = configs;
-        this.optionsProvider.SaveOption(options);
-    }
-
     private bool SaveConfigurationInternal(LaunchConfigurationWithCredentials launchConfigurationWithCredentials)
     {
         var configs = this.liveUpdateableOptions.CurrentValue.LaunchConfigurations.ToList();
