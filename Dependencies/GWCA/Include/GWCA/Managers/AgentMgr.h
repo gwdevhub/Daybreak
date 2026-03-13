@@ -47,9 +47,6 @@ namespace GW {
         // Same as pressing button (id) while talking to an NPC.
         GWCA_API bool SendDialog(uint32_t dialog_id);
 
-        // Returns last dialog id sent to the server. Requires the hook.
-        GWCA_API bool GetIsAgentTargettable(const GW::Agent* agent);
-
         // === Agent Array ===
 
         // Get Agent ID of currently observed agent
@@ -131,7 +128,6 @@ namespace GW {
 // ============================================================
 extern "C" {
     GWCA_API bool     SendDialog(uint32_t dialog_id);
-    GWCA_API bool     GetIsAgentTargettable(const void* agent);
 
     GWCA_API uint32_t GetObservingId();
     GWCA_API uint32_t GetControlledCharacterId();
