@@ -243,8 +243,6 @@ public sealed class LaunchViewModel(
 
     private void RetrieveLaunchConfigurations()
     {
-        var latestLaunchConfiguration =
-            this.launchConfigurationService.GetLastLaunchConfigurationWithCredentials();
         var configurations = this
             .launchConfigurationService.GetLaunchConfigurations()
             .Select(c => new LauncherViewContext { Configuration = c, CanLaunch = false })
@@ -256,10 +254,7 @@ public sealed class LaunchViewModel(
             this.LaunchConfigurations.Add(config);
         }
 
-        this.SelectedConfiguration =
-            this.LaunchConfigurations.FirstOrDefault(c =>
-                c.Configuration?.Equals(latestLaunchConfiguration) is true
-            ) ?? this.LaunchConfigurations.FirstOrDefault();
+        this.SelectedConfiguration = this.LaunchConfigurations.FirstOrDefault();
     }
 
     private async Task PeriodicallyCheckSelectedConfigState(CancellationToken cancellationToken)
@@ -377,10 +372,6 @@ public sealed class LaunchViewModel(
         {
             return;
         }
-
-        this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(
-            this.SelectedConfiguration.Configuration
-        );
 
         try
         {
@@ -615,9 +606,6 @@ public sealed class LaunchViewModel(
             apiContext,
             cancellationToken
         );
-        this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(
-            launcherViewContext.Configuration
-        );
         this.viewManager.ShowView<FocusView>(
             (nameof(FocusView.ProcessId), launchContext.ProcessId.ToString()),
             (
@@ -660,9 +648,6 @@ public sealed class LaunchViewModel(
         launcherViewContext.AppContext = launchedContext;
         launchNotificationToken.Cancel();
         this.daybreakApiService.RequestInstancesAnnouncement();
-        this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(
-            launcherViewContext.Configuration
-        );
 
         // Only attach to focus view if Daybreak API was enabled for this launch
         if (!launchedContext.EnabledMods.OfType<IDaybreakApiService>().Any())

@@ -15,8 +15,4 @@ public interface ILaunchConfigurationService
     bool DeleteConfiguration(LaunchConfigurationWithCredentials launchConfigurationWithCredentials);
 
     bool IsValid(LaunchConfigurationWithCredentials launchConfiguration);
-
-    LaunchConfigurationWithCredentials? GetLastLaunchConfigurationWithCredentials();
-
-    void SetLastLaunchConfigurationWithCredentials(LaunchConfigurationWithCredentials launchConfigurationWithCredentials);
 }
