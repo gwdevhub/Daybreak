@@ -30,7 +30,7 @@ jobs:
 
       - name: Bump version in Directory.Build.props
         id: bump
-        uses: vers-one/dotnet-project-version-updater@v1.7
+        uses: vers-one/dotnet-project-version-updater@v1.8
         with:
           file: "Directory.Build.props"
           version: ${{ inputs.versionBump }}
