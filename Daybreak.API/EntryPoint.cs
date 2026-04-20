@@ -87,8 +87,6 @@ public class EntryPoint
                 .WithRoutes()
                 .WithHealthChecks();
 
-        builder.Services.AddOpenApi();
-
         // Add CORS policy - allow localhost and trusted community sites
         builder.Services.AddCors(options =>
         {
