@@ -500,7 +500,8 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         ConstantsNode node,
         Dictionary<string, string> typeMap,
         HashSet<string> namespaceClassNames,
-        int indent)
+        int indent,
+        string? emitNameOverride = null)
     {
         var pad = new string(' ', indent);
 
@@ -508,11 +509,13 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         if (!HasAnyContent(node))
             return;
 
+        var emitName = emitNameOverride ?? SanitizeIdentifier(node.Name);
+
         // Always emit a partial class wrapper — C# allows multiple partial
         // declarations for the same nested class, so this merges cleanly
         // with any class already emitted by the export tree.
         sb.AppendLine();
-        sb.AppendLine($"{pad}public static partial class {SanitizeIdentifier(node.Name)}");
+        sb.AppendLine($"{pad}public static partial class {emitName}");
         sb.AppendLine($"{pad}{{");
 
         var innerIndent = indent + 4;
@@ -543,8 +546,12 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
                 foreach (var member in enumDef.Members)
                 {
                     var csType = MapCppTypeToCs(enumDef.UnderlyingType);
+                    var memberName = SanitizeIdentifier(member.Name);
+                    // CS0542: member names cannot be the same as their enclosing type
+                    if (memberName == emitName)
+                        memberName += "_";
                     var comment = member.Comment is not null ? $" // {member.Comment}" : "";
-                    sb.AppendLine($"{innerPad}internal const {csType} {SanitizeIdentifier(member.Name)} = {member.Value};{comment}");
+                    sb.AppendLine($"{innerPad}internal const {csType} {memberName} = {member.Value};{comment}");
                 }
             }
         }
@@ -554,8 +561,12 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         {
             var csType = MapCppTypeToCs(field.CppType);
             var value = field.Value;
+            var fieldName = SanitizeIdentifier(field.Name);
+            // CS0542: member names cannot be the same as their enclosing type
+            if (fieldName == emitName)
+                fieldName += "_";
             var comment = field.Comment is not null ? $" // {field.Comment}" : "";
-            sb.AppendLine($"{innerPad}internal const {csType} {SanitizeIdentifier(field.Name)} = {value};{comment}");
+            sb.AppendLine($"{innerPad}internal const {csType} {fieldName} = {value};{comment}");
         }
 
         // Type aliases are now emitted to GuildWars namespace, not nested GWCA classes
@@ -567,7 +578,11 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         // Emit children
         foreach (var child in node.Children.Values.OrderBy(c => c.Name, StringComparer.Ordinal))
         {
-            EmitConstantsNode(sb, child, typeMap, namespaceClassNames, innerIndent);
+            // CS0542: nested class name cannot be the same as enclosing type
+            string? childNameOverride = null;
+            if (SanitizeIdentifier(child.Name) == emitName)
+                childNameOverride = SanitizeIdentifier(child.Name) + "_";
+            EmitConstantsNode(sb, child, typeMap, namespaceClassNames, innerIndent, childNameOverride);
         }
 
         sb.AppendLine($"{pad}}}");
