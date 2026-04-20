@@ -216,7 +216,7 @@ internal sealed class ApplicationLauncher(
 
         if (!args.Any(a => a.StartsWith("-character")))
         {
-            args.AddRange(PopulateCommandLineArgs("-character", "Daybreak") ?? []);
+            args.AddRange(PopulateCommandLineArgs("-character", " ") ?? []);
         }
 
         var process = new Process()
