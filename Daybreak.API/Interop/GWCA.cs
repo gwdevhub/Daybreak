@@ -13,7 +13,7 @@ namespace Daybreak.API.Interop
 {
 
 /// <summary>
-/// P/Invoke bindings for 526 C++ exports from gwca.dll (0 skipped).
+/// P/Invoke bindings for 525 C++ exports from gwca.dll (0 skipped).
 /// Nested classes mirror the C++ namespace hierarchy (e.g. GW::Agents → GWCA.GW.Agents).
 /// Types annotated with [GWCAEquivalent] are used in signatures where available.
 /// </summary>
@@ -23,7 +23,7 @@ public static unsafe partial class GWCA
     // ═══════════════════════════════════════════════════
     // Parsed structs diagnostic:
     // [NAMESPACE] GWCA.GW popped at line 46
-    // [NAMESPACE] GWCA.GW.Agents popped at line 127
+    // [NAMESPACE] GWCA.GW.Agents popped at line 124
     // [NAMESPACE] GWCA.GW.CameraMgr popped at line 35
     // [NAMESPACE] GWCA.GW.Chat popped at line 21
     // [NAMESPACE] GWCA.GW.Chat.TextColor popped at line 49
@@ -32,6 +32,8 @@ public static unsafe partial class GWCA
     // [NAMESPACE] GWCA.GW.Constants.DialogID popped at line 331
     // [NAMESPACE] GWCA.GW.Constants.HealthbarHeight popped at line 232
     // [NAMESPACE] GWCA.GW.Constants.ItemID popped at line 201
+    // [NAMESPACE] GWCA.GW.Constants.ModelID.Minipet.SummoningStone.FoW.UW.FoW.Urgoz.Deep.DoA.EotnDungeons.BonusMissionPack.EotnDungeons popped at line 444
+    // [NAMESPACE] GWCA.GW.Constants.ModelID.Minipet.SummoningStone.FoW.UW.FoW.Urgoz.Deep.DoA.PolymockSummon popped at line 384
     // [NAMESPACE] GWCA.GW.Constants.Preference popped at line 62
     // [NAMESPACE] GWCA.GW.Constants.Range popped at line 288
     // [NAMESPACE] GWCA.GW.Constants.SqrRange popped at line 298
@@ -487,11 +489,6 @@ public static unsafe partial class GWCA
             // GW::Agents::GetHeroAgentID
             [LibraryImport(DllName, EntryPoint = "?GetHeroAgentID@Agents@GW@@YAII@Z")]
             public static partial uint GetHeroAgentID(uint value);
-
-            // GW::Agents::GetIsAgentTargettable
-            [LibraryImport(DllName, EntryPoint = "?GetIsAgentTargettable@Agents@GW@@YA_NPBUAgent@2@@Z")]
-            [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool GetIsAgentTargettable(global::Daybreak.API.Interop.GuildWars.Agent* agent);
 
             // GW::Agents::GetMapAgentArray
             [LibraryImport(DllName, EntryPoint = "?GetMapAgentArray@Agents@GW@@YAPAV?$Array@UMapAgent@GW@@@2@XZ")]
@@ -7910,6 +7907,377 @@ public static unsafe partial class GWCA
                 internal const int WitchsBrew = 6049;
                 internal const int WoodPlank = 946;
                 internal const int ZehtukasJug = 19171;
+            }
+
+            public static partial class ModelID
+            {
+
+                public static partial class Minipet
+                {
+                    internal const int Asura = 311;
+                    internal const int BlackMoaChick = 343;
+                    internal const int BrownRabbit = 306; // Miniature Brown Rabbit
+                    internal const int CelestialDog = 342;
+                    internal const int CelestialDragon = 336;
+                    internal const int CelestialHorse = 338;
+                    internal const int CelestialMonkey = 340;
+                    internal const int CelestialOx = 333;
+                    internal const int CelestialPig = 331;
+                    internal const int CelestialRabbit = 335;
+                    internal const int CelestialRat = 332;
+                    internal const int CelestialRooster = 341;
+                    internal const int CelestialSheep = 339;
+                    internal const int CelestialSnake = 337;
+                    internal const int CelestialTiger = 334;
+                    internal const int Ceratadon = 316;
+                    internal const int CollectorsEditionVaresh = 314;
+                    internal const int DestroyerOfFlesh = 312;
+                    internal const int Dhuum = 344;
+                    internal const int GhostlyHero = 327;
+                    internal const int GhostlyPriest = 349;
+                    internal const int Grawl = 326;
+                    internal const int GrayGiant = 310;
+                    internal const int GreasedLightning = 329;
+                    internal const int GuildLord = 347;
+                    internal const int HighPriestZhang = 348;
+                    internal const int IslandGuardian = 319;
+                    internal const int Kanaxai = 317;
+                    internal const int LonghairYeti = 321;
+                    internal const int MadKingsGuard = 345;
+                    internal const int Mallyx = 315;
+                    internal const int NagaRaincaller = 320;
+                    internal const int Oni = 322;
+                    internal const int Panda = 318;
+                    internal const int Pig = 328;
+                    internal const int PolarBear = 313;
+                    internal const int RiftWarden = 350;
+                    internal const int ShirokenAssassin = 323;
+                    internal const int SmiteCrawler = 346;
+                    internal const int Vizu = 324;
+                    internal const int WorldFamousRacingBeetle = 330;
+                    internal const int Yakkington = 307; // Miniature Yakkington
+                    internal const int ZhedShadowhoof = 325;
+
+                    public static partial class SummoningStone
+                    {
+
+                        internal const int AbaddonsCursed = 1338;
+                        internal const int BladeAncientSyuShai = 1339;
+                        internal const int YoannhTheRebuilber = 1340;
+                        internal const int FureystSharpsight = 1341;
+                        internal const int AmberJuggernaut = 516;
+                        internal const int ArcticKveldulf = 520;
+                        internal const int AutomatonGolem = 512;
+                        internal const int ChitinousDevourer = 519;
+                        internal const int DemonicOni = 515;
+                        internal const int FossilizedRaptor = 521;
+                        internal const int FrostySnowman = 523;
+                        internal const int GelatinousOoze = 518;
+                        internal const int GhastlyDreamRider = 524;
+                        internal const int IgneousFireImp = 513;
+                        internal const int JadeiteSiegeTurtle = 514;
+                        internal const int MercantileMerchant = 467;
+                        internal const int MischievousGrentch = 522;
+                        internal const int MysteriousCrystalSpider = 490;
+                        internal const int MysteriousRestlessCorpse = 492;
+                        internal const int MysteriousSaltsprayDragon = 491;
+                        internal const int MysteriousSmokePhantom = 493;
+                        internal const int MysteriousSwarmOfBees = 494;
+                        internal const int MysticalGaki = 517;
+                        internal const int ZaishenArcher = 468;
+                        internal const int ZaishenAvatarOfBalthazar = 469;
+                        internal const int ZaishenChampionOfBalthazar = 470;
+                        internal const int ZaishenFootman = 472;
+                        internal const int ZaishenGuildLord = 473;
+                        internal const int ZaishenPriestOfBalthazar = 471;
+
+                        public static partial class FoW
+                        {
+                            internal const int MikoTheUnchained = 2015;
+                            internal const int NimrosTheHunter = 1485;
+
+                            public static partial class UW
+                            {
+                                internal const int BanishedDreamRider = 2327;
+                                internal const int BladedAatxe = 2339;
+                                internal const int ChainedSoul = 2317;
+                                internal const int ChampionOfDhuum = 2394;
+                                internal const int ChargedBlackness = 2337;
+                                internal const int ColdfireNight = 2334;
+                                internal const int DeadCollector = 2332;
+                                internal const int DeadThresher = 2333;
+                                internal const int Dhuum = 2396;
+                                internal const int DyingNightmare = 2318;
+                                internal const int Escort1 = 2407; // souls npc spawned by escort quest
+                                internal const int Escort2 = 2408;
+                                internal const int Escort3 = 2409;
+                                internal const int Escort4 = 2410;
+                                internal const int Escort5 = 2411;
+                                internal const int Escort6 = 2412;
+                                internal const int FourHorseman = 2329; // all four share the same id
+                                internal const int GraspingDarkness = 2338;
+                                internal const int IceElemental = 2401; // friendly, during waste quest near dhuum.
+                                internal const int KeeperOfSouls = 2323;
+                                internal const int KingFrozenwind = 2403;
+                                internal const int MajorAlgheri = 2424;
+                                internal const int MindbladeSpectre = 2330;
+                                internal const int MinionOfDhuum = 2395;
+                                internal const int ObsidianBehemoth = 2319;
+                                internal const int ObsidianGuardian = 2320;
+                                internal const int PitsSoul1 = 2413;
+                                internal const int PitsSoul2 = 2414;
+                                internal const int PitsSoul3 = 2415;
+                                internal const int PitsSoul4 = 2416;
+                                internal const int Reapers = 2399; // outside dhuum chamber
+                                internal const int ReapersAtDhuum = 2400; // in dhuum chamber
+                                internal const int SkeletonOfDhuum1 = 2392;
+                                internal const int SkeletonOfDhuum2 = 2393;
+                                internal const int Slayer = 2391;
+                                internal const int SmiteCrawler = 2325;
+                                internal const int StalkingNight = 2335;
+                                internal const int TerrorwebDryder = 2321;
+                                internal const int TerrorwebDryderSilver = 2322;
+                                internal const int TerrorwebQueen = 2324; // boss-like
+                                internal const int TorturedSpirit = 2422;
+                                internal const int TorturedSpirit1 = 2404; // friendly, during quest
+                                internal const int WailingLord = 2326; // Note: same as FoW::Banshee
+
+                                public static partial class FoW
+                                {
+                                    internal const int Abyssal = 2861; // Note: same as ShadowOverlord.
+                                    internal const int AncientSkale = 2865;
+                                    internal const int ArmoredCaveSpider = 2851;
+                                    internal const int Banshee = 2377; // Note: same as UW::WailingLord
+                                    internal const int DoubtersDryder = 2854;
+                                    internal const int DragonLich = 2874;
+                                    internal const int EoE = 2927;
+                                    internal const int Forgemaster = 2880; // Friendly NPC
+                                    internal const int FrozenSoil = 2933;
+                                    internal const int Griffons = 2878; // Friendly NPC
+                                    internal const int InfernalWurm = 2873;
+                                    internal const int LordKhobay = 2879; // Unfriendly NPC
+                                    internal const int MahgoHydra = 2847;
+                                    internal const int Menzies = 2875;
+                                    internal const int ObsidianFurnanceDrake = 2853;
+                                    internal const int QZ = 2937;
+                                    internal const int Rastigan = 2877; // Friendly NPC
+                                    internal const int RockBorerWorm = 2872;
+                                    internal const int Rotscale = 2888;
+                                    internal const int SeedOfCorruption = 2862;
+                                    internal const int ShadowBeast = 2860;
+                                    internal const int ShadowElemental = 2856;
+                                    internal const int ShadowMesmer = 2855;
+                                    internal const int ShadowMonk = 2857;
+                                    internal const int ShadowOverlord = 2861; // Note: same as Abyssal.
+                                    internal const int ShadowRanger = 2859;
+                                    internal const int ShadowWarrior = 2858;
+                                    internal const int ShardWolf = 2886;
+                                    internal const int SkeletalBerserker = 2870;
+                                    internal const int SkeletalBond = 2869;
+                                    internal const int SkeletalEtherBreaker = 2867;
+                                    internal const int SkeletalIcehand = 2868;
+                                    internal const int SkeletalImpaler = 2871;
+                                    internal const int SmokeWalker = 2852;
+                                    internal const int SnarlingDriftwood = 2866;
+                                    internal const int SpiritShepherd = 2864;
+                                    internal const int SpiritWood = 2863;
+                                    internal const int TraitorousTempleGuard1 = 2882;
+                                    internal const int TraitorousTempleGuard2 = 2883;
+                                    internal const int TraitorousTempleGuard3 = 2884;
+                                    internal const int Winnowing = 2926;
+
+                                    public static partial class Urgoz
+                                    {
+                                        internal const int HoppingVampire = 3796;
+                                        internal const int Urgoz = 3805;
+
+                                        public static partial class Deep
+                                        {
+                                            internal const int Equinox = 4287;
+                                            internal const int Famine = 4289;
+                                            internal const int Kanaxai = 4110;
+                                            internal const int KanaxaiAspect = 4111;
+                                            internal const int Lacerate = 4283;
+
+                                            public static partial class DoA
+                                            {
+                                                internal const int AnguishTitan = 5249;
+                                                internal const int BlackBeastOfArgh = 5201;
+                                                internal const int CommanderVaresh = 5344;
+                                                internal const int DementiaTitan = 5248;
+                                                internal const int DementiaTitan2 = 5253;
+                                                internal const int DespairTitan = 5250;
+                                                internal const int DespairTitan2 = 5254;
+                                                internal const int EarthTormentor = 5261;
+                                                internal const int EbonVanguardAssassin = 5903;
+                                                internal const int FleshTormentor = 5259;
+                                                internal const int FoundrySnakes = 5272;
+                                                internal const int Fury = 5200;
+                                                internal const int FuryTitan = 5251;
+                                                internal const int GreaterDreamRider = 5267;
+                                                internal const int GreaterDreamRider2 = 5268;
+                                                internal const int HeartTormentor = 5258;
+                                                internal const int InfuriatingHeat = 5766;
+                                                internal const int LordJadoth = 5195;
+                                                internal const int MargoniteAnurDabi = 5218;
+                                                internal const int MargoniteAnurKaya = 5217;
+                                                internal const int MargoniteAnurKi = 5220;
+                                                internal const int MargoniteAnurMank = 5225;
+                                                internal const int MargoniteAnurRuk = 5223;
+                                                internal const int MargoniteAnurRund = 5224;
+                                                internal const int MargoniteAnurSu = 5219;
+                                                internal const int MargoniteAnurTuk = 5222;
+                                                internal const int MargoniteAnurVu = 5221;
+                                                internal const int MindTormentor = 5255;
+                                                internal const int MiseryTitan = 5246;
+                                                internal const int ProphetVaresh = 5343;
+                                                internal const int Quicksand = 5769;
+                                                internal const int RageTitan = 5247;
+                                                internal const int RageTitan2 = 5252;
+                                                internal const int SanityTormentor = 5263;
+                                                internal const int SmotheringTendril = 5265;
+                                                internal const int SoulTormentor = 5256;
+                                                internal const int SpiritTormentor = 5260;
+                                                internal const int StygianBrute = 5227;
+                                                internal const int StygianFiend = 5230;
+                                                internal const int StygianGolem = 5228;
+                                                internal const int StygianHorror = 5229;
+                                                internal const int StygianHunger = 5226;
+                                                internal const int StygianLordDerv = 5214;
+                                                internal const int StygianLordEle = 5198;
+                                                internal const int StygianLordMesmer = 5197;
+                                                internal const int StygianLordMonk = 5199;
+                                                internal const int StygianLordNecro = 5196;
+                                                internal const int StygianLordRanger = 5215;
+                                                internal const int TorturewebDryder = 5266;
+                                                internal const int VeilEarthTormentor = 5237;
+                                                internal const int VeilFleshTormentor = 5235;
+                                                internal const int VeilHeartTormentor = 5234;
+                                                internal const int VeilMindTormentor = 5231;
+                                                internal const int VeilSanityTormentor = 5238;
+                                                internal const int VeilSoulTormentor = 5232;
+                                                internal const int VeilSpiritTormentor = 5236;
+                                                internal const int VeilWaterTormentor = 5233;
+                                                internal const int WaterTormentor = 5257;
+
+                                                public static partial class EotnDungeons
+                                                {
+                                                    internal const int Arachni = 6844;
+                                                    internal const int Brigand = 7060; // soo
+                                                    internal const int CyndrTheMountainHeart = 6965;
+                                                    internal const int DiscOfChaos = 6122;
+                                                    internal const int DuncanTheBlack = 6456;
+                                                    internal const int EldritchEttin = 6872;
+                                                    internal const int FendiNin = 7064;
+                                                    internal const int Forgewright = 6460;
+                                                    internal const int Frostmaw = 6983;
+                                                    internal const int HavokSoulwail = 6478;
+                                                    internal const int Hidesplitter = 6852;
+                                                    internal const int IlsundurLordofFire = 6865;
+                                                    internal const int InfernalSiegeWurm = 6978; // kath lvl1 boss
+                                                    internal const int JusticiarThommis = 6457;
+                                                    internal const int KeymasterOfMurakai = 7069;
+                                                    internal const int Khabuus = 6299;
+                                                    internal const int MalfunctioningEnduringGolem = 6885;
+                                                    internal const int MurakaiLadyOfTheNight = 7059;
+                                                    internal const int PlagueOfDestruction = 6134;
+                                                    internal const int PrismaticOoze = 6857;
+                                                    internal const int RandStormweaver = 6458;
+                                                    internal const int RemnantOfAntiquities = 6985;
+                                                    internal const int RragarManeater12 = 6610; // lvl 1 and 2
+                                                    internal const int RragarManeater3 = 6609; // lvl 3
+                                                    internal const int Selvetarm = 6459;
+                                                    internal const int SoulOfFendiNin = 7065;
+                                                    internal const int StormcloudIncubus = 6902;
+                                                    internal const int TPSRegulartorGolem = 6883;
+                                                    internal const int ZhimMonns = 6297;
+                                                    internal const int ZoldarkTheUnholy = 7061;
+
+                                                    public static partial class BonusMissionPack
+                                                    {
+                                                        internal const int AdmiralJakman = 7230;
+                                                        internal const int AkinCinderspire = 7134;
+                                                        internal const int AnrakTindershot = 7132;
+                                                        internal const int Boo = 7500;
+                                                        internal const int CaptainSunpu = 7200;
+                                                        internal const int DettMortash = 7133;
+                                                        internal const int LazarusTheDire = 7167;
+                                                        internal const int MagisEmberglow = 7136;
+                                                        internal const int MasterRiyo = 7198;
+                                                        internal const int MerciaTheSmug = 7165;
+                                                        internal const int MinisterWona = 7201;
+                                                        internal const int OptimusCaliph = 7166;
+                                                        internal const int PalawaJoko = 7249;
+                                                        internal const int RoxAshreign = 7131;
+                                                        internal const int TwangSootpaws = 7135;
+                                                        internal const int WarAshenskull = 7130;
+                                                        internal const int YuriTheHand = 7197;
+
+                                                        public static partial class EotnDungeons
+                                                        {
+                                                            internal const int AngrySnowman = 7462;
+                                                        }
+
+                                                        public static partial class Minipet
+                                                        {
+                                                            internal const int LockedChest = 8192; // this is actually ->ExtraType
+                                                            internal const int MiniatureLegionnaire = 8035;
+
+                                                            public static partial class Minipet
+                                                            {
+                                                                internal const int MiniatureConfessorDorian = 8344;
+                                                                internal const int MiniatureConfessorIsaiah = 8352;
+                                                                internal const int MiniatureEcclesiateXunRao = 9039;
+                                                                internal const int MiniatureEvennia = 8351;
+                                                                internal const int MiniatureLivia = 8350;
+                                                                internal const int MiniatureMinisterReiko = 9038;
+                                                                internal const int MiniaturePeacekeeperEnforcer = 8354;
+                                                                internal const int MiniaturePrincessSalma = 8349;
+
+                                                                public static partial class SummoningStone
+                                                                {
+                                                                    internal const int ImperialBarrage = 9045;
+                                                                    internal const int ImperialCripplingSlash = 9043;
+                                                                    internal const int ImperialQuiveringBlade = 9046;
+                                                                    internal const int ImperialTripleChop = 9044;
+                                                                    internal const int TenguAngchuElementalist = 9051;
+                                                                    internal const int TenguAuraOftheLich = 9061;
+                                                                    internal const int TenguBroadHeadArrow = 9048;
+                                                                    internal const int TenguDefiantWasXinrae = 9062;
+                                                                    internal const int TenguFeveredDreams = 9052;
+                                                                    internal const int TenguGlassArrows = 9056;
+                                                                    internal const int TenguHundredBlades = 9047;
+                                                                    internal const int TenguLifeSheath = 9050;
+                                                                    internal const int TenguPalmStrike = 9049;
+                                                                    internal const int TenguPanic = 9060;
+                                                                    internal const int TenguPeaceandHarmony = 9058;
+                                                                    internal const int TenguPreservation = 9054;
+                                                                    internal const int TenguPrimalRage = 9055;
+                                                                    internal const int TenguSandstorm = 9059;
+                                                                    internal const int TenguSpitefulSpirit = 9053;
+                                                                    internal const int TenguWayOftheAssassin = 9057;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                                public static partial class PolymockSummon
+                                                {
+
+                                                    internal const int MursaatElementalist = 5898;
+                                                    internal const int FlameDjinn = 5899;
+                                                    internal const int IceImp = 5900;
+                                                    internal const int NagaShaman = 5901;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             public static partial class Preference
