@@ -55,10 +55,7 @@
     <PackageVersion Include="SevenZipExtractor" Version="1.0.19" />
     <PackageVersion Include="SharpCompress" Version="0.47.4" />
     <PackageVersion Include="SixLabors.ImageSharp" Version="3.1.12" />
-    <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.1.7" />
-    <PackageVersion Include="Swashbuckle.AspNetCore.Swagger" Version="10.1.7" />
-    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.1.7" />
-    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.7" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.14.1" />
     <PackageVersion Include="Sybil" Version="0.8.4" />
     <PackageVersion Include="System.IO.Compression" Version="4.3.0" />
     <PackageVersion Include="System.Diagnostics.PerformanceCounter" Version="10.0.6" />
