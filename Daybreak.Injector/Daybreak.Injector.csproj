@@ -19,10 +19,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Reloaded.Assembler" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Daybreak.Shared\Daybreak.Shared.csproj" />
   </ItemGroup>
 

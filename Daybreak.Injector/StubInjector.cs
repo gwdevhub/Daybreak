@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Models;
-using Reloaded.Assembler;
 using System.Diagnostics;
 using System.Text;
 
@@ -8,36 +7,26 @@ namespace Daybreak.Injector;
 public static class StubInjector
 {
     /// <summary>
-    /// ebp+8 is the dll path pointer
-    /// 0xDEADBEEF is a placeholder to be patched later for LoadLibraryA
-    /// 0xFEEDF00D is a placeholder to be patched later for GetProcAddress
+    /// Pre-assembled x86 stub bytecode.
+    /// 0xDEADBEEF is a placeholder to be patched later for LoadLibraryA.
+    /// 0xFEEDF00D is a placeholder to be patched later for GetProcAddress.
     /// </summary>
-    const string Asm = @"
-use32
-push ebp
-mov  ebp, esp
-
-mov  esi, [ebp+8]              ; ESI = &INJECT_DATA  (kept unchanged)
-
-; -------- LoadLibraryA(dllPath) ------------------------------
-push dword [esi]               ; dllPath
-mov  eax, 0xDEADBEEF           ; patched → LoadLibraryA
-call eax                       ; EAX = hModule
-
-; -------- GetProcAddress(hModule, funcName) ------------------
-push dword [esi+4]             ; funcName
-push eax                       ; hModule  (still in EAX)
-mov  eax, 0xFEEDF00D           ; patched → GetProcAddress
-call eax                       ; EAX = exported EntryPoint
-
-; -------- call EntryPoint() ----------------------------------
-call eax                       ; calls EntryPoint
-; xor  eax, eax                  ; thread exit-code 0
-
-; -------- return EntryPoint() response -----------------------
-leave                        ; = mov esp, ebp / pop ebp
-ret  4                      ; stdcall: pop lpParameter
-";
+    private static readonly byte[] StubTemplate =
+    [
+        0x55,                               // push ebp
+        0x89, 0xE5,                         // mov ebp, esp
+        0x8B, 0x75, 0x08,                   // mov esi, [ebp+8]
+        0xFF, 0x36,                         // push dword [esi]          ; dllPath
+        0xB8, 0xEF, 0xBE, 0xAD, 0xDE,       // mov eax, 0xDEADBEEF       ; -> LoadLibraryA
+        0xFF, 0xD0,                         // call eax
+        0xFF, 0x76, 0x04,                   // push dword [esi+4]        ; funcName
+        0x50,                               // push eax                  ; hModule
+        0xB8, 0x0D, 0xF0, 0xED, 0xFE,       // mov eax, 0xFEEDF00D       ; -> GetProcAddress
+        0xFF, 0xD0,                         // call eax
+        0xFF, 0xD0,                         // call eax                  ; EntryPoint()
+        0xC9,                               // leave
+        0xC2, 0x04, 0x00,                   // ret 4                     ; stdcall cleanup
+    ];
 
     public static InjectorResponses.InjectResult Inject(Process target, string dllPath, string entryPoint, out int exitCode)
     {
@@ -51,8 +40,7 @@ ret  4                      ; stdcall: pop lpParameter
             return InjectorResponses.InjectResult.InvalidProcess;
         }
 
-        using var assembler = new Assembler();
-        var stubBytes = assembler.Assemble(Asm);
+        var stubBytes = (byte[])StubTemplate.Clone();
 
         // patch placeholders
         var hKernel = NativeMethods.GetModuleHandle("kernel32.dll");
