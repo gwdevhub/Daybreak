@@ -88,6 +88,9 @@ public sealed class ScreenshotService(
 
         image.ProcessPixelRows(accessor =>
         {
+            Span<int> rValues = stackalloc int[Vector<int>.Count];
+            Span<int> gValues = stackalloc int[Vector<int>.Count];
+            Span<int> bValues = stackalloc int[Vector<int>.Count];
             for (int y = 0; y < accessor.Height; y += SampleQuality)
             {
                 var rowSpan = accessor.GetRowSpan(y);
@@ -107,11 +110,6 @@ public sealed class ScreenshotService(
                     var sumG = Vector<long>.Zero;
                     var sumB = Vector<long>.Zero;
                     int simdPixelCount = 0;
-
-                    // Gather sampled pixels into arrays for vectorization
-                    Span<int> rValues = stackalloc int[Vector<int>.Count];
-                    Span<int> gValues = stackalloc int[Vector<int>.Count];
-                    Span<int> bValues = stackalloc int[Vector<int>.Count];
 
                     // Collect sampled pixels for SIMD processing
                     while (x + (Vector<int>.Count * SampleQuality) <= rowSpan.Length)
