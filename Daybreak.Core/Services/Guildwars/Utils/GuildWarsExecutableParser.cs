@@ -2,16 +2,16 @@
 using PeNet.Header.Pe;
 
 namespace Daybreak.Services.Guildwars.Utils;
-/// <summary>
-/// https://github.com/gwdevhub/gwlauncher/blob/master/GW%20Launcher/Guildwars/FileIdFinder.cs
-/// </summary>
+
 internal sealed class GuildWarsExecutableParser
 {
     // Used by older Guild Wars versions
     private readonly static byte[] VersionPattern = [0x8B, 0xC8, 0x33, 0xDB, 0x39, 0x8D, 0xC0, 0xFD, 0xFF, 0xFF, 0x0F, 0x95, 0xC3];
 
-    // Used by newer Guild Wars versions
-    private readonly static byte?[] FileIdFunctionPattern = [0x55, 0x8B, 0xEC, 0x83, 0xEC, 0x08, 0xE8, null, null, null, null, 0x83, 0x3D, null, null, null, null, 0x00];
+    // Used by newer Guild Wars versions. Matches ProcessVersionUpdate prologue:
+    // push ebp; mov ebp,esp; sub esp,N; call <addr>; cmp dword ptr [global], 0
+    // Byte 5 (stack size) is wildcarded since it changes across builds.
+    private readonly static byte?[] FileIdFunctionPattern = [0x55, 0x8B, 0xEC, 0x83, 0xEC, null, 0xE8, null, null, null, null, 0x83, 0x3D, null, null, null, null, 0x00];
 
     private readonly PeFile peFile;
     private readonly ImageSectionHeader textSection;
@@ -38,11 +38,37 @@ internal sealed class GuildWarsExecutableParser
         return Task.Run(() =>
         {
             var patternRva = this.FindWithWildcards(FileIdFunctionPattern);
-            var callRva = patternRva + 0x32;
-            var fileIdFunctionRva = this.FollowCall(callRva);
+            var fileIdFunctionRva = this.FindGetFileIdCall(patternRva);
             var fileId = (int)this.Read(fileIdFunctionRva + 1);
             return fileId;
         }, cancellationToken);
+    }
+
+    // GetFileId is a tiny function: mov eax, <imm32>; ret (bytes: B8 xx xx xx xx C3).
+    // Scan E8 (call) instructions within the matched function and follow each one
+    // to find the call whose target matches that shape.
+    private uint FindGetFileIdCall(uint functionRva, int scanLength = 0x80)
+    {
+        for (int offset = 0; offset < scanLength; offset++)
+        {
+            var rva = functionRva + (uint)offset;
+            var posInFile = this.RvaToOffset(rva);
+            if (this.peFile.RawFile.ReadByte(posInFile) != 0xE8)
+            {
+                continue;
+            }
+
+            var targetRva = rva + (uint)BitConverter.ToInt32(this.peFile.RawFile.ToArray(), posInFile + 1) + 5;
+            var targetOffset = this.RvaToOffset(targetRva);
+            // Check for: B8 xx xx xx xx C3 (mov eax, imm32; ret)
+            if (this.peFile.RawFile.ReadByte(targetOffset) == 0xB8 &&
+                this.peFile.RawFile.ReadByte(targetOffset + 5) == 0xC3)
+            {
+                return targetRva;
+            }
+        }
+
+        throw new Exception("Couldn't find GetFileId call within the function");
     }
 
     private uint FindWithWildcards(byte?[] pattern, int offset = 0)
