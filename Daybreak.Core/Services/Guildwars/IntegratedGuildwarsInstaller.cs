@@ -310,15 +310,19 @@ internal sealed class IntegratedGuildwarsInstaller(
     {
         var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: destinationPath);
         var exePath = Path.Combine(destinationPath, ExeName);
+        scopedLogger.LogDebug("Fetching latest Guild Wars executable");
         var latestGwPath = await this.FetchLatestGuildwarsInternal(progress, cancellationToken);
         if (latestGwPath is null)
         {
+            scopedLogger.LogError("Failed to fetch latest Guild Wars executable");
             progress.Report(ProgressFailed);
             return false;
         }
 
+        scopedLogger.LogDebug("Copying latest Guild Wars executable to destination");
         var filePath = Path.GetFullPath(exePath);
         File.Copy(latestGwPath, filePath, true);
+        scopedLogger.LogDebug("Copied latest Guild Wars executable to destination");
         progress.Report(ProgressStartingExecutable);
         await Task.Delay(100, cancellationToken);
         this.guildWarsExecutableManager.AddExecutable(filePath);
