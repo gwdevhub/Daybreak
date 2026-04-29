@@ -13,7 +13,7 @@ namespace Daybreak.API.Interop
 {
 
 /// <summary>
-/// P/Invoke bindings for 525 C++ exports from gwca.dll (0 skipped).
+/// P/Invoke bindings for 527 C++ exports from gwca.dll (0 skipped).
 /// Nested classes mirror the C++ namespace hierarchy (e.g. GW::Agents → GWCA.GW.Agents).
 /// Types annotated with [GWCAEquivalent] are used in signatures where available.
 /// </summary>
@@ -23,27 +23,25 @@ public static unsafe partial class GWCA
     // ═══════════════════════════════════════════════════
     // Parsed structs diagnostic:
     // [NAMESPACE] GWCA.GW popped at line 46
-    // [NAMESPACE] GWCA.GW.Agents popped at line 124
+    // [NAMESPACE] GWCA.GW.Agents popped at line 196
     // [NAMESPACE] GWCA.GW.CameraMgr popped at line 35
     // [NAMESPACE] GWCA.GW.Chat popped at line 21
     // [NAMESPACE] GWCA.GW.Chat.TextColor popped at line 49
     // [NAMESPACE] GWCA.GW.Constants popped at line 25
-    // [NAMESPACE] GWCA.GW.Constants.Camera popped at line 357
-    // [NAMESPACE] GWCA.GW.Constants.DialogID popped at line 331
-    // [NAMESPACE] GWCA.GW.Constants.HealthbarHeight popped at line 232
+    // [NAMESPACE] GWCA.GW.Constants.DialogID popped at line 282
     // [NAMESPACE] GWCA.GW.Constants.ItemID popped at line 201
     // [NAMESPACE] GWCA.GW.Constants.ModelID.Minipet.SummoningStone.FoW.UW.FoW.Urgoz.Deep.DoA.EotnDungeons.BonusMissionPack.EotnDungeons popped at line 444
     // [NAMESPACE] GWCA.GW.Constants.ModelID.Minipet.SummoningStone.FoW.UW.FoW.Urgoz.Deep.DoA.PolymockSummon popped at line 384
     // [NAMESPACE] GWCA.GW.Constants.Preference popped at line 62
-    // [NAMESPACE] GWCA.GW.Constants.Range popped at line 288
-    // [NAMESPACE] GWCA.GW.Constants.SqrRange popped at line 298
+    // [NAMESPACE] GWCA.GW.Constants.Range popped at line 239
+    // [NAMESPACE] GWCA.GW.Constants.SqrRange popped at line 249
     // [NAMESPACE] GWCA.GW.Effects popped at line 60
     // [NAMESPACE] GWCA.GW.EventMgr popped at line 32
     // [NAMESPACE] GWCA.GW.FriendListMgr popped at line 32
     // [NAMESPACE] GWCA.GW.GameThread popped at line 32
     // [NAMESPACE] GWCA.GW.GuildMgr popped at line 21
     // [NAMESPACE] GWCA.GW.Hook popped at line 22
-    // [NAMESPACE] GWCA.GW.Items popped at line 95
+    // [NAMESPACE] GWCA.GW.Items popped at line 97
     // [NAMESPACE] GWCA.GW.Map popped at line 165
     // [NAMESPACE] GWCA.GW.MemoryMgr popped at line 30
     // [NAMESPACE] GWCA.GW.Merchant popped at line 26
@@ -59,9 +57,10 @@ public static unsafe partial class GWCA
     // [NAMESPACE] GWCA.GW.Scanner popped at line 52
     // [NAMESPACE] GWCA.GW.SkillbarMgr popped at line 39
     // [NAMESPACE] GWCA.GW.StoC popped at line 50
+    // [NAMESPACE] GWCA.GW.TargetFilter popped at line 112
     // [NAMESPACE] GWCA.GW.Trade popped at line 22
     // [NAMESPACE] GWCA.GW.UI popped at line 774
-    // [NAMESPACE] GWCA.GW.UI.UIPacket popped at line 29
+    // [NAMESPACE] GWCA.GW.UI.UIPacket popped at line 30
     // [NAMESPACE] GWCA.GWCA popped at line 15
     // GWCA.GW.AccountContext: 9 fields [OK]
     // GWCA.GW.AccountInfo: 7 fields [OK]
@@ -117,8 +116,9 @@ public static unsafe partial class GWCA
     // GWCA.GW.HeroInfo: 30 fields [OK]
     // GWCA.GW.HeroPartyMember: 6 fields [OK]
     // GWCA.GW.Inventory: 39 fields [OK]
+    // GWCA.GW.InventoryTableEntry: 3 fields [OK]
     // GWCA.GW.Item: 26 fields [OK]
-    // GWCA.GW.ItemContext: 12 fields [OK]
+    // GWCA.GW.ItemContext: 43 fields [OK]
     // GWCA.GW.ItemData: 4 fields [OK]
     // GWCA.GW.ItemFormula: 5 fields [OK]
     // GWCA.GW.ItemModifier: 1 fields [OK]
@@ -461,6 +461,11 @@ public static unsafe partial class GWCA
             // GW::Agents::GetAgentIdByLoginNumber
             [LibraryImport(DllName, EntryPoint = "?GetAgentIdByLoginNumber@Agents@GW@@YAII@Z")]
             public static partial uint GetAgentIdByLoginNumber(uint value);
+
+            // GW::Agents::GetAgentMatchesFlags
+            [LibraryImport(DllName, EntryPoint = "?GetAgentMatchesFlags@Agents@GW@@YA_NPBUAgent@2@W4AgentTargetFlags@2@@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool GetAgentMatchesFlags(global::Daybreak.API.Interop.GuildWars.Agent* agent1, global::Daybreak.API.Interop.GWCA.GW.AgentTargetFlags agentTargetFlags2);
 
             // GW::Agents::GetAgentPrimary
             [LibraryImport(DllName, EntryPoint = "?GetAgentPrimary@Agents@GW@@YA?AW4ProfessionByte@Constants@2@I@Z")]
@@ -1196,6 +1201,10 @@ public static unsafe partial class GWCA
             // GW::Items::GetGoldAmountOnCharacter
             [LibraryImport(DllName, EntryPoint = "?GetGoldAmountOnCharacter@Items@GW@@YAIXZ")]
             public static partial uint GetGoldAmountOnCharacter();
+
+            // GW::Items::GetHeroInventory
+            [LibraryImport(DllName, EntryPoint = "?GetHeroInventory@Items@GW@@YAPAUInventory@2@W4HeroID@Constants@2@@Z")]
+            public static partial global::Daybreak.API.Interop.GuildWars.Inventory* GetHeroInventory(global::Daybreak.API.Interop.GWCA.GW.Constants.HeroID heroID);
 
             // GW::Items::GetHoveredItem
             [LibraryImport(DllName, EntryPoint = "?GetHoveredItem@Items@GW@@YAPAUItem@2@XZ")]
@@ -2816,6 +2825,37 @@ public static unsafe partial class GWCA
     public static partial class GW
     {
 
+        public enum AgentTargetFlags : uint
+        {
+            Include_Ally = 0x000001,
+            Include_Neutral = 0x000002,
+            Accept_HasQuest = 0x000004,
+            Include_Enemy = 0x000008,
+            Include_SpiritPet = 0x000010,
+            Accept_ActiveState = 0x000020,
+            Include_Minion = 0x000040,
+            Include_NPCMinipet = 0x000080,
+            Accept_Player = 0x000100,
+            Type_Gadget = 0x000200,
+            Type_Item = 0x000400,
+            Exclude_DeadAlly = 0x000800,
+            Exclude_DeadNeutral = 0x001000,
+            Exclude_DeadEnemy = 0x002000,
+            Exclude_DeadSpiritPet = 0x004000,
+            Exclude_DeadMinion = 0x008000,
+            Exclude_DeadNPCMinipet = 0x010000,
+            Exclude_UsedCorpse = 0x020000,
+            Exclude_AliveAlly = 0x040000,
+            Exclude_AliveNeutral = 0x080000,
+            Exclude_AliveEnemy = 0x100000,
+            Exclude_AliveSpiritPet = 0x200000,
+            Exclude_AliveMinion = 0x400000,
+            Exclude_AliveNPCMinipet = 0x800000,
+            Exclude_BeingObserved = 0x2000000,
+            ZeroPriority = 0x4000000,
+            NPCMinipet_ZeroPriority = 0x8000000,
+        }
+
         public enum CallTargetType : uint
         {
             Following = 0x3,
@@ -3300,7 +3340,7 @@ public static unsafe partial class GWCA
                 Miku,
                 ZeiRi,
                 Devona,
-                GhostofAlthea,
+                GhostOfAlthea,
                 Count,
             }
 
@@ -4140,7 +4180,8 @@ public static unsafe partial class GWCA
                 MISSION_CINEMATIC_MISSION_PACK_ELONA_INTRODUCTION,
                 MISSION_CINEMATIC_MISSION_PACK_GWX_INTRODUCTION,
                 Piken_Square_pre_Searing_outpost,
-                Secret_Lair_of_the_Snowmen2 = 781, // ?
+                Forsaken_Tunnels_Presearing_Level1,
+                Secret_Lair_of_the_Snowmen2, // ?
                 Secret_Lair_of_the_Snowmen3, // ?
                 Droknars_Forge_cinematic, // ?
                 Isle_of_the_Nameless_PvP,
@@ -4227,6 +4268,12 @@ public static unsafe partial class GWCA
                 The_Final_Confrontation,
                 Lakeside_County_1070_AE,
                 Ashford_Catacombs_1070_AE,
+                Forsaken_Tunnels_Presearing_Level2,
+                Forsaken_Tunnels_Presearing_Level3,
+                Forsaken_Tunnels_Level1,
+                Forsaken_Tunnels_Level2,
+                Forsaken_Tunnels_Level3,
+                Forsaken_Tunnels_Level4,
                 Count = 0x373,
             }
 
@@ -7707,13 +7754,6 @@ public static unsafe partial class GWCA
                 Codex,
                 None = 0xff,
             }
-            internal const uint SkillMax = 0xd69;
-
-            public static partial class Camera
-            {
-                internal const float DEFAULT_DIST = 750.0f;
-                internal const float FIRST_PERSON_DIST = 2.0f;
-            }
 
             public static partial class DialogID
             {
@@ -7742,14 +7782,6 @@ public static unsafe partial class GWCA
                 internal const int UwTelePools = 144;
                 internal const int UwTeleVale = 145;
                 internal const int UwTeleWastes = 140;
-            }
-
-            public static partial class HealthbarHeight
-            {
-                internal const uint Large = 26;
-                internal const uint Larger = 30;
-                internal const uint Normal = 22;
-                internal const uint Small = 24;
             }
 
             public static partial class ItemID
@@ -9210,99 +9242,100 @@ public static unsafe partial class GWCA
                 kMessage_0x1000016c, // 0x1000016c
                 kMessage_0x1000016d, // 0x1000016d
                 kMessage_0x1000016e, // 0x1000016e
-                kMessage_0x1000016f, // 0x1000016f
-                kMessage_0x10000170, // 0x10000170
-                kMessage_0x10000171, // 0x10000171
-                kMessage_0x10000172, // 0x10000172
-                kMessage_0x10000173, // 0x10000173
-                kMessage_0x10000174, // 0x10000174
-                kCheckUIState, // 0x10000175
-                kMessage_0x10000176, // 0x10000176
-                kMessage_0x10000177, // 0x10000177
-                kMessage_0x10000178, // 0x10000178
-                kMessage_0x10000178_1, // 0x10000179, added to GW 2026-02-26
-                kMessage_0x10000178_2, // 0x1000017a, added to GW 2026-02-26
-                kMessage_0x10000178_3, // 0x1000017b, added to GW 2026-02-26
-                kDestroyUIPositionOverlay, // 0x1000017c
-                kEnableUIPositionOverlay, // 0x1000017d, wparam = uint32_t enable
-                kMessage_0x1000017b, // 0x1000017e
-                kGuildHall, // 0x1000017f, wparam = gh key (uint32_t[4])
-                kMessage_0x1000017d, // 0x10000180
-                kLeaveGuildHall, // 0x10000181
-                kTravel, // 0x10000182
-                kOpenWikiUrl, // 0x10000183, wparam = char* url
-                kMessage_0x10000181, // 0x10000184
-                kMessage_0x10000182, // 0x10000185
-                kSetPreGameContext_Value0, // 0x10000186, wparam = uint32_t value
-                kMessage_0x10000184, // 0x10000187
-                kGetPreGameContext_Value0, // 0x10000188, lparam = *uint32_t value_out
-                kSetPreGameContext_Value1, // 0x10000189, wparam = uint32_t value     , added to GW 2026-02-06
-                kGetPreGameContext_Value1, // 0x1000018a, lparam = *uint32_t value_out, added to GW 2026-02-06
-                kMessage_0x10000186, // 0x1000018b
-                kMessage_0x10000187, // 0x1000018c
-                kMessage_0x10000188, // 0x1000018d
-                kMessage_0x10000189, // 0x1000018e
-                kMessage_0x1000018a, // 0x1000018f
-                kMessage_0x1000018b, // 0x10000190
-                kMessage_0x1000018c, // 0x10000191
-                kMessage_0x1000018d, // 0x10000192
-                kAppendMessageToChat, // 0x10000193, wparam = wchar_t* message
-                kMessage_0x1000018f, // 0x10000194
-                kMessage_0x10000190, // 0x10000195
-                kMessage_0x10000191, // 0x10000196
-                kMessage_0x10000192, // 0x10000197
-                kMessage_0x10000193, // 0x10000198
-                kMessage_0x10000194, // 0x10000199
-                kMessage_0x10000195, // 0x1000019a
-                kMessage_0x10000196, // 0x1000019b
-                kMessage_0x10000197, // 0x1000019c
-                kMessage_0x10000198, // 0x1000019d
-                kMessage_0x10000199, // 0x1000019e
-                kMessage_0x1000019a, // 0x1000019f
-                kMessage_0x1000019b, // 0x100001a0
-                kHideHeroPanel, // 0x100001a1, wparam = hero_id
-                kShowHeroPanel, // 0x100001a2, wparam = hero_id
-                kMessage_0x1000019e, // 0x100001a3
-                kMessage_0x1000019f, // 0x100001a4
-                kMessage_0x100001a0, // 0x100001a5
-                kGetInventoryAgentId, // 0x100001a6, wparam = 0, lparam = uint32_t* agent_id_out. Used to fetch which agent is selected
-                kInventoryRelated1, // 0x100001a7, added to GW 2026-02-26
-                kInventoryRelated2, // 0x100001a8, added to GW 2026-02-26
-                kInventoryRelated3, // 0x100001a9, added to GW 2026-02-26
-                kEquipItem, // 0x100001aa, wparam = { item_id, agent_id }
-                kMoveItem, // 0x100001ab, wparam = { item_id, to_bag, to_slot, bool prompt }
-                kItemRelated_1, // 0x100001ac
-                kItemTooltip, // 0x100001ad
-                kItemRelated_3, // 0x100001ae, added to GW 2026-02-26
-                kItemRelated_4, // 0x100001af, added to GW 2026-02-26
-                kInitiateTrade, // 0x100001b0
-                kMessage_0x100001a7, // 0x100001b1
-                kMessage_0x100001a8, // 0x100001b2
-                kMessage_0x100001a9, // 0x100001b3
-                kMessage_0x100001aa, // 0x100001b4
-                kMessage_0x100001ab, // 0x100001b5
-                kMessage_0x100001ac, // 0x100001b6
-                kMessage_0x100001ad, // 0x100001b7
-                kMessage_0x100001ae, // 0x100001b8
-                kMessage_0x100001af, // 0x100001b9
-                kMessage_0x100001b0, // 0x100001ba
-                kMessage_0x100001b1, // 0x100001bb
-                kMessage_0x100001b2, // 0x100001bc
-                kMessage_0x100001b3, // 0x100001bd
-                kMessage_0x100001b4, // 0x100001be
-                kMessage_0x100001b5, // 0x100001bf
-                kInventoryAgentChanged, // 0x100001c0, Triggered when inventory needs updating due to agent change; no args
-                kInventoryRelated_1, // 0x100001c1
-                kInventoryRelated_2, // 0x100001c2
-                kMissionStatusRelated, // 0x100001c3
-                kUnused_1c2, // 0x100001c4
-                kCollapseExpandSkillListSection, // 0x100001c5
-                kTemplateRelated_1, // 0x100001c6
-                kTemplateRelated_2, // 0x100001c7
-                kPromptSaveTemplate, // 0x100001c8
-                kOpenTemplate, // 0x100001c9, wparam = GW::UI::ChatTemplate*
-                kTemplateRelated_3, // 0x100001ca
-                kTemplateRelated_4, // 0x100001cb
+                kMessage_0x1000016e_1, // 0x1000016f, added to GW 2026-04-28
+                kMessage_0x1000016f, // 0x10000170
+                kMessage_0x10000170, // 0x10000171
+                kMessage_0x10000171, // 0x10000172
+                kMessage_0x10000172, // 0x10000173
+                kMessage_0x10000173, // 0x10000174
+                kMessage_0x10000174, // 0x10000175
+                kCheckUIState, // 0x10000176
+                kMessage_0x10000176, // 0x10000177
+                kMessage_0x10000177, // 0x10000178
+                kMessage_0x10000178, // 0x10000179
+                kMessage_0x10000178_1, // 0x1000017a, added to GW 2026-02-26
+                kMessage_0x10000178_2, // 0x1000017b, added to GW 2026-02-26
+                kMessage_0x10000178_3, // 0x1000017c, added to GW 2026-02-26
+                kDestroyUIPositionOverlay, // 0x1000017d
+                kEnableUIPositionOverlay, // 0x1000017e, wparam = uint32_t enable
+                kMessage_0x1000017b, // 0x1000017f
+                kGuildHall, // 0x10000180, wparam = gh key (uint32_t[4])
+                kMessage_0x1000017d, // 0x10000181
+                kLeaveGuildHall, // 0x10000182
+                kTravel, // 0x10000183
+                kOpenWikiUrl, // 0x10000184, wparam = char* url
+                kMessage_0x10000181, // 0x10000185
+                kMessage_0x10000182, // 0x10000186
+                kSetPreGameContext_Value0, // 0x10000187, wparam = uint32_t value
+                kMessage_0x10000184, // 0x10000188
+                kGetPreGameContext_Value0, // 0x10000189, lparam = *uint32_t value_out
+                kSetPreGameContext_Value1, // 0x1000018a, wparam = uint32_t value     , added to GW 2026-02-06
+                kGetPreGameContext_Value1, // 0x1000018b, lparam = *uint32_t value_out, added to GW 2026-02-06
+                kMessage_0x10000186, // 0x1000018c
+                kMessage_0x10000187, // 0x1000018d
+                kMessage_0x10000188, // 0x1000018e
+                kMessage_0x10000189, // 0x1000018f
+                kMessage_0x1000018a, // 0x10000190
+                kMessage_0x1000018b, // 0x10000191
+                kMessage_0x1000018c, // 0x10000192
+                kMessage_0x1000018d, // 0x10000193
+                kAppendMessageToChat, // 0x10000194, wparam = wchar_t* message
+                kMessage_0x1000018f, // 0x10000195
+                kMessage_0x10000190, // 0x10000196
+                kMessage_0x10000191, // 0x10000197
+                kMessage_0x10000192, // 0x10000198
+                kMessage_0x10000193, // 0x10000199
+                kMessage_0x10000194, // 0x1000019a
+                kMessage_0x10000195, // 0x1000019b
+                kMessage_0x10000196, // 0x1000019c
+                kMessage_0x10000197, // 0x1000019d
+                kMessage_0x10000198, // 0x1000019e
+                kMessage_0x10000199, // 0x1000019f
+                kMessage_0x1000019a, // 0x100001a0
+                kMessage_0x1000019b, // 0x100001a1
+                kHideHeroPanel, // 0x100001a2, wparam = hero_id
+                kShowHeroPanel, // 0x100001a3, wparam = hero_id
+                kMessage_0x1000019e, // 0x100001a4
+                kMessage_0x1000019f, // 0x100001a5
+                kMessage_0x100001a0, // 0x100001a6
+                kGetInventoryAgentId, // 0x100001a7, wparam = 0, lparam = uint32_t* agent_id_out. Used to fetch which agent is selected
+                kInventoryRelated1, // 0x100001a8, added to GW 2026-02-26
+                kInventoryRelated2, // 0x100001a9, added to GW 2026-02-26
+                kInventoryRelated3, // 0x100001aa, added to GW 2026-02-26
+                kEquipItem, // 0x100001ab, wparam = { item_id, agent_id }
+                kMoveItem, // 0x100001ac, wparam = { item_id, to_bag, to_slot, bool prompt }
+                kItemRelated_1, // 0x100001ad
+                kItemTooltip, // 0x100001ae
+                kItemRelated_3, // 0x100001af, added to GW 2026-02-26
+                kItemRelated_4, // 0x100001b0, added to GW 2026-02-26
+                kInitiateTrade, // 0x100001b1
+                kMessage_0x100001a7, // 0x100001b2
+                kMessage_0x100001a8, // 0x100001b3
+                kMessage_0x100001a9, // 0x100001b4
+                kMessage_0x100001aa, // 0x100001b5
+                kMessage_0x100001ab, // 0x100001b6
+                kMessage_0x100001ac, // 0x100001b7
+                kMessage_0x100001ad, // 0x100001b8
+                kMessage_0x100001ae, // 0x100001b9
+                kMessage_0x100001af, // 0x100001ba
+                kMessage_0x100001b0, // 0x100001bb
+                kMessage_0x100001b1, // 0x100001bc
+                kMessage_0x100001b2, // 0x100001bd
+                kMessage_0x100001b3, // 0x100001be
+                kMessage_0x100001b4, // 0x100001bf
+                kMessage_0x100001b5, // 0x100001c0
+                kInventoryAgentChanged, // 0x100001c1, Triggered when inventory needs updating due to agent change; no args
+                kInventoryRelated_1, // 0x100001c2
+                kInventoryRelated_2, // 0x100001c3
+                kMissionStatusRelated, // 0x100001c4
+                kUnused_1c2, // 0x100001c5
+                kCollapseExpandSkillListSection, // 0x100001c6
+                kTemplateRelated_1, // 0x100001c7
+                kTemplateRelated_2, // 0x100001c8
+                kPromptSaveTemplate, // 0x100001c9
+                kOpenTemplate, // 0x100001ca, wparam = GW::UI::ChatTemplate*
+                kTemplateRelated_3, // 0x100001cb
+                kTemplateRelated_4, // 0x100001cc
                 kSendLoadSkillTemplate = 0x30000000 | 0x3, // 0x30000003, wparam = SkillbarMgr::SkillTemplate*
                 kSendPingWeaponSet = 0x30000000 | 0x4, // 0x30000004, wparam = UIPacket::kSendPingWeaponSet*
                 kSendMoveItem = 0x30000000 | 0x5, // 0x30000005, wparam = UIPacket::kSendMoveItem*
@@ -9500,6 +9533,37 @@ namespace Daybreak.API.Interop.GuildWars
         LEVEL_WARN,
         LEVEL_ERR,
         LEVEL_CRITICAL,
+    }
+
+    public enum AgentTargetFlags : uint
+    {
+        Include_Ally = 0x000001,
+        Include_Neutral = 0x000002,
+        Accept_HasQuest = 0x000004,
+        Include_Enemy = 0x000008,
+        Include_SpiritPet = 0x000010,
+        Accept_ActiveState = 0x000020,
+        Include_Minion = 0x000040,
+        Include_NPCMinipet = 0x000080,
+        Accept_Player = 0x000100,
+        Type_Gadget = 0x000200,
+        Type_Item = 0x000400,
+        Exclude_DeadAlly = 0x000800,
+        Exclude_DeadNeutral = 0x001000,
+        Exclude_DeadEnemy = 0x002000,
+        Exclude_DeadSpiritPet = 0x004000,
+        Exclude_DeadMinion = 0x008000,
+        Exclude_DeadNPCMinipet = 0x010000,
+        Exclude_UsedCorpse = 0x020000,
+        Exclude_AliveAlly = 0x040000,
+        Exclude_AliveNeutral = 0x080000,
+        Exclude_AliveEnemy = 0x100000,
+        Exclude_AliveSpiritPet = 0x200000,
+        Exclude_AliveMinion = 0x400000,
+        Exclude_AliveNPCMinipet = 0x800000,
+        Exclude_BeingObserved = 0x2000000,
+        ZeroPriority = 0x4000000,
+        NPCMinipet_ZeroPriority = 0x8000000,
     }
 
     public enum CallTargetType : uint
@@ -9936,7 +10000,7 @@ namespace Daybreak.API.Interop.GuildWars
         Miku,
         ZeiRi,
         Devona,
-        GhostofAlthea,
+        GhostOfAlthea,
         Count,
     }
 
@@ -10776,7 +10840,8 @@ namespace Daybreak.API.Interop.GuildWars
         MISSION_CINEMATIC_MISSION_PACK_ELONA_INTRODUCTION,
         MISSION_CINEMATIC_MISSION_PACK_GWX_INTRODUCTION,
         Piken_Square_pre_Searing_outpost,
-        Secret_Lair_of_the_Snowmen2 = 781,
+        Forsaken_Tunnels_Presearing_Level1,
+        Secret_Lair_of_the_Snowmen2,
         Secret_Lair_of_the_Snowmen3,
         Droknars_Forge_cinematic,
         Isle_of_the_Nameless_PvP,
@@ -10863,6 +10928,12 @@ namespace Daybreak.API.Interop.GuildWars
         The_Final_Confrontation,
         Lakeside_County_1070_AE,
         Ashford_Catacombs_1070_AE,
+        Forsaken_Tunnels_Presearing_Level2,
+        Forsaken_Tunnels_Presearing_Level3,
+        Forsaken_Tunnels_Level1,
+        Forsaken_Tunnels_Level2,
+        Forsaken_Tunnels_Level3,
+        Forsaken_Tunnels_Level4,
         Count = 0x373,
     }
 
@@ -15217,6 +15288,7 @@ namespace Daybreak.API.Interop.GuildWars
         kMessage_0x1000016c,
         kMessage_0x1000016d,
         kMessage_0x1000016e,
+        kMessage_0x1000016e_1,
         kMessage_0x1000016f,
         kMessage_0x10000170,
         kMessage_0x10000171,
@@ -15960,7 +16032,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
         public uint ItemsCount;
         [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
-        public global::Daybreak.API.Interop.GuildWars.BagStruct* BagArray;
+        public global::Daybreak.API.Interop.GuildWars.Inventory* Inventory;
         [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
         public ItemArray Items;
     }
@@ -16123,7 +16195,7 @@ namespace Daybreak.API.Interop.GuildWars
         public byte Scale; // percent
     }
 
-    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x438)]
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x440)]
     public unsafe struct CharContext
     {
         [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
@@ -16163,36 +16235,36 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x01B8)]
         public uint Token2; // player id
         [global::System.Runtime.InteropServices.FieldOffset(0x01BC)]
-        public fixed uint H01BC[25];
-        [global::System.Runtime.InteropServices.FieldOffset(0x0220)]
-        public uint DistrictNumber;
-        [global::System.Runtime.InteropServices.FieldOffset(0x0224)]
-        public global::Daybreak.API.Interop.GWCA.GW.Constants.Language Language;
+        public fixed uint H01BC[27];
         [global::System.Runtime.InteropServices.FieldOffset(0x0228)]
-        public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID ObserveMapId;
+        public uint DistrictNumber;
         [global::System.Runtime.InteropServices.FieldOffset(0x022C)]
-        public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID CurrentMapId;
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.Language Language;
         [global::System.Runtime.InteropServices.FieldOffset(0x0230)]
-        public global::Daybreak.API.Interop.GWCA.GW.Constants.InstanceType ObserveMapType;
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID ObserveMapId;
         [global::System.Runtime.InteropServices.FieldOffset(0x0234)]
-        public global::Daybreak.API.Interop.GWCA.GW.Constants.InstanceType CurrentMapType;
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID CurrentMapId;
         [global::System.Runtime.InteropServices.FieldOffset(0x0238)]
-        public fixed uint H0238[5];
-        [global::System.Runtime.InteropServices.FieldOffset(0x024C)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.InstanceType ObserveMapType;
+        [global::System.Runtime.InteropServices.FieldOffset(0x023C)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.InstanceType CurrentMapType;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0240)]
+        public fixed uint H0240[5];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0254)]
         public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> ObserverMatches;
-        [global::System.Runtime.InteropServices.FieldOffset(0x025C)]
-        public fixed uint H025C[17];
-        [global::System.Runtime.InteropServices.FieldOffset(0x02A0)]
-        public uint PlayerFlags; // bitwise something
-        [global::System.Runtime.InteropServices.FieldOffset(0x02A4)]
-        public uint PlayerNumber;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0264)]
+        public fixed uint H0264[17];
         [global::System.Runtime.InteropServices.FieldOffset(0x02A8)]
-        public fixed uint H02A8[40];
-        [global::System.Runtime.InteropServices.FieldOffset(0x0348)]
+        public uint PlayerFlags; // bitwise something
+        [global::System.Runtime.InteropServices.FieldOffset(0x02AC)]
+        public uint PlayerNumber;
+        [global::System.Runtime.InteropServices.FieldOffset(0x02B0)]
+        public fixed uint H02B0[40];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0350)]
         public global::Daybreak.API.Interop.GuildWars.ProgressBarContext* ProgressBar; // seems to never be nullptr
-        [global::System.Runtime.InteropServices.FieldOffset(0x034C)]
-        public fixed uint H034C[27];
-        [global::System.Runtime.InteropServices.FieldOffset(0x03B8)]
+        [global::System.Runtime.InteropServices.FieldOffset(0x0354)]
+        public fixed uint H0354[27];
+        [global::System.Runtime.InteropServices.FieldOffset(0x03C0)]
         public fixed char PlayerEmail[64];
     }
 
@@ -16546,7 +16618,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
         public uint AgentId;
         [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-        public uint Level;
+        public uint InventoryId;
         [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
         public global::Daybreak.API.Interop.GWCA.GW.HeroBehavior HeroBehavior;
         [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
@@ -16724,6 +16796,14 @@ namespace Daybreak.API.Interop.GuildWars
         public uint GoldStorage;
     }
 
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct InventoryTableEntry
+    {
+        public uint Stride;
+        public uint End;
+        public global::Daybreak.API.Interop.GuildWars.Inventory* Start;
+    }
+
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x54)]
     public unsafe struct ItemStruct
     {
@@ -16781,7 +16861,7 @@ namespace Daybreak.API.Interop.GuildWars
         public byte Slot;
     }
 
-    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x10C)]
     public unsafe struct ItemContext
     {
         [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
@@ -16793,17 +16873,79 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
         public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> BagsArray;
         [global::System.Runtime.InteropServices.FieldOffset(0x0034)]
-        public fixed byte H0034[12];
+        public uint H0034;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0038)]
+        public uint H0038;
+        [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
+        public uint H003C;
         [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
         public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H0040;
         [global::System.Runtime.InteropServices.FieldOffset(0x0050)]
         public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H0050;
         [global::System.Runtime.InteropServices.FieldOffset(0x0060)]
-        public fixed byte H0060[88];
+        public uint H0060;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0064)]
+        public uint H0064;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0068)]
+        public uint H0068;
+        [global::System.Runtime.InteropServices.FieldOffset(0x006C)]
+        public uint H006C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0070)]
+        public uint H0070;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0074)]
+        public uint H0074;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0078)]
+        public uint H0078;
+        [global::System.Runtime.InteropServices.FieldOffset(0x007C)]
+        public uint H007C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0080)]
+        public uint H0080;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0084)]
+        public uint H0084;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0088)]
+        public uint H0088;
+        [global::System.Runtime.InteropServices.FieldOffset(0x008C)]
+        public uint H008C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0090)]
+        public uint H0090;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0094)]
+        public uint H0094;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0098)]
+        public uint H0098;
+        [global::System.Runtime.InteropServices.FieldOffset(0x009C)]
+        public uint H009C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00A0)]
+        public uint H00A0;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00A4)]
+        public uint H00A4;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00A8)]
+        public uint H00A8;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00AC)]
+        public uint H00AC;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00B0)]
+        public uint H00B0;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00B4)]
+        public uint H00B4;
         [global::System.Runtime.InteropServices.FieldOffset(0x00B8)]
         public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> ItemArray;
         [global::System.Runtime.InteropServices.FieldOffset(0x00C8)]
-        public fixed byte H00C8[48];
+        public uint H00C8;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00CC)]
+        public uint H00CC;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00D0)]
+        public uint H00D0;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00D4)]
+        public uint H00D4;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00D8)]
+        public uint H00D8;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00DC)]
+        public uint H00DC;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00E0)]
+        public uint H00E0;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00E4)]
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.InventoryTableEntry> InventoryTable;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00F4)]
+        public uint H00F4;
         [global::System.Runtime.InteropServices.FieldOffset(0x00F8)]
         public global::Daybreak.API.Interop.GuildWars.Inventory* Inventory;
         [global::System.Runtime.InteropServices.FieldOffset(0x00FC)]
