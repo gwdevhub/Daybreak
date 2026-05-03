@@ -383,8 +383,8 @@ public class ProjectConfiguration : PluginConfigurationBase
     public override void RegisterMods(IModsProducer modsManager)
     {
         modsManager.RegisterMod<IGuildWarsVersionChecker, GuildWarsVersionChecker>();
-        modsManager.RegisterMod<IDaybreakApiService, DaybreakApiService>();
         modsManager.RegisterMod<IToolboxService, ToolboxService>();
+        modsManager.RegisterMod<IDaybreakApiService, DaybreakApiService>();
         modsManager.RegisterMod<IUModService, UModService>();
         modsManager.RegisterMod<IDirectSongService, DirectSongService>(singleton: true);
     }

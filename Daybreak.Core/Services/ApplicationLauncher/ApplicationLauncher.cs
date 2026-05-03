@@ -179,18 +179,24 @@ internal sealed class ApplicationLauncher(
         }
 
         var mods = this.modsManager.GetMods();
-        var enabledMods = mods
-            .Where(m =>
-            {
-                var willRun = m.IsInstalled && (launchConfigurationWithCredentials.CustomModLoadoutEnabled
-                        ? !m.CanDisable || (launchConfigurationWithCredentials.EnabledMods?.Contains(m.Name) is true)
-                        : m.IsEnabled);
-                scopedLogger.LogDebug(
-                        "Checking {ModName}.\nIsInstalled: {isInstalled}.\nCanDisable: {canDisable}.\nIsEnabled: {isEnabled}.\nWillRun: {willRun}",
-                        m.Name, m.IsInstalled, m.CanDisable, m.IsEnabled, willRun);
-                return willRun;
-            })
-            .ToList();
+        var customLoadoutNames = launchConfigurationWithCredentials.CustomModLoadoutEnabled
+            ? launchConfigurationWithCredentials.EnabledMods
+            : null;
+        var filteredMods = mods.Where(m =>
+        {
+            var willRun = m.IsInstalled && (customLoadoutNames is not null
+                    ? !m.CanDisable || customLoadoutNames.Contains(m.Name)
+                    : m.IsEnabled);
+            scopedLogger.LogDebug(
+                    "Checking {ModName}.\nIsInstalled: {isInstalled}.\nCanDisable: {canDisable}.\nIsEnabled: {isEnabled}.\nWillRun: {willRun}",
+                    m.Name, m.IsInstalled, m.CanDisable, m.IsEnabled, willRun);
+            return willRun;
+        });
+        // When a custom loadout is active, respect the order the user specified.
+        // Without this, mods always inject in registration order regardless of loadout position.
+        var enabledMods = customLoadoutNames is { Count: > 0 }
+            ? filteredMods.OrderBy(m => customLoadoutNames.IndexOf(m.Name) is var i && i >= 0 ? i : int.MaxValue).ToList()
+            : filteredMods.ToList();
 
         var disabledMods = mods.Except(enabledMods);
         if (this.launcherOptions.CurrentValue.CancelLaunchOutOfDateMods)

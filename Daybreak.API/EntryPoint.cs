@@ -135,14 +135,18 @@ public class EntryPoint
         try
         {
             scopedLogger.LogDebug("Initializing GWCA");
-            PreloadNativeDependencies(scopedLogger);
-            var result = GWCA.GW.Initialize();
-            scopedLogger.LogDebug($"GWCA.GW.Initialize() returned: {result}");
+            var gwcaAlreadyInitialized = PreloadNativeDependencies(scopedLogger);
+            if (!gwcaAlreadyInitialized)
+            {
+                var result = GWCA.GW.Initialize();
+                scopedLogger.LogDebug("GWCA.GW.Initialize() returned: {Result}", result);
+            }
+
             await app.RunAsync();
         }
         catch (Exception ex)
         {
-            scopedLogger.LogCritical(ex, $"Encountered fatal error while starting API server {ex}");
+            scopedLogger.LogCritical(ex, "Encountered fatal error while starting API server {Exception}", ex);
             throw;
         }
     }
@@ -180,26 +184,54 @@ public class EntryPoint
         return true;
     }
 
-    private static void PreloadNativeDependencies(ScopedLogger<EntryPoint> logger)
+    // Returns true if gwca.dll was already loaded by another tool (e.g. GWToolbox++),
+    // meaning the caller must NOT call GW::Initialize() — doing so installs a second
+    // set of inline detour hooks on the same GW packet dispatch functions, corrupting
+    // the trampoline chain and crashing GW mid-session.
+    private static bool PreloadNativeDependencies(ScopedLogger<EntryPoint> logger)
     {
+        string? existingGwcaPath = null;
+        string? daybreakGwcaPath = null;
+
         foreach (ProcessModule module in Process.GetCurrentProcess().Modules)
         {
-            if (module.ModuleName?.Contains("Daybreak.API", StringComparison.OrdinalIgnoreCase) is true)
+            if (existingGwcaPath is null
+                && module.ModuleName?.Equals("gwca.dll", StringComparison.OrdinalIgnoreCase) is true)
+            {
+                existingGwcaPath = module.FileName;
+            }
+
+            if (daybreakGwcaPath is null
+                && module.ModuleName?.Contains("Daybreak.API", StringComparison.OrdinalIgnoreCase) is true)
             {
                 var moduleDir = Path.GetDirectoryName(module.FileName)!;
-                var gwcaPath = Path.Combine(moduleDir, "gwca.dll");
-                if (File.Exists(gwcaPath))
+                var candidate = Path.Combine(moduleDir, "gwca.dll");
+                if (File.Exists(candidate))
                 {
-                    NativeLibrary.Load(gwcaPath);
-                    logger.LogDebug($"Preloaded gwca.dll from {gwcaPath}");
+                    daybreakGwcaPath = candidate;
                 }
-                else
-                {
-                    logger.LogError($"gwca.dll not found at {gwcaPath}");
-                }
-
-                break;
             }
         }
+
+        if (existingGwcaPath is not null)
+        {
+            logger.LogWarning(
+                "gwca.dll already loaded at {Path} — reusing existing instance to avoid hook conflicts with co-loaded tools.",
+                existingGwcaPath);
+            // Ensure [DllImport("gwca")] resolves to this instance; LoadLibrary
+            // deduplicates by path so this is a no-op ref-count bump if it's the same file.
+            NativeLibrary.Load(existingGwcaPath);
+            return true;
+        }
+
+        if (daybreakGwcaPath is null)
+        {
+            logger.LogError("gwca.dll not found alongside Daybreak.API — native library not loaded.");
+            return false;
+        }
+
+        NativeLibrary.Load(daybreakGwcaPath);
+        logger.LogDebug("Preloaded gwca.dll from {Path}", daybreakGwcaPath);
+        return false;
     }
 }
