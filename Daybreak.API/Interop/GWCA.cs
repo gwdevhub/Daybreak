@@ -8126,7 +8126,7 @@ public static unsafe partial class GWCA
                                     public static partial class Urgoz
                                     {
                                         internal const int HoppingVampire = 3796;
-                                        internal const int Urgoz = 3805;
+                                        internal const int Urgoz_ = 3805;
 
                                         public static partial class Deep
                                         {
@@ -8260,7 +8260,7 @@ public static unsafe partial class GWCA
                                                             internal const int LockedChest = 8192; // this is actually ->ExtraType
                                                             internal const int MiniatureLegionnaire = 8035;
 
-                                                            public static partial class Minipet
+                                                            public static partial class Minipet_
                                                             {
                                                                 internal const int MiniatureConfessorDorian = 8344;
                                                                 internal const int MiniatureConfessorIsaiah = 8352;
