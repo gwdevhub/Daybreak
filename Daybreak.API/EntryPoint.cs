@@ -182,24 +182,43 @@ public class EntryPoint
 
     private static void PreloadNativeDependencies(ScopedLogger<EntryPoint> logger)
     {
+        // First, check if gwca.dll is already loaded in the process (e.g. by GWToolbox).
+        // If so, reuse it via a ref-count bump on the existing path rather than loading
+        // a second copy from the Daybreak.API directory. Loading a second instance of
+        // gwca.dll would result in duplicate native modules in the process, which can
+        // lead to inconsistent state across mods that depend on it.
+        string? daybreakApiDir = default;
         foreach (ProcessModule module in Process.GetCurrentProcess().Modules)
         {
-            if (module.ModuleName?.Contains("Daybreak.API", StringComparison.OrdinalIgnoreCase) is true)
+            if (module.ModuleName?.Equals("gwca.dll", StringComparison.OrdinalIgnoreCase) is true)
             {
-                var moduleDir = Path.GetDirectoryName(module.FileName)!;
-                var gwcaPath = Path.Combine(moduleDir, "gwca.dll");
-                if (File.Exists(gwcaPath))
-                {
-                    NativeLibrary.Load(gwcaPath);
-                    logger.LogDebug($"Preloaded gwca.dll from {gwcaPath}");
-                }
-                else
-                {
-                    logger.LogError($"gwca.dll not found at {gwcaPath}");
-                }
-
-                break;
+                NativeLibrary.Load(module.FileName);
+                logger.LogDebug($"Reused already-loaded gwca.dll from {module.FileName}");
+                return;
             }
+
+            if (daybreakApiDir is null &&
+                module.ModuleName?.Contains("Daybreak.API", StringComparison.OrdinalIgnoreCase) is true)
+            {
+                daybreakApiDir = Path.GetDirectoryName(module.FileName);
+            }
+        }
+
+        if (daybreakApiDir is null)
+        {
+            logger.LogError("Could not locate Daybreak.API module directory to preload gwca.dll");
+            return;
+        }
+
+        var gwcaPath = Path.Combine(daybreakApiDir, "gwca.dll");
+        if (File.Exists(gwcaPath))
+        {
+            NativeLibrary.Load(gwcaPath);
+            logger.LogDebug($"Preloaded gwca.dll from {gwcaPath}");
+        }
+        else
+        {
+            logger.LogError($"gwca.dll not found at {gwcaPath}");
         }
     }
 }

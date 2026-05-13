@@ -366,6 +366,10 @@ internal sealed class ToolboxService(
         if (await this.processInjector.Inject(process, dll, cancellationToken))
         {
             scopedLogger.LogDebug("Injected toolbox dll");
+            // Give Toolbox a moment to load its bundled gwca.dll into the target process
+            // before any subsequent mod (e.g. Daybreak.API) tries to load its own copy.
+            // This ensures Daybreak.API's existing-module check sees gwca.dll and reuses it.
+            await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
             this.notificationService.NotifyInformation(
                 title: "GWToolbox started",
                 description: "GWToolbox has been injected");
