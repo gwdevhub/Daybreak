@@ -5,13 +5,41 @@
             "name": "Debug Daybreak.Linux",
             "type": "dotnet",
             "request": "launch",
-            "projectPath": "${workspaceFolder}/Daybreak.Linux/Daybreak.Linux.csproj"
+            "projectPath": "${workspaceFolder}/Daybreak.Linux/Daybreak.Linux.csproj",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "stopAtEntry": false,
+            "suppressJITOptimizations": false,
+            "symbolOptions": {
+                "searchMicrosoftSymbolServer": false,
+                "searchNuGetOrgSymbolServer": false
+            },
+            "logging": {
+                "engineLogging": false,
+                "moduleLoad": false,
+                "exceptions": false,
+                "browserStdOut": false
+            }
         },
         {
             "name": "Debug Daybreak.Windows",
             "type": "dotnet",
             "request": "launch",
-            "projectPath": "${workspaceFolder}/Daybreak.Windows/Daybreak.Windows.csproj"
+            "projectPath": "${workspaceFolder}/Daybreak.Windows/Daybreak.Windows.csproj",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "stopAtEntry": false,
+            "suppressJITOptimizations": false,
+            "symbolOptions": {
+                "searchMicrosoftSymbolServer": false,
+                "searchNuGetOrgSymbolServer": false
+            },
+            "logging": {
+                "engineLogging": false,
+                "moduleLoad": false,
+                "exceptions": false,
+                "browserStdOut": false
+            }
         }
     ]
 }
