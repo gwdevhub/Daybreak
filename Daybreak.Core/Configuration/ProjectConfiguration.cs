@@ -383,8 +383,11 @@ public class ProjectConfiguration : PluginConfigurationBase
     public override void RegisterMods(IModsProducer modsManager)
     {
         modsManager.RegisterMod<IGuildWarsVersionChecker, GuildWarsVersionChecker>();
-        modsManager.RegisterMod<IDaybreakApiService, DaybreakApiService>();
+        // Toolbox must be registered before Daybreak API so that Toolbox injects first
+        // and loads its gwca.dll. Daybreak API will then reuse the already-loaded gwca.dll
+        // instead of loading a second copy, avoiding duplicate native module loads.
         modsManager.RegisterMod<IToolboxService, ToolboxService>();
+        modsManager.RegisterMod<IDaybreakApiService, DaybreakApiService>();
         modsManager.RegisterMod<IUModService, UModService>();
         modsManager.RegisterMod<IDirectSongService, DirectSongService>(singleton: true);
     }

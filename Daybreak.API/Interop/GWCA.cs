@@ -13,7 +13,7 @@ namespace Daybreak.API.Interop
 {
 
 /// <summary>
-/// P/Invoke bindings for 527 C++ exports from gwca.dll (0 skipped).
+/// P/Invoke bindings for 528 C++ exports from gwca.dll (0 skipped).
 /// Nested classes mirror the C++ namespace hierarchy (e.g. GW::Agents → GWCA.GW.Agents).
 /// Types annotated with [GWCAEquivalent] are used in signatures where available.
 /// </summary>
@@ -59,7 +59,7 @@ public static unsafe partial class GWCA
     // [NAMESPACE] GWCA.GW.StoC popped at line 50
     // [NAMESPACE] GWCA.GW.TargetFilter popped at line 112
     // [NAMESPACE] GWCA.GW.Trade popped at line 22
-    // [NAMESPACE] GWCA.GW.UI popped at line 774
+    // [NAMESPACE] GWCA.GW.UI popped at line 31
     // [NAMESPACE] GWCA.GW.UI.UIPacket popped at line 30
     // [NAMESPACE] GWCA.GWCA popped at line 15
     // GWCA.GW.AccountContext: 9 fields [OK]
@@ -1758,6 +1758,11 @@ public static unsafe partial class GWCA
             [LibraryImport(DllName, EntryPoint = "?SetHeroBehavior@PartyMgr@GW@@YA_NIW4HeroBehavior@2@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool SetHeroBehavior(uint value1, global::Daybreak.API.Interop.GWCA.GW.HeroBehavior heroBehavior2);
+
+            // GW::PartyMgr::SetHeroSkillDisabled
+            [LibraryImport(DllName, EntryPoint = "?SetHeroSkillDisabled@PartyMgr@GW@@YA_NII_N@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool SetHeroSkillDisabled(uint value1, uint value2, [MarshalAs(UnmanagedType.U1)] bool flag3);
 
             // GW::PartyMgr::SetHeroTarget
             [LibraryImport(DllName, EntryPoint = "?SetHeroTarget@PartyMgr@GW@@YA_NII@Z")]
@@ -8121,7 +8126,7 @@ public static unsafe partial class GWCA
                                     public static partial class Urgoz
                                     {
                                         internal const int HoppingVampire = 3796;
-                                        internal const int Urgoz_ = 3805;
+                                        internal const int Urgoz = 3805;
 
                                         public static partial class Deep
                                         {
@@ -8255,7 +8260,7 @@ public static unsafe partial class GWCA
                                                             internal const int LockedChest = 8192; // this is actually ->ExtraType
                                                             internal const int MiniatureLegionnaire = 8035;
 
-                                                            public static partial class Minipet_
+                                                            public static partial class Minipet
                                                             {
                                                                 internal const int MiniatureConfessorDorian = 8344;
                                                                 internal const int MiniatureConfessorIsaiah = 8352;
