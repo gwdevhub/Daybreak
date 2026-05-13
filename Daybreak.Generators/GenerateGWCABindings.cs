@@ -501,15 +501,20 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         Dictionary<string, string> typeMap,
         HashSet<string> namespaceClassNames,
         int indent,
-        string? emitNameOverride = null)
+        string? emitNameOverride = null,
+        Stack<string>? ancestors = null)
     {
+        ancestors ??= new Stack<string>();
         var pad = new string(' ', indent);
 
         // If the node has nothing to emit (no enums, no consts, no children with content), skip
         if (!HasAnyContent(node))
             return;
 
-        var emitName = emitNameOverride ?? SanitizeIdentifier(node.Name);
+        // CS0542: a nested type cannot share its name with the immediately enclosing
+        // type. Append underscores until unique against the immediate enclosing class.
+        var rawName = emitNameOverride ?? SanitizeIdentifier(node.Name);
+        var emitName = MakeUniqueAgainstEnclosing(rawName, ancestors);
 
         // Always emit a partial class wrapper — C# allows multiple partial
         // declarations for the same nested class, so this merges cleanly
@@ -521,71 +526,89 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         var innerIndent = indent + 4;
         var innerPad = new string(' ', innerIndent);
 
-        // Emit enums
-        foreach (var enumDef in node.Enums.OrderBy(e => e.Name, StringComparer.Ordinal))
+        // Push ourselves so descendants see us as their immediate enclosing type.
+        ancestors.Push(emitName);
+        try
         {
-            sb.AppendLine();
-            if (enumDef.Name is not null)
+            // Emit enums
+            foreach (var enumDef in node.Enums.OrderBy(e => e.Name, StringComparer.Ordinal))
             {
-                var baseType = MapCppTypeToCs(enumDef.UnderlyingType);
-                sb.AppendLine($"{innerPad}public enum {SanitizeIdentifier(enumDef.Name)} : {baseType}");
-                sb.AppendLine($"{innerPad}{{");
-                foreach (var member in enumDef.Members)
+                sb.AppendLine();
+                if (enumDef.Name is not null)
                 {
-                    var comment = member.Comment is not null ? $" // {member.Comment}" : "";
-                    if (member.Value is not null)
-                        sb.AppendLine($"{innerPad}    {SanitizeIdentifier(member.Name)} = {member.Value},{comment}");
-                    else
-                        sb.AppendLine($"{innerPad}    {SanitizeIdentifier(member.Name)},{comment}");
+                    var baseType = MapCppTypeToCs(enumDef.UnderlyingType);
+                    var enumName = MakeUniqueAgainstEnclosing(SanitizeIdentifier(enumDef.Name), ancestors);
+                    sb.AppendLine($"{innerPad}public enum {enumName} : {baseType}");
+                    sb.AppendLine($"{innerPad}{{");
+                    foreach (var member in enumDef.Members)
+                    {
+                        var comment = member.Comment is not null ? $" // {member.Comment}" : "";
+                        if (member.Value is not null)
+                            sb.AppendLine($"{innerPad}    {SanitizeIdentifier(member.Name)} = {member.Value},{comment}");
+                        else
+                            sb.AppendLine($"{innerPad}    {SanitizeIdentifier(member.Name)},{comment}");
+                    }
+                    sb.AppendLine($"{innerPad}}}");
                 }
-                sb.AppendLine($"{innerPad}}}");
+                else
+                {
+                    // Anonymous enum → emit as const fields
+                    foreach (var member in enumDef.Members)
+                    {
+                        var csType = MapCppTypeToCs(enumDef.UnderlyingType);
+                        var memberName = MakeUniqueAgainstEnclosing(SanitizeIdentifier(member.Name), ancestors);
+                        var comment = member.Comment is not null ? $" // {member.Comment}" : "";
+                        sb.AppendLine($"{innerPad}internal const {csType} {memberName} = {member.Value};{comment}");
+                    }
+                }
             }
-            else
+
+            // Emit constexpr fields
+            foreach (var field in node.Constants.OrderBy(f => f.Name, StringComparer.Ordinal))
             {
-                // Anonymous enum → emit as const fields
-                foreach (var member in enumDef.Members)
-                {
-                    var csType = MapCppTypeToCs(enumDef.UnderlyingType);
-                    var memberName = SanitizeIdentifier(member.Name);
-                    // CS0542: member names cannot be the same as their enclosing type
-                    if (memberName == emitName)
-                        memberName += "_";
-                    var comment = member.Comment is not null ? $" // {member.Comment}" : "";
-                    sb.AppendLine($"{innerPad}internal const {csType} {memberName} = {member.Value};{comment}");
-                }
+                var csType = MapCppTypeToCs(field.CppType);
+                var value = field.Value;
+                var fieldName = MakeUniqueAgainstEnclosing(SanitizeIdentifier(field.Name), ancestors);
+                var comment = field.Comment is not null ? $" // {field.Comment}" : "";
+                sb.AppendLine($"{innerPad}internal const {csType} {fieldName} = {value};{comment}");
+            }
+
+            // Type aliases are now emitted to GuildWars namespace, not nested GWCA classes
+            // Skip type alias emission here - see EmitTypeAliasesToGuildWarsNamespace
+
+            // Structs are now emitted to GuildWars namespace, not nested classes
+            // Skip struct emission here - see EmitStructsToGuildWarsNamespace
+
+            // Emit children. Each child computes its own unique name against the
+            // ancestor stack on entry, so no override is needed here.
+            foreach (var child in node.Children.Values.OrderBy(c => c.Name, StringComparer.Ordinal))
+            {
+                EmitConstantsNode(sb, child, typeMap, namespaceClassNames, innerIndent, emitNameOverride: null, ancestors);
             }
         }
-
-        // Emit constexpr fields
-        foreach (var field in node.Constants.OrderBy(f => f.Name, StringComparer.Ordinal))
+        finally
         {
-            var csType = MapCppTypeToCs(field.CppType);
-            var value = field.Value;
-            var fieldName = SanitizeIdentifier(field.Name);
-            // CS0542: member names cannot be the same as their enclosing type
-            if (fieldName == emitName)
-                fieldName += "_";
-            var comment = field.Comment is not null ? $" // {field.Comment}" : "";
-            sb.AppendLine($"{innerPad}internal const {csType} {fieldName} = {value};{comment}");
-        }
-
-        // Type aliases are now emitted to GuildWars namespace, not nested GWCA classes
-        // Skip type alias emission here - see EmitTypeAliasesToGuildWarsNamespace
-
-        // Structs are now emitted to GuildWars namespace, not nested classes
-        // Skip struct emission here - see EmitStructsToGuildWarsNamespace
-
-        // Emit children
-        foreach (var child in node.Children.Values.OrderBy(c => c.Name, StringComparer.Ordinal))
-        {
-            // CS0542: nested class name cannot be the same as enclosing type
-            string? childNameOverride = null;
-            if (SanitizeIdentifier(child.Name) == emitName)
-                childNameOverride = SanitizeIdentifier(child.Name) + "_";
-            EmitConstantsNode(sb, child, typeMap, namespaceClassNames, innerIndent, childNameOverride);
+            ancestors.Pop();
         }
 
         sb.AppendLine($"{pad}}}");
+    }
+
+    /// <summary>
+    /// CS0542 guard: returns <paramref name="name"/> with one or more trailing
+    /// underscores until it no longer collides with the immediately enclosing
+    /// type name (the top of the <paramref name="ancestors"/> stack).
+    /// </summary>
+    private static string MakeUniqueAgainstEnclosing(string name, Stack<string> ancestors)
+    {
+        if (ancestors.Count == 0)
+            return name;
+
+        var enclosing = ancestors.Peek();
+        var unique = name;
+        while (string.Equals(unique, enclosing, StringComparison.Ordinal))
+            unique += "_";
+        return unique;
     }
 
     private static bool HasAnyContent(ConstantsNode node)
