@@ -1,6 +1,7 @@
 ﻿using Daybreak.Models;
 using Daybreak.Services.Logging;
 using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using Photino.NET;
 using System.Collections.Immutable;
@@ -33,7 +34,13 @@ public sealed class LogsViewModel(
             this.semaphore.Wait();
             try
             {
-                return [.. this.logs];
+                if (string.IsNullOrEmpty(this.SearchTerm))
+                {
+                    return [.. this.logs];
+                }
+
+                return [.. this.logs.Where(l =>
+                    StringUtils.MatchesSearchString(l.FormattedText, this.SearchTerm))];
             }
             finally
             {
@@ -44,6 +51,7 @@ public sealed class LogsViewModel(
 
     public bool AutoScroll { get; private set; } = true;
     public bool Loading { get; private set; } = false;
+    public string SearchTerm { get; private set; } = string.Empty;
 
     public override async ValueTask ParametersSet(LogsView view, CancellationToken cancellationToken)
     {
@@ -84,6 +92,12 @@ public sealed class LogsViewModel(
     public void ToggleAutoScroll()
     {
         this.AutoScroll = !this.AutoScroll;
+        this.RefreshView();
+    }
+
+    public void SetSearchTerm(string searchTerm)
+    {
+        this.SearchTerm = searchTerm ?? string.Empty;
         this.RefreshView();
     }
 
