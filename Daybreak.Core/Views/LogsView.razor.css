@@ -5,10 +5,14 @@
     height: 100%;
 }
 
+.logs-search-container {
+    margin: 33px 8px 0 8px;
+    flex-shrink: 0;
+}
+
 .console-container {
     flex: 1;
     margin: 8px;
-    margin-top: 33px;
     overflow: auto;
     color: var(--neutral-foreground-rest);
     font-family: 'Consolas', 'Courier New', 'Lucida Console', monospace;
@@ -91,6 +95,14 @@
     user-select: text;
     white-space: nowrap;
     flex-shrink: 0;
+}
+
+.console-output ::deep .log-match {
+    background: var(--accent-fill-rest);
+    color: var(--accent-foreground-rest);
+    border-radius: 2px;
+    padding: 0 1px;
+    font-weight: 600;
 }
 
 .log-exception,
