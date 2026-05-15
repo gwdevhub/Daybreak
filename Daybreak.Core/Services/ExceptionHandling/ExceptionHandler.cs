@@ -4,7 +4,6 @@ using Daybreak.Shared.Services.ExceptionHandling;
 using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
-using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
 using System.Logging;
@@ -42,7 +41,7 @@ internal sealed class ExceptionHandler(
         var exceptionDate = DateTime.UtcNow;
         if (this.logger is null)
         {
-            WriteCrashFiles(e, exceptionDate);
+            this.WriteCrashFiles(e, exceptionDate);
             return false;
         }
 
@@ -54,7 +53,7 @@ internal sealed class ExceptionHandler(
                 case HandleResult.Handled:
                     return true;
                 case HandleResult.Fatal:
-                    WriteCrashFiles(e, exceptionDate);
+                    this.WriteCrashFiles(e, exceptionDate);
                     return false;
                 case HandleResult.Unhandled:
                 default:

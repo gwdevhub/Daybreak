@@ -1,15 +1,15 @@
-﻿using Daybreak.Shared.Models;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Extensions;
+using System.Extensions.Core;
+using System.Text;
+using System.Text.Json;
+using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Api;
 using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.BuildTemplates.Models;
 using Daybreak.Shared.Services.BuildTemplates.Parsers;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics.CodeAnalysis;
-using System.Extensions;
-using System.Extensions.Core;
-using System.Text;
-using System.Text.Json;
 using Convert = System.Convert;
 
 namespace Daybreak.Shared.Services.BuildTemplates;
@@ -19,6 +19,7 @@ public sealed class BuildTemplateManager(
     ILogger<BuildTemplateManager> logger) : IBuildTemplateManager
 {
     private const string DecodingLookupTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+    private const char CanonicalNameSeparator = '\\';
     private readonly static string BuildsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Guild Wars", "Templates", "Skills");
 
     private List<IBuildEntry> BuildMemoryCache { get; } = [];
@@ -147,7 +148,7 @@ public sealed class BuildTemplateManager(
             Name = singleBuildEntry.Name,
             PreviousName = singleBuildEntry.PreviousName,
             SourceUrl = singleBuildEntry.SourceUrl,
-            Builds = [ singleBuildEntry ],
+            Builds = [singleBuildEntry],
             ToolboxBuildId = singleBuildEntry.ToolboxBuildId,
             IsToolboxBuild = singleBuildEntry.IsToolboxBuild,
             CreationTime = singleBuildEntry.CreationTime
@@ -258,10 +259,10 @@ public sealed class BuildTemplateManager(
     {
         var encodedBuild = this.EncodeTemplate(buildEntry);
 
-        var newPath = Path.Combine(BuildsPath, $"{buildEntry.Name}.txt");
+        var newPath = Path.Combine(BuildsPath, $"{NameToRelativePath(buildEntry.Name)}.txt");
         if (string.IsNullOrWhiteSpace(buildEntry.PreviousName) is false)
         {
-            var oldPath = Path.GetFullPath(Path.Combine(BuildsPath, $"{buildEntry.PreviousName}.txt"));
+            var oldPath = Path.GetFullPath(Path.Combine(BuildsPath, $"{NameToRelativePath(buildEntry.PreviousName)}.txt"));
             if (File.Exists(oldPath))
             {
                 File.Delete(oldPath);
@@ -277,13 +278,13 @@ public sealed class BuildTemplateManager(
 
     public void RemoveBuild(IBuildEntry buildEntry)
     {
-        var namePath = Path.Combine(BuildsPath, $"{buildEntry.Name}.txt");
+        var namePath = Path.Combine(BuildsPath, $"{NameToRelativePath(buildEntry.Name)}.txt");
         if (File.Exists(namePath))
         {
             File.Delete(namePath);
         }
 
-        var previousNamePath = Path.Combine(BuildsPath, $"{buildEntry.PreviousName}.txt");
+        var previousNamePath = Path.Combine(BuildsPath, $"{NameToRelativePath(buildEntry.PreviousName)}.txt");
         if (File.Exists(previousNamePath))
         {
             File.Delete(previousNamePath);
@@ -293,7 +294,7 @@ public sealed class BuildTemplateManager(
     public async Task<IBuildEntry?> GetBuild(string name)
     {
         // Use the cache as fallback for newly created builds that are not yet saved to the disk
-        var path = Path.Combine(BuildsPath, $"{name}.txt");
+        var path = Path.Combine(BuildsPath, $"{NameToRelativePath(name)}.txt");
         var result = await this.LoadBuildFromFile(path, name);
         if (result is null)
         {
@@ -311,7 +312,7 @@ public sealed class BuildTemplateManager(
 
     public void ClearBuilds()
     {
-        foreach(var file in Directory.GetFiles(BuildsPath, "*.txt", SearchOption.AllDirectories))
+        foreach (var file in Directory.GetFiles(BuildsPath, "*.txt", SearchOption.AllDirectories))
         {
             File.Delete(file);
         }
@@ -326,7 +327,7 @@ public sealed class BuildTemplateManager(
 
         foreach (var file in Directory.GetFiles(BuildsPath, "*.txt", SearchOption.AllDirectories))
         {
-            var name = Path.GetRelativePath(BuildsPath, file).Replace(".txt", string.Empty);
+            var name = RelativePathToName(Path.GetRelativePath(BuildsPath, file).Replace(".txt", string.Empty));
             var result = await this.LoadBuildFromFile(file, name);
             if (result is not null)
             {
@@ -465,7 +466,7 @@ public sealed class BuildTemplateManager(
 
             // Otherwise, encode as space-separated skill templates
             var encodedString = new StringBuilder();
-            foreach(var teamBuild in teamBuildEntry.Builds)
+            foreach (var teamBuild in teamBuildEntry.Builds)
             {
                 encodedString.Append(this.EncodeTemplateInner(teamBuild)).Append(' ');
             }
@@ -629,7 +630,7 @@ public sealed class BuildTemplateManager(
                         }
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     scopedLogger.LogError(ex, "Failed to parse build metadata {buildName}", buildName);
                     return default;
@@ -654,7 +655,7 @@ public sealed class BuildTemplateManager(
         }
 
         var builds = new List<IBuildEntry>();
-        for(var i = 0; i < buildTemplates.Length; i++)
+        for (var i = 0; i < buildTemplates.Length; i++)
         {
             var result = this.DecodeTemplateInner(buildTemplates[i]);
             if (result is null)
@@ -672,17 +673,17 @@ public sealed class BuildTemplateManager(
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         scopedLogger.LogDebug("Attempting to decode template");
-        
+
         // Decode base64 to binary
         var base64Decoded = template.Select(c => DecodingLookupTable.IndexOf(c)).ToList();
         var binaryDecoded = base64Decoded.Select(ToBitString).ToList();
         var bitString = string.Join("", binaryDecoded);
         var stream = new DecodeCharStream([.. binaryDecoded]);
-        
+
         // Read header to determine template type
         var headerValue = stream.Read(4);
         var header = (TemplateHeader)headerValue;
-        
+
         // Create decode context
         var context = new DecodeContext(template, bitString, stream);
 
@@ -722,7 +723,7 @@ public sealed class BuildTemplateManager(
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         scopedLogger.LogDebug("Encoding build to template");
-        
+
         // Find the appropriate parser for encoding
         var parser = this.templateParsers.FirstOrDefault(p => p.CanEncode(buildEntry));
         if (parser is null)
@@ -730,12 +731,12 @@ public sealed class BuildTemplateManager(
             scopedLogger.LogError("No parser found that can encode this build");
             throw new InvalidOperationException("No parser found that can encode this build");
         }
-        
+
         // Create encode context and encode
         var stream = new EncodeCharStream();
         var context = new EncodeContext(buildEntry, stream);
         var encodedBinary = parser.Encode(context);
-        
+
         // Convert binary string to base64
         int index = 0;
         var encodedBase64 = new List<int>();
@@ -753,13 +754,13 @@ public sealed class BuildTemplateManager(
     private static string ToBitString(int value)
     {
         var sb = new StringBuilder();
-        while(value > 0)
+        while (value > 0)
         {
             sb.Append(value % 2 == 1 ? 1 : 0);
             value /= 2;
         }
 
-        while(sb.Length < 6)
+        while (sb.Length < 6)
         {
             sb.Append(0);
         }
@@ -784,6 +785,15 @@ public sealed class BuildTemplateManager(
 
         return (int)value;
     }
+
+    private static string NameToRelativePath(string? name) =>
+        (name ?? string.Empty)
+            .Replace('\\', Path.DirectorySeparatorChar)
+            .Replace('/', Path.DirectorySeparatorChar);
+
+    private static string RelativePathToName(string relativePath) =>
+        relativePath.Replace(Path.DirectorySeparatorChar, CanonicalNameSeparator)
+                    .Replace('/', CanonicalNameSeparator);
 
     private static bool IsProfessionUnlocked(int professionId, uint unlockedProfessions) => (unlockedProfessions & (1 << professionId)) != 0;
 
