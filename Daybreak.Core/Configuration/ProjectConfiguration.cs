@@ -9,6 +9,7 @@ using Daybreak.Services.ApplicationArguments.ArgumentHandling;
 using Daybreak.Services.ApplicationLauncher;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Credentials;
+using Daybreak.Services.Formatting;
 using Daybreak.Services.DirectSong;
 using Daybreak.Services.Downloads;
 using Daybreak.Services.Events;
@@ -48,12 +49,12 @@ using Daybreak.Services.TradeChat.Models;
 using Daybreak.Services.TradeChat.Notifications;
 using Daybreak.Services.UMod;
 using Daybreak.Services.Updater;
-using Daybreak.Services.Wiki;
 using Daybreak.Shared.Models.Plugins;
 using Daybreak.Shared.Services.Api;
 using Daybreak.Shared.Services.ApplicationArguments;
 using Daybreak.Shared.Services.ApplicationLauncher;
 using Daybreak.Shared.Services.BuildTemplates;
+using Daybreak.Shared.Services.Formatting;
 using Daybreak.Shared.Services.BuildTemplates.Parsers;
 using Daybreak.Shared.Services.Credentials;
 using Daybreak.Shared.Services.DirectSong;
@@ -82,7 +83,6 @@ using Daybreak.Shared.Services.Toolbox;
 using Daybreak.Shared.Services.TradeChat;
 using Daybreak.Shared.Services.UMod;
 using Daybreak.Shared.Services.Updater;
-using Daybreak.Shared.Services.Wiki;
 using Daybreak.Services.Graph;
 using Daybreak.Themes;
 using Daybreak.Views;
@@ -225,6 +225,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IOnboardingService, OnboardingService>();
         services.AddScoped<IExperienceCalculator, ExperienceCalculator>();
         services.AddScoped<IAttributePointCalculator, AttributePointCalculator>();
+        services.AddScoped<ISkillNumberFormatter, SkillNumberFormatter>();
         services.AddScoped<IDownloadService, DownloadService>();
         services.AddScoped<IGuildWarsInstaller, IntegratedGuildwarsInstaller>();
         services.AddScoped<IExceptionHandler, ExceptionHandler>();
@@ -248,7 +249,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<ILaunchConfigurationService, LaunchConfigurationService>();
         services.AddScoped<IEventService, EventService>();
         services.AddScoped<IApplicationArgumentService, ApplicationArgumentService>();
-        services.AddScoped<IWikiService, WikiService>();
         services.AddScoped<IScreenshotService, ScreenshotService>();
 
         services.AddHostedSingleton<IApplicationUpdater, ApplicationUpdater>();
@@ -566,10 +566,6 @@ public class ProjectConfiguration : PluginConfigurationBase
             .Build()
             .RegisterHttpClient<ScopedApiContext>()
             .WithMessageHandler(SetupLoggingAndMetrics<ScopedApiContext>)
-            .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
-            .Build()
-            .RegisterHttpClient<WikiService>()
-            .WithMessageHandler(SetupLoggingAndMetrics<WikiService>)
             .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
             .Build()
             .RegisterHttpClient<ReShadeService>()

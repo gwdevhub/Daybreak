@@ -50,7 +50,7 @@ public static unsafe partial class GWCA
     // [NAMESPACE] GWCA.GW.Packet.StoC.GenericValueID popped at line 70
     // [NAMESPACE] GWCA.GW.Packet.StoC.JumboMessageType popped at line 82
     // [NAMESPACE] GWCA.GW.Packet.StoC.JumboMessageValue popped at line 99
-    // [NAMESPACE] GWCA.GW.PartyMgr popped at line 107
+    // [NAMESPACE] GWCA.GW.PartyMgr popped at line 108
     // [NAMESPACE] GWCA.GW.PlayerMgr popped at line 56
     // [NAMESPACE] GWCA.GW.QuestMgr popped at line 43
     // [NAMESPACE] GWCA.GW.Render popped at line 122
@@ -118,7 +118,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.Inventory: 39 fields [OK]
     // GWCA.GW.InventoryTableEntry: 3 fields [OK]
     // GWCA.GW.Item: 26 fields [OK]
-    // GWCA.GW.ItemContext: 43 fields [OK]
+    // GWCA.GW.ItemContext: 38 fields [OK]
     // GWCA.GW.ItemData: 4 fields [OK]
     // GWCA.GW.ItemFormula: 5 fields [OK]
     // GWCA.GW.ItemModifier: 1 fields [OK]
@@ -3873,7 +3873,7 @@ public static unsafe partial class GWCA
                 Test_Map_solo_areas, // "This is a debug map to allow multiplayer testing of current solo areas."
                 Nightfallen_Garden,
                 Churrhir_Fields,
-                Beknur_Harbor_outpost,
+                Beknur_Harbor,
                 Kodonur_Crossroads_cinematic,
                 Rilohn_Refuge_cinematic,
                 Pogahn_Passage_cinematic,
@@ -3903,7 +3903,7 @@ public static unsafe partial class GWCA
                 Lahtenda_Bog,
                 Arbor_Bay,
                 Issnur_Isles,
-                Beknur_Harbor,
+                Beknur_Harbor_outpost,
                 Mehtani_Keys,
                 Kodlonu_Hamlet_outpost,
                 Island_of_Shehkah,
@@ -6825,9 +6825,9 @@ public static unsafe partial class GWCA
                 Aura_of_the_Bloodstone1,
                 Aura_of_the_Bloodstone2,
                 Haunted_Ground,
-                Asuran_Bodyguard,
-                Asuran_Bodyguard1,
-                Asuran_Bodyguard2,
+                Asuran_Bodyguard_Rank2,
+                Asuran_Bodyguard_Rank3,
+                Asuran_Bodyguard_Rank4,
                 Energy_Channel,
                 Hunt_Rampage,
                 Boss_Bounty = 2440,
@@ -6836,9 +6836,9 @@ public static unsafe partial class GWCA
                 Hunt_Point_Bonus2,
                 Time_Attack,
                 Dwarven_Raider,
-                Dwarven_Raider1,
-                Dwarven_Raider2,
-                Dwarven_Raider3,
+                Dwarven_Raider_Rank2,
+                Dwarven_Raider_Rank3,
+                Dwarven_Raider_Rank4,
                 Great_Dwarfs_Blessing,
                 Hunt_Rampage1,
                 Boss_Bounty1 = 2452,
@@ -6846,19 +6846,19 @@ public static unsafe partial class GWCA
                 Hunt_Point_Bonus4,
                 Time_Attack1 = 2456,
                 Vanguard_Patrol,
-                Vanguard_Patrol1,
-                Vanguard_Patrol2,
-                Vanguard_Patrol3,
+                Vanguard_Patrol_Rank2,
+                Vanguard_Patrol_Rank3,
+                Vanguard_Patrol_Rank4,
                 Vanguard_Commendation,
                 Hunt_Rampage2,
                 Boss_Bounty2 = 2464,
                 Norn_Hunting_Party = 2469,
-                Norn_Hunting_Party1,
-                Norn_Hunting_Party2,
-                Norn_Hunting_Party3,
+                Norn_Hunting_Party_Rank2,
+                Norn_Hunting_Party_Rank3,
+                Norn_Hunting_Party_Rank4,
                 Strength_of_the_Norn,
                 Hunt_Rampage3,
-                Asuran_Bodyguard3 = 2481,
+                Asuran_Bodyguard = 2481,
                 Desperate_Howl,
                 Gloat,
                 Metamorphosis,
@@ -9302,45 +9302,47 @@ public static unsafe partial class GWCA
                 kShowHeroPanel, // 0x100001a3, wparam = hero_id
                 kMessage_0x1000019e, // 0x100001a4
                 kMessage_0x1000019f, // 0x100001a5
-                kMessage_0x100001a0, // 0x100001a6
+                kQuerySuppressedKeyAction, // 0x100001a6, wparam = 0, lparam = bool*. Used to check if the suppress action is pressed (usually shift)
                 kGetInventoryAgentId, // 0x100001a7, wparam = 0, lparam = uint32_t* agent_id_out. Used to fetch which agent is selected
                 kInventoryRelated1, // 0x100001a8, added to GW 2026-02-26
                 kInventoryRelated2, // 0x100001a9, added to GW 2026-02-26
                 kInventoryRelated3, // 0x100001aa, added to GW 2026-02-26
-                kEquipItem, // 0x100001ab, wparam = { item_id, agent_id }
-                kMoveItem, // 0x100001ac, wparam = { item_id, to_bag, to_slot, bool prompt }
-                kItemRelated_1, // 0x100001ad
-                kItemTooltip, // 0x100001ae
-                kItemRelated_3, // 0x100001af, added to GW 2026-02-26
-                kItemRelated_4, // 0x100001b0, added to GW 2026-02-26
-                kInitiateTrade, // 0x100001b1
-                kMessage_0x100001a7, // 0x100001b2
-                kMessage_0x100001a8, // 0x100001b3
-                kMessage_0x100001a9, // 0x100001b4
-                kMessage_0x100001aa, // 0x100001b5
-                kMessage_0x100001ab, // 0x100001b6
-                kMessage_0x100001ac, // 0x100001b7
-                kMessage_0x100001ad, // 0x100001b8
-                kMessage_0x100001ae, // 0x100001b9
-                kMessage_0x100001af, // 0x100001ba
-                kMessage_0x100001b0, // 0x100001bb
-                kMessage_0x100001b1, // 0x100001bc
-                kMessage_0x100001b2, // 0x100001bd
-                kMessage_0x100001b3, // 0x100001be
-                kMessage_0x100001b4, // 0x100001bf
-                kMessage_0x100001b5, // 0x100001c0
-                kInventoryAgentChanged, // 0x100001c1, Triggered when inventory needs updating due to agent change; no args
-                kInventoryRelated_1, // 0x100001c2
-                kInventoryRelated_2, // 0x100001c3
-                kMissionStatusRelated, // 0x100001c4
-                kUnused_1c2, // 0x100001c5
-                kCollapseExpandSkillListSection, // 0x100001c6
-                kTemplateRelated_1, // 0x100001c7
-                kTemplateRelated_2, // 0x100001c8
-                kPromptSaveTemplate, // 0x100001c9
-                kOpenTemplate, // 0x100001ca, wparam = GW::UI::ChatTemplate*
-                kTemplateRelated_3, // 0x100001cb
-                kTemplateRelated_4, // 0x100001cc
+                kInventoryRelated4, // 0x100001ab, added to GW 2026-04-28
+                kEquipItem, // 0x100001ac, wparam = { item_id, agent_id }
+                kMoveItem, // 0x100001ad, wparam = { item_id, to_bag, to_slot, bool prompt }
+                kItemRelated_1, // 0x100001ae
+                kItemTooltip, // 0x100001af
+                kItemRelated_3, // 0x100001b0, added to GW 2026-02-26
+                kItemRelated_4, // 0x100001b1, added to GW 2026-02-26
+                kItemRelated_5, // 0x100001b2, added to GW 2026-04-28
+                kInitiateTrade, // 0x100001b3
+                kMessage_0x100001a7, // 0x100001b4
+                kMessage_0x100001a8, // 0x100001b5
+                kMessage_0x100001a9, // 0x100001b6
+                kMessage_0x100001aa, // 0x100001b7
+                kMessage_0x100001ab, // 0x100001b8
+                kMessage_0x100001ac, // 0x100001b9
+                kMessage_0x100001ad, // 0x100001ba
+                kMessage_0x100001ae, // 0x100001bb
+                kMessage_0x100001af, // 0x100001bc
+                kMessage_0x100001b0, // 0x100001bd
+                kMessage_0x100001b1, // 0x100001be
+                kMessage_0x100001b2, // 0x100001bf
+                kMessage_0x100001b3, // 0x100001c0
+                kMessage_0x100001b4, // 0x100001c1
+                kMessage_0x100001b5, // 0x100001c2
+                kInventoryAgentChanged, // 0x100001c3, Triggered when inventory needs updating due to agent change; no args
+                kInventoryRelated_1, // 0x100001c4
+                kInventoryRelated_2, // 0x100001c5
+                kMissionStatusRelated, // 0x100001c6
+                kUnused_1c2, // 0x100001c7
+                kCollapseExpandSkillListSection, // 0x100001c8
+                kTemplateRelated_1, // 0x100001c9
+                kTemplateRelated_2, // 0x100001ca
+                kPromptSaveTemplate, // 0x100001cb
+                kOpenTemplate, // 0x100001cc, wparam = GW::UI::ChatTemplate*
+                kTemplateRelated_3, // 0x100001cd
+                kTemplateRelated_4, // 0x100001ce
                 kSendLoadSkillTemplate = 0x30000000 | 0x3, // 0x30000003, wparam = SkillbarMgr::SkillTemplate*
                 kSendPingWeaponSet = 0x30000000 | 0x4, // 0x30000004, wparam = UIPacket::kSendPingWeaponSet*
                 kSendMoveItem = 0x30000000 | 0x5, // 0x30000005, wparam = UIPacket::kSendMoveItem*
@@ -9446,6 +9448,14 @@ namespace Daybreak.API.Interop.GuildWars
     {
         public nint PrevLink;
         public nint NextNode;
+    }
+
+    /// <summary>
+    /// THash&lt;T&gt; - hash table (36 bytes, opaque to managed code).
+    /// </summary>
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x24)]
+    public struct THash
+    {
     }
 
     /// <summary>
@@ -10533,7 +10543,7 @@ namespace Daybreak.API.Interop.GuildWars
         Test_Map_solo_areas,
         Nightfallen_Garden,
         Churrhir_Fields,
-        Beknur_Harbor_outpost,
+        Beknur_Harbor,
         Kodonur_Crossroads_cinematic,
         Rilohn_Refuge_cinematic,
         Pogahn_Passage_cinematic,
@@ -10563,7 +10573,7 @@ namespace Daybreak.API.Interop.GuildWars
         Lahtenda_Bog,
         Arbor_Bay,
         Issnur_Isles,
-        Beknur_Harbor,
+        Beknur_Harbor_outpost,
         Mehtani_Keys,
         Kodlonu_Hamlet_outpost,
         Island_of_Shehkah,
@@ -13485,9 +13495,9 @@ namespace Daybreak.API.Interop.GuildWars
         Aura_of_the_Bloodstone1,
         Aura_of_the_Bloodstone2,
         Haunted_Ground,
-        Asuran_Bodyguard,
-        Asuran_Bodyguard1,
-        Asuran_Bodyguard2,
+        Asuran_Bodyguard_Rank2,
+        Asuran_Bodyguard_Rank3,
+        Asuran_Bodyguard_Rank4,
         Energy_Channel,
         Hunt_Rampage,
         Boss_Bounty = 2440,
@@ -13496,9 +13506,9 @@ namespace Daybreak.API.Interop.GuildWars
         Hunt_Point_Bonus2,
         Time_Attack,
         Dwarven_Raider,
-        Dwarven_Raider1,
-        Dwarven_Raider2,
-        Dwarven_Raider3,
+        Dwarven_Raider_Rank2,
+        Dwarven_Raider_Rank3,
+        Dwarven_Raider_Rank4,
         Great_Dwarfs_Blessing,
         Hunt_Rampage1,
         Boss_Bounty1 = 2452,
@@ -13506,19 +13516,19 @@ namespace Daybreak.API.Interop.GuildWars
         Hunt_Point_Bonus4,
         Time_Attack1 = 2456,
         Vanguard_Patrol,
-        Vanguard_Patrol1,
-        Vanguard_Patrol2,
-        Vanguard_Patrol3,
+        Vanguard_Patrol_Rank2,
+        Vanguard_Patrol_Rank3,
+        Vanguard_Patrol_Rank4,
         Vanguard_Commendation,
         Hunt_Rampage2,
         Boss_Bounty2 = 2464,
         Norn_Hunting_Party = 2469,
-        Norn_Hunting_Party1,
-        Norn_Hunting_Party2,
-        Norn_Hunting_Party3,
+        Norn_Hunting_Party_Rank2,
+        Norn_Hunting_Party_Rank3,
+        Norn_Hunting_Party_Rank4,
         Strength_of_the_Norn,
         Hunt_Rampage3,
-        Asuran_Bodyguard3 = 2481,
+        Asuran_Bodyguard = 2481,
         Desperate_Howl,
         Gloat,
         Metamorphosis,
@@ -15348,17 +15358,19 @@ namespace Daybreak.API.Interop.GuildWars
         kShowHeroPanel,
         kMessage_0x1000019e,
         kMessage_0x1000019f,
-        kMessage_0x100001a0,
+        kQuerySuppressedKeyAction,
         kGetInventoryAgentId,
         kInventoryRelated1,
         kInventoryRelated2,
         kInventoryRelated3,
+        kInventoryRelated4,
         kEquipItem,
         kMoveItem,
         kItemRelated_1,
         kItemTooltip,
         kItemRelated_3,
         kItemRelated_4,
+        kItemRelated_5,
         kInitiateTrade,
         kMessage_0x100001a7,
         kMessage_0x100001a8,
@@ -16718,7 +16730,7 @@ namespace Daybreak.API.Interop.GuildWars
         public uint Level;
     }
 
-    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x98)]
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0xA4)]
     public unsafe struct Inventory
     {
         [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
@@ -16940,19 +16952,9 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x00D0)]
         public uint H00D0;
         [global::System.Runtime.InteropServices.FieldOffset(0x00D4)]
-        public uint H00D4;
-        [global::System.Runtime.InteropServices.FieldOffset(0x00D8)]
-        public uint H00D8;
-        [global::System.Runtime.InteropServices.FieldOffset(0x00DC)]
-        public uint H00DC;
-        [global::System.Runtime.InteropServices.FieldOffset(0x00E0)]
-        public uint H00E0;
-        [global::System.Runtime.InteropServices.FieldOffset(0x00E4)]
-        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.InventoryTableEntry> InventoryTable;
-        [global::System.Runtime.InteropServices.FieldOffset(0x00F4)]
-        public uint H00F4;
+        public global::Daybreak.API.Interop.GuildWars.THash InventoryTable; // 0x24 bytes, keyed by agent_id
         [global::System.Runtime.InteropServices.FieldOffset(0x00F8)]
-        public global::Daybreak.API.Interop.GuildWars.Inventory* Inventory;
+        public global::Daybreak.API.Interop.GuildWars.Inventory* Inventory; // shortcut to player's own inventory
         [global::System.Runtime.InteropServices.FieldOffset(0x00FC)]
         public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H00FC;
     }
