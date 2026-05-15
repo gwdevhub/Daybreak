@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Text;
-using System.Text.Encodings.Web;
 
 namespace Daybreak.Tools.SkillUpdater;
 
@@ -30,11 +29,29 @@ internal static class SkillFileWriter
 
     private const string Footer = "}\n";
 
-    public static (string Content, IReadOnlyList<string> Warnings) Render(IEnumerable<ParsedSkill> skills)
+    public static (string Content, IReadOnlyList<string> Warnings) Render(
+        IEnumerable<ParsedSkill> skills,
+        IReadOnlyDictionary<string, string> iconUrls)
     {
+        // Expand skills carrying multiple ids (e.g. "Save Yourselves!" with
+        // 1954 Luxon + 2097 Kurzick) into one emitted entry per id.
+        var expanded = new List<ParsedSkill>();
+        foreach (var skill in skills)
+        {
+            expanded.Add(skill);
+            for (var i = 0; i < skill.AdditionalIds.Count; i++)
+            {
+                expanded.Add(skill with
+                {
+                    Id = skill.AdditionalIds[i],
+                    AdditionalIds = [],
+                });
+            }
+        }
+
         // Stable ordering: by id ascending so identifier collisions get resolved
         // deterministically (lower id keeps the bare identifier).
-        var ordered = skills
+        var ordered = expanded
             .OrderBy(s => s.Id)
             .ThenBy(s => s.Name, StringComparer.Ordinal)
             .ToList();
@@ -64,7 +81,7 @@ internal static class SkillFileWriter
 
         foreach (var (ident, skill) in rendered.OrderBy(r => r.Identifier, StringComparer.Ordinal))
         {
-            sb.Append("    ").Append(RenderField(ident, skill)).Append('\n');
+            sb.Append("    ").Append(RenderField(ident, skill, iconUrls)).Append('\n');
         }
 
         sb.Append('\n');
@@ -115,9 +132,9 @@ internal static class SkillFileWriter
         sb.Append("    ];\n");
     }
 
-    private static string RenderField(string identifier, ParsedSkill s)
+    private static string RenderField(string identifier, ParsedSkill s, IReadOnlyDictionary<string, string> iconUrls)
     {
-        var icon = BuildIconUrl(s.Name);
+        var icon = iconUrls.GetValueOrDefault(s.Name, string.Empty);
         return $"public static readonly Skill {identifier} = new() {{ "
             + $"Id = {s.Id.ToString(CultureInfo.InvariantCulture)}, "
             + $"Name = {Quote(s.Name)}, "
@@ -189,17 +206,6 @@ internal static class SkillFileWriter
 
         sb.Append('"');
         return sb.ToString();
-    }
-
-    /// <summary>
-    /// Stable URL pointing at the wiki's skill icon. <c>Special:FilePath</c>
-    /// 302-redirects to the current image regardless of content-hash dir
-    /// shuffles, so we don't need to chase the actual storage location.
-    /// </summary>
-    private static string BuildIconUrl(string skillName)
-    {
-        var encoded = UrlEncoder.Default.Encode($"{skillName}.jpg");
-        return $"https://wiki.guildwars.com/index.php?title=Special:FilePath/{encoded}";
     }
 
     /// <summary>

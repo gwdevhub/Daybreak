@@ -9451,6 +9451,14 @@ namespace Daybreak.API.Interop.GuildWars
     }
 
     /// <summary>
+    /// THash&lt;T&gt; - hash table (36 bytes, opaque to managed code).
+    /// </summary>
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x24)]
+    public struct THash
+    {
+    }
+
+    /// <summary>
     /// Inline array of 54 AttributeStruct elements.
     /// </summary>
     [global::System.Runtime.CompilerServices.InlineArray(54)]
@@ -16944,7 +16952,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x00D0)]
         public uint H00D0;
         [global::System.Runtime.InteropServices.FieldOffset(0x00D4)]
-        public THash<Inventory> InventoryTable; // 0x24 bytes, keyed by agent_id
+        public global::Daybreak.API.Interop.GuildWars.THash InventoryTable; // 0x24 bytes, keyed by agent_id
         [global::System.Runtime.InteropServices.FieldOffset(0x00F8)]
         public global::Daybreak.API.Interop.GuildWars.Inventory* Inventory; // shortcut to player's own inventory
         [global::System.Runtime.InteropServices.FieldOffset(0x00FC)]

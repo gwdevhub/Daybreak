@@ -32,8 +32,12 @@ internal static class Program
             Console.WriteLine($"Collected {skills.Count} skills.");
             Console.WriteLine();
 
+            var iconResolver = new IconResolver(client);
+            var iconUrls = await iconResolver.ResolveAsync(skills, cancellationSource.Token);
+            Console.WriteLine();
+
             Console.WriteLine("Rendering Skill.g.cs…");
-            var (content, warnings) = SkillFileWriter.Render(skills);
+            var (content, warnings) = SkillFileWriter.Render(skills, iconUrls);
             await File.WriteAllTextAsync(skillFile, content, cancellationSource.Token);
             Console.WriteLine($"Wrote {content.Length:N0} chars to {skillFile}");
             foreach (var warn in warnings)

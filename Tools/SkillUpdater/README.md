@@ -18,6 +18,8 @@ dotnet run --project Tools/SkillUpdater
    `Eye_of_the_North_skills`) with `prop=revisions&rvslots=main&rvprop=content`.
 2. Filters to pages containing a `{{Skill infobox}}` template.
 3. Parses each infobox via the tool-local `WikiSkillParser`.
-4. Derives a deterministic `IconUrl` from the skill name using
-   `Special:FilePath`.
+4. Resolves the canonical CDN URL for each skill icon by batched
+   `prop=imageinfo` queries — preferring the high-resolution
+   `<Name> (large).jpg`, falling back to `<Name>.jpg`, leaving the URL
+   empty when neither file exists.
 5. Writes a sorted, grouped `Skill.g.cs`.

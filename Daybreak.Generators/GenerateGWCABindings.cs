@@ -974,6 +974,21 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
             sb.AppendLine($"{pad}}}");
             sb.AppendLine();
         }
+
+        // THash<T> - GWCA hash table, fixed 0x24 (36) bytes regardless of T.
+        // Treated as an opaque blob; consumers use GWCA helpers for traversal.
+        // See Dependencies/GWCA/Include/GWCA/GameContainers/Hash.h.
+        if (emittedNames.Add("THash"))
+        {
+            sb.AppendLine($"{pad}/// <summary>");
+            sb.AppendLine($"{pad}/// THash&lt;T&gt; - hash table (36 bytes, opaque to managed code).");
+            sb.AppendLine($"{pad}/// </summary>");
+            sb.AppendLine($"{pad}[global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x24)]");
+            sb.AppendLine($"{pad}public struct THash");
+            sb.AppendLine($"{pad}{{");
+            sb.AppendLine($"{pad}}}");
+            sb.AppendLine();
+        }
     }
 
     /// <summary>
@@ -1248,6 +1263,12 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         if (cppType.StartsWith("TLink<"))
         {
             return "global::Daybreak.API.Interop.GuildWars.TLink";
+        }
+
+        // Handle THash<T> - hash table, always 0x24 bytes; opaque to managed code.
+        if (cppType.StartsWith("THash<"))
+        {
+            return "global::Daybreak.API.Interop.GuildWars.THash";
         }
 
         // Handle pointers

@@ -138,11 +138,23 @@ internal sealed class SkillEnumerator(WikiHttpClient client)
         }
 
         // The infobox `name` field can omit the `(PvP)` suffix even though the
-        // page title carries it. Prefer the page title as the canonical name.
-        if (!string.Equals(parsed.Name, title, StringComparison.Ordinal))
+        // page title carries it. Prefer the page title as the canonical name,
+        // stripping the surrounding quotes some shout titles carry — and
+        // remember the quoted form so the icon resolver can try it as well
+        // (image files keep the quotes in their filenames).
+        var rawTitle = title.Trim();
+        var isQuoted = rawTitle.Length >= 2 && rawTitle[0] == '"' && rawTitle[^1] == '"';
+        var canonicalTitle = isQuoted ? rawTitle[1..^1] : rawTitle;
+
+        if (!string.Equals(parsed.Name, canonicalTitle, StringComparison.Ordinal))
         {
-            parsed = parsed with { Name = title };
+            parsed = parsed with { Name = canonicalTitle };
         }
+
+        var iconBaseNames = isQuoted
+            ? (IReadOnlyList<string>)[canonicalTitle, rawTitle]
+            : [canonicalTitle];
+        parsed = parsed with { IconBaseNames = iconBaseNames };
 
         pageId = pageIdEl.GetInt32();
         skill = parsed;

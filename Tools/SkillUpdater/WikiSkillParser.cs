@@ -27,7 +27,23 @@ public sealed record ParsedSkill(
     double? Sacrifice,
     double? Upkeep,
     string Description,
-    string ConciseDescription);
+    string ConciseDescription)
+{
+    /// <summary>
+    /// Extra ids the wiki listed alongside <see cref="Id"/> in the same
+    /// <c>id =</c> field (e.g. <c>id = 1954, 2097</c> for Luxon/Kurzick
+    /// "Save Yourselves!"). Each one becomes its own emitted skill.
+    /// </summary>
+    public IReadOnlyList<int> AdditionalIds { get; init; } = [];
+
+    /// <summary>
+    /// Filenames (without the <c>File:</c> prefix) the icon resolver should
+    /// try, in priority order. Defaults to just <see cref="Name"/>; shouts
+    /// also include the quoted form because their image files preserve the
+    /// surrounding quotes (e.g. <c>"Save Yourselves!".jpg</c>).
+    /// </summary>
+    public IReadOnlyList<string> IconBaseNames { get; init; } = [];
+}
 
 /// <summary>
 /// Parses a wiki page's <c>{{Skill infobox …}}</c> into a <see cref="ParsedSkill"/>
@@ -56,9 +72,11 @@ internal static partial class WikiSkillParser
         string Get(string key) => fields.TryGetValue(key, out var v) ? v : string.Empty;
         bool YesFlag(string key) => Get(key) is var v && v.Length > 0 && v[0] is 'y' or 'Y';
 
+        var allIds = ParseAllIds(Get("id"));
+
         skill = new ParsedSkill(
-            Id: int.TryParse(Get("id"), NumberStyles.Integer, CultureInfo.InvariantCulture, out var id) ? id : 0,
-            Name: Get("name"),
+            Id: allIds.Count > 0 ? allIds[0] : 0,
+            Name: NormalizeName(Get("name")),
             CampaignIdentifier: ResolveCampaign(Get("campaign")),
             ProfessionIdentifier: ResolveProfession(Get("profession")),
             AttributeIdentifier: ResolveAttribute(Get("attribute")),
@@ -75,6 +93,11 @@ internal static partial class WikiSkillParser
             Upkeep: ParseNumber(Get("upkeep")),
             Description: Get("description"),
             ConciseDescription: Get("concise description"));
+        if (allIds.Count > 1)
+        {
+            skill = skill with { AdditionalIds = [.. allIds.Skip(1)] };
+        }
+
         return true;
     }
 
@@ -233,6 +256,47 @@ internal static partial class WikiSkillParser
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Some skill infoboxes carry multiple ids in one field
+    /// (e.g. <c>id = 1954, 2097</c> for Luxon/Kurzick variants of "Save Yourselves!").
+    /// We return every integer found in source order; the writer turns each
+    /// one into its own emitted <c>Skill</c> entry.
+    /// </summary>
+    private static List<int> ParseAllIds(string raw)
+    {
+        var ids = new List<int>();
+        if (string.IsNullOrWhiteSpace(raw))
+        {
+            return ids;
+        }
+
+        foreach (Match match in FirstIntegerRegex().Matches(raw))
+        {
+            if (int.TryParse(match.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id))
+            {
+                ids.Add(id);
+            }
+        }
+
+        return ids;
+    }
+
+    /// <summary>
+    /// Strips the surrounding double quotes some wiki page titles carry
+    /// (shouts, e.g. <c>"Save Yourselves!"</c>) so the C# identifier and
+    /// display name match the historical Daybreak convention.
+    /// </summary>
+    private static string NormalizeName(string raw)
+    {
+        var trimmed = raw.Trim();
+        if (trimmed.Length >= 2 && trimmed[0] == '"' && trimmed[^1] == '"')
+        {
+            return trimmed[1..^1];
+        }
+
+        return trimmed;
     }
 
     private static string ResolveSkillType(string raw)
@@ -414,4 +478,5 @@ internal static partial class WikiSkillParser
     [GeneratedRegex(@"\{\{gray\|([^}]+)\}\}", RegexOptions.IgnoreCase)] private static partial Regex GrayTextRegex();
     [GeneratedRegex(@"\{\{grey\|([^}]+)\}\}", RegexOptions.IgnoreCase)] private static partial Regex GreyTextRegex();
     [GeneratedRegex(@"[\s\-]+")] private static partial Regex TypeTokenSplitRegex();
+    [GeneratedRegex(@"\d+")] private static partial Regex FirstIntegerRegex();
 }
