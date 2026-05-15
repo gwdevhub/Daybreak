@@ -50,4 +50,7 @@
   <Project Path="Daybreak.Generators/Daybreak.Generators.csproj">
     <Platform Project="Any CPU" />
   </Project>
+  <Project Path="Tools/SkillUpdater/SkillUpdater.csproj">
+    <Platform Project="Any CPU" />
+  </Project>
 </Solution>

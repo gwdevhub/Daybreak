@@ -232,7 +232,7 @@ public abstract class BuildTemplateViewModelBase<TViewModel, TView>(
 
     protected void FilterSkillsByProfessionsAndString(string? searchFilter = default)
     {
-        var filteredSkills = Skill.Skills.Where(skill =>
+        var filteredSkills = Skill.AllSkills.Where(skill =>
         {
             if (skill.PvP)
             {

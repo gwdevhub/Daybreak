@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>$(TargetFrameworkVersion)</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>preview</LangVersion>
+    <RootNamespace>Daybreak.Tools.SkillUpdater</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <!-- Standalone developer tool. Intentionally has no project references -->
+    <!-- so a broken Skill.g.cs in Daybreak.Shared can never block re-running it. -->
+    <Platforms>AnyCPU</Platforms>
+  </PropertyGroup>
+
+</Project>
+

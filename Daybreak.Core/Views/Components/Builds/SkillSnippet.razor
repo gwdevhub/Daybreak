@@ -1,4 +1,6 @@
-﻿<div class="backdrop-panel container skill-snippet" style="--mouse-x: @(this.Context.MousePosition.PosX)px; --mouse-y: @(this.Context.MousePosition.PosY)px;">
+﻿@inject ISkillNumberFormatter SkillNumberFormatter
+
+<div class="backdrop-panel container skill-snippet" style="--mouse-x: @(this.Context.MousePosition.PosX)px; --mouse-y: @(this.Context.MousePosition.PosY)px;">
     <div class="left-side">
         <div class="skill-icon">
             <SkillIcon Skill="this.Context.Skill" />
@@ -23,67 +25,67 @@
         <div class="skill-concise-description">@this.Context.Skill.ConciseDescription</div>
     </div>
     <div class="right-side">
-        @if (!string.IsNullOrWhiteSpace(this.Context.Skill.Energy))
+        @if (this.Context.Skill.Energy.HasValue)
         {
             <div class="skill-resource">
                 <div class="skill-resource-img">
                     <Daybreak.Views.Components.Icons.Misc.Energy />
                 </div>
-                <div class="skill-resource-text">@this.Context.Skill.Energy</div>
+                <div class="skill-resource-text">@this.SkillNumberFormatter.Format(this.Context.Skill.Energy)</div>
             </div>
         }
-        @if (!string.IsNullOrWhiteSpace(this.Context.Skill.Activation))
+        @if (this.Context.Skill.Activation.HasValue)
         {
             <div class="skill-resource">
                 <div class="skill-resource-img">
                     <Daybreak.Views.Components.Icons.Misc.Activation />
                 </div>
-                <div class="skill-resource-text">@this.Context.Skill.Activation</div>
+                <div class="skill-resource-text">@this.SkillNumberFormatter.Format(this.Context.Skill.Activation)</div>
             </div>
         }
-        @if (!string.IsNullOrWhiteSpace(this.Context.Skill.Recharge))
+        @if (this.Context.Skill.Recharge.HasValue)
         {
             <div class="skill-resource">
                 <div class="skill-resource-img">
                     <Daybreak.Views.Components.Icons.Misc.Recharge />
                 </div>
-                <div class="skill-resource-text">@this.Context.Skill.Recharge</div>
+                <div class="skill-resource-text">@this.SkillNumberFormatter.Format(this.Context.Skill.Recharge)</div>
             </div>
         }
-        @if (!string.IsNullOrWhiteSpace(this.Context.Skill.Overcast))
+        @if (this.Context.Skill.Overcast.HasValue)
         {
             <div class="skill-resource">
                 <div class="skill-resource-img">
                     <Daybreak.Views.Components.Icons.Misc.Overcast />
                 </div>
-                <div class="skill-resource-text">@this.Context.Skill.Overcast</div>
+                <div class="skill-resource-text">@this.SkillNumberFormatter.Format(this.Context.Skill.Overcast)</div>
             </div>
         }
-        @if (!string.IsNullOrWhiteSpace(this.Context.Skill.Adrenaline))
+        @if (this.Context.Skill.Adrenaline.HasValue)
         {
             <div class="skill-resource">
                 <div class="skill-resource-img">
                     <Daybreak.Views.Components.Icons.Misc.Adrenaline />
                 </div>
-                <div class="skill-resource-text">@this.Context.Skill.Adrenaline</div>
+                <div class="skill-resource-text">@this.SkillNumberFormatter.Format(this.Context.Skill.Adrenaline)</div>
             </div>
         }
-        @if (!string.IsNullOrWhiteSpace(this.Context.Skill.Sacrifice))
+        @if (this.Context.Skill.Sacrifice.HasValue)
         {
             <div class="skill-resource">
                 <div class="skill-resource-img">
                     <Daybreak.Views.Components.Icons.Misc.Sacrifice />
                 </div>
-                <div class="skill-resource-text">@this.Context.Skill.Sacrifice</div>
+                <div class="skill-resource-text">@this.SkillNumberFormatter.FormatPercent(this.Context.Skill.Sacrifice)</div>
             </div>
         }
-        @if (!string.IsNullOrWhiteSpace(this.Context.Skill.Upkeep))
+        @if (this.Context.Skill.Upkeep.HasValue)
         {
             <div class="skill-resource">
                 <div class="skill-resource-img">
                     <Daybreak.Views.Components.Icons.Misc.Upkeep />
                 </div>
-                <div class="skill-resource-text">@this.Context.Skill.Upkeep</div>
+                <div class="skill-resource-text">@this.SkillNumberFormatter.Format(this.Context.Skill.Upkeep)</div>
             </div>
         }
     </div>
