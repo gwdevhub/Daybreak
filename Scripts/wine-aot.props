@@ -1,0 +1,30 @@
+<!--
+    MSBuild properties used by the wine-based x86 NativeAOT build.
+
+    Imported by Scripts/SetupWinePrefix.sh into the wine prefix, then passed to
+    `dotnet publish` via `-p:CustomAfterMicrosoftCommonProps=<this file>`.
+
+    Replaces the MSVC link.exe / lib.exe with LLVM equivalents (lld-link.exe,
+    llvm-lib.exe) and points the linker at the MSVC CRT + Windows SDK x86
+    libraries extracted by `xwin`. See Scripts/SetupWinePrefix.sh.
+
+    The override happens in a target with BeforeTargets="SetupOSSpecificProps;LinkNative"
+    because Microsoft.NETCore.Native.Windows.targets hard-codes <CppLinker>link</CppLinker>
+    in a top-level PropertyGroup, which would otherwise overwrite values set
+    via a regular imported props file.
+-->
+<Project>
+  <ItemGroup>
+    <AdditionalNativeLibraryDirectories Include="C:\xwin\crt\lib\x86" />
+    <AdditionalNativeLibraryDirectories Include="C:\xwin\sdk\lib\um\x86" />
+    <AdditionalNativeLibraryDirectories Include="C:\xwin\sdk\lib\ucrt\x86" />
+  </ItemGroup>
+  <Target Name="_WineAotOverrideLinker" BeforeTargets="SetupOSSpecificProps;LinkNative">
+    <PropertyGroup>
+      <IlcUseEnvironmentalTools>true</IlcUseEnvironmentalTools>
+      <CppLinker>C:\llvm\bin\lld-link.exe</CppLinker>
+      <CppLibCreator>C:\llvm\bin\llvm-lib.exe</CppLibCreator>
+    </PropertyGroup>
+    <Message Importance="high" Text="[wine-aot] CppLinker=$(CppLinker)" />
+  </Target>
+</Project>
