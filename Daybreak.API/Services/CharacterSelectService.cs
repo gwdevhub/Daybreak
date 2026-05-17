@@ -1,7 +1,6 @@
 ﻿using Daybreak.API.Extensions;
 using Daybreak.API.Interop;
 using Daybreak.API.Interop.GuildWars;
-using Daybreak.API.Models;
 using Daybreak.API.Services.Interop;
 using Daybreak.Shared.Models.Api;
 using System.Core.Extensions;
@@ -341,7 +340,7 @@ public sealed class CharacterSelectService(
 
                 await Task.Delay(100, cancellationToken);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 scopedLogger.LogError(e, "Error while waiting for character select to be ready");
                 throw;
