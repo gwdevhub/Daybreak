@@ -13,7 +13,7 @@ namespace Daybreak.API.Interop
 {
 
 /// <summary>
-/// P/Invoke bindings for 528 C++ exports from gwca.dll (0 skipped).
+/// P/Invoke bindings for 531 C++ exports from gwca.dll (0 skipped).
 /// Nested classes mirror the C++ namespace hierarchy (e.g. GW::Agents → GWCA.GW.Agents).
 /// Types annotated with [GWCAEquivalent] are used in signatures where available.
 /// </summary>
@@ -23,10 +23,10 @@ public static unsafe partial class GWCA
     // ═══════════════════════════════════════════════════
     // Parsed structs diagnostic:
     // [NAMESPACE] GWCA.GW popped at line 46
-    // [NAMESPACE] GWCA.GW.Agents popped at line 196
+    // [NAMESPACE] GWCA.GW.Agents popped at line 215
     // [NAMESPACE] GWCA.GW.CameraMgr popped at line 35
     // [NAMESPACE] GWCA.GW.Chat popped at line 21
-    // [NAMESPACE] GWCA.GW.Chat.TextColor popped at line 49
+    // [NAMESPACE] GWCA.GW.Chat.TextColor popped at line 50
     // [NAMESPACE] GWCA.GW.Constants popped at line 25
     // [NAMESPACE] GWCA.GW.Constants.DialogID popped at line 282
     // [NAMESPACE] GWCA.GW.Constants.ItemID popped at line 201
@@ -57,9 +57,9 @@ public static unsafe partial class GWCA
     // [NAMESPACE] GWCA.GW.Scanner popped at line 52
     // [NAMESPACE] GWCA.GW.SkillbarMgr popped at line 39
     // [NAMESPACE] GWCA.GW.StoC popped at line 50
-    // [NAMESPACE] GWCA.GW.TargetFilter popped at line 112
+    // [NAMESPACE] GWCA.GW.TargetFilter popped at line 122
     // [NAMESPACE] GWCA.GW.Trade popped at line 22
-    // [NAMESPACE] GWCA.GW.UI popped at line 31
+    // [NAMESPACE] GWCA.GW.UI popped at line 786
     // [NAMESPACE] GWCA.GW.UI.UIPacket popped at line 30
     // [NAMESPACE] GWCA.GWCA popped at line 15
     // GWCA.GW.AccountContext: 9 fields [OK]
@@ -69,11 +69,12 @@ public static unsafe partial class GWCA
     // GWCA.GW.Agent: 43 fields [OK]
     // GWCA.GW.AgentCharData: 15 fields [OK]
     // GWCA.GW.AgentContext: 27 fields [OK]
+    // GWCA.GW.AgentEffect: 2 fields [OK]
     // GWCA.GW.AgentEffects: 3 fields [OK]
     // GWCA.GW.AgentGadget: 5 fields [OK]
     // GWCA.GW.AgentInfo: 1 fields [OK]
     // GWCA.GW.AgentItem: 4 fields [OK]
-    // GWCA.GW.AgentLiving: 56 fields [OK]
+    // GWCA.GW.AgentLiving: 59 fields [OK]
     // GWCA.GW.AgentMovement: 12 fields [OK]
     // GWCA.GW.AgentSummaryInfo: 10 fields [SKIP: mixed offset fields]
     // GWCA.GW.AreaInfo: 31 fields [OK]
@@ -113,7 +114,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.HenchmanPartyMember: 4 fields [OK]
     // GWCA.GW.HeroConstData: 6 fields [OK]
     // GWCA.GW.HeroFlag: 8 fields [OK]
-    // GWCA.GW.HeroInfo: 30 fields [OK]
+    // GWCA.GW.HeroInfo: 35 fields [OK]
     // GWCA.GW.HeroPartyMember: 6 fields [OK]
     // GWCA.GW.Inventory: 39 fields [OK]
     // GWCA.GW.InventoryTableEntry: 3 fields [OK]
@@ -121,6 +122,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.ItemContext: 38 fields [OK]
     // GWCA.GW.ItemData: 4 fields [OK]
     // GWCA.GW.ItemFormula: 5 fields [OK]
+    // GWCA.GW.ItemListFrame: 0 fields [SKIP: no fields]
     // GWCA.GW.ItemModifier: 1 fields [OK]
     // GWCA.GW.LoginCharacter: 2 fields [OK]
     // GWCA.GW.MapAgent: 13 fields [OK]
@@ -214,19 +216,22 @@ public static unsafe partial class GWCA
     // GWCA.GW.UI.DialogBodyInfo: 3 fields [OK]
     // GWCA.GW.UI.DialogButtonInfo: 4 fields [OK]
     // GWCA.GW.UI.FloatingWindow: 9 fields [OK]
-    // GWCA.GW.UI.Frame: 86 fields [SKIP: unresolved typedef in field relation: FrameRelation]
+    // GWCA.GW.UI.Frame: 83 fields [SKIP: unresolved typedef in field relation: FrameRelation]
     // GWCA.GW.UI.FrameInteractionCallback: 3 fields [OK]
     // GWCA.GW.UI.FramePosition: 17 fields [OK]
-    // GWCA.GW.UI.FrameRelation: 5 fields [SKIP: complex template in field siblings: TList<FrameRelation>]
+    // GWCA.GW.UI.FrameRelation: 6 fields [SKIP: complex template in field children: TList<FrameRelation>]
     // GWCA.GW.UI.InteractionMessage: 3 fields [OK]
     // GWCA.GW.UI.MapEntryMessage: 2 fields [OK]
     // GWCA.GW.UI.TooltipInfo: 8 fields [OK]
     // GWCA.GW.UI.UIChatMessage: 3 fields [OK]
+    // GWCA.GW.UI.UIPacket.kAddCustomChatLink: 5 fields [OK]
+    // GWCA.GW.UI.UIPacket.kAgentOverheadNumber: 10 fields [OK]
     // GWCA.GW.UI.UIPacket.kAgentSkillPacket: 2 fields [OK]
     // GWCA.GW.UI.UIPacket.kAgentSkillStartedCast: 4 fields [OK]
     // GWCA.GW.UI.UIPacket.kAgentSpeechBubble: 4 fields [OK]
     // GWCA.GW.UI.UIPacket.kAllyOrGuildMessage: 4 fields [OK]
     // GWCA.GW.UI.UIPacket.kChangeTarget: 6 fields [OK]
+    // GWCA.GW.UI.UIPacket.kChatLinkClicked: 3 fields [OK]
     // GWCA.GW.UI.UIPacket.kCompassDraw: 4 fields [OK]
     // GWCA.GW.UI.UIPacket.kDialogueMessage: 5 fields [OK]
     // GWCA.GW.UI.UIPacket.kEffectAdd: 2 fields [OK]
@@ -275,6 +280,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.UI.UIPacket.kShowXunlaiChest: 3 fields [OK]
     // GWCA.GW.UI.UIPacket.kStartWhisper: 1 fields [OK]
     // GWCA.GW.UI.UIPacket.kTomeSkillSelection: 3 fields [OK]
+    // GWCA.GW.UI.UIPacket.kUIFeatureChanged: 2 fields [OK]
     // GWCA.GW.UI.UIPacket.kUIPositionChanged: 2 fields [OK]
     // GWCA.GW.UI.UIPacket.kUseKitOnItem: 2 fields [OK]
     // GWCA.GW.UI.UIPacket.kVendorItems: 4 fields [OK]
@@ -555,6 +561,10 @@ public static unsafe partial class GWCA
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool Move(global::Daybreak.API.Interop.GuildWars.GamePos gamePos);
 
+            // GW::Agents::RegisterAgentEffectCallback | function2: TODO: map struct function
+            // [LibraryImport(DllName, EntryPoint = "?RegisterAgentEffectCallback@Agents@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUHookStatus@GW@@PBUAgentLiving@2@PBUAgentEffect@2@@Z@std@@H@Z")]
+            // public static partial void RegisterAgentEffectCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, global::Daybreak.API.Interop.GuildWars.AgentLiving* agentLiving3, global::Daybreak.API.Interop.GuildWars.AgentEffect* agentEffect4);
+
             // GW::Agents::SendDialog
             [LibraryImport(DllName, EntryPoint = "?SendDialog@Agents@GW@@YA_NI@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
@@ -676,6 +686,10 @@ public static unsafe partial class GWCA
             [LibraryImport(DllName, EntryPoint = "?GetChatLog@Chat@GW@@YAPAUChatBuffer@12@XZ")]
             public static partial global::Daybreak.API.Interop.GuildWars.ChatBuffer* GetChatLog();
 
+            // GW::Chat::GetCurrentChatChannel
+            [LibraryImport(DllName, EntryPoint = "?GetCurrentChatChannel@Chat@GW@@YA?AW4Channel@12@XZ")]
+            public static partial global::Daybreak.API.Interop.GWCA.GW.Chat.Channel GetCurrentChatChannel();
+
             // GW::Chat::GetDefaultColors
             [LibraryImport(DllName, EntryPoint = "?GetDefaultColors@Chat@GW@@YAXW4Channel@12@PAI1@Z")]
             public static partial void GetDefaultColors(global::Daybreak.API.Interop.GWCA.GW.Chat.Channel channel1, uint* ptr2, nint ptr3);
@@ -696,9 +710,19 @@ public static unsafe partial class GWCA
             public static partial bool SendChat(byte value1, ushort* ptr2);
 
             // GW::Chat::SendChat
+            [LibraryImport(DllName, EntryPoint = "?SendChat@Chat@GW@@YA_NPBD@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool SendChat(byte* ptr);
+
+            // GW::Chat::SendChat
             [LibraryImport(DllName, EntryPoint = "?SendChat@Chat@GW@@YA_NPB_W0@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool SendChat(ushort* ptr1, nint ptr2);
+
+            // GW::Chat::SendChat
+            [LibraryImport(DllName, EntryPoint = "?SendChat@Chat@GW@@YA_NPB_W@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool SendChat(ushort* ptr);
 
             // GW::Chat::SetMessageColor
             [LibraryImport(DllName, EntryPoint = "?SetMessageColor@Chat@GW@@YAIW4Channel@12@I@Z")]
@@ -1127,6 +1151,25 @@ public static unsafe partial class GWCA
             [LibraryImport(DllName, EntryPoint = "?GetIsZcoin@Item@GW@@QBE_NXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
             public static partial double GetIsZcoin(nint self);
+        }
+
+        public static partial class ItemListFrame
+        {
+
+            // GW::ItemListFrame::GetSelectedValue
+            [LibraryImport(DllName, EntryPoint = "?GetSelectedValue@ItemListFrame@GW@@QAE_NPAI@Z")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
+            public static partial double GetSelectedValue(nint self, uint* ptr2);
+
+            // GW::ItemListFrame::GetSortHandler
+            [LibraryImport(DllName, EntryPoint = "?GetSortHandler@ItemListFrame@GW@@QAEP6AHII@ZXZ")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
+            public static partial nint GetSortHandler(nint self, int* ptr2, uint value3, uint value4);
+
+            // GW::ItemListFrame::SetSortHandler
+            [LibraryImport(DllName, EntryPoint = "?SetSortHandler@ItemListFrame@GW@@QAE_NP6AHII@Z@Z")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
+            public static partial double SetSortHandler(nint self, nint callback2);
         }
 
         public static partial class Items
@@ -2104,45 +2147,20 @@ public static unsafe partial class GWCA
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
             public static partial double GetCount(nint self, uint* ptr2);
 
-            // GW::ScrollableFrame::GetFirstChildFrameId
-            [LibraryImport(DllName, EntryPoint = "?GetFirstChildFrameId@ScrollableFrame@GW@@QAEIPAI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial uint* GetFirstChildFrameId(nint self);
-
             // GW::ScrollableFrame::GetItemFrameId
             [LibraryImport(DllName, EntryPoint = "?GetItemFrameId@ScrollableFrame@GW@@QAEII@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
             public static partial uint GetItemFrameId(nint self);
-
-            // GW::ScrollableFrame::GetItemRect
-            [LibraryImport(DllName, EntryPoint = "?GetItemRect@ScrollableFrame@GW@@QAE_NIQAM@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double GetItemRect(nint self, uint value2, float* ptr3);
 
             // GW::ScrollableFrame::GetItems
             [LibraryImport(DllName, EntryPoint = "?GetItems@ScrollableFrame@GW@@QAEIPAII@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
             public static partial uint* GetItems(nint self, uint value2);
 
-            // GW::ScrollableFrame::GetLastChildFrameId
-            [LibraryImport(DllName, EntryPoint = "?GetLastChildFrameId@ScrollableFrame@GW@@QAEIPAI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial uint* GetLastChildFrameId(nint self);
-
-            // GW::ScrollableFrame::GetNextChildFrameId
-            [LibraryImport(DllName, EntryPoint = "?GetNextChildFrameId@ScrollableFrame@GW@@QAEIIPAI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial uint GetNextChildFrameId(nint self, uint* ptr2);
-
-            // GW::ScrollableFrame::GetPage
-            [LibraryImport(DllName, EntryPoint = "?GetPage@ScrollableFrame@GW@@QAEPAUFrame@UI@2@XZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial global::Daybreak.API.Interop.Frame* GetPage(nint self);
-
-            // GW::ScrollableFrame::GetPrevChildFrameId
-            [LibraryImport(DllName, EntryPoint = "?GetPrevChildFrameId@ScrollableFrame@GW@@QAEIIPAI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial uint GetPrevChildFrameId(nint self, uint* ptr2);
+            // GW::ScrollableFrame::GetPage | returns TODO: map struct GW::ItemListFrame
+            // [LibraryImport(DllName, EntryPoint = "?GetPage@ScrollableFrame@GW@@QAEPAUItemListFrame@2@XZ")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
+            // public static partial ItemListFrame* GetPage(nint self);
 
             // GW::ScrollableFrame::GetSelectedValue
             [LibraryImport(DllName, EntryPoint = "?GetSelectedValue@ScrollableFrame@GW@@QAE_NPAI@Z")]
@@ -2159,10 +2177,10 @@ public static unsafe partial class GWCA
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
             public static partial double RemoveItem(nint self, uint value2);
 
-            // GW::ScrollableFrame::SetPage | scrollablePageContext2: TODO: map struct GW::ScrollableFrame::ScrollablePageContext
-            // [LibraryImport(DllName, EntryPoint = "?SetPage@ScrollableFrame@GW@@QAEPAUFrame@UI@2@PAUScrollablePageContext@12@@Z")]
+            // GW::ScrollableFrame::SetPage | returns TODO: map struct GW::ItemListFrame | scrollablePageContext2: TODO: map struct GW::ScrollableFrame::ScrollablePageContext
+            // [LibraryImport(DllName, EntryPoint = "?SetPage@ScrollableFrame@GW@@QAEPAUItemListFrame@2@PAUScrollablePageContext@12@@Z")]
             // [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            // public static partial global::Daybreak.API.Interop.Frame* SetPage(nint self, ScrollablePageContext* scrollablePageContext2);
+            // public static partial ItemListFrame* SetPage(nint self, ScrollablePageContext* scrollablePageContext2);
 
             // GW::ScrollableFrame::SetSortHandler
             [LibraryImport(DllName, EntryPoint = "?SetSortHandler@ScrollableFrame@GW@@QAE_NP6AHII@Z@Z")]
@@ -2613,6 +2631,11 @@ public static unsafe partial class GWCA
             [LibraryImport(DllName, EntryPoint = "?IsInControllerMode@UI@GW@@YA_NXZ")]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool IsInControllerMode();
+
+            // GW::UI::IsInMobileMode
+            [LibraryImport(DllName, EntryPoint = "?IsInMobileMode@UI@GW@@YA_NXZ")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool IsInMobileMode();
 
             // GW::UI::IsValidEncStr
             [LibraryImport(DllName, EntryPoint = "?IsValidEncStr@UI@GW@@YA_NPB_W@Z")]
@@ -8711,6 +8734,12 @@ public static unsafe partial class GWCA
                 FlagPref_0x69,
                 FlagPref_0x6a,
                 FlagPref_0x6b,
+                FlagPref_0x6c,
+                FlagPref_0x6d,
+                FlagPref_0x6e,
+                LegacyStartMissionButton,
+                FlagPref_0x70,
+                EnableMobileHUD,
                 Count,
             }
 
@@ -8876,10 +8905,14 @@ public static unsafe partial class GWCA
                 kFrameMessage_0x51, // 0x61, Multiple uses depending on frame
                 kFrameMessage_0x52, // 0x62, Multiple uses depending on frame
                 kFrameMessage_0x53, // 0x63, Multiple uses depending on frame
-                kFrameMessage_0x54, // 0x64, Multiple uses depending on frame
-                kFrameMessage_0x55, // 0x65, Multiple uses depending on frame
-                kFrameMessage_0x56, // 0x66, Multiple uses depending on frame
-                kFrameMessage_0x57, // 0x67, Multiple uses depending on frame
+                kFrameMessage_0x53_a, // 0x64, Added 2026-05-28
+                kFrameMessage_0x53_b, // 0x65, Added 2026-05-28
+                kFrameMessage_0x54, // 0x66, Multiple uses depending on frame
+                kFrameMessage_0x55, // 0x67, Multiple uses depending on frame
+                kFrameMessage_0x56, // 0x68, Multiple uses depending on frame
+                kFrameMessage_0x57, // 0x69, Multiple uses depending on frame
+                kFrameMessage_0x58, // 0x6a, Multiple uses depending on frame
+                kFrameMessage_0x59, // 0x6b, Multiple uses depending on frame
                 kMessage_0x10000000 = 0x10000000, // 0x10000000
                 kMessage_0x10000001, // 0x10000001
                 kMessage_0x10000002, // 0x10000002
@@ -8893,11 +8926,11 @@ public static unsafe partial class GWCA
                 kMessage_0x1000000a, // 0x1000000a
                 kMessage_0x1000000b, // 0x1000000b
                 kDialogueMessage, // 0x1000000c
-                kMessage_0x1000000d, // 0x1000000d
+                kAgentOverheadFloat, // 0x1000000d, // e.g. XP gain wparam = *GW::UI::UIPacket::kAgentOverheadNumber
                 kMessage_0x1000000e, // 0x1000000e
-                kMessage_0x1000000f, // 0x1000000f
+                kAgentOverheadNumber, // 0x1000000f, // e.g. damage, heal wparam = *GW::UI::UIPacket::kAgentOverheadNumber
                 kMessage_0x10000010, // 0x10000010
-                kMessage_0x10000011, // 0x10000011
+                kAgentOverheadText, // 0x10000011, // e.g. block, dodge wparam = *GW::UI::UIPacket::kAgentOverheadNumber
                 kMessage_0x10000012, // 0x10000012
                 kMessage_0x10000013, // 0x10000013
                 kMessage_0x10000014, // 0x10000014
@@ -9014,7 +9047,7 @@ public static unsafe partial class GWCA
                 kMessage_0x10000083, // 0x10000083
                 kFloatingWindowMoved, // 0x10000084, wparam = frame_id
                 kMessage_0x10000085, // 0x10000085
-                kMessage_0x10000086, // 0x10000086
+                kUIFeatureChanged, // 0x10000086, wparam = UIPacket::kUIFeatureChanged*
                 kMessage_0x10000087, // 0x10000087
                 kMessage_0x10000088, // 0x10000088
                 kMessage_0x10000089, // 0x10000089
@@ -9270,7 +9303,7 @@ public static unsafe partial class GWCA
                 kTravel, // 0x10000183
                 kOpenWikiUrl, // 0x10000184, wparam = char* url
                 kMessage_0x10000181, // 0x10000185
-                kMessage_0x10000182, // 0x10000186
+                kOpenUrlNoPrompt, // 0x10000186, wparam = char* url
                 kSetPreGameContext_Value0, // 0x10000187, wparam = uint32_t value
                 kMessage_0x10000184, // 0x10000188
                 kGetPreGameContext_Value0, // 0x10000189, lparam = *uint32_t value_out
@@ -9320,9 +9353,9 @@ public static unsafe partial class GWCA
                 kMessage_0x100001a8, // 0x100001b5
                 kMessage_0x100001a9, // 0x100001b6
                 kMessage_0x100001aa, // 0x100001b7
-                kMessage_0x100001ab, // 0x100001b8
+                kPartySearchWindowDestroyed, // 0x100001b8
                 kMessage_0x100001ac, // 0x100001b9
-                kMessage_0x100001ad, // 0x100001ba
+                kPartySearchWindowCreated, // 0x100001ba
                 kMessage_0x100001ae, // 0x100001bb
                 kMessage_0x100001af, // 0x100001bc
                 kMessage_0x100001b0, // 0x100001bd
@@ -9337,8 +9370,8 @@ public static unsafe partial class GWCA
                 kMissionStatusRelated, // 0x100001c6
                 kUnused_1c2, // 0x100001c7
                 kCollapseExpandSkillListSection, // 0x100001c8
-                kTemplateRelated_1, // 0x100001c9
-                kTemplateRelated_2, // 0x100001ca
+                kPromptLoadTemplate, // 0x100001c9
+                kOpenTemplateManager, // 0x100001ca
                 kPromptSaveTemplate, // 0x100001cb
                 kOpenTemplate, // 0x100001cc, wparam = GW::UI::ChatTemplate*
                 kTemplateRelated_3, // 0x100001cd
@@ -9365,6 +9398,17 @@ public static unsafe partial class GWCA
                 kSetRendererValue = 0x30000000 | 0x21, // 0x30000021, wparam = UIPacket::kSetRendererValue
                 kIdentifyItem = 0x30000000 | 0x22, // 0x30000022, wparam = UIPacket::kUseKitOnItem
                 kSalvageItem = 0x30000000 | 0x23, // 0x30000023, wparam = UIPacket::kUseKitOnItem
+                kAddCustomChatLink = 0x30000000 | 0x24, // 0x30000024, wparam = UIPacket::kAddCustomChatLink. Triggered when GWCA parses a [label;url] link in chat that GW didn't handle
+                kChatLinkClicked = 0x30000000 | 0x25, // 0x30000025, wparam = UIPacket::kChatLinkClicked. Triggered when the player clicks an <a> link in chat, e.g. build code
+            }
+
+            public enum UiProfileSetting : uint
+            {
+                CameraFollowsPlayer = 0,
+                GamepadAutoTargetSwitch = 1,
+                MobileHUD = 2,
+                AdSupported = 3,
+                ForceAprilFools = 4,
             }
 
             public enum WindowID : uint
@@ -9537,6 +9581,15 @@ namespace Daybreak.API.Interop.GuildWars
     public unsafe struct SkillIDArray8
     {
         private global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID _element0;
+    }
+
+    /// <summary>
+    /// Inline array of 4 DyeColor elements.
+    /// </summary>
+    [global::System.Runtime.CompilerServices.InlineArray(4)]
+    public unsafe struct DyeColorArray4
+    {
+        private global::Daybreak.API.Interop.GWCA.GW.DyeColor _element0;
     }
 
 
@@ -14767,6 +14820,12 @@ namespace Daybreak.API.Interop.GuildWars
         FlagPref_0x69,
         FlagPref_0x6a,
         FlagPref_0x6b,
+        FlagPref_0x6c,
+        FlagPref_0x6d,
+        FlagPref_0x6e,
+        LegacyStartMissionButton,
+        FlagPref_0x70,
+        EnableMobileHUD,
         Count,
     }
 
@@ -14932,10 +14991,14 @@ namespace Daybreak.API.Interop.GuildWars
         kFrameMessage_0x51,
         kFrameMessage_0x52,
         kFrameMessage_0x53,
+        kFrameMessage_0x53_a,
+        kFrameMessage_0x53_b,
         kFrameMessage_0x54,
         kFrameMessage_0x55,
         kFrameMessage_0x56,
         kFrameMessage_0x57,
+        kFrameMessage_0x58,
+        kFrameMessage_0x59,
         kMessage_0x10000000 = 0x10000000,
         kMessage_0x10000001,
         kMessage_0x10000002,
@@ -14949,11 +15012,11 @@ namespace Daybreak.API.Interop.GuildWars
         kMessage_0x1000000a,
         kMessage_0x1000000b,
         kDialogueMessage,
-        kMessage_0x1000000d,
+        kAgentOverheadFloat,
         kMessage_0x1000000e,
-        kMessage_0x1000000f,
+        kAgentOverheadNumber,
         kMessage_0x10000010,
-        kMessage_0x10000011,
+        kAgentOverheadText,
         kMessage_0x10000012,
         kMessage_0x10000013,
         kMessage_0x10000014,
@@ -15070,7 +15133,7 @@ namespace Daybreak.API.Interop.GuildWars
         kMessage_0x10000083,
         kFloatingWindowMoved,
         kMessage_0x10000085,
-        kMessage_0x10000086,
+        kUIFeatureChanged,
         kMessage_0x10000087,
         kMessage_0x10000088,
         kMessage_0x10000089,
@@ -15326,7 +15389,7 @@ namespace Daybreak.API.Interop.GuildWars
         kTravel,
         kOpenWikiUrl,
         kMessage_0x10000181,
-        kMessage_0x10000182,
+        kOpenUrlNoPrompt,
         kSetPreGameContext_Value0,
         kMessage_0x10000184,
         kGetPreGameContext_Value0,
@@ -15376,9 +15439,9 @@ namespace Daybreak.API.Interop.GuildWars
         kMessage_0x100001a8,
         kMessage_0x100001a9,
         kMessage_0x100001aa,
-        kMessage_0x100001ab,
+        kPartySearchWindowDestroyed,
         kMessage_0x100001ac,
-        kMessage_0x100001ad,
+        kPartySearchWindowCreated,
         kMessage_0x100001ae,
         kMessage_0x100001af,
         kMessage_0x100001b0,
@@ -15393,8 +15456,8 @@ namespace Daybreak.API.Interop.GuildWars
         kMissionStatusRelated,
         kUnused_1c2,
         kCollapseExpandSkillListSection,
-        kTemplateRelated_1,
-        kTemplateRelated_2,
+        kPromptLoadTemplate,
+        kOpenTemplateManager,
         kPromptSaveTemplate,
         kOpenTemplate,
         kTemplateRelated_3,
@@ -15421,6 +15484,17 @@ namespace Daybreak.API.Interop.GuildWars
         kSetRendererValue = 0x30000000 | 0x21,
         kIdentifyItem = 0x30000000 | 0x22,
         kSalvageItem = 0x30000000 | 0x23,
+        kAddCustomChatLink = 0x30000000 | 0x24,
+        kChatLinkClicked = 0x30000000 | 0x25,
+    }
+
+    public enum UiProfileSetting : uint
+    {
+        CameraFollowsPlayer = 0,
+        GamepadAutoTargetSwitch = 1,
+        MobileHUD = 2,
+        AdSupported = 3,
+        ForceAprilFools = 4,
     }
 
     public enum WindowID : uint
@@ -15752,6 +15826,13 @@ namespace Daybreak.API.Interop.GuildWars
         public uint InstanceTimer;
     }
 
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct AgentEffect
+    {
+        public uint EffectType;
+        public uint DataSize; // usually 0x34, detemines length of data in bytes
+    }
+
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x24)]
     public unsafe struct AgentEffects
     {
@@ -15869,9 +15950,15 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0140)]
         public uint H0140;
         [global::System.Runtime.InteropServices.FieldOffset(0x0144)]
-        public byte Hex; // Bitmap for the hex effect when targetted (apparently obsolete!) (yes)
-        [global::System.Runtime.InteropServices.FieldOffset(0x0145)]
-        public fixed byte H0145[19];
+        public uint H0144;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0148)]
+        public global::Daybreak.API.Interop.GuildWars.AgentEffect* NextQueuedAgentEffect; // Points to the next effect that needs to be processed in the update loop for this agent.
+        [global::System.Runtime.InteropServices.FieldOffset(0x014C)]
+        public uint H014c;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0150)]
+        public uint H0150;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0154)]
+        public uint H0154;
         [global::System.Runtime.InteropServices.FieldOffset(0x0158)]
         public uint ModelState; // Different values for different states of the model.
         [global::System.Runtime.InteropServices.FieldOffset(0x015C)]
@@ -16688,29 +16775,39 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0044)]
         public uint H0044;
         [global::System.Runtime.InteropServices.FieldOffset(0x0048)]
-        public uint H0048;
+        public uint AppearanceBitmap; // If hero is mercenary, this is the same type as GW::Player->appearance_bitmap. If hero isn't merc, this is empty.
         [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
-        public uint H004C;
+        public ushort ChestpieceDyeTint;
+        [global::System.Runtime.InteropServices.FieldOffset(0x004E)]
+        public ushort ChestpieceModelFileId;
         [global::System.Runtime.InteropServices.FieldOffset(0x0050)]
+        public ushort LeggingsDyeTint;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0052)]
+        public ushort LeggingsModelFileId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0054)]
+        public ushort HeadpieceDyeTint;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0056)]
+        public ushort HeadpieceModelFileId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0058)]
+        public ushort BootsDyeTint;
+        [global::System.Runtime.InteropServices.FieldOffset(0x005A)]
+        public ushort BootsModelFileId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x005C)]
+        public ushort GlovesDyeTint;
+        [global::System.Runtime.InteropServices.FieldOffset(0x005E)]
+        public ushort GlovesModelFileId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0060)]
+        public DyeColorArray4 ChestpieceDye;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0064)]
+        public DyeColorArray4 LeggingsDye;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0068)]
+        public DyeColorArray4 HeadpieceDye;
+        [global::System.Runtime.InteropServices.FieldOffset(0x006C)]
+        public DyeColorArray4 BootsDye;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0070)]
+        public DyeColorArray4 GlovesDye;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0074)]
         public fixed char Name[20];
-        [global::System.Runtime.InteropServices.FieldOffset(0x0078)]
-        public uint H0078;
-        [global::System.Runtime.InteropServices.FieldOffset(0x007C)]
-        public uint H007C;
-        [global::System.Runtime.InteropServices.FieldOffset(0x0080)]
-        public uint H0080;
-        [global::System.Runtime.InteropServices.FieldOffset(0x0084)]
-        public uint H0084;
-        [global::System.Runtime.InteropServices.FieldOffset(0x0088)]
-        public uint H0088;
-        [global::System.Runtime.InteropServices.FieldOffset(0x008C)]
-        public uint H008C;
-        [global::System.Runtime.InteropServices.FieldOffset(0x0090)]
-        public uint H0090;
-        [global::System.Runtime.InteropServices.FieldOffset(0x0094)]
-        public uint H0094;
-        [global::System.Runtime.InteropServices.FieldOffset(0x0098)]
-        public uint H0098;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x18)]
@@ -18658,7 +18755,7 @@ namespace Daybreak.API.Interop.GuildWars
     {
         public nint Callback;
         public nint UictlContext;
-        public uint H0008;
+        public uint CallbackState;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
@@ -18728,6 +18825,31 @@ namespace Daybreak.API.Interop.GuildWars
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kAddCustomChatLink
+    {
+        public global::Daybreak.API.Interop.GWCA.GW.Chat.Channel Channel; // GW::Chat::Channel
+        public fixed char LinkPrefix[32];
+        public fixed char Sender[32]; // whoever sent the chat message
+        public fixed char Label[256];
+        public fixed char Url[256];
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x28)]
+    public unsafe struct kAgentOverheadNumber
+    {
+        public uint AgentId;
+        public uint H0004;
+        public nint EncodedStr;
+        public uint Style;
+        public uint H0010;
+        public uint H0014;
+        public uint H0018;
+        public uint H001c;
+        public uint AgentIdDupe;
+        public int Amount;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
     public unsafe struct kAgentSkillPacket
     {
         public uint AgentId;
@@ -18770,6 +18892,14 @@ namespace Daybreak.API.Interop.GuildWars
         public byte HasAutoTargetChanged;
         public uint ManualTargetId;
         public byte HasManualTargetChanged;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kChatLinkClicked
+    {
+        public nint Sender;
+        public nint Label;
+        public nint Url;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
@@ -19173,6 +19303,13 @@ namespace Daybreak.API.Interop.GuildWars
         public uint ItemId;
         public uint H0004;
         public uint H0008;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kUIFeatureChanged
+    {
+        public global::Daybreak.API.Interop.GWCA.GW.UI.UiProfileSetting Setting;
+        public byte Flag;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]

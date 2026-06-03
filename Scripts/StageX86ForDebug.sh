@@ -5,12 +5,13 @@
 # easy-dot-net's "Run Daybreak.Linux") picks them up.
 #
 # Layout produced (matches VerifyNativeComponentsAction / DaybreakInjector):
-#   Daybreak.Linux/bin/<Config>/net10.0/linux-x64/Injector/Daybreak.Injector.exe
-#   Daybreak.Linux/bin/<Config>/net10.0/linux-x64/Api/Daybreak.API.dll
-#   Daybreak.Linux/bin/<Config>/net10.0/linux-x64/Api/gwca.dll
+#   Daybreak.Linux/bin/<Platform>/<Config>/net10.0/linux-x64/Injector/Daybreak.Injector.exe
+#   Daybreak.Linux/bin/<Platform>/<Config>/net10.0/linux-x64/Api/Daybreak.API.dll
+#   Daybreak.Linux/bin/<Platform>/<Config>/net10.0/linux-x64/Api/gwca.dll
 #
-# Usage:  Scripts/StageX86ForDebug.sh [Configuration]
+# Usage:  Scripts/StageX86ForDebug.sh [Configuration] [Platform]
 #   Configuration: Debug (default) or Release
+#   Platform: x64 (default)
 #
 # NativeAOT is built in Debug by default to match the Windows dev workflow
 # (Scripts/PublishWindowsX86.ps1 stages Debug AOT into the Daybreak.Linux
@@ -22,12 +23,13 @@
 set -euo pipefail
 
 DAYBREAK_CONFIG="${1:-Debug}"
+DAYBREAK_PLATFORM="${2:-x64}"
 STAGE_AOT_CONFIG="${STAGE_AOT_CONFIG:-Debug}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$REPO_ROOT"
 
-DEST_ROOT="$REPO_ROOT/Daybreak.Linux/bin/$DAYBREAK_CONFIG/net10.0/linux-x64"
+DEST_ROOT="$REPO_ROOT/Daybreak.Linux/bin/$DAYBREAK_PLATFORM/$DAYBREAK_CONFIG/net10.0/linux-x64"
 mkdir -p "$DEST_ROOT/Injector" "$DEST_ROOT/Api"
 
 echo "=== Building x86 components ($STAGE_AOT_CONFIG) via wine ==="
@@ -64,4 +66,4 @@ ls -la "$DEST_ROOT/Injector/" | sed 's/^/  /'
 echo
 ls -la "$DEST_ROOT/Api/" | sed 's/^/  /'
 echo
-echo "Now: dotnet run --project Daybreak.Linux -c $DAYBREAK_CONFIG"
+echo "Now: dotnet run --project Daybreak.Linux -c $DAYBREAK_CONFIG -p:Platform=$DAYBREAK_PLATFORM"
