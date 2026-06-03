@@ -20,6 +20,7 @@ public sealed record ItemEntry(
     ItemProperty[] Properties,
     uint Interaction,
     uint ModelFileId,
-    byte DyeTint)
+    byte DyeTint,
+    ushort Value)
 {
 }

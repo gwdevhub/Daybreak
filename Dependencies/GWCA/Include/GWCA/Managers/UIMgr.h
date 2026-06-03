@@ -78,15 +78,16 @@ namespace GW {
 
         struct FrameRelation {
             FrameRelation* parent;
-            uint32_t field67_0x124;
-            uint32_t field68_0x128;
+            uint32_t child_offset_id;
+            FrameRelation* parent_dupe;
             uint32_t frame_hash_id;
+            TList<FrameRelation> children;
             TList<FrameRelation> siblings;
             GWCA_API Frame* GetFrame();
             GWCA_API Frame* GetParent() const;
         };
 
-        static_assert(sizeof(FrameRelation) == 0x1c);
+        static_assert(sizeof(FrameRelation) == 0x28);
 
         struct FramePosition {
             uint32_t flags;
@@ -110,18 +111,18 @@ namespace GW {
             float screen_right;
             float screen_top;
 
-            GWCA_API [[nodiscard]] GW::Vec2f GetTopLeftOnScreen(const Frame* frame = nullptr) const;
-            GWCA_API [[nodiscard]] GW::Vec2f GetBottomRightOnScreen(const Frame* frame = nullptr) const;
-            GWCA_API [[nodiscard]] GW::Vec2f GetContentTopLeft(const Frame* frame = nullptr) const;
-            GWCA_API [[nodiscard]] GW::Vec2f GetContentBottomRight(const Frame* frame = nullptr) const;
-            GWCA_API [[nodiscard]] GW::Vec2f GetSizeOnScreen(const Frame* frame = nullptr) const;
-            GWCA_API [[nodiscard]] GW::Vec2f GetViewportScale(const Frame* frame = nullptr) const;
+            [[nodiscard]] GWCA_API GW::Vec2f GetTopLeftOnScreen(const Frame* frame = nullptr) const;
+            [[nodiscard]] GWCA_API GW::Vec2f GetBottomRightOnScreen(const Frame* frame = nullptr) const;
+            [[nodiscard]] GWCA_API GW::Vec2f GetContentTopLeft(const Frame* frame = nullptr) const;
+            [[nodiscard]] GWCA_API GW::Vec2f GetContentBottomRight(const Frame* frame = nullptr) const;
+            [[nodiscard]] GWCA_API GW::Vec2f GetSizeOnScreen(const Frame* frame = nullptr) const;
+            [[nodiscard]] GWCA_API GW::Vec2f GetViewportScale(const Frame* frame = nullptr) const;
         };
 
         struct FrameInteractionCallback {
             UIInteractionCallback callback;
             void* uictl_context;
-            uint32_t h0008;
+            uint32_t callback_state;
         };
 
         struct Frame {
@@ -178,9 +179,6 @@ namespace GW {
             uint32_t field64_0x120;
             uint32_t field65_0x124;
             FrameRelation relation;
-            uint32_t field73_0x144;
-            uint32_t field74_0x148;
-            uint32_t field75_0x14c;
             uint32_t field76_0x150;
             uint32_t field77_0x154;
             uint32_t field78_0x158;
@@ -467,10 +465,15 @@ namespace GW {
             FlagPref_0x69,
             FlagPref_0x6a,
             FlagPref_0x6b,
-            
+            FlagPref_0x6c,
+            FlagPref_0x6d,
+            FlagPref_0x6e,
+            LegacyStartMissionButton,
+            FlagPref_0x70,
+            EnableMobileHUD,
             Count
         };
-        static_assert(FlagPreference::Count == (FlagPreference)0x6c);
+        static_assert(FlagPreference::Count == (FlagPreference)0x72);
         // Used with GetWindowPosition
         enum WindowID : uint32_t {
             WindowID_Dialogue1 = 0x0,
@@ -705,6 +708,15 @@ namespace GW {
             ControlAction_ToggleGamepadCursorMode = 0x13d, // right dpad
 
         };
+
+        enum class UiProfileSetting : uint32_t {
+            CameraFollowsPlayer = 0,
+            GamepadAutoTargetSwitch = 1,
+            MobileHUD = 2,
+            AdSupported = 3,
+            ForceAprilFools = 4,
+        };
+
         struct FloatingWindow {
             void* unk1; // Some kind of function call
             wchar_t* name;
@@ -841,6 +853,9 @@ namespace GW {
 
         // When the player is actively using a game controller
         GWCA_API bool IsInControllerMode();
+
+        // When the GW interface is in mobile layout
+        GWCA_API bool IsInMobileMode();
 
         // When the player is using a game controller and is in cursor mode
         GWCA_API bool IsInControllerCursorMode();
