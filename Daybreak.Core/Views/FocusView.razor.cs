@@ -63,6 +63,115 @@ public sealed class FocusViewModel(
     public BuildComponentContext? BuildComponentContext { get; private set; }
     public string? BrowserSource { get; private set; } = "https://wiki.guildwars.com/wiki/Main_Page";
 
+    private List<FocusViewTile> tiles = [];
+
+    public bool IsEditingLayout { get; private set; }
+    public bool LayoutInitialized { get; private set; }
+    public int LayoutVersion { get; private set; }
+    public IReadOnlyList<FocusViewTile> Tiles => this.tiles;
+    public IEnumerable<FocusViewTile> VisibleTiles => this.tiles.Where(t => t.Visible);
+    public IEnumerable<FocusViewComponent> HiddenComponents => this.tiles.Where(t => !t.Visible).Select(t => t.Component);
+    public int GridColumns => FocusViewOptions.DefaultGridColumns;
+    public int GridRows => FocusViewOptions.DefaultGridRows;
+
+    public void ToggleEditLayout()
+    {
+        this.IsEditingLayout = !this.IsEditingLayout;
+        this.LayoutVersion++;
+        this.RefreshView();
+    }
+
+    public void SaveLayout()
+    {
+        this.PersistLayout();
+        this.IsEditingLayout = false;
+        this.LayoutVersion++;
+        this.RefreshView();
+    }
+
+    public bool IsTileVisible(FocusViewComponent component) =>
+        this.tiles.FirstOrDefault(t => t.Component == component)?.Visible ?? false;
+
+    public void ToggleTileVisibility(FocusViewComponent component)
+    {
+        var tile = this.tiles.FirstOrDefault(t => t.Component == component);
+        if (tile is null)
+        {
+            return;
+        }
+
+        tile.Visible = !tile.Visible;
+        this.LayoutVersion++;
+        this.PersistLayout();
+        this.RefreshView();
+    }
+
+    public void ApplyTileChanges(IEnumerable<FocusTileChange> changes)
+    {
+        var columns = this.GridColumns;
+        var rows = this.GridRows;
+        foreach (var change in changes)
+        {
+            if (!Enum.TryParse<FocusViewComponent>(change.Component, out var component))
+            {
+                continue;
+            }
+
+            var tile = this.tiles.FirstOrDefault(t => t.Component == component);
+            if (tile is null)
+            {
+                continue;
+            }
+
+            tile.ColumnSpan = Math.Clamp(change.ColumnSpan, 1, columns);
+            tile.RowSpan = Math.Clamp(change.RowSpan, 1, rows);
+            tile.Column = Math.Clamp(change.Column, 1, columns - tile.ColumnSpan + 1);
+            tile.Row = Math.Clamp(change.Row, 1, rows - tile.RowSpan + 1);
+        }
+    }
+
+    public void ResetLayout()
+    {
+        this.tiles = FocusViewOptions.DefaultLayout();
+        this.IsEditingLayout = false;
+        this.LayoutVersion++;
+        this.PersistLayout();
+        this.RefreshView();
+    }
+
+    public void MarkLayoutSynced() => this.LayoutInitialized = true;
+
+    private void LoadLayout()
+    {
+        var savedLayout = this.options.CurrentValue.Layout ?? [];
+        var normalized = new List<FocusViewTile>();
+        var defaults = FocusViewOptions.DefaultLayout();
+        var columns = this.GridColumns;
+        var rows = this.GridRows;
+        foreach (var component in Enum.GetValues<FocusViewComponent>())
+        {
+            var tile = savedLayout.FirstOrDefault(t => t.Component == component)
+                ?? defaults.First(t => t.Component == component);
+            tile.ColumnSpan = Math.Clamp(tile.ColumnSpan, 1, columns);
+            tile.RowSpan = Math.Clamp(tile.RowSpan, 1, rows);
+            tile.Column = Math.Clamp(tile.Column, 1, columns - tile.ColumnSpan + 1);
+            tile.Row = Math.Clamp(tile.Row, 1, rows - tile.RowSpan + 1);
+            normalized.Add(tile);
+        }
+
+        this.tiles = normalized;
+        this.PersistLayout();
+    }
+
+    private void PersistLayout()
+    {
+        var options = this.options.CurrentValue;
+        options.GridColumns = this.GridColumns;
+        options.GridRows = this.GridRows;
+        options.Layout = this.tiles;
+        this.optionsProvider.SaveOption(options);
+    }
+
     public override async ValueTask ParametersSet(FocusView view, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
@@ -291,6 +400,7 @@ public sealed class FocusViewModel(
         this.cancellationSource?.Dispose();
         this.cancellationSource = new CancellationTokenSource();
         var ct = this.cancellationSource.Token;
+        this.LoadLayout();
         this.SetupDefaultValues();
         Task.Factory.StartNew(() => this.PeriodicallyFetchGameInformation(ct), ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
     }
@@ -344,7 +454,10 @@ public sealed class FocusViewModel(
                 else
                 {
                     retryCount = 0;
-                    await this.RefreshViewAsync();
+                    if (!this.IsEditingLayout)
+                    {
+                        await this.RefreshViewAsync();
+                    }
                 }
             }
             catch (Exception ex)
@@ -602,7 +715,16 @@ public sealed class FocusViewModel(
         if (titleInfo is null ||
             !Title.TryParse((int)titleInfo.Id, out var title))
         {
-            return default;
+            return new TitleInformationComponentContext
+            {
+                Title = default,
+                CurrentPoints = 0,
+                IsPercentage = false,
+                MaxTierNumber = 0,
+                TierNumber = 0,
+                PointsForCurrentRank = 0,
+                PointsForNextRank = 0
+            };
         }
 
         return new TitleInformationComponentContext
@@ -656,4 +778,13 @@ public sealed class FocusViewModel(
             _ => throw new InvalidOperationException()
         };
     }
+}
+
+public sealed record FocusTileChange
+{
+    public required string Component { get; init; }
+    public required int Column { get; init; }
+    public required int Row { get; init; }
+    public required int ColumnSpan { get; init; }
+    public required int RowSpan { get; init; }
 }

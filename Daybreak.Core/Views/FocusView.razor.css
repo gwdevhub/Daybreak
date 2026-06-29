@@ -1,56 +1,197 @@
 ﻿.focus-dashboard {
+    position: relative;
     display: flex;
+    flex-direction: column;
     width: 100%;
-    height: calc(100% - 55px);
-    margin-top: 35px;
+    height: 100%;
     overflow: hidden;
 }
 
-.dashboard-half {
+.focus-content {
+    flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
-    width: 50%;
-    height: 100%;
+    margin-top: 35px;
+    margin-bottom: 20px;
+    overflow: hidden;
 }
 
-.component {
+.grid-stack {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    position: relative;
+}
+
+.grid-stack-item-content {
+    display: flex;
+    flex-direction: column;
+    inset: 0;
     border-radius: 8px;
+    background: transparent;
+}
+
+/* Gridstack's own rule (.grid-stack>.grid-stack-item>.grid-stack-item-content) forces
+   overflow-y:auto with high specificity, which makes tiles scroll. Override it at equal
+   specificity so tiles clip instead. */
+.grid-stack > .grid-stack-item > .grid-stack-item-content {
     overflow: clip;
 }
 
-.character-component {
-    flex-shrink: 0;
-    overflow: visible !important;
+.focus-tile-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.focus-tile-body > *,
+.focus-tile-body ::deep > * {
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+}
+
+/* The character select dropdown overflows its tile, so it must not be clipped or scrolled.
+   Needs to outrank gridstack's own .grid-stack>.grid-stack-item>.grid-stack-item-content rule. */
+.grid-stack > .grid-stack-item > .grid-stack-item-content.component-character {
+    overflow: visible;
+}
+
+.component-character .focus-tile-body {
+    overflow: visible;
+}
+
+.component-character {
     z-index: 1000;
 }
 
-.vanquish-component {
-    flex-shrink: 0;
+/* In edit mode the live Character dropdown is not rendered (only the placeholder), so drop its
+   raised z-index/overflow which would otherwise let it sit above the resize grabber. */
+.focus-dashboard.editing .grid-stack > .grid-stack-item > .grid-stack-item-content.component-character {
+    overflow: clip;
+    z-index: auto;
 }
 
-.resources-component {
-    flex-shrink: 0;
+/* Editing mode visuals */
+.focus-dashboard.editing .grid-stack {
+    background-image:
+        linear-gradient(to right, var(--neutral-stroke-rest) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--neutral-stroke-rest) 1px, transparent 1px);
+    background-size: calc(100% / var(--focus-cols)) calc(100% / var(--focus-rows));
+    background-position: 0 0;
 }
 
-.title-component {
-    flex-shrink: 0;
+.focus-dashboard.editing .grid-stack-item-content {
+    outline: 1px dashed var(--accent-stroke-control-rest);
+    outline-offset: -1px;
+    cursor: move;
 }
 
-.map-component {
-    flex-shrink: 0;
+/* In edit mode each tile is replaced by a full-size name placeholder so the
+   layout is not distorted by the live components (which require game data). */
+.focus-tile-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-fill-rest);
+    color: var(--foreground-on-accent-rest);
+    user-select: none;
+    overflow: hidden;
 }
 
-.quest-component {
-    flex: 1;
-    min-height: 0;
+.focus-tile-name {
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    text-align: center;
+    padding: 0 8px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
-.build-component {
-    height: 35%;
-    flex-shrink: 0;
+/* Larger, easier-to-grab resize handle in the bottom-right corner. z-index sits above any
+   component (e.g. Character uses z-index:1000 for its dropdown) so the grabber is always visible. */
+.focus-dashboard.editing .grid-stack-item > .ui-resizable-se {
+    width: 18px;
+    height: 18px;
+    right: 2px;
+    bottom: 2px;
+    background: transparent;
+    border-right: 3px solid var(--foreground-on-accent-rest);
+    border-bottom: 3px solid var(--foreground-on-accent-rest);
+    border-bottom-right-radius: 4px;
+    transform: none;
+    cursor: se-resize;
+    z-index: 1001;
 }
 
-.browser-component {
-    height: 65%;
-    flex-shrink: 0;
+/* Per-tile remove button (top-right) to hide a component while editing. */
+.tile-remove-button {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    z-index: 1002;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.45);
+    color: #fff;
+}
+
+.tile-remove-button:hover {
+    background: var(--error, #c50f1f);
+}
+
+/* Add-component dropdown, anchored to the titlebar button (mirrors the character dropdown). */
+.add-component-wrapper {
+    position: relative;
+    display: inline-flex;
+}
+
+.title-bar-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+    pointer-events: none;
+}
+
+.add-component-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    min-width: 180px;
+    max-height: 320px;
+    overflow-y: auto;
+    background: var(--neutral-fill-rest);
+    border: 1px solid var(--neutral-stroke-rest);
+    border-radius: 6px;
+    z-index: 20002;
+}
+
+.add-component-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    color: var(--neutral-foreground-rest);
+    border-bottom: 1px solid var(--neutral-stroke-rest);
+}
+
+.add-component-item:last-child {
+    border-bottom: none;
+}
+
+.add-component-item:hover {
+    background: var(--neutral-fill-hover);
 }
