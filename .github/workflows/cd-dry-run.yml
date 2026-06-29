@@ -13,10 +13,14 @@ on:
       - "Daybreak.Shared/**"
       - "Daybreak.Windows/**"
       - "Daybreak.Linux/**"
+      - ".github/scripts/**"
+      - ".github/workflows/cd-template.yml"
+      - ".github/workflows/cd-dry-run.yml"
 
 jobs:
   cd:
     uses: ./.github/workflows/cd-template.yml
     with:
       publishRelease: false
+      signBinaries: false
     secrets: inherit
