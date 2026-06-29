@@ -54,3 +54,15 @@
     color: var(--neutral-foreground-rest);
     z-index: 1;
 }
+
+.title-idle {
+    width: 100%;
+    height: var(--font-size-x-large);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--neutral-fill-rest);
+    border-radius: 0px 0px 8px 8px;
+    font-size: var(--font-size-medium);
+    color: var(--neutral-foreground-hint);
+}

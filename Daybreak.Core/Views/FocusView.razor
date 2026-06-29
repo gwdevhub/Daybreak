@@ -1,50 +1,82 @@
-﻿@using Daybreak.Views.Components.FocusView
+﻿@using Daybreak.Shared.Models.FocusView
+@using Daybreak.Views.Components.FocusView
+@using Microsoft.JSInterop
 
 @page "/focus"
 @inherits ViewBase<FocusView, FocusViewModel>
 
-<div class="focus-dashboard">
-    <div class="dashboard-half">
-        <div class="component character-component">
-            <CharacterComponent Context="@this.ViewModel.CharacterComponentContext"
-                                OnCharacterChanged="@this.ViewModel.OnCharacterChanged"
-                                OnExperienceBarClicked="@this.ViewModel.OnExperienceDisplayClicked" />
-        </div>
-        <div class="component resources-component">
-            <PlayerResourcesComponent Context="@this.ViewModel.PlayerResourcesComponentContext"
-                                      OnBalthazarBarClicked="@this.ViewModel.OnBalthazarBarClicked"
-                                      OnKurzickBarClicked="@this.ViewModel.OnKurzickBarClicked"
-                                      OnImperialBarClicked="@this.ViewModel.OnImperialBarClicked"
-                                      OnLuxonBarClicked="@this.ViewModel.OnLuxonBarClicked" />
-        </div>
-        <div class="component vanquish-component">
-            <VanquishComponent Context="@this.ViewModel.VanquishComponentContext"
-                               OnVanquishBarClicked="@this.ViewModel.OnVanquishingDisplayClicked" />
-        </div>
-        <div class="component title-component">
-            <TitleInformationComponent Context="@this.ViewModel.TitleInformationComponentContext"
-                                       OnTitleClicked="@this.ViewModel.OnTitleClicked" />
-        </div>
-        <div class="component map-component">
-            <CurrentMapComponent Context="@this.ViewModel.CurrentMapComponentContext"
-                                 OnCurrentMapClicked="@this.ViewModel.OnCurrentMapClicked"/>
-        </div>
-        <div class="component quest-component">
-            <QuestLogComponent Context="@this.ViewModel.QuestLogComponentContext"
-                               OnQuestClicked="@this.ViewModel.OnQuestClicked"/>
-        </div>
+<div class="focus-dashboard @(this.ViewModel.IsEditingLayout ? "editing" : string.Empty)">
+    <div class="title-bar-additional-btns-left">
+        @if (this.ViewModel.IsEditingLayout)
+        {
+            <button class="title-bar-btn" @onclick="@this.SaveLayoutAsync" title="Save layout">
+                <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Save())" />
+            </button>
+            <button class="title-bar-btn" @onclick="@this.ViewModel.ResetLayout" title="Reset layout to defaults">
+                <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowUndo())" />
+            </button>
+            <div class="add-component-wrapper">
+                <button class="title-bar-btn"
+                        title="Add component"
+                        disabled="@(!this.ViewModel.HiddenComponents.Any())"
+                        @onclick="@this.ToggleAddDropdown">
+                    <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Add())" />
+                </button>
+                @if (this.isAddDropdownOpen && this.ViewModel.HiddenComponents.Any())
+                {
+                    <div class="add-component-menu">
+                        @foreach (var component in this.ViewModel.HiddenComponents)
+                        {
+                            <div class="add-component-item" @onclick="@(() => this.AddComponentAsync(component))">
+                                <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Eye())" />
+                                <span>@TileName(component)</span>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <button class="title-bar-btn" @onclick="@this.EnterEditLayout" title="Edit layout">
+                <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.SquareMultiple())" />
+            </button>
+        }
     </div>
-    <div class="dashboard-half">
-        <div class="component build-component">
-            <BuildComponent Context="@this.ViewModel.BuildComponentContext"
-                            OnBuildClicked="@this.ViewModel.OnBuildClicked"
-                            OnLoadPlayerSingleBuildClicked="@this.ViewModel.OnPlayerSingleBuildClicked"
-                            OnLoadPlayerTeamBuildClicked="@this.ViewModel.OnPlayerTeamBuildClicked" />
-        </div>
-        <div class="component browser-component">
-            <iframe sandbox="allow-scripts allow-same-origin allow-forms"
-                    style="height: 100%; width: 100%; margin: -2px;"
-                    src="@this.ViewModel.BrowserSource" />
+
+    <div class="focus-content">
+        <div class="grid-stack" @ref="this.gridElement"
+             style="--focus-cols: @this.ViewModel.GridColumns; --focus-rows: @this.ViewModel.GridRows;">
+            @foreach (var tile in this.ViewModel.VisibleTiles)
+            {
+                <div class="grid-stack-item"
+                     @key="tile.Component"
+                     data-component="@tile.Component"
+                     gs-x="@(tile.Column - 1)"
+                     gs-y="@(tile.Row - 1)"
+                     gs-w="@tile.ColumnSpan"
+                     gs-h="@tile.RowSpan">
+                    <div class="grid-stack-item-content component component-@(tile.Component.ToString().ToLowerInvariant())">
+                        @if (this.ViewModel.IsEditingLayout)
+                        {
+                            <div class="focus-tile-placeholder">
+                                <span class="focus-tile-name">@TileName(tile.Component)</span>
+                                <button class="tile-remove-button"
+                                        title="Hide @TileName(tile.Component)"
+                                        @onclick="@(() => this.ToggleComponentAsync(tile.Component))">
+                                    <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Dismiss())" />
+                                </button>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="focus-tile-body">
+                                @this.RenderTile(tile.Component)
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
         </div>
     </div>
 </div>
@@ -54,4 +86,127 @@
     public required string ConfigurationId { get; init; }
     [Parameter]
     public required string ProcessId { get; init; }
+
+    [Inject]
+    public required IJSRuntime JSRuntime { get; init; }
+
+    private ElementReference gridElement;
+    private int lastSyncedVersion = -1;
+    private bool isAddDropdownOpen;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (this.ViewModel.Tiles.Count == 0)
+        {
+            return;
+        }
+
+        if (this.ViewModel.LayoutVersion != this.lastSyncedVersion)
+        {
+            this.lastSyncedVersion = this.ViewModel.LayoutVersion;
+            this.ViewModel.MarkLayoutSynced();
+            await this.JSRuntime.InvokeVoidAsync("focusGrid.init", this.gridElement, new
+            {
+                columns = this.ViewModel.GridColumns,
+                rows = this.ViewModel.GridRows,
+                editing = this.ViewModel.IsEditingLayout
+            });
+        }
+    }
+
+    // Pulls the current geometry from Gridstack into the view model. Called only at meaningful
+    // moments (save / show / hide) so live drag/resize is never interrupted by a round-trip.
+    private async Task SyncFromGridAsync()
+    {
+        if (this.ViewModel.Tiles.Count == 0)
+        {
+            return;
+        }
+
+        var changes = await this.JSRuntime.InvokeAsync<FocusTileChange[]>("focusGrid.save");
+        this.ViewModel.ApplyTileChanges(changes);
+    }
+
+    private async Task SaveLayoutAsync()
+    {
+        await this.SyncFromGridAsync();
+        this.isAddDropdownOpen = false;
+        this.ViewModel.SaveLayout();
+    }
+
+    private void EnterEditLayout()
+    {
+        this.isAddDropdownOpen = false;
+        this.ViewModel.ToggleEditLayout();
+    }
+
+    private void ToggleAddDropdown() => this.isAddDropdownOpen = !this.isAddDropdownOpen;
+
+    private async Task ToggleComponentAsync(FocusViewComponent component)
+    {
+        await this.SyncFromGridAsync();
+        this.ViewModel.ToggleTileVisibility(component);
+    }
+
+    private async Task AddComponentAsync(FocusViewComponent component)
+    {
+        await this.SyncFromGridAsync();
+        this.ViewModel.ToggleTileVisibility(component);
+        if (!this.ViewModel.HiddenComponents.Any())
+        {
+            this.isAddDropdownOpen = false;
+        }
+    }
+
+    private RenderFragment RenderTile(FocusViewComponent component) => component switch
+    {
+        FocusViewComponent.Character => @<CharacterComponent Context="@this.ViewModel.CharacterComponentContext"
+                                                             OnCharacterChanged="@this.ViewModel.OnCharacterChanged"
+                                                             OnExperienceBarClicked="@this.ViewModel.OnExperienceDisplayClicked" />,
+        FocusViewComponent.PlayerResources => @<PlayerResourcesComponent Context="@this.ViewModel.PlayerResourcesComponentContext"
+                                                                         OnBalthazarBarClicked="@this.ViewModel.OnBalthazarBarClicked"
+                                                                         OnKurzickBarClicked="@this.ViewModel.OnKurzickBarClicked"
+                                                                         OnImperialBarClicked="@this.ViewModel.OnImperialBarClicked"
+                                                                         OnLuxonBarClicked="@this.ViewModel.OnLuxonBarClicked" />,
+        FocusViewComponent.Vanquish => @<VanquishComponent Context="@this.ViewModel.VanquishComponentContext"
+                                                           OnVanquishBarClicked="@this.ViewModel.OnVanquishingDisplayClicked" />,
+        FocusViewComponent.Title => @<TitleInformationComponent Context="@this.ViewModel.TitleInformationComponentContext"
+                                                                OnTitleClicked="@this.ViewModel.OnTitleClicked" />,
+        FocusViewComponent.CurrentMap => @<CurrentMapComponent Context="@this.ViewModel.CurrentMapComponentContext"
+                                                               OnCurrentMapClicked="@this.ViewModel.OnCurrentMapClicked" />,
+        FocusViewComponent.QuestLog => @<QuestLogComponent Context="@this.ViewModel.QuestLogComponentContext"
+                                                           OnQuestClicked="@this.ViewModel.OnQuestClicked" />,
+        FocusViewComponent.Build => @<BuildComponent Context="@this.ViewModel.BuildComponentContext"
+                                                     OnBuildClicked="@this.ViewModel.OnBuildClicked"
+                                                     OnLoadPlayerSingleBuildClicked="@this.ViewModel.OnPlayerSingleBuildClicked"
+                                                     OnLoadPlayerTeamBuildClicked="@this.ViewModel.OnPlayerTeamBuildClicked" />,
+        FocusViewComponent.Browser => @<iframe sandbox="allow-scripts allow-same-origin allow-forms"
+                                               style="height: 100%; width: 100%; margin: -2px;"
+                                               src="@this.ViewModel.BrowserSource" />,
+        _ => @<text></text>
+    };
+
+    private static string TileName(FocusViewComponent component) => component switch
+    {
+        FocusViewComponent.Character => "Character",
+        FocusViewComponent.PlayerResources => "Resources",
+        FocusViewComponent.Vanquish => "Vanquish",
+        FocusViewComponent.Title => "Title",
+        FocusViewComponent.CurrentMap => "Current Map",
+        FocusViewComponent.QuestLog => "Quest Log",
+        FocusViewComponent.Build => "Builds",
+        FocusViewComponent.Browser => "Browser",
+        _ => component.ToString()
+    };
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _ = this.JSRuntime.InvokeVoidAsync("focusGrid.destroy");
+        }
+
+        base.Dispose(disposing);
+    }
 }

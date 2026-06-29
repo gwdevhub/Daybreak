@@ -1,21 +1,34 @@
-﻿@if (this.Context is not null &&
-     this.Context.HardMode &&
-     this.Context.Vanquishing)
-{
-    <div class="container backdrop-panel">
+﻿<div class="container backdrop-panel">
+    @if (this.Context is null)
+    {
+        <SpinnerWidget IsLoading="true" />
+    }
+    else
+    {
         <div class="title">
             Vanquishing
         </div>
-        <div class="vanquish-bar-container">
-            <div class="vanquish-bar" @onclick="@(() => this.VanquishBarClicked())">
-                <div class="vanquish-bar-fill" style="@(this.GetVanquishBarWidth())"></div>
-                <div class="vanquish-bar-text">
-                    @this.GetVanquishBarText()
+        @if (this.Context.HardMode && this.Context.Vanquishing)
+        {
+            <div class="vanquish-bar-container">
+                <div class="vanquish-bar" @onclick="@(() => this.VanquishBarClicked())">
+                    <div class="vanquish-bar-fill" style="@(this.GetVanquishBarWidth())"></div>
+                    <div class="vanquish-bar-text">
+                        @this.GetVanquishBarText()
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-}
+        }
+        else
+        {
+            <div class="vanquish-bar-container">
+                <div class="vanquish-idle">
+                    Not vanquishing
+                </div>
+            </div>
+        }
+    }
+</div>
 
 @code {
     [Parameter]
@@ -37,6 +50,11 @@
         }
 
         var totalFoes = this.Context.FoesToKill + this.Context.FoesKilled;
+        if (totalFoes is 0)
+        {
+            return "width: 0%;";
+        }
+
         return $"width: {this.Context.FoesKilled * 100d / totalFoes}%;";
     }
 

@@ -1,6 +1,23 @@
-﻿@if (this.Context is not null)
-{
-    <div class="container backdrop-panel">
+﻿<div class="container backdrop-panel">
+    @if (this.Context is null)
+    {
+        <SpinnerWidget IsLoading="true" />
+    }
+    else if (this.Context.Title is null)
+    {
+        <div class="title-track-container">
+            <div class="title-label">
+                Title Track
+            </div>
+        </div>
+        <div class="title-bar-container">
+            <div class="title-idle">
+                No active title
+            </div>
+        </div>
+    }
+    else
+    {
         <div class="title-track-container">
             <div class="title-label">
                 Title Track
@@ -18,8 +35,8 @@
                 </div>
             </div>
         </div>
-    </div>
-}
+    }
+</div>
 
 @code {
     [Parameter]
@@ -69,7 +86,7 @@
 
     private string GetTitleDescription()
     {
-        if (this.Context is null)
+        if (this.Context?.Title is null)
         {
             return string.Empty;
         }
