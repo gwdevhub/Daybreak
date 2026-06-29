@@ -72,7 +72,7 @@ end
 vim.api.nvim_create_user_command('DaybreakStageX86', function(opts)
     local config = opts.args ~= '' and opts.args or 'Debug'
     local progress = start_progress('Daybreak StageX86', 'Building x86 components (' .. config .. ')…')
-    vim.fn.jobstart({ scripts .. '/StageX86ForDebug.sh', config }, {
+    vim.fn.jobstart({ scripts .. '/StageX86ForDebug.sh', config, '' }, {
         cwd = repo,
         on_exit = function(_, code)
             vim.schedule(function()
@@ -102,7 +102,7 @@ end, {
 -- bindings work.
 vim.api.nvim_create_user_command('DaybreakRunLinux', function()
     vim.cmd('enew')
-    vim.fn.termopen({ 'dotnet', 'run', '--project', 'Daybreak.Linux/Daybreak.Linux.csproj' },
+    vim.fn.termopen({ 'dotnet', 'run', '--project', 'Daybreak.Linux/Daybreak.Linux.csproj', '-c', 'Debug' },
                     { cwd = repo })
     vim.cmd('startinsert')
 end, { desc = 'Run Daybreak.Linux via dotnet run in the current window' })
