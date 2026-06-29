@@ -15,6 +15,9 @@ on:
       - "Daybreak.Shared/**"
       - "Daybreak.Windows/**"
       - "Daybreak.Linux/**"
+      - ".github/scripts/**"
+      - ".github/workflows/cd-template.yml"
+      - ".github/workflows/cd.yaml"
   workflow_dispatch:
 
 jobs:
@@ -22,4 +25,5 @@ jobs:
     uses: ./.github/workflows/cd-template.yml
     with:
       publishRelease: true
+      signBinaries: true
     secrets: inherit

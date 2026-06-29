@@ -9,6 +9,11 @@ on:
         required: false
         type: boolean
         default: false
+      signBinaries:
+        description: "Whether to code-sign Windows binaries"
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   # ───────────────────────────────────────────────────────
@@ -16,7 +21,7 @@ jobs:
   #            (Injector + API) that both platforms need.
   # ───────────────────────────────────────────────────────
   build-x86:
-    runs-on: windows-latest
+    runs-on: windows-2025
 
     outputs:
       version: ${{ steps.get_version.outputs.version }}
@@ -24,6 +29,9 @@ jobs:
     env:
       Configuration: Release
       Actions_Allow_Unsecure_Commands: true
+      CERTUM_OTP_URI: ${{ secrets.CERTUM_OTP_URI }}
+      CERTUM_USERID: ${{ secrets.CERTUM_USERID }}
+      CERTUM_CERT_SHA1: ${{ secrets.CERTUM_CERT_SHA1 }}
 
     steps:
       - name: Checkout
@@ -48,6 +56,30 @@ jobs:
         run: .\Scripts\PublishWindowsX86.ps1
         shell: pwsh
 
+      # Certum SimplySign code signing. Binaries are signed only when explicitly
+      # requested and the Certum secrets are provisioned.
+      - name: Set up Certum SimplySign
+        if: inputs.signBinaries && env.CERTUM_OTP_URI != ''
+        shell: bash
+        run: |
+          chmod +x ./.github/scripts/install-simplysign.sh
+          ./.github/scripts/install-simplysign.sh
+          powershell -ExecutionPolicy Bypass -File "./.github/scripts/configure-simplysign.ps1"
+
+      - name: Authenticate Certum SimplySign
+        if: inputs.signBinaries && env.CERTUM_OTP_URI != ''
+        shell: bash
+        run: powershell -ExecutionPolicy Bypass -File "./.github/scripts/connect-simplysign.ps1"
+
+      - name: Sign x86 binaries
+        if: inputs.signBinaries && env.CERTUM_OTP_URI != ''
+        run: |
+          ./.github/scripts/sign-certum.ps1 -Files @(
+            "Publish/Injector/Daybreak.Injector.exe",
+            "Publish/Api/Daybreak.API.dll"
+          )
+        shell: pwsh
+
       - name: Upload x86 artifacts
         uses: actions/upload-artifact@v7
         with:
@@ -62,11 +94,14 @@ jobs:
   # ───────────────────────────────────────────────────────
   build-windows:
     needs: build-x86
-    runs-on: windows-latest
+    runs-on: windows-2025
 
     env:
       Configuration: Release
       Actions_Allow_Unsecure_Commands: true
+      CERTUM_OTP_URI: ${{ secrets.CERTUM_OTP_URI }}
+      CERTUM_USERID: ${{ secrets.CERTUM_USERID }}
+      CERTUM_CERT_SHA1: ${{ secrets.CERTUM_CERT_SHA1 }}
 
     steps:
       - name: Checkout
@@ -96,6 +131,28 @@ jobs:
 
       - name: Publish Windows x64
         run: .\Scripts\PublishWindows.ps1
+        shell: pwsh
+
+      - name: Set up Certum SimplySign
+        if: inputs.signBinaries && env.CERTUM_OTP_URI != ''
+        shell: bash
+        run: |
+          chmod +x ./.github/scripts/install-simplysign.sh
+          ./.github/scripts/install-simplysign.sh
+          powershell -ExecutionPolicy Bypass -File "./.github/scripts/configure-simplysign.ps1"
+
+      - name: Authenticate Certum SimplySign
+        if: inputs.signBinaries && env.CERTUM_OTP_URI != ''
+        shell: bash
+        run: powershell -ExecutionPolicy Bypass -File "./.github/scripts/connect-simplysign.ps1"
+
+      - name: Sign Windows build
+        if: inputs.signBinaries && env.CERTUM_OTP_URI != ''
+        run: |
+          ./.github/scripts/sign-certum.ps1 -Files @(
+            "Publish/Daybreak.exe",
+            "Publish/Installer/Daybreak.Installer.exe"
+          )
         shell: pwsh
 
       - name: Upload Windows build
