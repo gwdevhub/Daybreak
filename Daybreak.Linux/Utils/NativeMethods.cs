@@ -14,6 +14,7 @@ public static partial class NativeMethods
     public const string GtkLib = "libgtk-3.so.0";
     public const string GdkLib = "libgdk-3.so.0";
     public const string GlibLib = "libglib-2.0.so.0";
+    public const string LibcLib = "libc";
 
     #endregion
 
@@ -208,6 +209,16 @@ public static partial class NativeMethods
 
     #region GTK3 P/Invoke
 
+    /// <summary>
+    /// Initializes GTK without aborting on failure. Idempotent and safe to call
+    /// repeatedly (no-op once GTK is already initialized). Used to guarantee a
+    /// default <c>GdkDisplay</c> exists before enumerating monitors, in case it
+    /// is queried before Photino has created its first window.
+    /// </summary>
+    [LibraryImport(GtkLib, EntryPoint = "gtk_init_check")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool gtk_init_check(nint argc, nint argv);
+
     [LibraryImport(GtkLib, EntryPoint = "gtk_widget_get_window")]
     public static partial nint gtk_widget_get_window(nint widget);
 
@@ -293,6 +304,61 @@ public static partial class NativeMethods
 
     [LibraryImport(GdkLib, EntryPoint = "gdk_x11_window_get_xid")]
     public static partial ulong gdk_x11_window_get_xid(nint gdkWindow);
+
+    // --- Monitor enumeration / scaling ---
+
+    /// <summary>GdkRectangle: monitor geometry in application (logical) pixels.</summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct GdkRectangle
+    {
+        public int X;
+        public int Y;
+        public int Width;
+        public int Height;
+    }
+
+    [LibraryImport(GdkLib, EntryPoint = "gdk_display_get_n_monitors")]
+    public static partial int gdk_display_get_n_monitors(nint display);
+
+    [LibraryImport(GdkLib, EntryPoint = "gdk_display_get_monitor")]
+    public static partial nint gdk_display_get_monitor(nint display, int monitorNum);
+
+    [LibraryImport(GdkLib, EntryPoint = "gdk_display_get_primary_monitor")]
+    public static partial nint gdk_display_get_primary_monitor(nint display);
+
+    [LibraryImport(GdkLib, EntryPoint = "gdk_display_get_monitor_at_point")]
+    public static partial nint gdk_display_get_monitor_at_point(nint display, int x, int y);
+
+    [LibraryImport(GdkLib, EntryPoint = "gdk_monitor_get_geometry")]
+    public static partial void gdk_monitor_get_geometry(nint monitor, out GdkRectangle geometry);
+
+    /// <summary>
+    /// Returns the integer scale factor (1, 2, ...) GDK applies to the monitor.
+    /// Under X11/XWayland this reflects GDK_SCALE / Xft.dpi-derived integer
+    /// scaling; true fractional per-monitor scaling requires the Wayland backend.
+    /// </summary>
+    /// <summary>
+    /// Returns the integer scale factor (1, 2, ...) GDK applies to the monitor.
+    /// Note: Daybreak does not use this for UI scaling because, under the forced
+    /// X11 backend, GDK always reports 1 regardless of the real (fractional)
+    /// Wayland scale; see <see cref="Daybreak.Linux.Utils.DisplayScale"/>.
+    /// </summary>
+    [LibraryImport(GdkLib, EntryPoint = "gdk_monitor_get_scale_factor")]
+    public static partial int gdk_monitor_get_scale_factor(nint monitor);
+
+    #endregion
+
+    #region libc P/Invoke
+
+    /// <summary>
+    /// Sets an environment variable in the native C runtime. Required because
+    /// <see cref="System.Environment.SetEnvironmentVariable(string, string)"/>
+    /// updates only the managed environment cache and is NOT visible to native
+    /// libraries' getenv() (e.g. GTK reading GDK_BACKEND at gtk_init).
+    /// </summary>
+    /// <param name="overwrite">When 0, an existing value is preserved.</param>
+    [LibraryImport(LibcLib, EntryPoint = "setenv", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial int setenv(string name, string value, int overwrite);
 
     #endregion
 }
