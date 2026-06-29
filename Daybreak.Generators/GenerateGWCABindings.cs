@@ -308,6 +308,45 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         var outputPath = Path.Combine(repoRoot!, "Daybreak.API", "Interop", "GWCA.cs");
 #pragma warning disable RS1035 // File IO required to emit source that LibraryImport generator can process
         File.WriteAllText(outputPath, sb.ToString());
+
+        // Emit linker /ALTERNATENAME directives for the NativeAOT (DirectPInvoke,
+        // win-x86) static-link path. NativeAOT decorates cdecl P/Invoke targets
+        // with a leading underscore ('_?Foo@GW@@...'), but MSVC emits C++ symbols
+        // without it ('?Foo@GW@@...'). DirectPInvoke does no fuzzy matching, so we
+        // bridge each referenced symbol to its real name. Harmless on the DLL path
+        // (the file is only consumed by the native linker via Daybreak.API.csproj).
+        EmitAlternateNamesFile(sb.ToString(),
+            Path.Combine(repoRoot!, "Daybreak.API", "Interop", "GWCA.alternatenames.rsp"));
+#pragma warning restore RS1035
+    }
+
+    /// <summary>
+    /// Scans the generated bindings for active (non-commented) LibraryImport
+    /// entry points and writes one "/ALTERNATENAME:_&lt;entry&gt;=&lt;entry&gt;"
+    /// directive per unique symbol, bridging NativeAOT's x86 cdecl underscore
+    /// decoration to GWCA's undecorated MSVC C++ export names.
+    /// </summary>
+    private static void EmitAlternateNamesFile(string generatedSource, string outputPath)
+    {
+        const string marker = "[LibraryImport(DllName, EntryPoint = \"";
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+        var alt = new StringBuilder();
+        foreach (var rawLine in generatedSource.Split('\n'))
+        {
+            var line = rawLine.Trim();
+            // Skip commented-out bindings ("// [LibraryImport...]").
+            if (!line.StartsWith(marker, StringComparison.Ordinal))
+                continue;
+            var start = marker.Length;
+            var end = line.IndexOf('"', start);
+            if (end <= start)
+                continue;
+            var entry = line.Substring(start, end - start);
+            if (seen.Add(entry))
+                alt.Append("/ALTERNATENAME:_").Append(entry).Append('=').Append(entry).Append('\n');
+        }
+#pragma warning disable RS1035 // File IO required to emit linker directives the native linker consumes
+        File.WriteAllText(outputPath, alt.ToString());
 #pragma warning restore RS1035
     }
 
@@ -468,10 +507,16 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         // Use C export name when available for std::function params
         var entryPoint = useCExport ? info.FunctionName : entry.MangledName;
 
-        // Build LibraryImport attribute and calling convention
+        // Build LibraryImport attribute and calling convention. GWCA's free
+        // functions are __cdecl (the 'YA' in the mangled name) and members are
+        // __thiscall ('QAE'/'AAE'). The convention must be explicit: it is both
+        // an ABI requirement (x86 stack cleanup differs) and, for DirectPInvoke
+        // static linking, it drives the symbol decoration the linker resolves.
+        // Without it the default Winapi/__stdcall mangles every free function as
+        // '_<name>@<bytes>', which matches neither the cdecl ABI nor the lib.
         var conventionAttr = info.IsMember
             ? $"[UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]"
-            : "";
+            : $"[UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]";
 
         // Bool return type needs explicit marshalling
         var retAttr = csRet == "bool" ? "[return: MarshalAs(UnmanagedType.U1)]" : "";
