@@ -14,6 +14,7 @@ public static partial class NativeMethods
     public const string GtkLib = "libgtk-3.so.0";
     public const string GdkLib = "libgdk-3.so.0";
     public const string GlibLib = "libglib-2.0.so.0";
+    public const string LibcLib = "libc";
 
     #endregion
 
@@ -293,6 +294,20 @@ public static partial class NativeMethods
 
     [LibraryImport(GdkLib, EntryPoint = "gdk_x11_window_get_xid")]
     public static partial ulong gdk_x11_window_get_xid(nint gdkWindow);
+
+    #endregion
+
+    #region libc P/Invoke
+
+    /// <summary>
+    /// Sets an environment variable in the native C runtime. Required because
+    /// <see cref="System.Environment.SetEnvironmentVariable(string, string)"/>
+    /// updates only the managed environment cache and is NOT visible to native
+    /// libraries' getenv() (e.g. GTK reading GDK_BACKEND at gtk_init).
+    /// </summary>
+    /// <param name="overwrite">When 0, an existing value is preserved.</param>
+    [LibraryImport(LibcLib, EntryPoint = "setenv", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial int setenv(string name, string value, int overwrite);
 
     #endregion
 }
