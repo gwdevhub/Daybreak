@@ -12,11 +12,13 @@ static void PrintUsage()
     Console.WriteLine("- stub");
     Console.WriteLine("- launch");
     Console.WriteLine("- resume");
+    Console.WriteLine("- resolve");
     Console.WriteLine("Examples:");
     Console.WriteLine("1) Daybreak.Injector winapi 1234 C:\\path\\to\\dll.dll");
     Console.WriteLine("2) Daybreak.Injector stub 1234 entryPoint C:\\path\\to\\dll.dll");
     Console.WriteLine("3) Daybreak.Injector launch true C:\\path\\to\\dll.dll arg1 arg2 arg3");
     Console.WriteLine("4) Daybreak.Injector resume 1234");
+    Console.WriteLine("5) Daybreak.Injector resolve \"Z:\\path\\to\\Gw.exe\"");
     Console.WriteLine("======================================================");
 }
 
@@ -173,6 +175,24 @@ static bool TryParseThreadResumeArgs(
     return true;
 }
 
+static bool TryParseResolveArgs(
+    string[] args,
+    [NotNullWhen(true)] out string? executablePath,
+    out InjectorResponses.ResolveResult exitCode)
+{
+    executablePath = default;
+    if (args.Length < 2 || string.IsNullOrWhiteSpace(args[1]))
+    {
+        PrintUsage();
+        exitCode = InjectorResponses.ResolveResult.InvalidArgs;
+        return false;
+    }
+
+    executablePath = args[1];
+    exitCode = InjectorResponses.ResolveResult.Success;
+    return true;
+}
+
 if (args.Length < 1)
 {
     PrintUsage();
@@ -243,6 +263,24 @@ switch (mode)
             var result = (int) ThreadResumer.Resume(threadHwnd.Value);
             Console.WriteLine($"ExitCode: {result}");
             return result;
+        }
+    case "resolve":
+        {
+            if (!TryParseResolveArgs(args, out var executablePath, out var parseResult))
+            {
+                Console.WriteLine($"ExitCode: {(int)parseResult}");
+                return (int)parseResult;
+            }
+
+            Console.WriteLine($"Resolving Wine PID for {executablePath}");
+            var result = ProcessResolver.Resolve(executablePath, out var processId);
+            if (result is InjectorResponses.ResolveResult.Success)
+            {
+                Console.WriteLine($"ProcessId: {processId}");
+            }
+
+            Console.WriteLine($"ExitCode: {(int)result}");
+            return (int)result;
         }
     default:
         PrintUsage();

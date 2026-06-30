@@ -18,6 +18,7 @@ public class DaybreakInjector(
 ) : IDaybreakInjector
 {
     private const string InjectorRelativePath = "Injector/Daybreak.Injector.exe";
+    private const string GuildWarsExecutableName = "Gw.exe";
 
     private readonly ILogger<DaybreakInjector> logger = logger;
     private readonly IWinePrefixManager winePrefixManager = winePrefixManager;
@@ -57,8 +58,9 @@ public class DaybreakInjector(
             return InjectorResponses.InjectResult.InvalidInjector;
         }
 
-        // Convert Linux PID to Wine PID for the injector
-        var winePid = this.winePidMapper.LinuxPidToWinePid(processId);
+        // Resolve the Wine PID by matching the process's full image path (handles
+        // multiple concurrent Guild Wars instances).
+        var winePid = await this.ResolveWinePid(processId, cancellationToken);
         if (winePid is null)
         {
             scopedLogger.LogError("No Wine PID mapping found for Linux PID {ProcessId}", processId);
@@ -99,8 +101,9 @@ public class DaybreakInjector(
             return InjectorResponses.InjectResult.InvalidInjector;
         }
 
-        // Convert Linux PID to Wine PID for the injector
-        var winePid = this.winePidMapper.LinuxPidToWinePid(processId);
+        // Resolve the Wine PID by matching the process's full image path (handles
+        // multiple concurrent Guild Wars instances).
+        var winePid = await this.ResolveWinePid(processId, cancellationToken);
         if (winePid is null)
         {
             scopedLogger.LogError("No Wine PID mapping found for Linux PID {ProcessId}", processId);
@@ -289,5 +292,89 @@ public class DaybreakInjector(
         }
 
         return defaultExitCode;
+    }
+
+    /// <summary>
+    /// Resolves the Wine PID for a Linux Guild Wars process by asking the injector (which runs
+    /// inside Wine) to match on the process's full image path. This disambiguates multiple
+    /// concurrent Guild Wars instances, which a name-only lookup cannot.
+    /// </summary>
+    private async Task<int?> ResolveWinePid(int linuxPid, CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+
+        var wineExecutablePath = TryGetWineExecutablePath(linuxPid);
+        if (wineExecutablePath is null)
+        {
+            scopedLogger.LogError("Could not read Wine executable path for Linux PID {ProcessId}", linuxPid);
+            return null;
+        }
+
+        var (output, _, _) = await this.LaunchInjector(
+            ["resolve", $"\"{wineExecutablePath}\""],
+            cancellationToken,
+            completionChecker: (line, _) => line.StartsWith("ExitCode: ")
+        );
+
+        var winePid = ParseLabeledIntFromOutput(output, "ProcessId: ");
+        if (winePid is null)
+        {
+            scopedLogger.LogWarning(
+                "Injector could not resolve Wine PID for {ExecutablePath} (Linux PID {ProcessId})",
+                wineExecutablePath,
+                linuxPid
+            );
+            return null;
+        }
+
+        scopedLogger.LogDebug(
+            "Resolved Linux PID {ProcessId} -> Wine PID {WinePid} via {ExecutablePath}",
+            linuxPid,
+            winePid.Value,
+            wineExecutablePath
+        );
+        return winePid;
+    }
+
+    /// <summary>
+    /// Reads the Wine-form executable path (e.g. "Z:\home\...\Gw.exe") from the process's
+    /// command line, used to uniquely identify it among concurrent Guild Wars instances.
+    /// </summary>
+    private static string? TryGetWineExecutablePath(int linuxPid)
+    {
+        try
+        {
+            var cmdline = File.ReadAllText($"/proc/{linuxPid}/cmdline");
+            var segments = cmdline.Split('\0', StringSplitOptions.RemoveEmptyEntries);
+            return segments.FirstOrDefault(s =>
+                s.EndsWith(GuildWarsExecutableName, StringComparison.OrdinalIgnoreCase));
+        }
+        catch (IOException)
+        {
+            return null;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return null;
+        }
+    }
+
+    private static int? ParseLabeledIntFromOutput(string? output, string label)
+    {
+        if (output is null)
+        {
+            return null;
+        }
+
+        foreach (var line in output.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (line.StartsWith(label) &&
+                int.TryParse(line[label.Length..], out var value))
+            {
+                return value;
+            }
+        }
+
+        return null;
     }
 }
