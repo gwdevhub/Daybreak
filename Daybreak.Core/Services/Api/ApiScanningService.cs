@@ -131,7 +131,7 @@ public sealed class ApiScanningService(
             }
 
             // Convert the reported PID (Wine PID on Linux) to system PID
-            var systemPid = this.pidProvider.ResolveSystemPid(reportedPid.Value, GuildWarsExecutable);
+            var systemPid = this.pidProvider.ResolveSystemPid(reportedPid.Value, GuildWarsExecutable, port);
             var uri = new Uri($"http://localhost:{port}");
 
             scopedLogger.LogDebug(

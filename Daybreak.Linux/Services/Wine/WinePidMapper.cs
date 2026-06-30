@@ -17,8 +17,12 @@ public sealed class WinePidMapper(
     private readonly ILogger<WinePidMapper> logger = logger;
 
     /// <inheritdoc />
-    public int? WinePidToLinuxPid(int winePid, string executableName)
+    public int? WinePidToLinuxPid(int winePid, string executable)
     {
+        var targetFileName = Path.GetFileName(executable);
+        var matchByFullPath = executable.Contains('/') || executable.Contains('\\');
+        var targetFullPath = matchByFullPath ? TryGetFullPath(executable) : null;
+
         try
         {
             foreach (var procDir in Directory.EnumerateDirectories("/proc"))
@@ -38,14 +42,35 @@ public sealed class WinePidMapper(
                     }
 
                     var cmdline = File.ReadAllText(cmdlinePath);
-                    if (!cmdline.Contains(executableName, StringComparison.OrdinalIgnoreCase))
+                    if (cmdline.Length == 0)
                     {
                         continue;
                     }
 
+                    // cmdline is null-separated; find the segment pointing at the executable.
+                    var segments = cmdline.Split('\0', StringSplitOptions.RemoveEmptyEntries);
+                    var exeSegment = segments.FirstOrDefault(s =>
+                        s.EndsWith(targetFileName, StringComparison.OrdinalIgnoreCase));
+                    if (exeSegment is null)
+                    {
+                        continue;
+                    }
+
+                    // When a full path was supplied, require an exact path match so that
+                    // concurrent Guild Wars instances in different directories are not confused.
+                    if (matchByFullPath)
+                    {
+                        var candidateFullPath = TryGetFullPath(WinePathToLinuxPath(exeSegment));
+                        if (candidateFullPath is null ||
+                            !string.Equals(candidateFullPath, targetFullPath, StringComparison.OrdinalIgnoreCase))
+                        {
+                            continue;
+                        }
+                    }
+
                     this.logger.LogDebug(
-                        "Resolved Wine PID {WinePid} -> Linux PID {LinuxPid} for {ExeName}",
-                        winePid, pid, executableName
+                        "Resolved Wine PID {WinePid} -> Linux PID {LinuxPid} for {Executable}",
+                        winePid, pid, executable
                     );
 
                     return pid;
@@ -56,11 +81,37 @@ public sealed class WinePidMapper(
         }
         catch (Exception ex)
         {
-            this.logger.LogError(ex, "Error scanning /proc for Wine process {ExeName}", executableName);
+            this.logger.LogError(ex, "Error scanning /proc for Wine process {Executable}", executable);
         }
 
-        this.logger.LogWarning("Could not find Linux PID for Wine PID {WinePid} ({ExeName})", winePid, executableName);
+        this.logger.LogWarning("Could not find Linux PID for Wine PID {WinePid} ({Executable})", winePid, executable);
         return null;
+    }
+
+    private static string? TryGetFullPath(string path)
+    {
+        try
+        {
+            return Path.GetFullPath(path);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Converts a Wine Z: drive path back to a Linux path.
+    /// "Z:\home\user\Guild Wars\Gw.exe" -> "/home/user/Guild Wars/Gw.exe".
+    /// </summary>
+    private static string WinePathToLinuxPath(string winePath)
+    {
+        if (winePath.StartsWith("Z:", StringComparison.OrdinalIgnoreCase))
+        {
+            winePath = winePath[2..];
+        }
+
+        return winePath.Replace('\\', '/');
     }
 
     /// <inheritdoc />
