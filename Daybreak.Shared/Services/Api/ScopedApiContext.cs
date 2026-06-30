@@ -131,6 +131,16 @@ public sealed class ScopedApiContext(
             scopedLogger.LogError("Failed to post data to {path}: {statusCode} {reasonPhrase}", path, response.StatusCode, response.ReasonPhrase ?? string.Empty);
             return false;
         }
+        catch (OperationCanceledException) when (timeoutCts.IsCancellationRequested)
+        {
+            scopedLogger.LogDebug("Request to {path} timed out after {timeout}", path, timeout);
+            return false;
+        }
+        catch (OperationCanceledException)
+        {
+            scopedLogger.LogDebug("Request to {path} was canceled", path);
+            return false;
+        }
         catch (Exception ex)
         {
             scopedLogger.LogError(ex, "Failed to execute api request");
@@ -169,6 +179,16 @@ public sealed class ScopedApiContext(
         {
             using var response = await this.httpClient.GetAsync(uri, compositeCts.Token);
             return await responseBuilder(response);
+        }
+        catch (OperationCanceledException) when (timeoutCts.IsCancellationRequested)
+        {
+            scopedLogger.LogDebug("Request to {path} timed out after {timeout}", path, timeout);
+            return default;
+        }
+        catch (OperationCanceledException)
+        {
+            scopedLogger.LogDebug("Request to {path} was canceled", path);
+            return default;
         }
         catch (Exception ex)
         {
