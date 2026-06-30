@@ -255,7 +255,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddHostedSingleton<IThemeManager, BlazorThemeInteropService>();
         services.AddHostedSingleton<IConnectivityStatus, ConnectivityStatus>();
         services.AddHostedSingleton<ITradeAlertingService, TradeAlertingService>();
-        services.AddHostedSingleton<IGuildWarsExecutableManager, GuildWarsExecutableManager>();
+        services.AddSingleton<IGuildWarsExecutableManager, GuildWarsExecutableManager>();
         services.AddHostedSingleton<IEventNotifierService, EventNotifierService>();
         services.AddHostedSingleton<IApiScanningService, ApiScanningService>();
         services.AddHostedSingleton<GameScreenshotsTheme>();
