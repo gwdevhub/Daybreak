@@ -7,7 +7,7 @@ namespace Daybreak.Tools.SkillUpdater;
 /// Polite HTTP client for the Guild Wars wiki.
 /// * Single in-flight request (serialised behind a SemaphoreSlim).
 /// * 250 ms minimum spacing between requests.
-/// * Exponential back-off on 429/5xx (3 retries: 1s → 2s → 4s).
+/// * Exponential back-off on transient wiki/WAF throttling responses.
 /// * Custom User-Agent identifying Daybreak.
 /// </summary>
 public sealed class WikiHttpClient : IDisposable
@@ -15,9 +15,11 @@ public sealed class WikiHttpClient : IDisposable
     private static readonly TimeSpan MinSpacing = TimeSpan.FromMilliseconds(250);
     private static readonly TimeSpan[] BackoffDelays =
     [
-        TimeSpan.FromSeconds(1),
-        TimeSpan.FromSeconds(2),
-        TimeSpan.FromSeconds(4),
+        TimeSpan.FromSeconds(5),
+        TimeSpan.FromSeconds(15),
+        TimeSpan.FromSeconds(30),
+        TimeSpan.FromSeconds(60),
+        TimeSpan.FromSeconds(120),
     ];
 
     private readonly HttpClient httpClient;
@@ -73,6 +75,7 @@ public sealed class WikiHttpClient : IDisposable
     }
 
     private static bool ShouldRetry(HttpStatusCode code) =>
+        code == HttpStatusCode.Forbidden ||
         code == HttpStatusCode.TooManyRequests ||
         (int)code >= 500;
 
