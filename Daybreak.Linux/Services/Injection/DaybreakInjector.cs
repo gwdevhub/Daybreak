@@ -193,8 +193,9 @@ public class DaybreakInjector(
         // Convert Wine PID to Linux PID so the rest of Daybreak can use Process.GetProcessById()
         if (processId > 0)
         {
-            var executableName = Path.GetFileName(executablePath);
-            var linuxPid = this.winePidMapper.WinePidToLinuxPid(processId, executableName);
+            // Match on the full executable path so concurrent Guild Wars instances
+            // (different install directories) are not confused for one another.
+            var linuxPid = this.winePidMapper.WinePidToLinuxPid(processId, executablePath);
             if (linuxPid is not null)
             {
                 scopedLogger.LogInformation(

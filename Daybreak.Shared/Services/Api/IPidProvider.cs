@@ -12,6 +12,7 @@ public interface IPidProvider
     /// </summary>
     /// <param name="reportedPid">The process ID reported by the API (may be a Wine PID on Linux).</param>
     /// <param name="executableName">The executable name to search for (e.g., "Gw.exe").</param>
+    /// <param name="port">The local TCP port owned by the process, when available.</param>
     /// <returns>The system process ID, or the original PID if conversion fails or is not needed.</returns>
-    int ResolveSystemPid(int reportedPid, string executableName);
+    int ResolveSystemPid(int reportedPid, string executableName, int? port = null);
 }

@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Extensions.Core;
 using System.Logging;
 using System.Net.NetworkInformation;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using Daybreak.API.Configuration;
 using Daybreak.API.Extensions;
@@ -22,8 +23,12 @@ namespace Daybreak.API;
 public class EntryPoint
 {
     private const int StartPort = 5080;
+    private const string GwcaDllName = "gwca.dll";
     private static readonly TimeSpan InitializationTimeout = TimeSpan.FromSeconds(5);
     private static readonly CancellationTokenSource CancellationTokenSource = new();
+    private static readonly object GwcaResolverLock = new();
+    private static IntPtr gwcaHandle;
+    private static bool gwcaResolverRegistered;
 
     [UnmanagedCallersOnly(EntryPoint = "ThreadInit"), STAThread]
     [RequiresUnreferencedCode("The handler uses a static method that gets referenced, so there's no unreferenced code to worry about")]
@@ -192,7 +197,8 @@ public class EntryPoint
         {
             if (module.ModuleName?.Equals("gwca.dll", StringComparison.OrdinalIgnoreCase) is true)
             {
-                NativeLibrary.Load(module.FileName);
+                var handle = NativeLibrary.Load(module.FileName);
+                RegisterGwcaResolver(handle, module.FileName, logger);
                 logger.LogDebug($"Reused already-loaded gwca.dll from {module.FileName}");
                 return;
             }
@@ -213,12 +219,40 @@ public class EntryPoint
         var gwcaPath = Path.Combine(daybreakApiDir, "gwca.dll");
         if (File.Exists(gwcaPath))
         {
-            NativeLibrary.Load(gwcaPath);
+            var handle = NativeLibrary.Load(gwcaPath);
+            RegisterGwcaResolver(handle, gwcaPath, logger);
             logger.LogDebug($"Preloaded gwca.dll from {gwcaPath}");
         }
         else
         {
             logger.LogError($"gwca.dll not found at {gwcaPath}");
         }
+    }
+
+    private static void RegisterGwcaResolver(IntPtr handle, string path, ScopedLogger<EntryPoint> logger)
+    {
+        lock (GwcaResolverLock)
+        {
+            gwcaHandle = handle;
+            if (gwcaResolverRegistered)
+            {
+                logger.LogDebug($"Updated gwca.dll resolver handle for {path}");
+                return;
+            }
+
+            NativeLibrary.SetDllImportResolver(typeof(GWCA).Assembly, ResolveNativeLibrary);
+            gwcaResolverRegistered = true;
+            logger.LogDebug($"Registered gwca.dll import resolver for {path}");
+        }
+    }
+
+    private static IntPtr ResolveNativeLibrary(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
+    {
+        if (string.Equals(libraryName, GwcaDllName, StringComparison.OrdinalIgnoreCase))
+        {
+            return gwcaHandle;
+        }
+
+        return IntPtr.Zero;
     }
 }
