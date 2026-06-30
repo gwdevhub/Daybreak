@@ -60,44 +60,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- gwca.dll is a build-time codegen input only (PE exports + headers feed the binding generator); it is not copied or linked. -->
+    <None Include="..\Dependencies\GWCA\gwca.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>gwca.dll</Link>
+    </None>
     <AdditionalFiles Include="..\Dependencies\GWCA\gwca.dll" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <!-- Statically link GWCA into the NativeAOT image instead of P/Invoking gwca.dll at runtime. -->
-    <DirectPInvoke Include="gwca.dll" />
-    <NativeLibrary Include="..\Dependencies\GWCA\gwca_static.lib" />
-    <NativeLibrary Include="..\Dependencies\GWCA\minhook.lib" />
-    <NativeLibrary Include="..\Dependencies\GWCA\d3d9.lib" />
-    <NativeLibrary Include="..\Dependencies\GWCA\d3dx9.lib" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <!-- GWCA pulls in system imports beyond NativeAOT's default SDK lib set:
-         shell32 (CommandLineToArgvW, ShellExecuteW) and dbghelp (ImageNtHeader). -->
-    <SdkNativeLibrary Include="shell32.lib" />
-    <SdkNativeLibrary Include="dbghelp.lib" />
   </ItemGroup>
 
   <ItemGroup>
     <RdXmlFile Include="rd.xml" />
   </ItemGroup>
-
-  <!--
-    NativeAOT win-x86 statically links GWCA via DirectPInvoke. NativeAOT decorates
-    cdecl P/Invoke targets with a leading underscore (_?Foo@GW@@...), but MSVC C++
-    exports have none (?Foo@GW@@...). The GWCA binding generator emits a matching
-    set of /ALTERNATENAME directives (Interop/GWCA.alternatenames.rsp) during
-    CoreCompile; feed them to lld-link before it runs.
-  -->
-  <Target Name="_AddGwcaAlternateNames"
-          BeforeTargets="LinkNative"
-          Condition="Exists('$(MSBuildProjectDirectory)/Interop/GWCA.alternatenames.rsp')">
-    <ReadLinesFromFile File="$(MSBuildProjectDirectory)/Interop/GWCA.alternatenames.rsp">
-      <Output TaskParameter="Lines" ItemName="LinkerArg" />
-    </ReadLinesFromFile>
-  </Target>
   
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />

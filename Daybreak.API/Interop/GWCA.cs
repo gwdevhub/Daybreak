@@ -13,7 +13,7 @@ namespace Daybreak.API.Interop
 {
 
 /// <summary>
-/// P/Invoke bindings for 531 C++ exports from gwca.dll (0 skipped).
+/// P/Invoke bindings for 536 C++ exports from gwca.dll (0 skipped).
 /// Nested classes mirror the C++ namespace hierarchy (e.g. GW::Agents → GWCA.GW.Agents).
 /// Types annotated with [GWCAEquivalent] are used in signatures where available.
 /// </summary>
@@ -2307,6 +2307,11 @@ public static unsafe partial class GWCA
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial void EnableHooks();
 
+            // GW::Render::FlushCommandQueue
+            [LibraryImport(DllName, EntryPoint = "?FlushCommandQueue@Render@GW@@YAXXZ")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial void FlushCommandQueue();
+
             // GW::Render::GetDevice | returns TODO: map struct IDirect3DDevice9
             // [LibraryImport(DllName, EntryPoint = "?GetDevice@Render@GW@@YAPAUIDirect3DDevice9@@XZ")]
             // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -2924,6 +2929,11 @@ public static unsafe partial class GWCA
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint EncStrToUInt32(ushort* ptr);
 
+            // GW::UI::GetButtonFrameByEncodedString | returns TODO: map struct GW::ButtonFrame
+            // [LibraryImport(DllName, EntryPoint = "?GetButtonFrameByEncodedString@UI@GW@@YAPAUButtonFrame@2@PB_W_N@Z")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial ButtonFrame* GetButtonFrameByEncodedString(ushort* ptr1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+
             // GW::UI::GetChildFrame
             [LibraryImport(DllName, EntryPoint = "?GetChildFrame@UI@GW@@YAPAUFrame@12@PAU312@I@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -2979,6 +2989,16 @@ public static unsafe partial class GWCA
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool GetIsWorldMapShowing();
 
+            // GW::UI::GetLastFrameContext
+            [LibraryImport(DllName, EntryPoint = "?GetLastFrameContext@UI@GW@@YAPAXPAUFrame@12@@Z")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial void* GetLastFrameContext(global::Daybreak.API.Interop.Frame* frame);
+
+            // GW::UI::GetMultilineTextFrameByEncodedString | returns TODO: map struct GW::MultiLineTextLabelFrame
+            // [LibraryImport(DllName, EntryPoint = "?GetMultilineTextFrameByEncodedString@UI@GW@@YAPAUMultiLineTextLabelFrame@2@PB_W_N@Z")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial MultiLineTextLabelFrame* GetMultilineTextFrameByEncodedString(ushort* ptr1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+
             // GW::UI::GetParentFrame
             [LibraryImport(DllName, EntryPoint = "?GetParentFrame@UI@GW@@YAPAUFrame@12@PAU312@@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -3019,6 +3039,11 @@ public static unsafe partial class GWCA
             [LibraryImport(DllName, EntryPoint = "?GetSettings@UI@GW@@YAPAV?$Array@E@2@XZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<byte>* GetSettings();
+
+            // GW::UI::GetTextFrameByEncodedString | returns TODO: map struct GW::TextLabelFrame
+            // [LibraryImport(DllName, EntryPoint = "?GetTextFrameByEncodedString@UI@GW@@YAPAUTextLabelFrame@2@PB_W_N@Z")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial TextLabelFrame* GetTextFrameByEncodedString(ushort* ptr1, [MarshalAs(UnmanagedType.U1)] bool flag2);
 
             // GW::UI::GetTextLanguage
             [LibraryImport(DllName, EntryPoint = "?GetTextLanguage@UI@GW@@YA?AW4Language@Constants@2@XZ")]
