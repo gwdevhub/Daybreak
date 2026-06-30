@@ -9,7 +9,7 @@ namespace Daybreak.Windows.Services.Api;
 public sealed class PidProvider : IPidProvider
 {
     /// <inheritdoc />
-    public int ResolveSystemPid(int reportedPid, string executableName)
+    public int ResolveSystemPid(int reportedPid, string executableName, int? port = null)
     {
         // On Windows, the reported PID is the actual system PID
         return reportedPid;
