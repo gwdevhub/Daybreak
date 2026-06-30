@@ -28,6 +28,24 @@ public sealed class GuildWarsProcessFinder : IGuildWarsProcessFinder
         return this.FindProcesses(configuration).FirstOrDefault();
     }
 
+    /// <summary>
+    /// Terminates the Guild Wars process tree. Guards against killing an unrelated
+    /// process by verifying the main module is Gw.exe. Reading the main module of an
+    /// elevated process throws a <see cref="Win32Exception"/>, which is propagated so
+    /// the caller can fall back to a direct kill or request elevation.
+    /// </summary>
+    public void KillProcess(GuildWarsApplicationLaunchContext guildWarsApplicationLaunchContext)
+    {
+        var process = guildWarsApplicationLaunchContext.GuildWarsProcess;
+        if (
+            process.MainModule?.FileName is not null
+            && process.MainModule.FileName.Contains("Gw.exe", StringComparison.OrdinalIgnoreCase)
+        )
+        {
+            process.Kill(true);
+        }
+    }
+
     public IEnumerable<GuildWarsApplicationLaunchContext?> FindProcesses(
         params LaunchConfigurationWithCredentials[] configurations
     )
