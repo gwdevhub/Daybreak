@@ -17,7 +17,6 @@ public sealed class CharacterSelectService(
     UIContextService uiContextService,
     GameThreadService gameThreadService,
     GameContextService gameContextService,
-    PreferencesService preferencesService,
     ILogger<CharacterSelectService> logger)
 {
     private readonly InstanceContextService instanceContextService = instanceContextService.ThrowIfNull();
@@ -25,7 +24,6 @@ public sealed class CharacterSelectService(
     private readonly UIContextService uiContextService = uiContextService.ThrowIfNull();
     private readonly GameThreadService gameThreadService = gameThreadService.ThrowIfNull();
     private readonly GameContextService gameContextService = gameContextService.ThrowIfNull();
-    private readonly PreferencesService preferencesService = preferencesService.ThrowIfNull();
     private readonly ILogger<CharacterSelectService> logger = logger.ThrowIfNull();
 
     public Task<CharacterSelectInformation?> GetCharacterSelectInformation(CancellationToken cancellationToken)
@@ -164,6 +162,12 @@ public sealed class CharacterSelectService(
         {
             unsafe
             {
+                if (!this.IsCharSelectReady())
+                {
+                    scopedLogger.LogError("Character select is not ready");
+                    return false;
+                }
+
                 var selectorFrame = this.GetCharSelectorFrame();
                 if (selectorFrame is null)
                 {
@@ -172,7 +176,8 @@ public sealed class CharacterSelectService(
                 }
 
                 var ctx = this.uiContextService.GetFrameContext<CharSelectorContext>(selectorFrame);
-                if (ctx.IsNull)
+                if (ctx.IsNull ||
+                    (nuint)ctx.Pointer <= 0xFFFF)
                 {
                     scopedLogger.LogError("Character selector context not found");
                     return false;
@@ -267,7 +272,10 @@ public sealed class CharacterSelectService(
                     }
                 }
 
-                // Navigate to target character by selecting previous/next until we reach it
+                // Navigate to target character by selecting previous/next until we reach it.
+                // Empty roster slots are represented by null entries in the character array, so
+                // step over them instead of bailing out (otherwise navigation gets stuck at the
+                // slot right before a gap and never reaches characters beyond it).
                 while (targetIdx < selectedIdx)
                 {
                     if (selectedIdx == 0)
@@ -275,13 +283,24 @@ public sealed class CharacterSelectService(
                         break;
                     }
 
-                    if (!SelectChar(selectedIdx - 1))
+                    var prevIdx = selectedIdx - 1;
+                    while (prevIdx > 0 && ctx.Pointer->Chars.Buffer[prevIdx].IsNull)
+                    {
+                        prevIdx--;
+                    }
+
+                    if (ctx.Pointer->Chars.Buffer[prevIdx].IsNull)
+                    {
+                        break;
+                    }
+
+                    if (!SelectChar(prevIdx))
                     {
                         scopedLogger.LogError("Failed to select previous character");
                         return false;
                     }
 
-                    selectedIdx--;
+                    selectedIdx = prevIdx;
                 }
 
                 while (targetIdx > selectedIdx)
@@ -291,13 +310,24 @@ public sealed class CharacterSelectService(
                         break;
                     }
 
-                    if (!SelectChar(selectedIdx + 1))
+                    var nextIdx = selectedIdx + 1;
+                    while (nextIdx < charCount && ctx.Pointer->Chars.Buffer[nextIdx].IsNull)
+                    {
+                        nextIdx++;
+                    }
+
+                    if (nextIdx >= charCount)
+                    {
+                        break;
+                    }
+
+                    if (!SelectChar(nextIdx))
                     {
                         scopedLogger.LogError("Failed to select next character");
                         return false;
                     }
 
-                    selectedIdx++;
+                    selectedIdx = nextIdx;
                 }
 
                 var chosen = selectedIdx == targetIdx;
@@ -352,25 +382,13 @@ public sealed class CharacterSelectService(
             return false;
         }
 
-        var previousOrderPreference = await this.gameThreadService.QueueOnGameThread(() => this.preferencesService.GetEnumPreference(EnumPreference.CharSortOrder), cancellationToken);
-        if (previousOrderPreference is null)
-        {
-            scopedLogger.LogError("Failed to get previous character sort order preference");
-            return false;
-        }
-
-        scopedLogger.LogInformation("Previous character sort order preference: {order}. Setting order to alphabetize", (CharSortOrder)previousOrderPreference);
-        await this.gameThreadService.QueueOnGameThread(() => this.preferencesService.SetEnumPreference(EnumPreference.CharSortOrder, (uint)CharSortOrder.Alphabetize), cancellationToken);
-        try
-        {
-            return await this.SelectCharacterToPlay(characterName, play: true, cancellationToken);
-        }
-        finally
-        {
-            // TODO: Delay to ensure character select has fully processed the selection before reverting sort order. Should be done after loading into the map.
-            await Task.Delay(1000, cancellationToken);
-            await this.gameThreadService.QueueOnGameThread(() => this.preferencesService.SetEnumPreference(EnumPreference.CharSortOrder, previousOrderPreference.Value), cancellationToken);
-        }
+        // NOTE: Mirrors GWToolbox's GW::LoginMgr::SelectCharacterToPlay, which navigates the
+        // character carousel purely by stepping prev/next over the selector context's character
+        // array. It deliberately does NOT touch the in-game CharSortOrder preference: the
+        // navigation relies on the selector context order matching the visible carousel order,
+        // and forcing a re-sort here desyncs the two (the click-by-name steps then land on the
+        // wrong index, so navigation only appears to work in one direction).
+        return await this.SelectCharacterToPlay(characterName, play: true, cancellationToken);
     }
 
     private async Task<string?> GetCharNameByUuid(string uuid, CancellationToken cancellationToken)
@@ -432,7 +450,27 @@ public sealed class CharacterSelectService(
 
     private unsafe bool IsCharSelectReady()
     {
-        return this.GetCharSelectorFrame() is not null;
+        // GW UI state must report char select (2). kCheckUIState fills the value passed via lParam.
+        uint uiState = 10;
+        this.uiContextService.SendMessage(UIMessage.kCheckUIState, 0, (nuint)(&uiState));
+
+        var selectorFrame = this.GetCharSelectorFrame();
+        if (uiState != 2 ||
+            selectorFrame is null ||
+            !selectorFrame->IsVisible)
+        {
+            return false;
+        }
+
+        // The frame context must be fully populated (a real pointer) and belong to this frame.
+        var ctx = this.uiContextService.GetFrameContext<CharSelectorContext>(selectorFrame);
+        if (ctx.IsNull ||
+            (nuint)ctx.Pointer <= 0xFFFF)
+        {
+            return false;
+        }
+
+        return ctx.Pointer->FrameId == selectorFrame->FrameId;
     }
 
     private unsafe Frame* GetCharSelectorFrame()
