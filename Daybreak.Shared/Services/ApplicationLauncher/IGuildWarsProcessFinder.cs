@@ -30,4 +30,12 @@ public interface IGuildWarsProcessFinder
     IEnumerable<GuildWarsApplicationLaunchContext?> FindProcesses(
         params LaunchConfigurationWithCredentials[] configurations
     );
+
+    /// <summary>
+    /// Terminates the Guild Wars process associated with the given launch context.
+    /// Implementations are responsible for handling platform-specific process layouts
+    /// (e.g. Wine-hosted processes on Linux). May throw, allowing the caller to handle
+    /// platform-specific failures such as insufficient privileges.
+    /// </summary>
+    void KillProcess(GuildWarsApplicationLaunchContext guildWarsApplicationLaunchContext);
 }

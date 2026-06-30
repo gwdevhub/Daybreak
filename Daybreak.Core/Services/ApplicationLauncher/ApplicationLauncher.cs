@@ -536,18 +536,7 @@ internal sealed class ApplicationLauncher(
         var scopedLogger = this.logger.CreateScopedLogger();
         try
         {
-            var process = guildWarsApplicationLaunchContext.GuildWarsProcess;
-            if (
-                process.MainModule?.FileName is not null
-                && process.MainModule.FileName.Contains(
-                    "Gw.exe",
-                    StringComparison.OrdinalIgnoreCase
-                )
-            )
-            {
-                process.Kill(true);
-                return;
-            }
+            this.guildWarsProcessFinder.KillProcess(guildWarsApplicationLaunchContext);
         }
         catch (Exception e)
             when (e.Message.Contains(

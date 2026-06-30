@@ -52,6 +52,19 @@ public sealed class GuildWarsProcessFinder(
         return this.FindProcesses(configuration).FirstOrDefault();
     }
 
+    /// <summary>
+    /// Terminates the Wine-hosted Guild Wars process tree.
+    /// The process was already validated as a Gw.exe Wine process during discovery,
+    /// so we kill it directly. On Linux the process exposed by the context is the
+    /// Wine loader hosting Gw.exe; its <see cref="Process.MainModule"/> therefore
+    /// points at the Wine loader rather than Gw.exe, which is why platform-agnostic
+    /// name checks cannot be used here.
+    /// </summary>
+    public void KillProcess(GuildWarsApplicationLaunchContext guildWarsApplicationLaunchContext)
+    {
+        guildWarsApplicationLaunchContext.GuildWarsProcess.Kill(entireProcessTree: true);
+    }
+
     public IEnumerable<GuildWarsApplicationLaunchContext?> FindProcesses(
         params LaunchConfigurationWithCredentials[] configurations
     )
