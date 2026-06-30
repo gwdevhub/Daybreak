@@ -1,8 +1,9 @@
 namespace Daybreak.Linux.Services.Wine;
 
 /// <summary>
-/// Stateless translator between Wine-internal PIDs and Linux system PIDs.
-/// Uses /proc scanning and winedbg to resolve mappings on demand.
+/// Translates Wine-internal PIDs to Linux system PIDs by scanning /proc.
+/// The reverse direction (Linux → Wine PID) is handled by the injector, which runs
+/// inside Wine and can disambiguate concurrent instances by full image path.
 /// </summary>
 public interface IWinePidMapper
 {
@@ -18,13 +19,4 @@ public interface IWinePidMapper
     /// unambiguous matching) or a bare file name (e.g. "Gw.exe") as a best-effort fallback.</param>
     /// <returns>The Linux PID, or null if not found.</returns>
     int? WinePidToLinuxPid(int winePid, string executable);
-
-    /// <summary>
-    /// Converts a Linux system PID back to a Wine-internal PID.
-    /// Reads the process's cmdline to determine the executable, then queries
-    /// winedbg to find the corresponding Wine PID.
-    /// </summary>
-    /// <param name="linuxPid">The Linux system PID.</param>
-    /// <returns>The Wine PID, or null if not found.</returns>
-    int? LinuxPidToWinePid(int linuxPid);
 }
