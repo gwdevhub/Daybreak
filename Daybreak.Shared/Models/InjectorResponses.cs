@@ -52,4 +52,12 @@ public static class InjectorResponses
         InvalidInjector =               -3,
         InvalidThreadHandle =           -400,
     }
+
+    public enum ResolveResult
+    {
+        Success =                       0,
+        InvalidArgs =                   -1,
+        InvalidInjector =               -3,
+        ProcessNotFound =               -501,
+    }
 }
