@@ -11,7 +11,7 @@ public class Notification : ICancellableNotification
     public string Description { get; init; } = string.Empty;
     public string Metadata { get; init; } = string.Empty;
     public DateTime ExpirationTime { get; init; }
-    public DateTime CreationTime { get; init; } = DateTime.Now;
+    public DateTime CreationTime { get; init; } = DateTime.UtcNow;
 
     public bool Dismissible { get; init; }
     public virtual Type? HandlingType { get; init; }
