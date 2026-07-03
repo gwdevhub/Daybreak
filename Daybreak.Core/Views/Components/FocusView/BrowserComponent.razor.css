@@ -1,0 +1,38 @@
+﻿.browser-container {
+    position: relative;
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.browser-frame {
+    flex: 1;
+    height: 100%;
+    width: 100%;
+    margin: -2px;
+    border: none;
+}
+
+.browser-toggle-button {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    z-index: 1002;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.45);
+    color: #fff;
+}
+
+.browser-toggle-button:hover {
+    background: var(--accent-fill-rest);
+}
