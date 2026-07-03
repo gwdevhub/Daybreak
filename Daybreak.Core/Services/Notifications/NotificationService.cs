@@ -153,7 +153,7 @@ internal sealed class NotificationService(
             Title = title,
             Description = description,
             Metadata = metaData ?? string.Empty,
-            ExpirationTime = expirationTime ?? (DateTime.Now + TimeSpan.FromSeconds(5)),
+            ExpirationTime = expirationTime ?? (DateTime.UtcNow + TimeSpan.FromSeconds(5)),
             Dismissible = dismissible,
             Level = logLevel,
         };
