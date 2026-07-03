@@ -1,0 +1,37 @@
+﻿<div class="browser-container @(this.IsMaximized ? "maximized" : string.Empty)">
+    <button class="browser-toggle-button"
+            title="@(this.IsMaximized ? "Restore" : "Expand to fullscreen")"
+            @onclick="this.ToggleMaximized"
+            @onclick:stopPropagation="true">
+        <FluentIcon Value="@(this.IsMaximized ?
+            (Microsoft.FluentUI.AspNetCore.Components.Icon)new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowMinimize() :
+            new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowMaximize())" />
+    </button>
+    <iframe sandbox="allow-scripts allow-same-origin allow-forms"
+            class="browser-frame"
+            src="@this.Source" />
+</div>
+
+@code {
+    [Parameter]
+    public string? Source { get; init; }
+    [Parameter]
+    public Action? OnMaximized { get; init; }
+    [Parameter]
+    public Action? OnRestore { get; init; }
+
+    private bool IsMaximized { get; set; }
+
+    private void ToggleMaximized()
+    {
+        this.IsMaximized = !this.IsMaximized;
+        if (this.IsMaximized)
+        {
+            this.OnMaximized?.Invoke();
+        }
+        else
+        {
+            this.OnRestore?.Invoke();
+        }
+    }
+}
