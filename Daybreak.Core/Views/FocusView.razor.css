@@ -130,6 +130,22 @@
     z-index: 1001;
 }
 
+/* A maximized tile (e.g. Browser) expands to cover the whole grid area, hiding its siblings.
+   GridStack positions tiles with inline transform/width/height, so !important is required to
+   override it here. */
+.grid-stack-item.maximized {
+    position: absolute !important;
+    inset: 0 !important;
+    transform: none !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 1500;
+}
+
+.grid-stack.has-maximized > .grid-stack-item:not(.maximized) {
+    display: none;
+}
+
 /* Per-tile remove button (top-right) to hide a component while editing. */
 .tile-remove-button {
     position: absolute;
