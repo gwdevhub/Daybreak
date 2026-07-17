@@ -13,7 +13,7 @@ namespace Daybreak.API.Interop
 {
 
 /// <summary>
-/// P/Invoke bindings for 536 C++ exports from gwca.dll (0 skipped).
+/// P/Invoke bindings for 545 C++ exports from gwca.dll (0 skipped).
 /// Nested classes mirror the C++ namespace hierarchy (e.g. GW::Agents → GWCA.GW.Agents).
 /// Types annotated with [GWCAEquivalent] are used in signatures where available.
 /// </summary>
@@ -30,8 +30,8 @@ public static unsafe partial class GWCA
     // [NAMESPACE] GWCA.GW.Constants popped at line 25
     // [NAMESPACE] GWCA.GW.Constants.DialogID popped at line 282
     // [NAMESPACE] GWCA.GW.Constants.ItemID popped at line 201
-    // [NAMESPACE] GWCA.GW.Constants.ModelID.Minipet.SummoningStone.FoW.UW.FoW.Urgoz.Deep.DoA.EotnDungeons.BonusMissionPack.EotnDungeons popped at line 444
-    // [NAMESPACE] GWCA.GW.Constants.ModelID.Minipet.SummoningStone.FoW.UW.FoW.Urgoz.Deep.DoA.PolymockSummon popped at line 384
+    // [NAMESPACE] GWCA.GW.Constants.ModelID.Minipet.SummoningStone.FoW.UW.FoW.Urgoz.Deep.DoA.EotnDungeons.BonusMissionPack.EotnDungeons popped at line 445
+    // [NAMESPACE] GWCA.GW.Constants.ModelID.Minipet.SummoningStone.FoW.UW.FoW.Urgoz.Deep.DoA.PolymockSummon popped at line 385
     // [NAMESPACE] GWCA.GW.Constants.Preference popped at line 62
     // [NAMESPACE] GWCA.GW.Constants.Range popped at line 239
     // [NAMESPACE] GWCA.GW.Constants.SqrRange popped at line 249
@@ -44,7 +44,7 @@ public static unsafe partial class GWCA
     // [NAMESPACE] GWCA.GW.Items popped at line 97
     // [NAMESPACE] GWCA.GW.Map popped at line 165
     // [NAMESPACE] GWCA.GW.MemoryMgr popped at line 30
-    // [NAMESPACE] GWCA.GW.Merchant popped at line 26
+    // [NAMESPACE] GWCA.GW.Merchant popped at line 30
     // [NAMESPACE] GWCA.GW.Packet popped at line 112
     // [NAMESPACE] GWCA.GW.Packet.StoC popped at line 107
     // [NAMESPACE] GWCA.GW.Packet.StoC.GenericValueID popped at line 70
@@ -53,13 +53,13 @@ public static unsafe partial class GWCA
     // [NAMESPACE] GWCA.GW.PartyMgr popped at line 108
     // [NAMESPACE] GWCA.GW.PlayerMgr popped at line 56
     // [NAMESPACE] GWCA.GW.QuestMgr popped at line 43
-    // [NAMESPACE] GWCA.GW.Render popped at line 122
+    // [NAMESPACE] GWCA.GW.Render popped at line 127
     // [NAMESPACE] GWCA.GW.Scanner popped at line 52
-    // [NAMESPACE] GWCA.GW.SkillbarMgr popped at line 39
+    // [NAMESPACE] GWCA.GW.SkillbarMgr popped at line 43
     // [NAMESPACE] GWCA.GW.StoC popped at line 50
     // [NAMESPACE] GWCA.GW.TargetFilter popped at line 122
     // [NAMESPACE] GWCA.GW.Trade popped at line 22
-    // [NAMESPACE] GWCA.GW.UI popped at line 786
+    // [NAMESPACE] GWCA.GW.UI popped at line 806
     // [NAMESPACE] GWCA.GW.UI.UIPacket popped at line 30
     // [NAMESPACE] GWCA.GWCA popped at line 15
     // GWCA.GW.AccountContext: 9 fields [OK]
@@ -120,7 +120,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.InventoryTableEntry: 3 fields [OK]
     // GWCA.GW.Item: 26 fields [OK]
     // GWCA.GW.ItemContext: 38 fields [OK]
-    // GWCA.GW.ItemData: 4 fields [OK]
+    // GWCA.GW.ItemData: 5 fields [OK]
     // GWCA.GW.ItemFormula: 5 fields [OK]
     // GWCA.GW.ItemListFrame: 0 fields [SKIP: no fields]
     // GWCA.GW.ItemModifier: 1 fields [OK]
@@ -210,7 +210,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.TradeItem: 2 fields [OK]
     // GWCA.GW.TradePlayer: 2 fields [OK]
     // GWCA.GW.UI.AgentNameTagInfo: 15 fields [OK]
-    // GWCA.GW.UI.ChatTemplate: 3 fields [OK]
+    // GWCA.GW.UI.ChatTemplate: 4 fields [OK]
     // GWCA.GW.UI.CompassPoint: 2 fields [OK]
     // GWCA.GW.UI.CreateUIComponentPacket: 6 fields [OK]
     // GWCA.GW.UI.DialogBodyInfo: 3 fields [OK]
@@ -2603,6 +2603,11 @@ public static unsafe partial class GWCA
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GuildWars.Skill* GetSkillConstantData(global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillID);
 
+            // GW::SkillbarMgr::GetSkillConstantDataCount
+            [LibraryImport(DllName, EntryPoint = "?GetSkillConstantDataCount@SkillbarMgr@GW@@YAIXZ")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial uint GetSkillConstantDataCount();
+
             // GW::SkillbarMgr::GetSkillSlot
             [LibraryImport(DllName, EntryPoint = "?GetSkillSlot@SkillbarMgr@GW@@YAHW4SkillID@Constants@2@@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -2653,6 +2658,36 @@ public static unsafe partial class GWCA
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool LoadSkillTemplate(byte* ptr);
+
+            // GW::SkillbarMgr::RegisterDecodeTemplateHeaderCallback | function2: TODO: map struct function
+            // [LibraryImport(DllName, EntryPoint = "?RegisterDecodeTemplateHeaderCallback@SkillbarMgr@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUHookStatus@GW@@PAUSkillTemplate@SkillbarMgr@2@PAXPAE@Z@std@@H@Z")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial void RegisterDecodeTemplateHeaderCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, global::Daybreak.API.Interop.GuildWars.SkillTemplate* skillTemplate3, void* ptr4, byte* ptr5);
+
+            // GW::SkillbarMgr::RegisterDecodeTemplateStringCallback | function2: TODO: map struct function
+            // [LibraryImport(DllName, EntryPoint = "?RegisterDecodeTemplateStringCallback@SkillbarMgr@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUHookStatus@GW@@PB_WPAUSkillTemplate@SkillbarMgr@2@PAHPAE@Z@std@@H@Z")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial void RegisterDecodeTemplateStringCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, ushort* ptr3, global::Daybreak.API.Interop.GuildWars.SkillTemplate* skillTemplate4, int* ptr5, byte* ptr6);
+
+            // GW::SkillbarMgr::RegisterGetAccountTemplateDataCallback | function2: TODO: map struct function
+            // [LibraryImport(DllName, EntryPoint = "?RegisterGetAccountTemplateDataCallback@SkillbarMgr@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUHookStatus@GW@@IPAUSkillTemplate@SkillbarMgr@2@PAH2@Z@std@@H@Z")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial void RegisterGetAccountTemplateDataCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, uint value3, global::Daybreak.API.Interop.GuildWars.SkillTemplate* skillTemplate4, int* ptr5, nint ptr6);
+
+            // GW::SkillbarMgr::RegisterLoadSkillTemplateCallback | function2: TODO: map struct function
+            // [LibraryImport(DllName, EntryPoint = "?RegisterLoadSkillTemplateCallback@SkillbarMgr@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUHookStatus@GW@@IPAUSkillTemplate@SkillbarMgr@2@@Z@std@@H@Z")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial void RegisterLoadSkillTemplateCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, uint value3, global::Daybreak.API.Interop.GuildWars.SkillTemplate* skillTemplate4);
+
+            // GW::SkillbarMgr::RegisterUpdateTemplateDisplayCallback | function2: TODO: map struct function
+            // [LibraryImport(DllName, EntryPoint = "?RegisterUpdateTemplateDisplayCallback@SkillbarMgr@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUHookStatus@GW@@PAI@Z@std@@H@Z")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial void RegisterUpdateTemplateDisplayCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, uint* ptr3);
+
+            // GW::SkillbarMgr::RemoveTemplateCallback
+            [LibraryImport(DllName, EntryPoint = "?RemoveTemplateCallback@SkillbarMgr@GW@@YAXPAUHookEntry@2@@Z")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial void RemoveTemplateCallback(global::Daybreak.API.Interop.HookEntry* hookEntry);
 
             // GW::SkillbarMgr::UseSkill
             [LibraryImport(DllName, EntryPoint = "?UseSkill@SkillbarMgr@GW@@YA_NII@Z")]
@@ -3177,6 +3212,11 @@ public static unsafe partial class GWCA
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool SetCommandLinePref(ushort* ptr1, ushort* ptr2);
 
+            // GW::UI::SetFrameBounds
+            [LibraryImport(DllName, EntryPoint = "?SetFrameBounds@UI@GW@@YAXPAUFrame@12@IPAM1@Z")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial void SetFrameBounds(global::Daybreak.API.Interop.Frame* frame1, uint value2, float* ptr3, nint ptr4);
+
             // GW::UI::SetFrameDisabled
             [LibraryImport(DllName, EntryPoint = "?SetFrameDisabled@UI@GW@@YA_NPAUFrame@12@_N@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -3188,6 +3228,11 @@ public static unsafe partial class GWCA
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool SetFrameMargins(global::Daybreak.API.Interop.Frame* frame1, uint value2, float* ptr3, nint ptr4, uint value5);
+
+            // GW::UI::SetFramePosition
+            [LibraryImport(DllName, EntryPoint = "?SetFramePosition@UI@GW@@YAXPAUFrame@12@IPAM@Z")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial void SetFramePosition(global::Daybreak.API.Interop.Frame* frame1, uint value2, float* ptr3);
 
             // GW::UI::SetFrameTitle
             [LibraryImport(DllName, EntryPoint = "?SetFrameTitle@UI@GW@@YA_NPAUFrame@12@PB_W@Z")]
@@ -4766,10 +4811,10 @@ public static unsafe partial class GWCA
                 Ashford_Catacombs_1070_AE,
                 Forsaken_Tunnels_Presearing_Level2,
                 Forsaken_Tunnels_Presearing_Level3,
+                Unknown_879,
                 Forsaken_Tunnels_Level1,
                 Forsaken_Tunnels_Level2,
                 Forsaken_Tunnels_Level3,
-                Forsaken_Tunnels_Level4,
                 Count = 0x373,
             }
 
@@ -8609,6 +8654,7 @@ public static unsafe partial class GWCA
                                     internal const int SnarlingDriftwood = 2866;
                                     internal const int SpiritShepherd = 2864;
                                     internal const int SpiritWood = 2863;
+                                    internal const int Symbiosis = 2930;
                                     internal const int TraitorousTempleGuard1 = 2882;
                                     internal const int TraitorousTempleGuard2 = 2883;
                                     internal const int TraitorousTempleGuard3 = 2884;
@@ -8750,6 +8796,7 @@ public static unsafe partial class GWCA
                                                         {
                                                             internal const int LockedChest = 8192; // this is actually ->ExtraType
                                                             internal const int MiniatureLegionnaire = 8035;
+                                                            internal const int VarnyTheZealot = 8258;
 
                                                             public static partial class Minipet_
                                                             {
@@ -9563,7 +9610,7 @@ public static unsafe partial class GWCA
                 kTargetNPCPartyMember, // 0x100000b3, wparam = { uint32_t unk, uint32_t agent_id }
                 kTargetPlayerPartyMember, // 0x100000b4, wparam = { uint32_t unk, uint32_t player_number }
                 kVendorWindow, // 0x100000b5, wparam = UIPacket::kVendorWindow
-                kMessage_0x100000b6, // 0x100000b6
+                kVendorError, // 0x100000b6, wparam = { uint32_t flag, uint32_t error_id }
                 kMessage_0x100000b7, // 0x100000b7
                 kMessage_0x100000b8, // 0x100000b8
                 kVendorItems, // 0x100000b9, wparam = UIPacket::kVendorItems
@@ -9785,65 +9832,66 @@ public static unsafe partial class GWCA
                 kMessage_0x1000018b, // 0x10000191
                 kMessage_0x1000018c, // 0x10000192
                 kMessage_0x1000018d, // 0x10000193
-                kAppendMessageToChat, // 0x10000194, wparam = wchar_t* message
-                kMessage_0x1000018f, // 0x10000195
-                kMessage_0x10000190, // 0x10000196
-                kMessage_0x10000191, // 0x10000197
-                kMessage_0x10000192, // 0x10000198
-                kMessage_0x10000193, // 0x10000199
-                kMessage_0x10000194, // 0x1000019a
-                kMessage_0x10000195, // 0x1000019b
-                kMessage_0x10000196, // 0x1000019c
-                kMessage_0x10000197, // 0x1000019d
-                kMessage_0x10000198, // 0x1000019e
-                kMessage_0x10000199, // 0x1000019f
-                kMessage_0x1000019a, // 0x100001a0
-                kMessage_0x1000019b, // 0x100001a1
-                kHideHeroPanel, // 0x100001a2, wparam = hero_id
-                kShowHeroPanel, // 0x100001a3, wparam = hero_id
-                kMessage_0x1000019e, // 0x100001a4
-                kMessage_0x1000019f, // 0x100001a5
-                kQuerySuppressedKeyAction, // 0x100001a6, wparam = 0, lparam = bool*. Used to check if the suppress action is pressed (usually shift)
-                kGetInventoryAgentId, // 0x100001a7, wparam = 0, lparam = uint32_t* agent_id_out. Used to fetch which agent is selected
-                kInventoryRelated1, // 0x100001a8, added to GW 2026-02-26
-                kInventoryRelated2, // 0x100001a9, added to GW 2026-02-26
-                kInventoryRelated3, // 0x100001aa, added to GW 2026-02-26
-                kInventoryRelated4, // 0x100001ab, added to GW 2026-04-28
-                kEquipItem, // 0x100001ac, wparam = { item_id, agent_id }
-                kMoveItem, // 0x100001ad, wparam = { item_id, to_bag, to_slot, bool prompt }
-                kItemRelated_1, // 0x100001ae
-                kItemTooltip, // 0x100001af
-                kItemRelated_3, // 0x100001b0, added to GW 2026-02-26
-                kItemRelated_4, // 0x100001b1, added to GW 2026-02-26
-                kItemRelated_5, // 0x100001b2, added to GW 2026-04-28
-                kInitiateTrade, // 0x100001b3
-                kMessage_0x100001a7, // 0x100001b4
-                kMessage_0x100001a8, // 0x100001b5
-                kMessage_0x100001a9, // 0x100001b6
-                kMessage_0x100001aa, // 0x100001b7
-                kPartySearchWindowDestroyed, // 0x100001b8
-                kMessage_0x100001ac, // 0x100001b9
-                kPartySearchWindowCreated, // 0x100001ba
-                kMessage_0x100001ae, // 0x100001bb
-                kMessage_0x100001af, // 0x100001bc
-                kMessage_0x100001b0, // 0x100001bd
-                kMessage_0x100001b1, // 0x100001be
-                kMessage_0x100001b2, // 0x100001bf
-                kMessage_0x100001b3, // 0x100001c0
-                kMessage_0x100001b4, // 0x100001c1
-                kMessage_0x100001b5, // 0x100001c2
-                kInventoryAgentChanged, // 0x100001c3, Triggered when inventory needs updating due to agent change; no args
-                kInventoryRelated_1, // 0x100001c4
-                kInventoryRelated_2, // 0x100001c5
-                kMissionStatusRelated, // 0x100001c6
-                kUnused_1c2, // 0x100001c7
-                kCollapseExpandSkillListSection, // 0x100001c8
-                kPromptLoadTemplate, // 0x100001c9
-                kOpenTemplateManager, // 0x100001ca
-                kPromptSaveTemplate, // 0x100001cb
-                kOpenTemplate, // 0x100001cc, wparam = GW::UI::ChatTemplate*
-                kTemplateRelated_3, // 0x100001cd
-                kTemplateRelated_4, // 0x100001ce
+                kMessage_0x1000018d_2, // 0x10000194, added to GW 2026-06-17
+                kAppendMessageToChat, // 0x10000195, wparam = wchar_t* message
+                kMessage_0x1000018f, // 0x10000196
+                kMessage_0x10000190, // 0x10000197
+                kMessage_0x10000191, // 0x10000198
+                kMessage_0x10000192, // 0x10000199
+                kMessage_0x10000193, // 0x1000019a
+                kMessage_0x10000194, // 0x1000019b
+                kMessage_0x10000195, // 0x1000019c
+                kMessage_0x10000196, // 0x1000019d
+                kMessage_0x10000197, // 0x1000019e
+                kMessage_0x10000198, // 0x1000019f
+                kMessage_0x10000199, // 0x100001a0
+                kMessage_0x1000019a, // 0x100001a1
+                kMessage_0x1000019b, // 0x100001a2
+                kHideHeroPanel, // 0x100001a3, wparam = hero_id
+                kShowHeroPanel, // 0x100001a4, wparam = hero_id
+                kMessage_0x1000019e, // 0x100001a5
+                kMessage_0x1000019f, // 0x100001a6
+                kQuerySuppressedKeyAction, // 0x100001a7, wparam = 0, lparam = bool*. Used to check if the suppress action is pressed (usually shift)
+                kGetInventoryAgentId, // 0x100001a8, wparam = 0, lparam = uint32_t* agent_id_out. Used to fetch which agent is selected
+                kInventoryRelated1, // 0x100001a9, added to GW 2026-02-26
+                kInventoryRelated2, // 0x100001aa, added to GW 2026-02-26
+                kInventoryRelated3, // 0x100001ab, added to GW 2026-02-26
+                kInventoryRelated4, // 0x100001ac, added to GW 2026-04-28
+                kEquipItem, // 0x100001ad, wparam = { item_id, agent_id }
+                kMoveItem, // 0x100001ae, wparam = { item_id, to_bag, to_slot, bool prompt }
+                kItemRelated_1, // 0x100001af
+                kItemTooltip, // 0x100001b0
+                kItemRelated_3, // 0x100001b1, added to GW 2026-02-26
+                kItemRelated_4, // 0x100001b2, added to GW 2026-02-26
+                kItemRelated_5, // 0x100001b3, added to GW 2026-04-28
+                kInitiateTrade, // 0x100001b4
+                kMessage_0x100001a7, // 0x100001b5
+                kMessage_0x100001a8, // 0x100001b6
+                kMessage_0x100001a9, // 0x100001b7
+                kMessage_0x100001aa, // 0x100001b8
+                kPartySearchWindowDestroyed, // 0x100001b9
+                kMessage_0x100001ac, // 0x100001ba
+                kPartySearchWindowCreated, // 0x100001bb
+                kMessage_0x100001ae, // 0x100001bc
+                kMessage_0x100001af, // 0x100001bd
+                kMessage_0x100001b0, // 0x100001be
+                kMessage_0x100001b1, // 0x100001bf
+                kMessage_0x100001b2, // 0x100001c0
+                kMessage_0x100001b3, // 0x100001c1
+                kMessage_0x100001b4, // 0x100001c2
+                kMessage_0x100001b5, // 0x100001c3
+                kInventoryAgentChanged, // 0x100001c4, Triggered when inventory needs updating due to agent change; no args
+                kInventoryRelated_1, // 0x100001c5
+                kInventoryRelated_2, // 0x100001c6
+                kMissionStatusRelated, // 0x100001c7
+                kUnused_1c2, // 0x100001c8
+                kCollapseExpandSkillListSection, // 0x100001c9
+                kPromptLoadTemplate, // 0x100001ca
+                kOpenTemplateManager, // 0x100001cb
+                kPromptSaveTemplate, // 0x100001cc
+                kOpenTemplate, // 0x100001cd, wparam = GW::UI::ChatTemplate*
+                kTemplateRelated_3, // 0x100001ce
+                kTemplateRelated_4, // 0x100001cf
                 kSendLoadSkillTemplate = 0x30000000 | 0x3, // 0x30000003, wparam = SkillbarMgr::SkillTemplate*
                 kSendPingWeaponSet = 0x30000000 | 0x4, // 0x30000004, wparam = UIPacket::kSendPingWeaponSet*
                 kSendMoveItem = 0x30000000 | 0x5, // 0x30000005, wparam = UIPacket::kSendMoveItem*
@@ -11466,10 +11514,10 @@ namespace Daybreak.API.Interop.GuildWars
         Ashford_Catacombs_1070_AE,
         Forsaken_Tunnels_Presearing_Level2,
         Forsaken_Tunnels_Presearing_Level3,
+        Unknown_879,
         Forsaken_Tunnels_Level1,
         Forsaken_Tunnels_Level2,
         Forsaken_Tunnels_Level3,
-        Forsaken_Tunnels_Level4,
         Count = 0x373,
     }
 
@@ -15649,7 +15697,7 @@ namespace Daybreak.API.Interop.GuildWars
         kTargetNPCPartyMember,
         kTargetPlayerPartyMember,
         kVendorWindow,
-        kMessage_0x100000b6,
+        kVendorError,
         kMessage_0x100000b7,
         kMessage_0x100000b8,
         kVendorItems,
@@ -15871,6 +15919,7 @@ namespace Daybreak.API.Interop.GuildWars
         kMessage_0x1000018b,
         kMessage_0x1000018c,
         kMessage_0x1000018d,
+        kMessage_0x1000018d_2,
         kAppendMessageToChat,
         kMessage_0x1000018f,
         kMessage_0x10000190,
@@ -17528,6 +17577,7 @@ namespace Daybreak.API.Interop.GuildWars
     public unsafe struct ItemData
     {
         public uint ModelFileId;
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.ItemType Type;
         public global::Daybreak.API.Interop.GuildWars.DyeInfo Dye;
         public uint Value;
         public uint Interaction;
@@ -19167,6 +19217,7 @@ namespace Daybreak.API.Interop.GuildWars
         public uint AgentId;
         public uint Type; // 0 = build, 1 = equipment
         public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<char> Code;
+        public nint Name;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
