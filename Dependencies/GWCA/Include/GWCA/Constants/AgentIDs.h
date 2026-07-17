@@ -279,6 +279,7 @@ namespace GW {
 
             constexpr int Winnowing = 2926;
             constexpr int EoE = 2927;
+            constexpr int Symbiosis = 2930;
             constexpr int FrozenSoil = 2933;
             constexpr int QZ = 2937;
 
@@ -453,6 +454,8 @@ namespace GW {
             } // namespace Minipet
 
             constexpr int LockedChest = 8192; // this is actually ->ExtraType
+
+            constexpr int VarnyTheZealot = 8258;
 
             namespace Minipet {
                 constexpr int MiniatureConfessorDorian = 8344;
