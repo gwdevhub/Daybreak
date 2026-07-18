@@ -1,6 +1,7 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Services.TradeChat.Models;
 using Daybreak.Services.TradeChat.Notifications;
+using Daybreak.Shared;
 using Daybreak.Shared.Configuration.Options;
 using Daybreak.Shared.Converters;
 using Daybreak.Shared.Models.Trade;
@@ -197,7 +198,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IHostedServi
                 this.notificationService.NotifyInformation(
                     title: "Quote alert!",
                     description: description,
-                    expirationTime: DateTime.Now + TimeSpan.FromSeconds(15));
+                    expirationTime: Global.NotificationShortExpiration);
             }
 
             await Task.Delay(TimeSpan.FromSeconds(this.options.CurrentValue.QuoteAlertsInterval), cancellationToken);
@@ -258,7 +259,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IHostedServi
             title: $"{source} Trader Alert",
             description: $"{alert.Name} has matched on a trader message. Sender: {traderMessageDTO.Sender}. Message: {traderMessageDTO.Message}",
             metaData: JsonSerializer.Serialize(traderMessage),
-            expirationTime: DateTime.Now + TimeSpan.FromDays(1));
+            expirationTime: DateTime.UtcNow + TimeSpan.FromDays(1));
     }
 
     private static bool CheckMatch(string toCheck, string toMatch, bool isRegex)

@@ -1,6 +1,7 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Services.Notifications.Handlers;
 using Daybreak.Shared.Converters;
+using Daybreak.Shared;
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.Events;
 using Daybreak.Shared.Services.Notifications;
@@ -32,7 +33,7 @@ internal sealed class EventNotifierService(
         await Task.Delay(5000, cancellationToken);
         foreach (var e in this.eventService.GetCurrentActiveEvents())
         {
-            this.notificationService.NotifyInformation<NavigateToCalendarViewHandler>(e.Title!, $"{GetRemainingTime(e)}\n{e.Description!}", expirationTime: DateTime.Now + TimeSpan.FromSeconds(15), metaData: e.Title);
+            this.notificationService.NotifyInformation<NavigateToCalendarViewHandler>(e.Title!, $"{GetRemainingTime(e)}\n{e.Description!}", expirationTime: Global.NotificationShortExpiration, metaData: e.Title);
         }
     }
 
