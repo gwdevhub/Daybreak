@@ -125,7 +125,7 @@ internal sealed class GuildWarsVersionChecker(
         this.notificationService.NotifyError<GuildWarsBatchUpdateNotificationHandler>(
             title: "Guild Wars needs an update",
             description: $"Click here to update the executable located at {guildWarsStartingContext.ApplicationLauncherContext.ExecutablePath}",
-            expirationTime: DateTime.Now + TimeSpan.FromSeconds(15));
+            expirationTime: Global.NotificationShortExpiration);
     }
 
     public Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken) => Task.CompletedTask;
