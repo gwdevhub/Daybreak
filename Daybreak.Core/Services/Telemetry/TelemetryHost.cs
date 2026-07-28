@@ -159,7 +159,10 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
             return;
         }
 
-        var apmUri = new Uri(ApmEndpoint);
+        // Endpoints are resolved relative to the vmauth root, so the base must end with '/'
+        // otherwise Uri resolution would drop the trailing path segment.
+        var normalizedEndpoint = ApmEndpoint.EndsWith('/') ? ApmEndpoint : ApmEndpoint + "/";
+        var apmUri = new Uri(normalizedEndpoint);
         var creds = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes($"{ApmServiceAccount}:{ApmServiceKey}"));
 
         this.meter = Sdk.CreateMeterProviderBuilder()
@@ -172,11 +175,13 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
             .AddMeter("OpenTelemetry.Instrumentation.SqlClient")
             .AddOtlpExporter((exporterOptions, readerOptions) =>
             {
-                exporterOptions.Endpoint = new Uri(apmUri, "v1/metrics");
+                exporterOptions.Endpoint = new Uri(apmUri, "opentelemetry/v1/metrics");
                 exporterOptions.Headers = $"Authorization=Basic {creds}";
                 exporterOptions.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
                 readerOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 10_000;
-                readerOptions.TemporalityPreference = MetricReaderTemporalityPreference.Delta;
+                // VictoriaMetrics works best with cumulative temporality; delta breaks
+                // standard rate()/increase() queries used by the Grafana dashboards.
+                readerOptions.TemporalityPreference = MetricReaderTemporalityPreference.Cumulative;
             })
             .Build();
 
@@ -189,8 +194,8 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
         logOpts.SetResourceBuilder(this.resourceBuilder);
         logOpts.AddOtlpExporter(exp =>
         {
-            exp.Endpoint = new Uri(apmUri, "v1/logs");
-            exp.Headers = $"Authorization=Basic  {creds}";
+            exp.Endpoint = new Uri(apmUri, "insert/opentelemetry/v1/logs");
+            exp.Headers = $"Authorization=Basic {creds}";
             exp.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
         });
 

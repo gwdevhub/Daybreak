@@ -128,7 +128,13 @@ public class ProjectConfiguration : PluginConfigurationBase
             var resourceBuilder = ResourceBuilder
                 .CreateDefault()
                 .AddService("Daybreak", serviceVersion: CurrentVersion.ToString());
-            var attributes = new List<KeyValuePair<string, object>>();
+            var attributes = new List<KeyValuePair<string, object>>
+            {
+                // Mirror the fleet-wide `service` stream field (promtail sets it for
+                // container logs) so Daybreak shows up in Grafana Logs Drilldown's
+                // `service` picker, alongside the `service_name` set by AddService.
+                new("service", "Daybreak"),
+            };
 #if DEBUG
             attributes.Add(new KeyValuePair<string, object>("deployment.environment", "debug"));
 #else
