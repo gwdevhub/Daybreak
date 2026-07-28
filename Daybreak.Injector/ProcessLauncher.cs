@@ -17,7 +17,7 @@ public sealed class ProcessLauncher
     {
         var sw = Stopwatch.StartNew();
         Process? process;
-        processId = LaunchClient(path, string.Join(" ", args), elevated, out threadId);
+        processId = LaunchClient(path, args, elevated, out threadId);
         if (processId is 0)
         {
             Console.WriteLine("Failed to launch GuildWars process.");
