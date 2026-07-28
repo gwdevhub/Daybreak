@@ -1,13 +1,12 @@
 ﻿using Daybreak.Launch;
 using Daybreak.Models;
-using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting.Display;
 using System.Collections.Immutable;
 
 namespace Daybreak.Services.Logging;
 
-public sealed class InMemorySink : ILogEventSink, IDisposable
+public sealed class InMemorySink : RedactingLogEventSink, IDisposable
 {
     private const int MaxLogEvents = 50000;
 
@@ -30,7 +29,7 @@ public sealed class InMemorySink : ILogEventSink, IDisposable
         this.logEvents.Clear();
     }
 
-    public void Emit(LogEvent logEvent)
+    protected override void EmitRedacted(LogEvent logEvent)
     {
         lock (this.snapShotLock)
         {
