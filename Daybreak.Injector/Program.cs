@@ -22,6 +22,50 @@ static void PrintUsage()
     Console.WriteLine("======================================================");
 }
 
+// Re-quotes a single argument token using the same rules as CommandLineToArgvW so that
+// values containing spaces, tabs or quotes survive being reconstructed into a command line.
+// Without this, tokens are joined with plain spaces and any argument value with whitespace
+// (e.g. a quoted custom argument or a path with spaces) is silently split apart.
+static string EscapeArgument(string argument)
+{
+    if (argument.Length > 0 &&
+        !argument.Any(c => c is ' ' or '\t' or '\n' or '\v' or '"'))
+    {
+        return argument;
+    }
+
+    var builder = new System.Text.StringBuilder();
+    builder.Append('"');
+    for (var i = 0; i < argument.Length; i++)
+    {
+        var backslashes = 0;
+        while (i < argument.Length && argument[i] == '\\')
+        {
+            i++;
+            backslashes++;
+        }
+
+        if (i == argument.Length)
+        {
+            builder.Append('\\', backslashes * 2);
+            break;
+        }
+        else if (argument[i] == '"')
+        {
+            builder.Append('\\', (backslashes * 2) + 1);
+            builder.Append('"');
+        }
+        else
+        {
+            builder.Append('\\', backslashes);
+            builder.Append(argument[i]);
+        }
+    }
+
+    builder.Append('"');
+    return builder.ToString();
+}
+
 static bool TryParseInjectWinApiArgs(
     string[] args,
     [NotNullWhen(true)] out Process? process,
@@ -137,7 +181,7 @@ static bool TryParseLaunchArgs(
     }
 
     elevated = parsedElevated;
-    gwArgs = args.Length > 3 ? string.Join(" ", args.Skip(3)) : string.Empty;
+    gwArgs = args.Length > 3 ? string.Join(" ", args.Skip(3).Select(EscapeArgument)) : string.Empty;
 
     if (!File.Exists(gwPath))
     {
