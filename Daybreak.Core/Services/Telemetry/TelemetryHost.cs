@@ -24,7 +24,7 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
     private const string UnknownHost = "Unknown";
     private const string MaskedValue = "[REDACTED]";
 
-    private static readonly string ApmEndpoint = SecretManager.GetSecret(SecretKeys.ApmUri);
+    private static readonly string ApmEndpoint = SanitizeUri(SecretManager.GetSecret(SecretKeys.ApmUri));
     private static readonly string ApmServiceAccount = SecretManager.GetSecret(SecretKeys.ApmServiceAccount);
     private static readonly string ApmServiceKey = SecretManager.GetSecret(SecretKeys.ApmServiceKey);
 
@@ -204,6 +204,20 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
 
         // Register handler to forward Serilog events to OpenTelemetry
         TelemetryLogSink.Instance.LoggingHandler = this.ForwardLogEvent;
+    }
+
+    // Configured URIs must never contain whitespace. Stray characters such as a non-breaking space
+    // (U+00A0) from copy-pasted secrets survive SecretManager sanitization (which keeps whitespace to
+    // preserve JSON formatting) and would otherwise be percent-encoded into a bogus path segment
+    // (e.g. ".../%C2%A0/opentelemetry/v1/metrics"), producing 400 responses from the collector.
+    private static string SanitizeUri(string uri)
+    {
+        if (string.IsNullOrEmpty(uri))
+        {
+            return uri;
+        }
+
+        return new string([.. uri.Where(c => !char.IsWhiteSpace(c) && !char.IsControl(c))]);
     }
 
     private void ForwardLogEvent(LogEvent logEvent)
