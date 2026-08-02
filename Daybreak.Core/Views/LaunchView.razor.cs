@@ -507,9 +507,12 @@ public sealed class LaunchViewModel(
                 cancellationToken
             );
 
-            // If the API is available but it does not belong to the desired user, return null
+            // If the API is available but it does not belong to the desired user, return null.
+            // Steam login configurations use a virtual credential whose username is not the account
+            // email, so the ownership check is skipped for them.
             if (
                 maybeApiContext is not null
+                && launcherViewContext.Configuration.Credentials.IsSteamLogin is false
                 && await maybeApiContext.GetLoginInfo(cancellationToken) is LoginInfo loginInfo
                 && loginInfo.Email != launcherViewContext.Configuration.Credentials.Username
             )

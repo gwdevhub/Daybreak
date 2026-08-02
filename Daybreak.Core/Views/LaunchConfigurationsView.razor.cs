@@ -30,6 +30,7 @@ public sealed class LaunchConfigurationsViewModel(
     public override ValueTask ParametersSet(LaunchConfigurationsView view, CancellationToken cancellationToken)
     {
         this.Credentials.ClearAnd().AddRange(this.credentialManager.GetCredentialList());
+        this.Credentials.Add(LoginCredentials.SteamLogin);
         this.LaunchConfigurations.ClearAnd().AddRange(this.launchConfigurationService.GetLaunchConfigurations());
         this.Executables.ClearAnd().AddRange(this.guildWarsExecutableManager.GetExecutableList()).Add(string.Empty);
         return base.ParametersSet(view, cancellationToken);

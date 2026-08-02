@@ -128,4 +128,25 @@ public sealed class CredentialManagerTests
         a.Username.Should().BeEmpty();
         a.Password.Should().BeEmpty();
     }
+
+    [TestMethod]
+    public void TryGetCredentialsByIdentifier_SteamLoginSentinel_ReturnsVirtualCredential()
+    {
+        var ok = this.manager.TryGetCredentialsByIdentifier(LoginCredentials.SteamLoginIdentifier, out var found);
+
+        ok.Should().BeTrue();
+        found.Should().BeSameAs(LoginCredentials.SteamLogin);
+        found!.IsSteamLogin.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public void StoreCredentials_DoesNotPersistSteamLoginSentinel()
+    {
+        var real = new LoginCredentials { Identifier = "id-1", Username = "alice", Password = "pw" };
+
+        this.manager.StoreCredentials([LoginCredentials.SteamLogin, real]);
+
+        this.options.ProtectedLoginCredentials.Should().ContainSingle()
+            .Which.Identifier.Should().Be("id-1");
+    }
 }

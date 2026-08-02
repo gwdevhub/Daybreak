@@ -2,9 +2,20 @@
 
 public sealed class LoginCredentials : IEquatable<LoginCredentials>
 {
+    public const string SteamLoginIdentifier = "__STEAM_LOGIN__";
+
+    public static LoginCredentials SteamLogin { get; } = new()
+    {
+        Identifier = SteamLoginIdentifier,
+        Username = "Steam Login",
+        Password = string.Empty
+    };
+
     public string? Identifier { get; set; }
     public string? Username { get; set; }
     public string? Password { get; set; }
+
+    public bool IsSteamLogin => string.Equals(this.Identifier, SteamLoginIdentifier, StringComparison.Ordinal);
 
     public bool Equals(LoginCredentials? other)
     {
