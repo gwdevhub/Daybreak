@@ -13,15 +13,55 @@
     margin: 50px 0px 0px 0px;
 }
 
-.version-row {
+.version-item {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    width: 100%;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--neutral-stroke-divider-rest);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    box-sizing: border-box;
+    border-radius: 6px;
+    height: 56px;
 }
 
-.version-row-center {
-    cursor: pointer;
-    text-align: center;
-    align-content: center;
+    .version-item:hover {
+        background-color: var(--accent-fill-hover);
+    }
+
+    .version-item:focus {
+        outline: 2px solid var(--accent-fill-focus);
+        outline-offset: -2px;
+    }
+
+.version-info {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.version-icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.version-name {
+    font-weight: 600;
     font-size: var(--font-size-medium);
+    color: var(--neutral-foreground-rest);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.version-actions {
+    flex-shrink: 0;
 }
