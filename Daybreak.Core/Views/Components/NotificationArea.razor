@@ -25,6 +25,9 @@
                     {
                         <p class="notification-description">@notificationTuple.Notification.Description</p>
                     }
+                    <div class="notification-progress"
+                         @key="@($"{notificationTuple.Notification.Id}-{notificationTuple.LifetimeGeneration}")"
+                         style="animation-duration: @(notificationTuple.LifetimeMilliseconds.ToString(System.Globalization.CultureInfo.InvariantCulture))ms;"></div>
                 </div>
             }
         </div>
@@ -72,7 +75,7 @@
             try
             {
                 await this.notificationLock.WaitAsync(cancellationToken);
-                this.notifications.Add(new NotificationWrapper { Notification = notification, ExpirationTime = notification.ExpirationTime });
+                this.notifications.Add(new NotificationWrapper { Notification = notification, StartTime = DateTime.UtcNow, ExpirationTime = notification.ExpirationTime });
             }
             catch (OperationCanceledException)
             {
@@ -167,7 +170,9 @@
 
     private void ExtendNotification(NotificationWrapper notification)
     {
+        notification.StartTime = DateTime.UtcNow;
         notification.ExpirationTime = DateTime.UtcNow + NotificationExtension;
+        notification.LifetimeGeneration++;
     }
 
     private async Task OpenNofitication(NotificationWrapper notification)
