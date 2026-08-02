@@ -99,26 +99,56 @@
 
 /* Notification level styling */
 .notification-item.level-information {
-    border-left: 4px solid var(--accent-fill-rest);
+    --notification-accent: var(--accent-fill-rest);
+    border-left: 4px solid var(--notification-accent);
 }
 
 .notification-item.level-warning {
-    border-left: 4px solid #ff9500;
+    --notification-accent: #ff9500;
+    border-left: 4px solid var(--notification-accent);
 }
 
 .notification-item.level-error,
 .notification-item.level-critical {
-    border-left: 4px solid #d13438;
+    --notification-accent: #d13438;
+    border-left: 4px solid var(--notification-accent);
 }
 
 .notification-item.level-debug,
 .notification-item.level-trace {
-    border-left: 4px solid var(--neutral-stroke-accessible);
+    --notification-accent: var(--neutral-stroke-accessible);
+    border-left: 4px solid var(--notification-accent);
 }
 
 .notification-item[class*="level-"]:hover {
     border-left: 0px;
     cursor: pointer;
+}
+
+/* Expiration progress line animating from start time to expiration */
+.notification-progress {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 100%;
+    background: var(--notification-accent, var(--accent-fill-rest));
+    transform: scaleX(0);
+    transform-origin: left center;
+    animation-name: notificationProgress;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+    animation-iteration-count: 1;
+    pointer-events: none;
+}
+
+@keyframes notificationProgress {
+    from {
+        transform: scaleX(0);
+    }
+    to {
+        transform: scaleX(1);
+    }
 }
 
 @keyframes slideInFromRight {
@@ -178,5 +208,10 @@
     .notification-item.closing {
         animation: none;
         opacity: 0;
+    }
+
+    .notification-progress {
+        animation: none;
+        transform: scaleX(1);
     }
 }
