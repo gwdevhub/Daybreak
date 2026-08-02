@@ -10,6 +10,7 @@ using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.ReShade;
+using Daybreak.Shared.Services.Shell;
 using Daybreak.Shared.Utils;
 using Daybreak.Views.Mods;
 using HtmlAgilityPack;
@@ -18,7 +19,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Core.Extensions;
 using System.Data;
-using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
 using System.IO.Compression;
@@ -34,6 +34,7 @@ internal sealed class ReShadeService(
     IHttpClient<ReShadeService> httpClient,
     IDownloadService downloadService,
     IViewManager viewManager,
+    IShellExecutor shellExecutor,
     ILogger<ReShadeService> logger) : IReShadeService
 {
     private const string PackagesIniUrl = "https://raw.githubusercontent.com/crosire/reshade-shaders/list/EffectPackages.ini";
@@ -68,6 +69,7 @@ internal sealed class ReShadeService(
     private readonly IHttpClient<ReShadeService> httpClient = httpClient.ThrowIfNull();
     private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
     private readonly IViewManager viewManager = viewManager.ThrowIfNull();
+    private readonly IShellExecutor shellExecutor = shellExecutor.ThrowIfNull();
     private readonly ILogger<ReShadeService> logger = logger.ThrowIfNull();
 
     public string Name => "ReShade";
@@ -220,7 +222,7 @@ internal sealed class ReShadeService(
 
     public void OpenReShadeFolder()
     {
-        Process.Start("explorer.exe", ReShadePath);
+        this.shellExecutor.OpenPath(ReShadePath);
     }
 
     public async Task<IEnumerable<ShaderPackage>> GetStockPackages(CancellationToken cancellationToken)
