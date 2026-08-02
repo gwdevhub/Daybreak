@@ -26,6 +26,12 @@ internal sealed class CredentialManager(
     public bool TryGetCredentialsByIdentifier(string identifier, out LoginCredentials? loginCredentials)
     {
         loginCredentials = default;
+        if (string.Equals(identifier, LoginCredentials.SteamLoginIdentifier, StringComparison.Ordinal))
+        {
+            loginCredentials = LoginCredentials.SteamLogin;
+            return true;
+        }
+
         if (this.GetCredentialList().FirstOrDefault(l => l.Identifier == identifier) is LoginCredentials foundCredentials)
         {
             loginCredentials = foundCredentials;
@@ -56,6 +62,7 @@ internal sealed class CredentialManager(
         this.logger.LogDebug("Storing credentials");
         var options = this.liveOptions.CurrentValue;
         options.ProtectedLoginCredentials = [.. loginCredentials
+            .Where(c => !c.IsSteamLogin)
             .Select(this.ProtectCredentials)
             .OfType<ProtectedLoginCredentials>()];
         this.optionsProvider.SaveOption(options);

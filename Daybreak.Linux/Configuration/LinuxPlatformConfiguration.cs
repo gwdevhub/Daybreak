@@ -55,6 +55,7 @@ public sealed class LinuxPlatformConfiguration : PluginConfigurationBase
         services.AddSingleton<IWinePidMapper, WinePidMapper>();
         services.AddScoped<IGuildWarsReadyChecker, GuildWarsReadyChecker>();
         services.AddScoped<IGuildWarsProcessFinder, GuildWarsProcessFinder>();
+        services.AddSingleton<ISteamService, SteamService>();
         services.AddSingleton<IModPathResolver, ModPathResolver>();
         services.AddSingleton<IDirectSongRegistrar, DirectSongRegistrar>();
         services.AddScoped<IRegistryService, RegistryService>();

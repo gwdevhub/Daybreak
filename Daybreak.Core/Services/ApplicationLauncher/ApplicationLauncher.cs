@@ -30,6 +30,7 @@ internal sealed class ApplicationLauncher(
     IGuildWarsProcessFinder guildWarsProcessFinder,
     IDaybreakRestartingService daybreakRestartingService,
     IPrivilegeManager privilegeManager,
+    ISteamService steamService,
     ILogger<ApplicationLauncher> logger
 ) : IApplicationLauncher
 {
@@ -55,6 +56,7 @@ internal sealed class ApplicationLauncher(
 
     private readonly IPrivilegeManager privilegeManager =
         privilegeManager.ThrowIfNull();
+    private readonly ISteamService steamService = steamService.ThrowIfNull();
 
     public async Task<GuildWarsApplicationLaunchContext?> LaunchGuildwars(
         LaunchConfigurationWithCredentials launchConfigurationWithCredentials,
@@ -63,6 +65,27 @@ internal sealed class ApplicationLauncher(
     {
         launchConfigurationWithCredentials.ThrowIfNull();
         launchConfigurationWithCredentials.Credentials.ThrowIfNull();
+        if (launchConfigurationWithCredentials.Credentials?.IsSteamLogin is true)
+        {
+            if (!this.steamService.IsSteamLoginSupported)
+            {
+                this.notificationService.NotifyError(
+                    title: "Steam login is not supported",
+                    description: "Steam login is not supported on this platform yet. Please select a different set of credentials"
+                );
+                return default;
+            }
+
+            if (!this.steamService.IsSteamRunning())
+            {
+                this.notificationService.NotifyError(
+                    title: "Steam is not running",
+                    description: "Steam login is selected but the Steam client is not running. Please start Steam and log in, then try again"
+                );
+                return default;
+            }
+        }
+
         using var timeout = new CancellationTokenSource(LaunchTimeout);
         using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(
             cancellationToken,
@@ -107,8 +130,9 @@ internal sealed class ApplicationLauncher(
     )
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        var email = launchConfigurationWithCredentials.Credentials?.Username;
-        var password = launchConfigurationWithCredentials.Credentials?.Password;
+        var isSteamLogin = launchConfigurationWithCredentials.Credentials?.IsSteamLogin is true;
+        var email = isSteamLogin ? null : launchConfigurationWithCredentials.Credentials?.Username;
+        var password = isSteamLogin ? null : launchConfigurationWithCredentials.Credentials?.Password;
         var executable = launchConfigurationWithCredentials.ExecutablePath;
         if (executable is not null && File.Exists(executable) is false)
         {
@@ -229,7 +253,7 @@ internal sealed class ApplicationLauncher(
         };
 
         var steamAppIdFilePath = Path.Combine(workingDirectory, SteamAppIdFile);
-        if (launchConfigurationWithCredentials.SteamSupport)
+        if (launchConfigurationWithCredentials.SteamSupport || isSteamLogin)
         {
             await File.WriteAllTextAsync(steamAppIdFilePath, SteamAppId, cancellationToken);
             scopedLogger.LogDebug(
