@@ -1,5 +1,5 @@
-﻿using Daybreak.Shared.Services.Updater;
-using System.Diagnostics;
+﻿using Daybreak.Shared.Services.Shell;
+using Daybreak.Shared.Services.Updater;
 using System.Extensions;
 using TrailBlazr.Services;
 using TrailBlazr.ViewModels;
@@ -7,13 +7,15 @@ using TrailBlazr.ViewModels;
 namespace Daybreak.Views;
 public sealed class VersionManagementViewModel(
     IViewManager viewManager,
-    IApplicationUpdater applicationUpdater)
+    IApplicationUpdater applicationUpdater,
+    IShellExecutor shellExecutor)
     : ViewModelBase<VersionManagementViewModel, VersionManagementView>
 {
     private const string VersionPlaceholder = "{VERSION}";
     private const string ReleaseURL = $"https://github.com/AlexMacocian/Daybreak/releases/tag/v{VersionPlaceholder}";
     private readonly IViewManager viewManager = viewManager;
     private readonly IApplicationUpdater applicationUpdater = applicationUpdater;
+    private readonly IShellExecutor shellExecutor = shellExecutor;
 
     public List<Version> Versions { get; init; } = [];
     public Version? CurrentVersion { get; set; }
@@ -31,6 +33,6 @@ public sealed class VersionManagementViewModel(
 
     public void OpenVersionPage(Version version)
     {
-        Process.Start("explorer.exe", ReleaseURL.Replace(VersionPlaceholder, version.ToString()));
+        this.shellExecutor.OpenUrl(ReleaseURL.Replace(VersionPlaceholder, version.ToString()));
     }
 }

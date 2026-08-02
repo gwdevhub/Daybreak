@@ -8,6 +8,7 @@ using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Privilege;
+using Daybreak.Shared.Services.Shell;
 using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.Updater;
 using Daybreak.Shared.Services.Window;
@@ -17,7 +18,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using Photino.Blazor;
 using System.Core.Extensions;
-using System.Diagnostics;
 using System.Extensions;
 using TrailBlazr.Services;
 
@@ -39,6 +39,7 @@ public sealed class AppViewModel
     private readonly JSConsoleInterop jsConsoleInterop;
     private readonly INotificationService notificationService;
     private readonly IWindowManipulationService windowManipulationService;
+    private readonly IShellExecutor shellExecutor;
     private readonly ILogger<App> logger;
 
     private SemaphoreSlim themeChangeSemaphore = new(1, 1);
@@ -89,6 +90,7 @@ public sealed class AppViewModel
         INotificationProducer notificationProducer,
         INotificationService notificationService,
         IWindowManipulationService windowManipulationService,
+        IShellExecutor shellExecutor,
         ILogger<App> logger)
     {
         this.keyboardHookService = keyboardHookService.ThrowIfNull();
@@ -104,6 +106,7 @@ public sealed class AppViewModel
         this.NotificationProducer = notificationProducer.ThrowIfNull();
         this.notificationService = notificationService.ThrowIfNull();
         this.windowManipulationService = windowManipulationService.ThrowIfNull();
+        this.shellExecutor = shellExecutor.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
 
         
@@ -215,14 +218,7 @@ public sealed class AppViewModel
 
     public void OpenIssues()
     {
-        try
-        {
-            Process.Start(new ProcessStartInfo { FileName = IssueUrl, UseShellExecute = true });
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError(ex, "Encountered exception while opening issues page");
-        }
+        this.shellExecutor.OpenUrl(IssueUrl);
     }
 
     public void OpenSynchronizationView()

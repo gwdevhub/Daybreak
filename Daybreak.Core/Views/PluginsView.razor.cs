@@ -1,8 +1,8 @@
 ﻿using Daybreak.Shared.Models.Plugins;
 using Daybreak.Shared.Services.ApplicationLauncher;
 using Daybreak.Shared.Services.Plugins;
+using Daybreak.Shared.Services.Shell;
 using Photino.NET;
-using System.Diagnostics;
 using System.Extensions;
 using TrailBlazr.Services;
 using TrailBlazr.ViewModels;
@@ -12,13 +12,15 @@ public sealed class PluginsViewModel(
     PhotinoWindow window,
     IApplicationLauncher applicationLauncher,
     IViewManager viewManager,
-    IPluginsService pluginsService)
+    IPluginsService pluginsService,
+    IShellExecutor shellExecutor)
     : ViewModelBase<PluginsViewModel, PluginsView>
 {
     private readonly PhotinoWindow window = window;
     private readonly IApplicationLauncher applicationLauncher = applicationLauncher;
     private readonly IViewManager viewManager = viewManager;
     private readonly IPluginsService pluginsService = pluginsService;
+    private readonly IShellExecutor shellExecutor = shellExecutor;
 
     public List<AvailablePlugin> AvailablePlugins { get; init; } = [];
     public bool CanSave { get; private set; } = false;
@@ -71,7 +73,7 @@ public sealed class PluginsViewModel(
 
     public void NavigateToPlugin(AvailablePlugin plugin)
     {
-        Process.Start("explorer.exe", plugin.Path);
+        this.shellExecutor.OpenPath(plugin.Path);
     }
 
     private void UpdatePlugins()
