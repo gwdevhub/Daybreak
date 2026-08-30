@@ -122,7 +122,10 @@ public sealed class WinePrefixManager(
     public IEnumerable<string> GetCustomArguments() => [];
 
     /// <inheritdoc />
-    public Task OnGuildWarsStarting(GuildWarsStartingContext guildWarsStartingContext, CancellationToken cancellationToken)
+    public async Task OnGuildWarsStarting(
+        GuildWarsStartingContext guildWarsStartingContext,
+        CancellationToken cancellationToken
+    )
     {
         if (!this.IsAvailable())
         {
@@ -132,7 +135,7 @@ public sealed class WinePrefixManager(
                 title: "Wine not installed",
                 description: "Wine is required to launch Guild Wars on Linux. Please install Wine and restart Daybreak.",
                 expirationTime: DateTime.UtcNow + TimeSpan.FromSeconds(15));
-            return Task.CompletedTask;
+            return;
         }
 
         if (!this.IsInitialized())
@@ -143,10 +146,23 @@ public sealed class WinePrefixManager(
                 title: "Wine prefix not initialized",
                 description: "The Wine prefix needs to be set up before launching Guild Wars. Click here to initialize it.",
                 expirationTime: DateTime.UtcNow + TimeSpan.FromSeconds(15));
-            return Task.CompletedTask;
+            return;
         }
 
-        return Task.CompletedTask;
+        if (await this.ConfigureComputerName(cancellationToken))
+        {
+            return;
+        }
+
+        this.logger.LogError(
+            "Failed to configure the Linux host name as the Wine computer name. Blocking Guild Wars startup"
+        );
+        guildWarsStartingContext.CancelStartup = true;
+        this.notificationService.NotifyError(
+            title: "Wine prefix configuration failed",
+            description: "Daybreak could not configure the Linux host name as the Wine computer name. Check the logs for details.",
+            expirationTime: DateTime.UtcNow + TimeSpan.FromSeconds(15)
+        );
     }
 
     /// <inheritdoc />
@@ -461,6 +477,15 @@ public sealed class WinePrefixManager(
         };
 
         startInfo.Environment["WINEPREFIX"] = this.winePrefixPath;
+
+        // Guild Wars outlives this call, so its crash backtrace must go somewhere
+        // durable rather than into the stderr pipe we stop reading below.
+        if (WineDebugLog.IsEnabled)
+        {
+            WineDebugLog.WriteSessionHeader($"{wineExePath} {wineArgs}");
+            WineDebugLog.Apply(startInfo);
+            this.logger.LogDebug("Wine diagnostics are being appended to {WineDebugLog}", WineDebugLog.LogPath);
+        }
 
         try
         {

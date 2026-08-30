@@ -13,7 +13,7 @@ namespace Daybreak.API.Interop
 {
 
 /// <summary>
-/// P/Invoke bindings for 545 C++ exports from gwca.dll (0 skipped).
+/// P/Invoke bindings for 560 C++ exports from gwca.dll (0 skipped).
 /// Nested classes mirror the C++ namespace hierarchy (e.g. GW::Agents → GWCA.GW.Agents).
 /// Types annotated with [GWCAEquivalent] are used in signatures where available.
 /// </summary>
@@ -23,11 +23,11 @@ public static unsafe partial class GWCA
     // ═══════════════════════════════════════════════════
     // Parsed structs diagnostic:
     // [NAMESPACE] GWCA.GW popped at line 46
-    // [NAMESPACE] GWCA.GW.Agents popped at line 215
-    // [NAMESPACE] GWCA.GW.CameraMgr popped at line 35
-    // [NAMESPACE] GWCA.GW.Chat popped at line 21
-    // [NAMESPACE] GWCA.GW.Chat.TextColor popped at line 50
-    // [NAMESPACE] GWCA.GW.Constants popped at line 25
+    // [NAMESPACE] GWCA.GW.Agents popped at line 211
+    // [NAMESPACE] GWCA.GW.CameraMgr popped at line 34
+    // [NAMESPACE] GWCA.GW.Chat popped at line 13
+    // [NAMESPACE] GWCA.GW.Chat.TextColor popped at line 54
+    // [NAMESPACE] GWCA.GW.Constants popped at line 17
     // [NAMESPACE] GWCA.GW.Constants.DialogID popped at line 282
     // [NAMESPACE] GWCA.GW.Constants.ItemID popped at line 201
     // [NAMESPACE] GWCA.GW.Constants.ModelID.Minipet.SummoningStone.FoW.UW.FoW.Urgoz.Deep.DoA.EotnDungeons.BonusMissionPack.EotnDungeons popped at line 445
@@ -35,31 +35,31 @@ public static unsafe partial class GWCA
     // [NAMESPACE] GWCA.GW.Constants.Preference popped at line 62
     // [NAMESPACE] GWCA.GW.Constants.Range popped at line 239
     // [NAMESPACE] GWCA.GW.Constants.SqrRange popped at line 249
-    // [NAMESPACE] GWCA.GW.Effects popped at line 60
-    // [NAMESPACE] GWCA.GW.EventMgr popped at line 32
-    // [NAMESPACE] GWCA.GW.FriendListMgr popped at line 32
-    // [NAMESPACE] GWCA.GW.GameThread popped at line 32
+    // [NAMESPACE] GWCA.GW.Effects popped at line 58
+    // [NAMESPACE] GWCA.GW.EventMgr popped at line 83
+    // [NAMESPACE] GWCA.GW.FriendListMgr popped at line 35
+    // [NAMESPACE] GWCA.GW.GameThread popped at line 31
     // [NAMESPACE] GWCA.GW.GuildMgr popped at line 21
-    // [NAMESPACE] GWCA.GW.Hook popped at line 22
+    // [NAMESPACE] GWCA.GW.Hook popped at line 127
     // [NAMESPACE] GWCA.GW.Items popped at line 97
-    // [NAMESPACE] GWCA.GW.Map popped at line 165
-    // [NAMESPACE] GWCA.GW.MemoryMgr popped at line 30
+    // [NAMESPACE] GWCA.GW.Map popped at line 166
+    // [NAMESPACE] GWCA.GW.MemoryMgr popped at line 28
     // [NAMESPACE] GWCA.GW.Merchant popped at line 30
-    // [NAMESPACE] GWCA.GW.Packet popped at line 112
-    // [NAMESPACE] GWCA.GW.Packet.StoC popped at line 107
-    // [NAMESPACE] GWCA.GW.Packet.StoC.GenericValueID popped at line 70
-    // [NAMESPACE] GWCA.GW.Packet.StoC.JumboMessageType popped at line 82
-    // [NAMESPACE] GWCA.GW.Packet.StoC.JumboMessageValue popped at line 99
-    // [NAMESPACE] GWCA.GW.PartyMgr popped at line 108
+    // [NAMESPACE] GWCA.GW.Packet popped at line 91
+    // [NAMESPACE] GWCA.GW.Packet.StoC popped at line 86
+    // [NAMESPACE] GWCA.GW.Packet.StoC.GenericValueID popped at line 58
+    // [NAMESPACE] GWCA.GW.Packet.StoC.JumboMessageType popped at line 70
+    // [NAMESPACE] GWCA.GW.Packet.StoC.JumboMessageValue popped at line 78
+    // [NAMESPACE] GWCA.GW.PartyMgr popped at line 107
     // [NAMESPACE] GWCA.GW.PlayerMgr popped at line 56
     // [NAMESPACE] GWCA.GW.QuestMgr popped at line 43
-    // [NAMESPACE] GWCA.GW.Render popped at line 127
-    // [NAMESPACE] GWCA.GW.Scanner popped at line 52
+    // [NAMESPACE] GWCA.GW.Render popped at line 167
+    // [NAMESPACE] GWCA.GW.Scanner popped at line 119
     // [NAMESPACE] GWCA.GW.SkillbarMgr popped at line 43
-    // [NAMESPACE] GWCA.GW.StoC popped at line 50
-    // [NAMESPACE] GWCA.GW.TargetFilter popped at line 122
+    // [NAMESPACE] GWCA.GW.StoC popped at line 45
+    // [NAMESPACE] GWCA.GW.TargetFilter popped at line 126
     // [NAMESPACE] GWCA.GW.Trade popped at line 22
-    // [NAMESPACE] GWCA.GW.UI popped at line 806
+    // [NAMESPACE] GWCA.GW.UI popped at line 833
     // [NAMESPACE] GWCA.GW.UI.UIPacket popped at line 30
     // [NAMESPACE] GWCA.GWCA popped at line 15
     // GWCA.GW.AccountContext: 9 fields [OK]
@@ -116,6 +116,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.HeroFlag: 8 fields [OK]
     // GWCA.GW.HeroInfo: 35 fields [OK]
     // GWCA.GW.HeroPartyMember: 6 fields [OK]
+    // GWCA.GW.Hook.HookTarget: 1 fields [OK]
     // GWCA.GW.Inventory: 39 fields [OK]
     // GWCA.GW.InventoryTableEntry: 3 fields [OK]
     // GWCA.GW.Item: 26 fields [OK]
@@ -126,10 +127,13 @@ public static unsafe partial class GWCA
     // GWCA.GW.ItemModifier: 1 fields [OK]
     // GWCA.GW.LoginCharacter: 2 fields [OK]
     // GWCA.GW.MapAgent: 13 fields [OK]
-    // GWCA.GW.MapContext: 57 fields [OK]
-    // GWCA.GW.MapProp: 18 fields [OK]
+    // GWCA.GW.MapContext: 51 fields [OK]
+    // GWCA.GW.MapLightContext: 2 fields [OK]
+    // GWCA.GW.MapLightDescriptor: 8 fields [OK]
+    // GWCA.GW.MapProp: 20 fields [OK]
     // GWCA.GW.MapStaticData: 37 fields [SKIP: unresolved typedef in field map: PathingMapArray]
     // GWCA.GW.MapTypeInstanceInfo: 3 fields [OK]
+    // GWCA.GW.MapWaterContext: 8 fields [OK]
     // GWCA.GW.Mat4x3f: 13 fields [OK]
     // GWCA.GW.MaterialCost: 4 fields [OK]
     // GWCA.GW.Merchant.QuoteInfo: 2 fields [OK]
@@ -175,13 +179,14 @@ public static unsafe partial class GWCA
     // GWCA.GW.ProfessionState: 5 fields [OK]
     // GWCA.GW.ProgressBarContext: 5 fields [OK]
     // GWCA.GW.PropByType: 2 fields [OK]
-    // GWCA.GW.PropModelInfo: 6 fields [OK]
+    // GWCA.GW.PropModelInfo: 5 fields [OK]
     // GWCA.GW.PropsContext: 6 fields [SKIP: complex template in field propsByType: Array<TList<PropByType>>]
     // GWCA.GW.PvPItemInfo: 1 fields [OK]
     // GWCA.GW.PvPItemUpgradeInfo: 10 fields [OK]
     // GWCA.GW.Quest: 11 fields [OK]
     // GWCA.GW.RecObject: 9 fields [OK]
-    // GWCA.GW.Render.Mat4x3f: 13 fields [OK]
+    // GWCA.GW.Render.GlesDevice: 12 fields [OK]
+    // GWCA.GW.Render.GlFragmentRenderState: 5 fields [OK]
     // GWCA.GW.SalvageSessionInfo: 9 fields [OK]
     // GWCA.GW.ScannerSectionOffset: 2 fields [OK]
     // GWCA.GW.ScrollableFrame: 0 fields [SKIP: no fields]
@@ -196,6 +201,10 @@ public static unsafe partial class GWCA
     // GWCA.GW.SubStructUnk: 9 fields [OK]
     // GWCA.GW.TabsFrame: 0 fields [SKIP: no fields]
     // GWCA.GW.TagInfo: 4 fields [OK]
+    // GWCA.GW.TerrainShadowRecord: 3 fields [OK]
+    // GWCA.GW.TerrainTexContext: 5 fields [SKIP: complex template in field shadow_records: BaseArray<TerrainShadowRecord>]
+    // GWCA.GW.TerrainTexTile: 5 fields [OK]
+    // GWCA.GW.TerrainTexture: 4 fields [OK]
     // GWCA.GW.TextCache: 1 fields [OK]
     // GWCA.GW.TextParser: 14 fields [OK]
     // GWCA.GW.THash: 5 fields [SKIP: template param T in field m_fullList]
@@ -209,7 +218,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.TradeContext: 4 fields [OK]
     // GWCA.GW.TradeItem: 2 fields [OK]
     // GWCA.GW.TradePlayer: 2 fields [OK]
-    // GWCA.GW.UI.AgentNameTagInfo: 15 fields [OK]
+    // GWCA.GW.UI.AgentNameTagInfo: 17 fields [OK]
     // GWCA.GW.UI.ChatTemplate: 4 fields [OK]
     // GWCA.GW.UI.CompassPoint: 2 fields [OK]
     // GWCA.GW.UI.CreateUIComponentPacket: 6 fields [OK]
@@ -271,7 +280,6 @@ public static unsafe partial class GWCA
     // GWCA.GW.UI.UIPacket.kSendMerchantTransactItem: 5 fields [OK]
     // GWCA.GW.UI.UIPacket.kSendMoveItem: 4 fields [OK]
     // GWCA.GW.UI.UIPacket.kSendPingWeaponSet: 3 fields [OK]
-    // GWCA.GW.UI.UIPacket.kSendUseItem: 2 fields [OK]
     // GWCA.GW.UI.UIPacket.kSendWorldAction: 3 fields [OK]
     // GWCA.GW.UI.UIPacket.kServerActiveQuestChanged: 5 fields [OK]
     // GWCA.GW.UI.UIPacket.kSetAgentProfession: 3 fields [OK]
@@ -621,10 +629,11 @@ public static unsafe partial class GWCA
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool Move(global::Daybreak.API.Interop.GuildWars.GamePos gamePos);
 
-            // GW::Agents::RegisterAgentEffectCallback | function2: TODO: map struct function
-            // [LibraryImport(DllName, EntryPoint = "?RegisterAgentEffectCallback@Agents@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUHookStatus@GW@@PBUAgentLiving@2@PBUAgentEffect@2@@Z@std@@H@Z")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // public static partial void RegisterAgentEffectCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, global::Daybreak.API.Interop.GuildWars.AgentLiving* agentLiving3, global::Daybreak.API.Interop.GuildWars.AgentEffect* agentEffect4);
+            // GW::Agents::RefreshAgentNameTag
+            [LibraryImport(DllName, EntryPoint = "?RefreshAgentNameTag@Agents@GW@@YA_NPBUAgent@2@@Z")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool RefreshAgentNameTag(global::Daybreak.API.Interop.GuildWars.Agent* agent);
 
             // GW::Agents::SendDialog
             [LibraryImport(DllName, EntryPoint = "?SendDialog@Agents@GW@@YA_NI@Z")]
@@ -1058,6 +1067,12 @@ public static unsafe partial class GWCA
             [LibraryImport(DllName, EntryPoint = "?RemoveEventCallback@EventMgr@GW@@YAXPAUHookEntry@2@W4EventID@12@@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial void RemoveEventCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, global::Daybreak.API.Interop.GWCA.GW.EventMgr.EventID eventID2);
+
+            // GW::EventMgr::SendEventMessage
+            [LibraryImport(DllName, EntryPoint = "?SendEventMessage@EventMgr@GW@@YA_NW4EventID@12@PAXI@Z")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool SendEventMessage(global::Daybreak.API.Interop.GWCA.GW.EventMgr.EventID eventID1, void* ptr2, uint value3);
         }
 
         public static partial class FriendListMgr
@@ -1245,9 +1260,9 @@ public static unsafe partial class GWCA
         {
 
             // GW::Hook::CreateHook
-            [LibraryImport(DllName, EntryPoint = "?CreateHook@Hook@GW@@YAHPAPAXPAX0@Z")]
+            [LibraryImport(DllName, EntryPoint = "?CreateHook@Hook@GW@@YAHPAPAXUHookTarget@12@0@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial int CreateHook(void* ptr1, void* ptr2, nint ptr3);
+            public static partial int CreateHook(void* ptr1, global::Daybreak.API.Interop.GuildWars.HookTarget hookTarget2, nint ptr3);
 
             // GW::Hook::Deinitialize
             [LibraryImport(DllName, EntryPoint = "?Deinitialize@Hook@GW@@YAXXZ")]
@@ -1255,14 +1270,14 @@ public static unsafe partial class GWCA
             public static partial void Deinitialize();
 
             // GW::Hook::DisableHooks
-            [LibraryImport(DllName, EntryPoint = "?DisableHooks@Hook@GW@@YAXPAX@Z")]
+            [LibraryImport(DllName, EntryPoint = "?DisableHooks@Hook@GW@@YAXUHookTarget@12@@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void DisableHooks(void* ptr);
+            public static partial void DisableHooks(global::Daybreak.API.Interop.GuildWars.HookTarget hookTarget);
 
             // GW::Hook::EnableHooks
-            [LibraryImport(DllName, EntryPoint = "?EnableHooks@Hook@GW@@YAXPAX@Z")]
+            [LibraryImport(DllName, EntryPoint = "?EnableHooks@Hook@GW@@YAXUHookTarget@12@@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void EnableHooks(void* ptr);
+            public static partial void EnableHooks(global::Daybreak.API.Interop.GuildWars.HookTarget hookTarget);
 
             // GW::Hook::EnterHook
             [LibraryImport(DllName, EntryPoint = "?EnterHook@Hook@GW@@YAXXZ")]
@@ -1285,9 +1300,9 @@ public static unsafe partial class GWCA
             public static partial void LeaveHook();
 
             // GW::Hook::RemoveHook
-            [LibraryImport(DllName, EntryPoint = "?RemoveHook@Hook@GW@@YAXPAX@Z")]
+            [LibraryImport(DllName, EntryPoint = "?RemoveHook@Hook@GW@@YAXUHookTarget@12@@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void RemoveHook(void* ptr);
+            public static partial void RemoveHook(global::Daybreak.API.Interop.GuildWars.HookTarget hookTarget);
         }
 
         public static partial class Item
@@ -1640,6 +1655,11 @@ public static unsafe partial class GWCA
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial int GetDistrict();
 
+            // GW::Map::GetDistrictCount
+            [LibraryImport(DllName, EntryPoint = "?GetDistrictCount@Map@GW@@YAIXZ")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial uint GetDistrictCount();
+
             // GW::Map::GetFoesKilled
             [LibraryImport(DllName, EntryPoint = "?GetFoesKilled@Map@GW@@YAIXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -1870,6 +1890,25 @@ public static unsafe partial class GWCA
             [LibraryImport(DllName, EntryPoint = "?SetLabel@MultiLineTextLabelFrame@GW@@QAE_NPB_W@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
             public static partial double SetLabel(nint self, ushort* ptr2);
+        }
+
+        public static partial class NPCEquipment
+        {
+
+            // GW::NPCEquipment::GetType
+            [LibraryImport(DllName, EntryPoint = "?GetType@NPCEquipment@GW@@QAEIXZ")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
+            public static partial void GetType(nint self);
+
+            // GW::NPCEquipment::RedrawEquipmentSlot
+            [LibraryImport(DllName, EntryPoint = "?RedrawEquipmentSlot@NPCEquipment@GW@@QAE_NI@Z")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
+            public static partial double RedrawEquipmentSlot(nint self, uint value2);
+
+            // GW::NPCEquipment::UndrawEquipmentSlot
+            [LibraryImport(DllName, EntryPoint = "?UndrawEquipmentSlot@NPCEquipment@GW@@QAE_NI@Z")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
+            public static partial double UndrawEquipmentSlot(nint self, uint value2);
         }
 
         public static partial class PartyMgr
@@ -2312,6 +2351,11 @@ public static unsafe partial class GWCA
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial void FlushCommandQueue();
 
+            // GW::Render::GetBackend
+            [LibraryImport(DllName, EntryPoint = "?GetBackend@Render@GW@@YA?AW4Backend@12@XZ")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial global::Daybreak.API.Interop.GWCA.GW.Render.Backend GetBackend();
+
             // GW::Render::GetDevice | returns TODO: map struct IDirect3DDevice9
             // [LibraryImport(DllName, EntryPoint = "?GetDevice@Render@GW@@YAPAUIDirect3DDevice9@@XZ")]
             // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -2322,10 +2366,30 @@ public static unsafe partial class GWCA
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial float GetFieldOfView();
 
+            // GW::Render::GetFrameCallback
+            [LibraryImport(DllName, EntryPoint = "?GetFrameCallback@Render@GW@@YAP6AXXZXZ")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial nint GetFrameCallback();
+
             // GW::Render::GetFrameLimit
             [LibraryImport(DllName, EntryPoint = "?GetFrameLimit@Render@GW@@YAIXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetFrameLimit();
+
+            // GW::Render::GetGlesDevice
+            [LibraryImport(DllName, EntryPoint = "?GetGlesDevice@Render@GW@@YAPAUGlesDevice@12@XZ")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial global::Daybreak.API.Interop.GuildWars.GlesDevice* GetGlesDevice();
+
+            // GW::Render::GetGlesRenderCallback
+            [LibraryImport(DllName, EntryPoint = "?GetGlesRenderCallback@Render@GW@@YAP6AXPAUGlesDevice@12@@ZXZ")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial nint GetGlesRenderCallback();
+
+            // GW::Render::GetGlesResetCallback
+            [LibraryImport(DllName, EntryPoint = "?GetGlesResetCallback@Render@GW@@YAP6AXPAUGlesDevice@12@@ZXZ")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial nint GetGlesResetCallback();
 
             // GW::Render::GetGraphicsRendererValue
             [LibraryImport(DllName, EntryPoint = "?GetGraphicsRendererValue@Render@GW@@YAIW4Metric@12@I@Z")]
@@ -2337,21 +2401,20 @@ public static unsafe partial class GWCA
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial int GetIsFullscreen();
 
-            // GW::Render::GetIsInRenderLoop
-            [LibraryImport(DllName, EntryPoint = "?GetIsInRenderLoop@Render@GW@@YA_NXZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool GetIsInRenderLoop();
-
             // GW::Render::GetRenderCallback
             [LibraryImport(DllName, EntryPoint = "?GetRenderCallback@Render@GW@@YAP6AXPAUIDirect3DDevice9@@@ZXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial nint GetRenderCallback();
 
-            // GW::Render::GetTransform
-            [LibraryImport(DllName, EntryPoint = "?GetTransform@Render@GW@@YAPAUMat4x3f@12@W4Transform@12@@Z")]
+            // GW::Render::GetRendererMode
+            [LibraryImport(DllName, EntryPoint = "?GetRendererMode@Render@GW@@YA?AW4RendererMode@12@XZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.Mat4x3f* GetTransform(global::Daybreak.API.Interop.GWCA.GW.Render.Transform transform);
+            public static partial global::Daybreak.API.Interop.GWCA.GW.Render.RendererMode GetRendererMode();
+
+            // GW::Render::GetResetCallback
+            [LibraryImport(DllName, EntryPoint = "?GetResetCallback@Render@GW@@YAP6AXPAUIDirect3DDevice9@@@ZXZ")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial nint GetResetCallback();
 
             // GW::Render::GetViewportHeight
             [LibraryImport(DllName, EntryPoint = "?GetViewportHeight@Render@GW@@YAIXZ")]
@@ -2374,11 +2437,26 @@ public static unsafe partial class GWCA
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool SetFog([MarshalAs(UnmanagedType.U1)] bool flag);
 
+            // GW::Render::SetFrameCallback
+            [LibraryImport(DllName, EntryPoint = "?SetFrameCallback@Render@GW@@YAXP6AXXZ@Z")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial void SetFrameCallback(nint callback);
+
             // GW::Render::SetFrameLimit
             [LibraryImport(DllName, EntryPoint = "?SetFrameLimit@Render@GW@@YA_NI@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool SetFrameLimit(uint value);
+
+            // GW::Render::SetGlesRenderCallback
+            [LibraryImport(DllName, EntryPoint = "?SetGlesRenderCallback@Render@GW@@YAXP6AXPAUGlesDevice@12@@Z@Z")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial void SetGlesRenderCallback(nint callback);
+
+            // GW::Render::SetGlesResetCallback
+            [LibraryImport(DllName, EntryPoint = "?SetGlesResetCallback@Render@GW@@YAXP6AXPAUGlesDevice@12@@Z@Z")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial void SetGlesResetCallback(nint callback);
 
             // GW::Render::SetGraphicsRendererValue
             [LibraryImport(DllName, EntryPoint = "?SetGraphicsRendererValue@Render@GW@@YA_NW4Metric@12@II@Z")]
@@ -2414,6 +2492,11 @@ public static unsafe partial class GWCA
             [LibraryImport(DllName, EntryPoint = "?FindInRange@Scanner@GW@@YAIPBD0HKK@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint FindInRange(byte* ptr1, nint ptr2, int value3, uint value4, uint value5);
+
+            // GW::Scanner::FindNth
+            [LibraryImport(DllName, EntryPoint = "?FindNth@Scanner@GW@@YAIPBD0IHW4ScannerSection@2@@Z")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial uint FindNth(byte* ptr1, nint ptr2, uint value3, int value4, global::Daybreak.API.Interop.GWCA.GW.ScannerSection scannerSection5);
 
             // GW::Scanner::FindNthUseOfString
             [LibraryImport(DllName, EntryPoint = "?FindNthUseOfString@Scanner@GW@@YAIPBDIHW4ScannerSection@2@@Z")]
@@ -2476,9 +2559,9 @@ public static unsafe partial class GWCA
         {
 
             // GW::ScrollableFrame::AddItem
-            [LibraryImport(DllName, EntryPoint = "?AddItem@ScrollableFrame@GW@@QAE_NIIP6AXPAUInteractionMessage@UI@2@PAX1@Z@Z")]
+            [LibraryImport(DllName, EntryPoint = "?AddItem@ScrollableFrame@GW@@QAEIIIP6AXPAUInteractionMessage@UI@2@PAX1@Z@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double AddItem(nint self, uint value2, uint value3, nint callback4);
+            public static partial uint AddItem(nint self, uint value2, nint callback3);
 
             // GW::ScrollableFrame::ClearItems
             [LibraryImport(DllName, EntryPoint = "?ClearItems@ScrollableFrame@GW@@QAE_NXZ")]
@@ -2603,10 +2686,10 @@ public static unsafe partial class GWCA
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GuildWars.Skill* GetSkillConstantData(global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillID);
 
-            // GW::SkillbarMgr::GetSkillConstantDataCount
-            [LibraryImport(DllName, EntryPoint = "?GetSkillConstantDataCount@SkillbarMgr@GW@@YAIXZ")]
+            // GW::SkillbarMgr::GetSkillCount
+            [LibraryImport(DllName, EntryPoint = "?GetSkillCount@SkillbarMgr@GW@@YAIXZ")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint GetSkillConstantDataCount();
+            public static partial uint GetSkillCount();
 
             // GW::SkillbarMgr::GetSkillSlot
             [LibraryImport(DllName, EntryPoint = "?GetSkillSlot@SkillbarMgr@GW@@YAHW4SkillID@Constants@2@@Z")]
@@ -2914,6 +2997,12 @@ public static unsafe partial class GWCA
         public static partial class UI
         {
 
+            // GW::UI::AddFrameCallback
+            [LibraryImport(DllName, EntryPoint = "?AddFrameCallback@UI@GW@@YA_NPAUFrame@12@P6AXPAUInteractionMessage@12@PAX2@Z2@Z")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool AddFrameCallback(global::Daybreak.API.Interop.Frame* frame1, nint callback2, nint ptr3);
+
             // GW::UI::AddFrameUIInteractionCallback
             [LibraryImport(DllName, EntryPoint = "?AddFrameUIInteractionCallback@UI@GW@@YA_NPAUFrame@12@P6AXPAUInteractionMessage@12@PAX2@Z2@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -3213,9 +3302,9 @@ public static unsafe partial class GWCA
             public static partial bool SetCommandLinePref(ushort* ptr1, ushort* ptr2);
 
             // GW::UI::SetFrameBounds
-            [LibraryImport(DllName, EntryPoint = "?SetFrameBounds@UI@GW@@YAXPAUFrame@12@IPAM1@Z")]
+            [LibraryImport(DllName, EntryPoint = "?SetFrameBounds@UI@GW@@YAXPAUFrame@12@W4FrameLayoutMode@12@PAM2@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void SetFrameBounds(global::Daybreak.API.Interop.Frame* frame1, uint value2, float* ptr3, nint ptr4);
+            public static partial void SetFrameBounds(global::Daybreak.API.Interop.Frame* frame1, global::Daybreak.API.Interop.GWCA.GW.UI.FrameLayoutMode frameLayoutMode2, float* ptr3, nint ptr4);
 
             // GW::UI::SetFrameDisabled
             [LibraryImport(DllName, EntryPoint = "?SetFrameDisabled@UI@GW@@YA_NPAUFrame@12@_N@Z")]
@@ -3230,9 +3319,9 @@ public static unsafe partial class GWCA
             public static partial bool SetFrameMargins(global::Daybreak.API.Interop.Frame* frame1, uint value2, float* ptr3, nint ptr4, uint value5);
 
             // GW::UI::SetFramePosition
-            [LibraryImport(DllName, EntryPoint = "?SetFramePosition@UI@GW@@YAXPAUFrame@12@IPAM@Z")]
+            [LibraryImport(DllName, EntryPoint = "?SetFramePosition@UI@GW@@YAXPAUFrame@12@W4FrameLayoutMode@12@PAM@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void SetFramePosition(global::Daybreak.API.Interop.Frame* frame1, uint value2, float* ptr3);
+            public static partial void SetFramePosition(global::Daybreak.API.Interop.Frame* frame1, global::Daybreak.API.Interop.GWCA.GW.UI.FrameLayoutMode frameLayoutMode2, float* ptr3);
 
             // GW::UI::SetFrameTitle
             [LibraryImport(DllName, EntryPoint = "?SetFrameTitle@UI@GW@@YA_NPAUFrame@12@PB_W@Z")]
@@ -3472,6 +3561,20 @@ public static unsafe partial class GWCA
             Fight,
             Guard,
             AvoidCombat,
+        }
+
+        public enum NameTagFlags : uint
+        {
+            NameTagFlags_Picked = 0x8,
+            NameTagFlags_Highlighted = 0x10,
+            NameTagFlags_InRange = 0x20,
+            NameTagFlags_EvaluatedTarget = 0x80,
+            NameTagFlags_ManualTarget = 0x100,
+            NameTagFlags_Suppressed = 0x200,
+            NameTagFlags_PassesFilter = 0x400,
+            NameTagFlags_NotOwnedByPlayer = 0x800,
+            NameTagFlags_PassesTransientFilter = 0x1000,
+            NameTagFlags_Disabled = 0x20000,
         }
 
         public enum ObserverMatchType : uint
@@ -8182,7 +8285,6 @@ public static unsafe partial class GWCA
                 Heroic_Refrain,
                 Reforged_Mode = 0xD6A,
                 Dhuums_Covenant_Broken,
-                Count = 0xD6c,
             }
 
             public enum SkillType : int
@@ -8811,26 +8913,26 @@ public static unsafe partial class GWCA
 
                                                                 public static partial class SummoningStone
                                                                 {
-                                                                    internal const int ImperialBarrage = 9045;
-                                                                    internal const int ImperialCripplingSlash = 9043;
-                                                                    internal const int ImperialQuiveringBlade = 9046;
-                                                                    internal const int ImperialTripleChop = 9044;
-                                                                    internal const int TenguAngchuElementalist = 9051;
-                                                                    internal const int TenguAuraOftheLich = 9061;
-                                                                    internal const int TenguBroadHeadArrow = 9048;
-                                                                    internal const int TenguDefiantWasXinrae = 9062;
-                                                                    internal const int TenguFeveredDreams = 9052;
-                                                                    internal const int TenguGlassArrows = 9056;
-                                                                    internal const int TenguHundredBlades = 9047;
-                                                                    internal const int TenguLifeSheath = 9050;
-                                                                    internal const int TenguPalmStrike = 9049;
-                                                                    internal const int TenguPanic = 9060;
-                                                                    internal const int TenguPeaceandHarmony = 9058;
-                                                                    internal const int TenguPreservation = 9054;
-                                                                    internal const int TenguPrimalRage = 9055;
-                                                                    internal const int TenguSandstorm = 9059;
-                                                                    internal const int TenguSpitefulSpirit = 9053;
-                                                                    internal const int TenguWayOftheAssassin = 9057;
+                                                                    internal const int ImperialBarrage = 9270;
+                                                                    internal const int ImperialCripplingSlash = 9268;
+                                                                    internal const int ImperialQuiveringBlade = 9271;
+                                                                    internal const int ImperialTripleChop = 9269;
+                                                                    internal const int TenguAngchuElementalist = 9276;
+                                                                    internal const int TenguAuraOftheLich = 9286;
+                                                                    internal const int TenguBroadHeadArrow = 9273;
+                                                                    internal const int TenguDefiantWasXinrae = 9287;
+                                                                    internal const int TenguFeveredDreams = 9277;
+                                                                    internal const int TenguGlassArrows = 9281;
+                                                                    internal const int TenguHundredBlades = 9272;
+                                                                    internal const int TenguLifeSheath = 9275;
+                                                                    internal const int TenguPalmStrike = 9274;
+                                                                    internal const int TenguPanic = 9285;
+                                                                    internal const int TenguPeaceandHarmony = 9283;
+                                                                    internal const int TenguPreservation = 9279;
+                                                                    internal const int TenguPrimalRage = 9280;
+                                                                    internal const int TenguSandstorm = 9284;
+                                                                    internal const int TenguSpitefulSpirit = 9278;
+                                                                    internal const int TenguWayOftheAssassin = 9282;
                                                                 }
                                                             }
                                                         }
@@ -8885,10 +8987,49 @@ public static unsafe partial class GWCA
 
             public enum EventID : int
             {
-                kRecvPing = 0x8,
-                kSendFriendState = 0x26,
-                kRecvFriendState = 0x2c,
+                kAppActivated = 0x0, // WM_ACTIVATEAPP; packet is one dword, non-zero when activated
+                kFrameTick = 0x1, // once per frame from the pump, packet is the elapsed milliseconds
+                kRenderFinished = 0x2, // once per frame after the render, packet is one dword
+                kCharTyped = 0x3, // WM_CHAR: {character, repeat, modifier keys}
+                kCursorVisibility = 0x5, // packet is one dword, non-zero to show the cursor
+                kShutdown = 0x6, // posting this latches the event queue closed, so nothing dispatches after it
+                kScreenSizeChanged = 0x7, // {new width, new height, old width, old height}, raised inside the queue drain
+                kDriverError = 0x8, // the game's own handler logs "Driver internal error encountered." and quits
+                kRecvPing = kDriverError, // legacy GWCA name for 0x8; the game does not use this id for pings
+                kDpiChanged = 0xa, // WM_DPICHANGED: {x dpi, y dpi}
+                kGamepadAttached = 0xb, // the four below come from the same controller poll in EvtOs.cpp
+                kGamepadState = 0xc, // one dword
+                kGamepadAxis = 0xd, // four dwords
+                kGamepadButtonDown = 0xe, // {button, state}
+                kGamepadButtonUp = 0xf, // {button, state}
+                kCharTypedInjected = 0x13, // same shape as kCharTyped, from the game's own WM_APP+3 injection
+                kKeyDown = 0x1a, // {key, repeat, modifier keys}; the engine records the key as held here
+                kKeyUp = 0x1b, // same shape; the engine clears the held bit here
+                kFocusLost = 0x1c, // WM_KILLFOCUS, no packet
+                kMouseMoveRelative = 0x1d, // {button, 0, x, y, button mask, modifier keys} while the mouse is captured
+                kMouseButtonDown = 0x1e, // same shape as kMouseMoveRelative
+                kMouseLeave = 0x1f, // WM_MOUSELEAVE, no packet
+                kMouseMove = 0x20, // same shape as kMouseMoveRelative, only sent when the position changed
+                kMouseButtonUp = 0x21, // same shape; also synthesised for every held button when capture is lost
+                kMouseWheel = 0x22, // same shape, with the wheel delta in place of the button
+                kWindowMoved = 0x23, // WM_MOVE: {x, y}
+                kFriend = 0x24,
+                kService = 0x25, // same packet shape as kFriend; FrApi forwards it as UI message 0x50
+                kServiceAlt = 0x26, // same again, forwarded as UI message 0x51
+                kFocusGained = 0x27, // WM_SETFOCUS, no packet
+                kWindowResized = 0x28, // WM_SIZE: {width, height}
+                kTouchDown = 0x2c, // the three touch ids carry {index, 0, x, y, touch mask}
+                kTouchMove = 0x2d,
+                kTouchUp = 0x2e, // also synthesised for every held touch when the sequence is cancelled
+                kReserved = 0x2a,
                 kNone = 0xffff,
+            }
+
+            public enum FriendEventType : int
+            {
+                kStatusChanged = 0x26,
+                kLocationChanged = 0x28,
+                kFriendAddedOrRemoved = 0x2c,
             }
         }
 
@@ -8919,6 +9060,13 @@ public static unsafe partial class GWCA
 
         public static partial class Render
         {
+
+            public enum Backend : uint
+            {
+                Unknown = 0,
+                D3D9,
+                GLES3,
+            }
 
             public enum Metric : uint
             {
@@ -8951,11 +9099,11 @@ public static unsafe partial class GWCA
                 Count,
             }
 
-            public enum Transform : int
+            public enum RendererMode : uint
             {
-                TRANSFORM_PROJECTION_MATRIX = 0,
-                TRANSFORM_MODEL_MATRIX = 1,
-                TRANSFORM_COUNT = 5,
+                Windowed = 0,
+                WindowedBorderless = 1,
+                WindowedFullscreen = 2,
             }
         }
 
@@ -9256,6 +9404,20 @@ public static unsafe partial class GWCA
                 FlagPref_0x70,
                 EnableMobileHUD,
                 Count,
+            }
+
+            public enum FrameLayoutMode : uint
+            {
+                FrameLayoutMode_None = 0,
+                FrameLayoutMode_AnchorBottom = 0x1, // vertical: anchor to the rect's bottom edge
+                FrameLayoutMode_Center = 0x2, // required alongside centered placement on either axis (asserts otherwise)
+                FrameLayoutMode_AnchorLeft = 0x4, // horizontal: anchor to the rect's left edge
+                FrameLayoutMode_AnchorRight = 0x8, // horizontal: anchor to the rect's right edge
+                FrameLayoutMode_AnchorTop = 0x10, // vertical: anchor to the rect's top edge
+                FrameLayoutMode_StretchWidth = 0x20, // horizontal: fill the rect's full width (also behaves as a left anchor)
+                FrameLayoutMode_StretchHeight = 0x40, // vertical: fill the rect's full height (also behaves as a bottom anchor)
+                FrameLayoutMode_AnchorHorizontalMargin = 0x80, // gate: trim the resolved rect inward on the AnchorLeft/AnchorRight edge(s)
+                FrameLayoutMode_AnchorVerticalMargin = 0x100, // gate: trim the resolved rect inward on the AnchorTop/AnchorBottom edge(s)
             }
 
             public enum NumberCommandLineParameter : uint
@@ -9857,47 +10019,48 @@ public static unsafe partial class GWCA
                 kInventoryRelated2, // 0x100001aa, added to GW 2026-02-26
                 kInventoryRelated3, // 0x100001ab, added to GW 2026-02-26
                 kInventoryRelated4, // 0x100001ac, added to GW 2026-04-28
-                kEquipItem, // 0x100001ad, wparam = { item_id, agent_id }
-                kMoveItem, // 0x100001ae, wparam = { item_id, to_bag, to_slot, bool prompt }
-                kItemRelated_1, // 0x100001af
-                kItemTooltip, // 0x100001b0
-                kItemRelated_3, // 0x100001b1, added to GW 2026-02-26
-                kItemRelated_4, // 0x100001b2, added to GW 2026-02-26
-                kItemRelated_5, // 0x100001b3, added to GW 2026-04-28
-                kInitiateTrade, // 0x100001b4
-                kMessage_0x100001a7, // 0x100001b5
-                kMessage_0x100001a8, // 0x100001b6
-                kMessage_0x100001a9, // 0x100001b7
-                kMessage_0x100001aa, // 0x100001b8
-                kPartySearchWindowDestroyed, // 0x100001b9
-                kMessage_0x100001ac, // 0x100001ba
-                kPartySearchWindowCreated, // 0x100001bb
-                kMessage_0x100001ae, // 0x100001bc
-                kMessage_0x100001af, // 0x100001bd
-                kMessage_0x100001b0, // 0x100001be
-                kMessage_0x100001b1, // 0x100001bf
-                kMessage_0x100001b2, // 0x100001c0
-                kMessage_0x100001b3, // 0x100001c1
-                kMessage_0x100001b4, // 0x100001c2
-                kMessage_0x100001b5, // 0x100001c3
-                kInventoryAgentChanged, // 0x100001c4, Triggered when inventory needs updating due to agent change; no args
-                kInventoryRelated_1, // 0x100001c5
-                kInventoryRelated_2, // 0x100001c6
-                kMissionStatusRelated, // 0x100001c7
-                kUnused_1c2, // 0x100001c8
-                kCollapseExpandSkillListSection, // 0x100001c9
-                kPromptLoadTemplate, // 0x100001ca
-                kOpenTemplateManager, // 0x100001cb
-                kPromptSaveTemplate, // 0x100001cc
-                kOpenTemplate, // 0x100001cd, wparam = GW::UI::ChatTemplate*
-                kTemplateRelated_3, // 0x100001ce
-                kTemplateRelated_4, // 0x100001cf
+                kInventoryRelated4_1, // 0x100001ad, added to GW 2026-08-07
+                kEquipItem, // 0x100001ae, wparam = { item_id, agent_id }
+                kMoveItem, // 0x100001af, wparam = { item_id, to_bag, to_slot, bool prompt }
+                kItemRelated_1, // 0x100001b0
+                kItemTooltip, // 0x100001b1
+                kItemRelated_3, // 0x100001b2, added to GW 2026-02-26
+                kItemRelated_4, // 0x100001b3, added to GW 2026-02-26
+                kItemRelated_5, // 0x100001b4, added to GW 2026-04-28
+                kInitiateTrade, // 0x100001b5
+                kMessage_0x100001a7, // 0x100001b6
+                kMessage_0x100001a8, // 0x100001b7
+                kMessage_0x100001a9, // 0x100001b8
+                kMessage_0x100001aa, // 0x100001b9
+                kPartySearchWindowDestroyed, // 0x100001ba
+                kMessage_0x100001ac, // 0x100001bb
+                kPartySearchWindowCreated, // 0x100001bc
+                kMessage_0x100001ae, // 0x100001bd
+                kMessage_0x100001af, // 0x100001be
+                kMessage_0x100001b0, // 0x100001bf
+                kMessage_0x100001b1, // 0x100001c0
+                kMessage_0x100001b2, // 0x100001c1
+                kMessage_0x100001b3, // 0x100001c2
+                kMessage_0x100001b4, // 0x100001c3
+                kMessage_0x100001b5, // 0x100001c4
+                kInventoryAgentChanged, // 0x100001c5, Triggered when inventory needs updating due to agent change; no args
+                kInventoryRelated_1, // 0x100001c6
+                kInventoryRelated_2, // 0x100001c7
+                kMissionStatusRelated, // 0x100001c8
+                kUnused_1c2, // 0x100001c9
+                kCollapseExpandSkillListSection, // 0x100001ca
+                kPromptLoadTemplate, // 0x100001cb
+                kOpenTemplateManager, // 0x100001cc
+                kPromptSaveTemplate, // 0x100001cd
+                kOpenTemplate, // 0x100001ce, wparam = GW::UI::ChatTemplate*
+                kTemplateRelated_3, // 0x100001cf
+                kTemplateRelated_4, // 0x100001d0
                 kSendLoadSkillTemplate = 0x30000000 | 0x3, // 0x30000003, wparam = SkillbarMgr::SkillTemplate*
                 kSendPingWeaponSet = 0x30000000 | 0x4, // 0x30000004, wparam = UIPacket::kSendPingWeaponSet*
                 kSendMoveItem = 0x30000000 | 0x5, // 0x30000005, wparam = UIPacket::kSendMoveItem*
                 kSendMerchantRequestQuote = 0x30000000 | 0x6, // 0x30000006, wparam = UIPacket::kSendMerchantRequestQuote*
                 kSendMerchantTransactItem = 0x30000000 | 0x7, // 0x30000007, wparam = UIPacket::kSendMerchantTransactItem*
-                kSendUseItem = 0x30000000 | 0x8, // 0x30000008, wparam = UIPacket::kSendUseItem*
+                kSendUseItem = 0x30000000 | 0x8, // 0x30000008, wparam = uint32_t item_id
                 kSendSetActiveQuest = 0x30000000 | 0x9, // 0x30000009, wparam = uint32_t quest_id
                 kSendAbandonQuest = 0x30000000 | 0xA, // 0x3000000a, wparam = uint32_t quest_id
                 kSendChangeTarget = 0x30000000 | 0xB, // 0x3000000b, wparam = UIPacket::kSendChangeTarget* // e.g. tell the gw client to focus on a different target
@@ -10225,6 +10388,20 @@ namespace Daybreak.API.Interop.GuildWars
         Fight,
         Guard,
         AvoidCombat,
+    }
+
+    public enum NameTagFlags : uint
+    {
+        NameTagFlags_Picked = 0x8,
+        NameTagFlags_Highlighted = 0x10,
+        NameTagFlags_InRange = 0x20,
+        NameTagFlags_EvaluatedTarget = 0x80,
+        NameTagFlags_ManualTarget = 0x100,
+        NameTagFlags_Suppressed = 0x200,
+        NameTagFlags_PassesFilter = 0x400,
+        NameTagFlags_NotOwnedByPlayer = 0x800,
+        NameTagFlags_PassesTransientFilter = 0x1000,
+        NameTagFlags_Disabled = 0x20000,
     }
 
     public enum ObserverMatchType : uint
@@ -14885,7 +15062,6 @@ namespace Daybreak.API.Interop.GuildWars
         Heroic_Refrain,
         Reforged_Mode = 0xD6A,
         Dhuums_Covenant_Broken,
-        Count = 0xD6c,
     }
 
     public enum SkillType : int
@@ -15343,6 +15519,20 @@ namespace Daybreak.API.Interop.GuildWars
         FlagPref_0x70,
         EnableMobileHUD,
         Count,
+    }
+
+    public enum FrameLayoutMode : uint
+    {
+        FrameLayoutMode_None = 0,
+        FrameLayoutMode_AnchorBottom = 0x1,
+        FrameLayoutMode_Center = 0x2,
+        FrameLayoutMode_AnchorLeft = 0x4,
+        FrameLayoutMode_AnchorRight = 0x8,
+        FrameLayoutMode_AnchorTop = 0x10,
+        FrameLayoutMode_StretchWidth = 0x20,
+        FrameLayoutMode_StretchHeight = 0x40,
+        FrameLayoutMode_AnchorHorizontalMargin = 0x80,
+        FrameLayoutMode_AnchorVerticalMargin = 0x100,
     }
 
     public enum NumberCommandLineParameter : uint
@@ -15944,6 +16134,7 @@ namespace Daybreak.API.Interop.GuildWars
         kInventoryRelated2,
         kInventoryRelated3,
         kInventoryRelated4,
+        kInventoryRelated4_1,
         kEquipItem,
         kMoveItem,
         kItemRelated_1,
@@ -16078,10 +16269,56 @@ namespace Daybreak.API.Interop.GuildWars
 
     public enum EventID : int
     {
-        kRecvPing = 0x8,
-        kSendFriendState = 0x26,
-        kRecvFriendState = 0x2c,
+        kAppActivated = 0x0,
+        kFrameTick = 0x1,
+        kRenderFinished = 0x2,
+        kCharTyped = 0x3,
+        kCursorVisibility = 0x5,
+        kShutdown = 0x6,
+        kScreenSizeChanged = 0x7,
+        kDriverError = 0x8,
+        kRecvPing = kDriverError,
+        kDpiChanged = 0xa,
+        kGamepadAttached = 0xb,
+        kGamepadState = 0xc,
+        kGamepadAxis = 0xd,
+        kGamepadButtonDown = 0xe,
+        kGamepadButtonUp = 0xf,
+        kCharTypedInjected = 0x13,
+        kKeyDown = 0x1a,
+        kKeyUp = 0x1b,
+        kFocusLost = 0x1c,
+        kMouseMoveRelative = 0x1d,
+        kMouseButtonDown = 0x1e,
+        kMouseLeave = 0x1f,
+        kMouseMove = 0x20,
+        kMouseButtonUp = 0x21,
+        kMouseWheel = 0x22,
+        kWindowMoved = 0x23,
+        kFriend = 0x24,
+        kService = 0x25,
+        kServiceAlt = 0x26,
+        kFocusGained = 0x27,
+        kWindowResized = 0x28,
+        kTouchDown = 0x2c,
+        kTouchMove = 0x2d,
+        kTouchUp = 0x2e,
+        kReserved = 0x2a,
         kNone = 0xffff,
+    }
+
+    public enum FriendEventType : int
+    {
+        kStatusChanged = 0x26,
+        kLocationChanged = 0x28,
+        kFriendAddedOrRemoved = 0x2c,
+    }
+
+    public enum Backend : uint
+    {
+        Unknown = 0,
+        D3D9,
+        GLES3,
     }
 
     public enum Metric : uint
@@ -16115,11 +16352,11 @@ namespace Daybreak.API.Interop.GuildWars
         Count,
     }
 
-    public enum Transform : int
+    public enum RendererMode : uint
     {
-        TRANSFORM_PROJECTION_MATRIX = 0,
-        TRANSFORM_MODEL_MATRIX = 1,
-        TRANSFORM_COUNT = 5,
+        Windowed = 0,
+        WindowedBorderless = 1,
+        WindowedFullscreen = 2,
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x138)]
@@ -16215,7 +16452,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0054)]
         public float RotationSin; // sine of rotation
         [global::System.Runtime.InteropServices.FieldOffset(0x0058)]
-        public uint NameProperties; // Bitmap basically telling what the agent is
+        public global::Daybreak.API.Interop.GWCA.GW.NameTagFlags NameProperties; // Bitmap basically telling what the agent is
         [global::System.Runtime.InteropServices.FieldOffset(0x005C)]
         public uint Ground;
         [global::System.Runtime.InteropServices.FieldOffset(0x0060)]
@@ -17665,9 +17902,9 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0080)]
         public uint H0080;
         [global::System.Runtime.InteropServices.FieldOffset(0x0084)]
-        public nint Terrain;
+        public nint Terrain; // relationship to TerrainTexContext is unconfirmed
         [global::System.Runtime.InteropServices.FieldOffset(0x0088)]
-        public uint H0088;
+        public nint Collision; // "Collision" map chunk (Engine\Map\Collision\CollApi.cpp)
         [global::System.Runtime.InteropServices.FieldOffset(0x008C)]
         public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID MapId;
         [global::System.Runtime.InteropServices.FieldOffset(0x0090)]
@@ -17689,27 +17926,15 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x00B0)]
         public uint H00B0;
         [global::System.Runtime.InteropServices.FieldOffset(0x00B4)]
-        public uint H00B4;
-        [global::System.Runtime.InteropServices.FieldOffset(0x00B8)]
-        public uint H00B8;
-        [global::System.Runtime.InteropServices.FieldOffset(0x00BC)]
-        public uint H00BC;
+        public global::Daybreak.API.Interop.GuildWars.Vec3fStruct ViewEye; // cached by GmWorldUpdateView
         [global::System.Runtime.InteropServices.FieldOffset(0x00C0)]
-        public uint H00C0;
-        [global::System.Runtime.InteropServices.FieldOffset(0x00C4)]
-        public uint H00C4;
-        [global::System.Runtime.InteropServices.FieldOffset(0x00C8)]
-        public uint H00C8;
+        public global::Daybreak.API.Interop.GuildWars.Vec3fStruct ViewTarget;
         [global::System.Runtime.InteropServices.FieldOffset(0x00CC)]
-        public uint H00CC;
-        [global::System.Runtime.InteropServices.FieldOffset(0x00D0)]
-        public uint H00D0;
-        [global::System.Runtime.InteropServices.FieldOffset(0x00D4)]
-        public uint H00D4;
+        public global::Daybreak.API.Interop.GuildWars.Vec3fStruct ViewUp;
         [global::System.Runtime.InteropServices.FieldOffset(0x00D8)]
         public uint H00D8;
         [global::System.Runtime.InteropServices.FieldOffset(0x00DC)]
-        public uint H00DC;
+        public uint ViewFlags; // bit 0: view has been updated this frame
         [global::System.Runtime.InteropServices.FieldOffset(0x00E0)]
         public uint H00E0;
         [global::System.Runtime.InteropServices.FieldOffset(0x00E4)]
@@ -17717,7 +17942,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x00E8)]
         public uint H00E8;
         [global::System.Runtime.InteropServices.FieldOffset(0x00EC)]
-        public uint H00EC;
+        public global::Daybreak.API.Interop.GuildWars.MapLightContext* Lights; // "Light" map chunk
         [global::System.Runtime.InteropServices.FieldOffset(0x00F0)]
         public uint H00F0;
         [global::System.Runtime.InteropServices.FieldOffset(0x00F4)]
@@ -17731,7 +17956,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0104)]
         public uint H0104;
         [global::System.Runtime.InteropServices.FieldOffset(0x0108)]
-        public uint H0108;
+        public uint Flags; // bit 1: map has water
         [global::System.Runtime.InteropServices.FieldOffset(0x010C)]
         public uint H010C;
         [global::System.Runtime.InteropServices.FieldOffset(0x0110)]
@@ -17743,17 +17968,47 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x011C)]
         public uint H011C;
         [global::System.Runtime.InteropServices.FieldOffset(0x0120)]
-        public uint H0120;
+        public nint Shore; // "Shore" map chunk, only loaded when flags bit 1 is set
         [global::System.Runtime.InteropServices.FieldOffset(0x0124)]
         public uint H0124;
         [global::System.Runtime.InteropServices.FieldOffset(0x0128)]
         public uint H0128;
         [global::System.Runtime.InteropServices.FieldOffset(0x012C)]
-        public uint H012C;
+        public global::Daybreak.API.Interop.GuildWars.MapWaterContext* Water;
         [global::System.Runtime.InteropServices.FieldOffset(0x0130)]
         public nint Zones;
         [global::System.Runtime.InteropServices.FieldOffset(0x0134)]
         public uint H0134;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x20)]
+    public unsafe struct MapLightContext
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.MapLightDescriptor> Descriptors;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<uint> Lights; // HGrLight handles, parallel to descriptors (same count)
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x1C)]
+    public unsafe struct MapLightDescriptor
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public global::Daybreak.API.Interop.GuildWars.Vec3fStruct Position;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public byte Red;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000D)]
+        public byte Green;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000E)]
+        public byte Blue;
+        [global::System.Runtime.InteropServices.FieldOffset(0x000F)]
+        public byte H000F;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public float Intensity; // colour bytes are premultiplied by intensity / 255 when the light is built
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public float InnerRange;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public float OuterRange;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x90)]
@@ -17777,10 +18032,14 @@ namespace Daybreak.API.Interop.GuildWars
         public float RotationAngle;
         [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
         public float RotationCos;
-        [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
-        public float RotationSin;
         [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
-        public fixed uint H0034[5];
+        public float RotationSin;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0044)]
+        public fixed uint H0044[3];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0050)]
+        public float Scale;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0054)]
+        public global::Daybreak.API.Interop.GuildWars.PropModelInfo* ModelInfo;
         [global::System.Runtime.InteropServices.FieldOffset(0x0058)]
         public global::Daybreak.API.Interop.GuildWars.RecObject* InteractiveModel;
         [global::System.Runtime.InteropServices.FieldOffset(0x005C)]
@@ -17789,8 +18048,8 @@ namespace Daybreak.API.Interop.GuildWars
         public uint AppearanceBitmap; // Modified when animation changes
         [global::System.Runtime.InteropServices.FieldOffset(0x0070)]
         public uint AnimationBits;
-        [global::System.Runtime.InteropServices.FieldOffset(0x0064)]
-        public fixed uint H0064[5];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0074)]
+        public fixed uint H0074[5];
         [global::System.Runtime.InteropServices.FieldOffset(0x0088)]
         public global::Daybreak.API.Interop.GuildWars.PropByType* PropObjectInfo;
         [global::System.Runtime.InteropServices.FieldOffset(0x008C)]
@@ -17803,6 +18062,27 @@ namespace Daybreak.API.Interop.GuildWars
         public uint RequestInstanceMapType; // Used for auth server
         public byte IsOutpost;
         public global::Daybreak.API.Interop.GWCA.GW.RegionType MapRegionType;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct MapWaterContext
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public fixed uint H0000[43];
+        [global::System.Runtime.InteropServices.FieldOffset(0x00AC)]
+        public uint SceneProgram; // the single handle water contributes to the scene program list
+        [global::System.Runtime.InteropServices.FieldOffset(0x00B0)]
+        public fixed uint H00B0[12];
+        [global::System.Runtime.InteropServices.FieldOffset(0x00E0)]
+        public fixed uint ShaderPrograms[2]; // two of the four per-map shader programs, chosen by quality
+        [global::System.Runtime.InteropServices.FieldOffset(0x00E8)]
+        public uint H00E8;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00EC)]
+        public float PlaneZ; // world height of the water plane
+        [global::System.Runtime.InteropServices.FieldOffset(0x00F0)]
+        public fixed uint H00F0[42];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0198)]
+        public fixed uint ShaderPrograms2[2]; // the other two quality variants
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
@@ -18401,13 +18681,11 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
         public uint H0000;
         [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-        public uint H0004;
+        public nint ModelFileName; // hash-encoded; FileHashToFileId() turns it into a file id
         [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-        public uint H0008;
+        public float BoundingRadius; // model space; scale by MapProp::scale for world units
         [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
-        public uint H000C;
-        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-        public uint H0010;
+        public fixed float BoundsZOffsets[2];
         [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
         public uint H0014;
     }
@@ -18694,6 +18972,45 @@ namespace Daybreak.API.Interop.GuildWars
         public byte Secondary;
         [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
         public ushort Level;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0xC)]
+    public unsafe struct TerrainShadowRecord
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public nint CompressedStream; // layer 1, entropy coded, decoded per tile
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public nint CompressedStreamEnd;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
+        public nint BlockMask; // layer 2, the map's own data - not scratch
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct TerrainTexTile
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public fixed uint H0000[3];
+        [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
+        public uint TileX;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public uint TileY;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public uint State; // set to 2 once the tile's shadow layer has been decoded
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public uint H0018; // zeroed alongside the state above
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct TerrainTexture
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public fixed uint H0000[39];
+        [global::System.Runtime.InteropServices.FieldOffset(0x009C)]
+        public uint StreamFlags; // bit 0x800: decompress + upload still pending
+        [global::System.Runtime.InteropServices.FieldOffset(0x00A0)]
+        public fixed uint H00A0[55];
+        [global::System.Runtime.InteropServices.FieldOffset(0x017C)]
+        public global::Daybreak.API.Interop.GuildWars.TerrainTexTile* Tile; // tagged pointer: null, or bit 0 set, means no tile
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
@@ -19182,13 +19499,13 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
         public uint AgentId;
         [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
-        public uint H0002;
+        public uint H0004;
         [global::System.Runtime.InteropServices.FieldOffset(0x0008)]
-        public uint H0003;
+        public uint H0008;
         [global::System.Runtime.InteropServices.FieldOffset(0x000C)]
         public nint NameEnc;
         [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
-        public byte H0010;
+        public byte Highlight;
         [global::System.Runtime.InteropServices.FieldOffset(0x0011)]
         public byte H0012;
         [global::System.Runtime.InteropServices.FieldOffset(0x0012)]
@@ -19209,6 +19526,10 @@ namespace Daybreak.API.Interop.GuildWars
         public byte H001F;
         [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
         public nint ExtraInfoEnc; // Title etc
+        [global::System.Runtime.InteropServices.FieldOffset(0x0024)]
+        public uint ExtraInfoColor; // ARGB
+        [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
+        public uint ExtraInfoAttributes; // bold/size etc
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
@@ -19533,10 +19854,10 @@ namespace Daybreak.API.Interop.GuildWars
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
     public unsafe struct kMeasureContent
     {
-        public float MaxWidth; // Maximum width constraint
-        public float MaxHeight; // Maximum height constraint
-        public float* SizeOutput; // Pointer to output buffer for calculated size
-        public uint Flags; // Layout flags (similar to the 0x100 flag we saw)
+        public float MaxWidth; // Available width, after the frame's own margin/padding is already subtracted
+        public float MaxHeight; // Available height, after the frame's own margin/padding is already subtracted
+        public float* SizeOutput; // Points at a 2-float [width, height] buffer the handler must fill
+        public uint Flags; // Not confirmed meaningful - see comment above
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
@@ -19751,13 +20072,6 @@ namespace Daybreak.API.Interop.GuildWars
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-    public unsafe struct kSendUseItem
-    {
-        public uint ItemId;
-        public ushort Quantity; // Unused, but would be cool
-    }
-
-    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
     public unsafe struct kSendWorldAction
     {
         public global::Daybreak.API.Interop.GWCA.GW.WorldActionId ActionId;
@@ -19786,12 +20100,12 @@ namespace Daybreak.API.Interop.GuildWars
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
     public unsafe struct kSetLayout
     {
-        public float Field0x0;
-        public float Field0x4;
-        public float Field0x8;
-        public float Field0xc;
         public float AvailableWidth;
         public float AvailableHeight;
+        public float LocalLeft;
+        public float LocalBottom;
+        public float LocalRight;
+        public float LocalTop;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
@@ -19902,10 +20216,60 @@ namespace Daybreak.API.Interop.GuildWars
         public nint SenderEnc;
     }
 
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0xD0)]
+    public unsafe struct GlFragmentRenderState
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public fixed float TextureFactor[4];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0010)]
+        public fixed float FogColor[4];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0020)]
+        public fixed float SamplerBiases[2];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
+        public fixed float BumpEnvMat[8];
+        [global::System.Runtime.InteropServices.FieldOffset(0x00C0)]
+        public fixed float DiscardSettings[4];
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct GlesDevice
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public fixed byte H0000[2004];
+        [global::System.Runtime.InteropServices.FieldOffset(0x07D4)]
+        public uint DevMode; // GR_MODE_*
+        [global::System.Runtime.InteropServices.FieldOffset(0x07D8)]
+        public fixed byte H07D8[40];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0800)]
+        public nint DevWindow; // native window
+        [global::System.Runtime.InteropServices.FieldOffset(0x0804)]
+        public fixed byte H0804[8];
+        [global::System.Runtime.InteropServices.FieldOffset(0x080C)]
+        public nint DevSurface;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0810)]
+        public uint Width; // live surface size
+        [global::System.Runtime.InteropServices.FieldOffset(0x0814)]
+        public uint Height;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0818)]
+        public nint DevContext;
+        [global::System.Runtime.InteropServices.FieldOffset(0x081C)]
+        public fixed byte H081C[2004];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0FF0)]
+        public global::Daybreak.API.Interop.GuildWars.GlFragmentRenderState FragmentState;
+        [global::System.Runtime.InteropServices.FieldOffset(0x10C0)]
+        public uint UniformBuffer; // the UBO name
+    }
+
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
     public unsafe struct PacketBase
     {
         public uint Header;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct HookTarget
+    {
+        public nuint Value;
     }
 
     public unsafe struct KeyCallback { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<uint> Value; }

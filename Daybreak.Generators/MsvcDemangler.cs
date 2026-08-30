@@ -461,6 +461,7 @@ internal sealed class MsvcDemangler
                 {
                     pos++; // skip Z - this terminates the function pointer, not the outer param list
                 }
+
                 break;
             }
 

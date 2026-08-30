@@ -200,6 +200,34 @@ public static string ToWinePath(string linuxPath)
 }
 ```
 
+### Wine Debug Log
+
+Debug builds append all Wine output to `wine-debug.log` in the Daybreak output folder:
+
+```
+Daybreak.Linux/bin/Debug/net10.0/linux-x64/wine-debug.log
+```
+
+This is the place to look when Guild Wars dies without an error. Guild Wars is a grandchild of the Wine process Daybreak starts, so its stderr would otherwise go to a pipe nobody reads and the crash report would be lost. Wine runs `winedbg --auto` on a crash, so the log contains the faulting stack — including managed frames when `Daybreak.API` is at fault:
+
+```
+err:eventlog:ReportEventW L"Message: Access Violation: Attempted to read or write protected memory..."
+err:eventlog:ReportEventW L"   at Daybreak.API.Interop.GuildWars.GuildWarsArray`1.Enumerator.get_Current()"
+err:eventlog:ReportEventW L"   at Daybreak.API.Services.CharacterSelectService...
+err:seh:NtRaiseException Unhandled exception code c0000409
+```
+
+Note that `Daybreak.API` is NativeAOT, which cannot throw `AccessViolationException`. A bad pointer read therefore calls `FailFast` and terminates Guild Wars instantly, with nothing written to `Daybreak.API.log`.
+
+Each launch is delimited by a `===== <timestamp> <command> =====` header. The log is append-only, so delete it when it gets large.
+
+Environment variables:
+
+| Variable | Effect |
+|----------|--------|
+| `DAYBREAK_WINE_DEBUG` | `1` forces logging on, `0` off. Defaults to on for Debug builds, off for Release. |
+| `DAYBREAK_WINE_DEBUG_CHANNELS` | Sets `WINEDEBUG`, e.g. `+seh`. Unset by default — Wine's default `err` class already reports crashes, and trace channels slow the game badly. |
+
 ---
 
 ## Credits
