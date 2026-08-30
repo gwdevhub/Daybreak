@@ -19,6 +19,11 @@ public sealed class WinePrefixManager(
 {
     private const string WinePrefixFolder = "WinePrefix";
     private const string WineExecutable = "wine";
+    private const string WineNetworkRegistryKey = @"HKCU\Software\Wine\Network";
+    private const string ComputerNameRegistryKey =
+        @"HKLM\System\CurrentControlSet\Control\ComputerName\ComputerName";
+    private const string ActiveComputerNameRegistryKey =
+        @"HKLM\System\CurrentControlSet\Control\ComputerName\ActiveComputerName";
 
     private static readonly ProgressUpdate ProgressStarting = new(0, "Starting Wine prefix setup");
     private static readonly ProgressUpdate ProgressCheckingWine = new(
@@ -243,6 +248,59 @@ public sealed class WinePrefixManager(
         return this.winePrefixPath;
     }
 
+    public async Task<bool> ConfigureComputerName(CancellationToken cancellationToken)
+    {
+        if (!this.IsInitialized())
+        {
+            this.logger.LogWarning(
+                "Cannot configure computer name before the Wine prefix is initialized"
+            );
+            return false;
+        }
+
+        var computerName = Environment.MachineName;
+        var useDnsComputerNameConfigured = await this.AddRegistryValue(
+            WineNetworkRegistryKey,
+            "UseDnsComputerName",
+            "N",
+            "REG_SZ",
+            cancellationToken
+        );
+        var computerNameConfigured = await this.AddRegistryValue(
+            ComputerNameRegistryKey,
+            "ComputerName",
+            computerName,
+            "REG_SZ",
+            cancellationToken
+        );
+        var activeComputerNameConfigured = await this.AddRegistryValue(
+            ActiveComputerNameRegistryKey,
+            "ComputerName",
+            computerName,
+            "REG_SZ",
+            cancellationToken
+        );
+
+        if (
+            !useDnsComputerNameConfigured
+            || !computerNameConfigured
+            || !activeComputerNameConfigured
+        )
+        {
+            this.logger.LogError(
+                "Failed to configure Wine computer name {ComputerName} from the Linux host name",
+                computerName
+            );
+            return false;
+        }
+
+        this.logger.LogInformation(
+            "Configured Wine computer name {ComputerName} from the Linux host name",
+            computerName
+        );
+        return true;
+    }
+
     public IProgressAsyncOperation<bool> Install(CancellationToken cancellationToken)
     {
         return ProgressAsyncOperation.Create(
@@ -280,6 +338,13 @@ public sealed class WinePrefixManager(
                 "Wine prefix already initialized at {PrefixPath}",
                 this.winePrefixPath
             );
+
+            if (!await this.ConfigureComputerName(cancellationToken))
+            {
+                progress.Report(ProgressFailed);
+                return false;
+            }
+
             progress.Report(ProgressAlreadyInitialized);
             return true;
         }
@@ -331,6 +396,13 @@ public sealed class WinePrefixManager(
             if (!await this.SetDllOverride("d3d9", "native,builtin", cancellationToken))
             {
                 this.logger.LogWarning("Failed to set d3d9 DLL override, but continuing...");
+            }
+
+            progress.Report(new ProgressUpdate(0.9, "Configuring computer name"));
+            if (!await this.ConfigureComputerName(cancellationToken))
+            {
+                progress.Report(ProgressFailed);
+                return false;
             }
 
             this.logger.LogInformation("Wine prefix initialized successfully");
