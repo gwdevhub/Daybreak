@@ -433,6 +433,7 @@ internal sealed class DXVKService(
             {
                 Directory.Delete(x32Target, recursive: true);
             }
+
             if (Directory.Exists(x64Target))
             {
                 Directory.Delete(x64Target, recursive: true);

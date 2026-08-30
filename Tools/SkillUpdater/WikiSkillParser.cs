@@ -194,9 +194,13 @@ internal static partial class WikiSkillParser
             {
                 var c = body[i];
                 if (c == '{' && i + 1 < body.Length && body[i + 1] == '{') { braceDepth++; i += 2; continue; }
+
                 if (c == '}' && i + 1 < body.Length && body[i + 1] == '}') { braceDepth--; i += 2; continue; }
+
                 if (c == '[' && i + 1 < body.Length && body[i + 1] == '[') { bracketDepth++; i += 2; continue; }
+
                 if (c == ']' && i + 1 < body.Length && body[i + 1] == ']') { bracketDepth--; i += 2; continue; }
+
                 if (c == '|' && braceDepth == 0 && bracketDepth == 0)
                 {
                     break;

@@ -221,7 +221,7 @@ internal sealed class ScreenManager(
     /// global value, and under the forced X11 backend GDK cannot report reliable
     /// per-monitor scales anyway.
     /// </summary>
-    private int GetDpiForPosition(int x, int y)
+    private int GetDpiForPosition(int _, int __)
     {
         return (int)Math.Round(this.GetEffectiveScale() * DefaultDpi);
     }

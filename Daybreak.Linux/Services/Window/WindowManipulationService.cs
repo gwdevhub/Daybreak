@@ -137,6 +137,7 @@ internal sealed class WindowManipulationService(ILogger<WindowManipulationServic
                 result = window;
                 break;
             }
+
             current = NativeMethods.G_list_next(current);
         }
 

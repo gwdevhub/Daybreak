@@ -178,6 +178,7 @@ internal static class CppHeaderParser
                 {
                     inMultiLineConstexpr = false;
                 }
+
                 continue;
             }
 
@@ -189,6 +190,7 @@ internal static class CppHeaderParser
                 {
                     inSkipBlock = false;
                 }
+
                 continue;
             }
 
@@ -211,6 +213,7 @@ internal static class CppHeaderParser
                     {
                         ParseEnumMembersFromLine(trimmed.Substring(0, closeBraceIdx), currentEnum);
                     }
+
                     inEnum = false;
                     var node = namespaceStack.Peek();
                     node.Enums.Add(currentEnum);
@@ -231,11 +234,11 @@ internal static class CppHeaderParser
                 int closeBraces = CountChar(lineWithoutComments, '}');
                 int prevDepth = structBraceDepth;
                 structBraceDepth += openBraces - closeBraces;
-                
+
                 // Debug: Track brace changes for AgentLiving
                 if (currentStruct.Name == "AgentLiving" && (openBraces > 0 || closeBraces > 0))
                 {
-                    DebugLines.Add($"[BRACE] line {i+1}: {currentStruct.Name} depth {prevDepth}->{structBraceDepth} (open={openBraces}, close={closeBraces})");
+                    DebugLines.Add($"[BRACE] line {i + 1}: {currentStruct.Name} depth {prevDepth}->{structBraceDepth} (open={openBraces}, close={closeBraces})");
                 }
 
                 // If we hit the closing brace of the struct
@@ -252,8 +255,8 @@ internal static class CppHeaderParser
                         pathParts.Add(n.Name);
                     pathParts.Reverse();
                     currentStruct.DebugNamespacePath = string.Join(".", pathParts);
-                    
-                    DebugLines.Add($"[STRUCT-END] line {i+1}: {currentStruct.Name} with {currentStruct.Fields.Count} fields");
+
+                    DebugLines.Add($"[STRUCT-END] line {i + 1}: {currentStruct.Name} with {currentStruct.Fields.Count} fields");
                     node.Structs.Add(currentStruct);
                     currentStruct = null;
                     inStruct = false;
@@ -278,6 +281,7 @@ internal static class CppHeaderParser
                         if (field is not null)
                             currentStruct.Fields.Add(field);
                     }
+
                     continue;
                 }
 
@@ -295,7 +299,7 @@ internal static class CppHeaderParser
                 var trailingCommentIdx = trimmed.IndexOf("//");
                 if (trailingCommentIdx > 0)
                     trimmedWithoutTrailingComment = trimmed.Substring(0, trailingCommentIdx).TrimEnd();
-                    
+
                 if (trimmedWithoutTrailingComment.Contains("(") && (trimmedWithoutTrailingComment.Contains(")") || trimmedWithoutTrailingComment.Contains("{")))
                     continue;
 
@@ -339,6 +343,7 @@ internal static class CppHeaderParser
                     };
                     currentStruct.Fields.Add(field);
                 }
+
                 continue;
             }
 
@@ -354,6 +359,7 @@ internal static class CppHeaderParser
                     var child = current.GetOrCreateChild(part);
                     namespaceStack.Push(child);
                 }
+
                 continue;
             }
 
@@ -366,13 +372,14 @@ internal static class CppHeaderParser
                     freeBraceDepth--;
                     continue;
                 }
-                
+
                 if (namespaceStack.Count > 1)
                 {
                     // Debug: Track where namespace was popped
                     var poppedNode = namespaceStack.Pop();
                     poppedNode.DebugPopLine = i + 1;
                 }
+
                 continue;
             }
 
@@ -390,6 +397,7 @@ internal static class CppHeaderParser
                         }
                     }
                 }
+
                 continue;
             }
 
@@ -436,6 +444,7 @@ internal static class CppHeaderParser
                     inSkipBlock = true;
                     skipBlockBraceCount = braces;
                 }
+
                 continue;
             }
 
@@ -448,6 +457,7 @@ internal static class CppHeaderParser
                     inSkipBlock = true;
                     skipBlockBraceCount = braces;
                 }
+
                 continue;
             }
 
@@ -455,17 +465,18 @@ internal static class CppHeaderParser
             if (OutOfLineMethodRegex.IsMatch(trimmed))
             {
                 int braces = CountChar(trimmed, '{') - CountChar(trimmed, '}');
-                DebugLines.Add($"[OUT-OF-LINE] line {i+1}: {trimmed.Substring(0, Math.Min(50, trimmed.Length))}... braces={braces}");
+                DebugLines.Add($"[OUT-OF-LINE] line {i + 1}: {trimmed.Substring(0, Math.Min(50, trimmed.Length))}... braces={braces}");
                 if (braces > 0)
                 {
                     inSkipBlock = true;
                     skipBlockBraceCount = braces;
                 }
+
                 continue;
             }
             else if (trimmed.Contains("::") && trimmed.Contains("(") && trimmed.Contains("{"))
             {
-                DebugLines.Add($"[UNMATCHED-METHOD] line {i+1}: {trimmed.Substring(0, Math.Min(60, trimmed.Length))}");
+                DebugLines.Add($"[UNMATCHED-METHOD] line {i + 1}: {trimmed.Substring(0, Math.Min(60, trimmed.Length))}");
             }
 
             // ── Track function declarations with body on separate line ─
@@ -492,6 +503,7 @@ internal static class CppHeaderParser
                     inMultiLineConstexpr = true;
                     multiLineBraceCount = braces;
                 }
+
                 continue;
             }
 
@@ -501,7 +513,7 @@ internal static class CppHeaderParser
             {
                 var structName = structMatch.Groups[1].Value;
                 var baseType = structMatch.Groups[2].Success ? structMatch.Groups[2].Value : null;
-                DebugLines.Add($"[STRUCT-START] line {i+1}: {structName} (inSkip={inSkipBlock}, freeBrace={freeBraceDepth})");
+                DebugLines.Add($"[STRUCT-START] line {i + 1}: {structName} (inSkip={inSkipBlock}, freeBrace={freeBraceDepth})");
 
                 // Skip some special cases
                 if (structName.StartsWith("__") || structName == "Packet")
@@ -512,6 +524,7 @@ internal static class CppHeaderParser
                         inSkipBlock = true;
                         skipBlockBraceCount = braces;
                     }
+
                     continue;
                 }
 
@@ -530,7 +543,7 @@ internal static class CppHeaderParser
             if (structNobraceMatch.Success)
             {
                 var structName = structNobraceMatch.Groups[1].Value;
-                
+
                 // Skip forward declarations (just struct Name;)
                 if (trimmed.EndsWith(";"))
                     continue;
@@ -559,8 +572,10 @@ internal static class CppHeaderParser
                         i = j;
                         break;
                     }
+
                     break; // unexpected content
                 }
+
                 continue;
             }
 
@@ -593,9 +608,11 @@ internal static class CppHeaderParser
                     {
                         ParseEnumMembersFromLine(rest, enumDef);
                     }
+
                     currentEnum = enumDef;
                     inEnum = true;
                 }
+
                 continue;
             }
 
@@ -637,14 +654,18 @@ internal static class CppHeaderParser
                             {
                                 ParseEnumMembersFromLine(rest, enumDef);
                             }
+
                             currentEnum = enumDef;
                             inEnum = true;
                         }
+
                         i = j;
                         break;
                     }
+
                     break; // unexpected content
                 }
+
                 continue;
             }
 
@@ -794,7 +815,7 @@ internal static class CppHeaderParser
         int slashSlash = line.IndexOf("//");
         if (slashSlash >= 0)
             line = line.Substring(0, slashSlash);
-        
+
         // Remove /* */ style comments (simple - doesn't handle nested)
         int blockStart = line.IndexOf("/*");
         while (blockStart >= 0)
@@ -806,7 +827,7 @@ internal static class CppHeaderParser
                 line = line.Substring(0, blockStart);
             blockStart = line.IndexOf("/*");
         }
-        
+
         return line;
     }
 

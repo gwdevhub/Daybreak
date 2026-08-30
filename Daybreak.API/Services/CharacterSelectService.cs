@@ -35,21 +35,28 @@ public sealed class CharacterSelectService(
             {
                 var gameContext = this.gameContextService.GetGameContext();
                 if (gameContext.IsNull ||
-                    gameContext.Pointer->World is null)
+                    gameContext.Pointer->World is null ||
+                    gameContext.Pointer->Character is null)
                 {
                     scopedLogger.LogError("Game context is not initialized");
                     return default;
                 }
 
                 var availableCharsContext = this.gameContextService.GetAvailableChars();
-                if (availableCharsContext.IsNull)
+                if (!availableCharsContext.IsValid ||
+                    !availableCharsContext.Pointer->IsValid)
                 {
-                    scopedLogger.LogError("Available characters context is not initialized");
+                    scopedLogger.LogError(
+                        "Available characters context is not initialized (array@0x{Array:X8} buffer=0x{Buffer:X8} capacity={Capacity} size={Size})",
+                        (nuint)availableCharsContext.Pointer,
+                        availableCharsContext.IsValid ? (nuint)availableCharsContext.Pointer->Buffer : 0,
+                        availableCharsContext.IsValid ? availableCharsContext.Pointer->Capacity : 0,
+                        availableCharsContext.IsValid ? availableCharsContext.Pointer->Size : 0);
                     return default;
                 }
 
                 var currentUuid = (*(Uuid*)gameContext.Pointer->Character->PlayerUuid).ToString();
-                var availableChars = new List<CharacterSelectEntry>((int)availableCharsContext.Pointer->Size);
+                var availableChars = new List<CharacterSelectEntry>((int)availableCharsContext.Pointer->Count);
                 foreach (var charContext in *availableCharsContext.Pointer)
                 {
                     var name = new string(charContext.Name);
@@ -196,7 +203,9 @@ public sealed class CharacterSelectService(
 
                 // Find target character index
                 uint targetIdx = 0xFFFF;
-                var charCount = ctx.Pointer->Chars.Size;
+                // Count (not Size) so a not-yet-allocated roster yields zero iterations
+                // instead of indexing through a null buffer.
+                var charCount = ctx.Pointer->Chars.Count;
 
                 for (uint i = 0; i < charCount; i++)
                 {
