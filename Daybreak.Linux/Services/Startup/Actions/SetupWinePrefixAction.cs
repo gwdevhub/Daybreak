@@ -53,4 +53,31 @@ public sealed class SetupWinePrefixAction(
             expirationTime: Global.NotificationLongExpiration
         );
     }
+
+    public override async Task ExecuteOnStartupAsync(CancellationToken cancellationToken)
+    {
+        if (
+            !this.winePrefixManager.IsAvailable()
+            || !this.winePrefixManager.IsInitialized()
+        )
+        {
+            return;
+        }
+
+        var scopedLogger = this.logger.CreateScopedLogger();
+        if (await this.winePrefixManager.ConfigureComputerName(cancellationToken))
+        {
+            scopedLogger.LogDebug("Wine computer name configuration is up to date");
+            return;
+        }
+
+        scopedLogger.LogError(
+            "Failed to configure the Linux host name as the Wine computer name"
+        );
+        this.notificationService.NotifyError(
+            title: "Wine prefix configuration failed",
+            description: "Daybreak could not configure the Linux host name as the Wine computer name. Check the logs for details.",
+            expirationTime: DateTime.UtcNow + TimeSpan.FromSeconds(30)
+        );
+    }
 }
