@@ -13,17 +13,44 @@ public readonly unsafe struct GuildWarsArray<T> : IEnumerable<T>
     public readonly uint Size;
     public readonly uint Param;
 
+    /// <summary>
+    /// Upper bound on a believable element count. Guild Wars' largest arrays hold at most a
+    /// few thousand entries, so anything beyond this is uninitialised or misresolved memory
+    /// rather than a real array.
+    /// </summary>
+    private const uint MaxPlausibleCapacity = 0x10000;
+
+    /// <summary>
+    /// Mirrors <c>GW::BaseArray::valid()</c> - the buffer must be null or aligned and the size
+    /// must fit within the capacity - plus a bound on the capacity itself. Guild Wars leaves
+    /// these fields transiently inconsistent while it (re)allocates an array, and a
+    /// misresolved GWCA scan can point this struct at arbitrary bytes that still satisfy
+    /// <c>size &lt;= capacity</c>.
+    /// </summary>
+    public bool IsValid =>
+        (this.Buffer is null || ((nuint)this.Buffer & 0x3) == 0) &&
+        this.Size <= this.Capacity &&
+        this.Capacity <= MaxPlausibleCapacity;
+
+    /// <summary>
+    /// Number of elements that can safely be read. Zero whenever the array is not backed by
+    /// a buffer, matching <c>GW::BaseArray::get()</c>, which returns null instead of
+    /// dereferencing. Reading past this is an access violation, and because NativeAOT cannot
+    /// throw <c>AccessViolationException</c> it fail-fasts and takes Guild Wars down with it.
+    /// </summary>
+    public uint Count => this.Buffer is not null && this.IsValid ? this.Size : 0;
+
     public T this[int index]
     {
         get
         {
             ArgumentOutOfRangeException.ThrowIfNegative(index);
-            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual((uint)index, this.Size);
+            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual((uint)index, this.Count);
             return this.Buffer[index];
         }
     }
 
-    public Enumerator GetEnumerator() => new(this.Buffer, this.Size);
+    public Enumerator GetEnumerator() => new(this.Buffer, this.Count);
 
     IEnumerator<T> IEnumerable<T>.GetEnumerator() => this.GetEnumerator();
 
