@@ -348,6 +348,7 @@ public sealed class KeyboardHookService : IHostedService, IKeyboardHookService, 
                 result = window;
                 break;
             }
+
             current = NativeMethods.G_list_next(current);
         }
 

@@ -19,6 +19,15 @@ set -euo pipefail
 
 # ─── configuration ────────────────────────────────────────────────────────────
 DOTNET_SDK_CHANNEL="${DOTNET_SDK_CHANNEL:-10.0}"
+# Pinned, not "latest": the SDK's bundled Roslyn must be >= the
+# Microsoft.CodeAnalysis.CSharp version referenced by Daybreak.Generators
+# (see Directory.Packages.props). A generator built against a newer Roslyn is
+# rejected with CS9057 and silently dropped, which makes Daybreak.API fail to
+# compile with a wall of "GWCAEquivalentAttribute could not be found" errors.
+#   SDK 10.0.300 -> Roslyn 5.6.0.0
+#   SDK 10.0.400 -> Roslyn 5.9.0.0
+# Set DOTNET_SDK_VERSION=latest to track the newest SDK in the channel.
+DOTNET_SDK_VERSION="${DOTNET_SDK_VERSION:-10.0.400}"
 LLVM_VERSION="${LLVM_VERSION:-22.1.5}"
 XWIN_VERSION="${XWIN_VERSION:-0.9.0}"
 WINEPREFIX_DEFAULT="$HOME/.wine-daybreak"
@@ -68,21 +77,28 @@ fi
 
 # ─── 2. .NET SDK ──────────────────────────────────────────────────────────────
 DOTNET_DIR="$WINEPREFIX/drive_c/dotnet"
-if [[ ! -f "$DOTNET_DIR/dotnet.exe" ]]; then
-    log "Resolving latest .NET $DOTNET_SDK_CHANNEL SDK"
-    SDK_INFO=$(curl -fsSL "https://builds.dotnet.microsoft.com/dotnet/release-metadata/${DOTNET_SDK_CHANNEL}/releases.json" | python3 -c "
+log "Resolving .NET SDK ($DOTNET_SDK_VERSION) from channel $DOTNET_SDK_CHANNEL"
+SDK_INFO=$(curl -fsSL "https://builds.dotnet.microsoft.com/dotnet/release-metadata/${DOTNET_SDK_CHANNEL}/releases.json" | python3 -c "
 import json,sys
+want=sys.argv[1]
 d=json.load(sys.stdin)
-v=d['latest-sdk']
+if want=='latest':
+    want=d['latest-sdk']
 for r in d['releases']:
-    if r['sdk']['version']==v:
-        for f in r['sdk']['files']:
+    for s in ([r['sdk']] + r.get('sdks',[])):
+        if s['version']!=want:
+            continue
+        for f in s['files']:
             if f['rid']=='win-x64' and f['name'].endswith('.zip'):
-                print(v); print(f['url']); sys.exit(0)
-sys.exit('No win-x64 SDK zip found')
-")
-    SDK_VER=$(echo "$SDK_INFO" | sed -n '1p')
-    SDK_URL=$(echo "$SDK_INFO" | sed -n '2p')
+                print(want); print(f['url']); sys.exit(0)
+sys.exit(f'No win-x64 SDK zip found for {want}')
+" "$DOTNET_SDK_VERSION")
+SDK_VER=$(echo "$SDK_INFO" | sed -n '1p')
+SDK_URL=$(echo "$SDK_INFO" | sed -n '2p')
+
+# Keyed on the versioned SDK directory, not dotnet.exe: bumping
+# DOTNET_SDK_VERSION must actually install the new SDK into an existing prefix.
+if [[ ! -d "$DOTNET_DIR/sdk/$SDK_VER" ]]; then
     SDK_ZIP="$CACHE_DIR/dotnet-sdk-${SDK_VER}-win-x64.zip"
 
     if [[ ! -f "$SDK_ZIP" ]]; then
@@ -94,10 +110,12 @@ sys.exit('No win-x64 SDK zip found')
     fi
 
     mkdir -p "$DOTNET_DIR"
-    log "Extracting SDK into $DOTNET_DIR"
-    (cd "$DOTNET_DIR" && unzip -q "$SDK_ZIP")
+    # -o so a newer SDK lands side-by-side and refreshes the shared host/runtime.
+    # With no global.json in the repo, dotnet then selects the highest SDK.
+    log "Extracting SDK $SDK_VER into $DOTNET_DIR"
+    (cd "$DOTNET_DIR" && unzip -qo "$SDK_ZIP")
 else
-    log ".NET SDK already present in $DOTNET_DIR"
+    log ".NET SDK $SDK_VER already present in $DOTNET_DIR"
 fi
 
 # ─── 3. LLVM Windows binaries (lld-link.exe, llvm-lib.exe) ───────────────────

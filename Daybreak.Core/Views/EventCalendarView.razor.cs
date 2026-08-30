@@ -6,6 +6,7 @@ using System.Core.Extensions;
 using TrailBlazr.ViewModels;
 
 namespace Daybreak.Views;
+
 public sealed class EventCalendarViewModel(IEventService eventService)
     : ViewModelBase<EventCalendarViewModel, EventCalendarView>
 {
@@ -92,7 +93,7 @@ public sealed class EventCalendarViewModel(IEventService eventService)
         {
             dates.Add(new DateTime(today.Year, today.Month, day));
         }
-        
+
         return dates;
     }
 
@@ -107,6 +108,7 @@ public sealed class EventCalendarViewModel(IEventService eventService)
                 events.Add(eventItem);
             }
         }
+
         return events;
     }
 }
