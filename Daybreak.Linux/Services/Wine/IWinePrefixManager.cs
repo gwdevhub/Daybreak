@@ -31,6 +31,13 @@ public interface IWinePrefixManager : IModService
     string GetWinePrefixPath();
 
     /// <summary>
+    /// Configures the Windows computer name from the Linux host name.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>True if successful, false otherwise.</returns>
+    Task<bool> ConfigureComputerName(CancellationToken cancellationToken);
+
+    /// <summary>
     /// Launches a Windows executable through Wine with the managed prefix.
     /// Uses event-based stdout/stderr reading to avoid pipe deadlocks.
     /// Because Wine's wrapper process may not exit even after the Windows exe finishes
