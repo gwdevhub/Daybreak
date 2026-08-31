@@ -10,6 +10,11 @@ namespace Daybreak.Tools.SkillUpdater;
 /// <c>gcmcontinue</c>. Pages without a <c>{{Skill infobox}}</c> block (category
 /// indexes, "List of …" pages) are skipped. De-duplicates by page id.
 /// </summary>
+/// <remarks>
+/// This yields the roster only — the page's name and the ids it covers. The
+/// values behind each id come from the GWToolbox API; see
+/// <see cref="WikiSkillEntry"/>.
+/// </remarks>
 internal sealed class SkillEnumerator(WikiHttpClient client)
 {
     private const string ApiBase = "https://wiki.guildwars.com/api.php";
@@ -23,15 +28,15 @@ internal sealed class SkillEnumerator(WikiHttpClient client)
         "Eye_of_the_North_skills",
     ];
 
-    public async Task<IReadOnlyList<ParsedSkill>> EnumerateAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<WikiSkillEntry>> EnumerateAsync(CancellationToken cancellationToken)
     {
-        var seen = new Dictionary<int, ParsedSkill>();
+        var seen = new Dictionary<int, WikiSkillEntry>();
         foreach (var category in CampaignCategories)
         {
             Console.WriteLine($"-> Category:{category}");
             var newCount = 0;
             var skipped = 0;
-            await foreach (var (pageId, skill, isSkill) in this.EnumerateCategoryAsync(category, cancellationToken))
+            await foreach (var (pageId, entry, isSkill) in this.EnumerateCategoryAsync(category, cancellationToken))
             {
                 if (!isSkill)
                 {
@@ -39,7 +44,7 @@ internal sealed class SkillEnumerator(WikiHttpClient client)
                     continue;
                 }
 
-                if (seen.TryAdd(pageId, skill!))
+                if (seen.TryAdd(pageId, entry!))
                 {
                     newCount++;
                 }
@@ -51,7 +56,7 @@ internal sealed class SkillEnumerator(WikiHttpClient client)
         return [.. seen.Values];
     }
 
-    private async IAsyncEnumerable<(int PageId, ParsedSkill? Skill, bool IsSkill)> EnumerateCategoryAsync(
+    private async IAsyncEnumerable<(int PageId, WikiSkillEntry? Entry, bool IsSkill)> EnumerateCategoryAsync(
         string category,
         [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
     {
@@ -78,10 +83,10 @@ internal sealed class SkillEnumerator(WikiHttpClient client)
             {
                 foreach (var page in pages.EnumerateArray())
                 {
-                    if (TryProjectSkill(page, out var pageId, out var skill))
+                    if (TryProjectEntry(page, out var pageId, out var entry))
                     {
                         batchSkills++;
-                        yield return (pageId, skill, true);
+                        yield return (pageId, entry, true);
                     }
                     else
                     {
@@ -96,10 +101,10 @@ internal sealed class SkillEnumerator(WikiHttpClient client)
         while (gcmcontinue is not null);
     }
 
-    private static bool TryProjectSkill(JsonElement page, out int pageId, out ParsedSkill skill)
+    private static bool TryProjectEntry(JsonElement page, out int pageId, out WikiSkillEntry entry)
     {
         pageId = 0;
-        skill = null!;
+        entry = null!;
         if (!page.TryGetProperty("title", out var titleEl) ||
             !page.TryGetProperty("pageid", out var pageIdEl))
         {
@@ -131,33 +136,26 @@ internal sealed class SkillEnumerator(WikiHttpClient client)
             return false;
         }
 
-        if (!WikiSkillParser.TryParse(content, out var parsed))
-        {
-            Console.Error.WriteLine($"     ! parse failed for '{title}' (pageid {pageIdEl.GetInt32()})");
-            return false;
-        }
+        // Monster and environment skill pages routinely omit the id from their
+        // infobox; keep them in the roster with no ids so the mapper can fall
+        // back to resolving them by name against the API.
+        WikiSkillRosterParser.TryParseIds(content, out var ids);
 
-        // The infobox `name` field can omit the `(PvP)` suffix even though the
-        // page title carries it. Prefer the page title as the canonical name,
-        // stripping the surrounding quotes some shout titles carry — and
-        // remember the quoted form so the icon resolver can try it as well
-        // (image files keep the quotes in their filenames).
+        // The page title is the canonical name: the infobox `name` field can
+        // omit the `(PvP)` suffix the title carries. Strip the surrounding
+        // quotes some shout titles carry — and remember the quoted form so the
+        // icon resolver can try it as well (image files keep the quotes in
+        // their filenames).
         var rawTitle = title.Trim();
         var isQuoted = rawTitle.Length >= 2 && rawTitle[0] == '"' && rawTitle[^1] == '"';
         var canonicalTitle = isQuoted ? rawTitle[1..^1] : rawTitle;
 
-        if (!string.Equals(parsed.Name, canonicalTitle, StringComparison.Ordinal))
-        {
-            parsed = parsed with { Name = canonicalTitle };
-        }
-
-        var iconBaseNames = isQuoted
-            ? (IReadOnlyList<string>)[canonicalTitle, rawTitle]
-            : [canonicalTitle];
-        parsed = parsed with { IconBaseNames = iconBaseNames };
-
         pageId = pageIdEl.GetInt32();
-        skill = parsed;
+        entry = new WikiSkillEntry(canonicalTitle, ids)
+        {
+            IconBaseNames = isQuoted ? [canonicalTitle, rawTitle] : [canonicalTitle],
+        };
+
         return true;
     }
 

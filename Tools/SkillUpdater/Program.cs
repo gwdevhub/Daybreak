@@ -24,23 +24,65 @@ internal static class Program
 
         try
         {
-            using var client = new WikiHttpClient(UserAgent);
-            var enumerator = new SkillEnumerator(client);
+            using var wikiClient = new WikiHttpClient(UserAgent);
+            using var apiClient = new GwToolboxClient(UserAgent);
 
-            Console.WriteLine("Enumerating skills from wiki…");
-            var skills = await enumerator.EnumerateAsync(cancellationSource.Token);
-            Console.WriteLine($"Collected {skills.Count} skills.");
+            Console.WriteLine("Fetching skill data from api.gwtoolbox.com…");
+            var apiSkills = await apiClient.FetchSkillsAsync(cancellationSource.Token);
+            Console.WriteLine($"Fetched {apiSkills.Count} skill records.");
             Console.WriteLine();
 
-            var iconResolver = new IconResolver(client);
-            var iconUrls = await iconResolver.ResolveAsync(skills, cancellationSource.Token);
+            var enumerator = new SkillEnumerator(wikiClient);
+            Console.WriteLine("Enumerating the skill roster from the wiki…");
+            var roster = await enumerator.EnumerateAsync(cancellationSource.Token);
+            Console.WriteLine($"Collected {roster.Count} skill pages.");
+            Console.WriteLine();
+
+            var skills = new List<ParsedSkill>();
+            var warnings = new List<string>();
+            foreach (var entry in roster)
+            {
+                // Monster and environment skill pages routinely omit the id
+                // from their infobox. The API still knows them, so fall back to
+                // its name index rather than emitting an unusable id-0 entry.
+                if (entry.Ids.Count == 0)
+                {
+                    if (apiSkills.TryGetUniqueByName(entry.Name, out var byName))
+                    {
+                        skills.Add(SkillMapper.Map(byName.Id, entry.Name, byName));
+                    }
+                    else
+                    {
+                        warnings.Add($"skipped '{entry.Name}': the wiki lists no id and the name is not unique in the API");
+                    }
+
+                    continue;
+                }
+
+                foreach (var id in entry.Ids)
+                {
+                    if (!apiSkills.TryGetById(id, out var apiSkill))
+                    {
+                        warnings.Add($"skipped '{entry.Name}' (id {id}): no record in the API");
+                        continue;
+                    }
+
+                    skills.Add(SkillMapper.Map(id, entry.Name, apiSkill));
+                }
+            }
+
+            Console.WriteLine($"Mapped {skills.Count} skills from API data.");
+            Console.WriteLine();
+
+            var iconResolver = new IconResolver(wikiClient);
+            var iconUrls = await iconResolver.ResolveAsync(roster, cancellationSource.Token);
             Console.WriteLine();
 
             Console.WriteLine("Rendering Skill.g.cs…");
-            var (content, warnings) = SkillFileWriter.Render(skills, iconUrls);
+            var (content, renderWarnings) = SkillFileWriter.Render(skills, iconUrls);
             await File.WriteAllTextAsync(skillFile, content, cancellationSource.Token);
             Console.WriteLine($"Wrote {content.Length:N0} chars to {skillFile}");
-            foreach (var warn in warnings)
+            foreach (var warn in renderWarnings.Concat(warnings))
             {
                 Console.Error.WriteLine($"  ! {warn}");
             }
