@@ -29,7 +29,7 @@ internal sealed class IconResolver(WikiHttpClient client)
     private const int BatchSize = 25;
 
     public async Task<IReadOnlyDictionary<string, string>> ResolveAsync(
-        IReadOnlyList<ParsedSkill> skills,
+        IReadOnlyList<WikiSkillEntry> skills,
         CancellationToken cancellationToken)
     {
         // Track candidate (skillName, filename) pairs across passes; a skill
