@@ -1,0 +1,14 @@
+.empty-state {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    color: var(--neutral-foreground-hint);
+}
+
+.empty-message {
+    font-size: var(--font-size-large);
+    text-align: center;
+}
