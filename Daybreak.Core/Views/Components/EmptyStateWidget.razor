@@ -1,0 +1,28 @@
+﻿<div class="empty-state">
+    <FluentIcon Value="@this.Icon" Color="Color.Neutral" />
+    <div class="empty-message">@this.Message</div>
+    <FluentButton Appearance="Appearance.Accent"
+                  Disabled="@this.Disabled"
+                  IconStart="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Add())"
+                  Title="@this.ActionText"
+                  OnClick="@this.OnAction">
+        @this.ActionText
+    </FluentButton>
+</div>
+
+@code {
+    [Parameter]
+    public string Message { get; set; } = string.Empty;
+
+    [Parameter]
+    public string ActionText { get; set; } = "Add";
+
+    [Parameter]
+    public Icon Icon { get; set; } = new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size48.Search();
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public EventCallback OnAction { get; set; }
+}

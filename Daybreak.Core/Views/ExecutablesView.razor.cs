@@ -37,6 +37,7 @@ public class ExecutablesViewModel(
     {
         this.Executables.Remove(executable);
         this.guildWarsExecutableManager.RemoveExecutable(executable.Path);
+        this.RefreshView();
     }
 
     public async Task CreateExecutable()
