@@ -349,6 +349,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         optionsProducer.RegisterOptions<SynchronizationOptions>();
         optionsProducer.RegisterOptions<FocusViewOptions>();
         optionsProducer.RegisterOptions<DaybreakApiOptions>();
+        optionsProducer.RegisterOptions<DownloadOptions>();
 
         optionsProducer.RegisterOptions<ToolboxOptions>();
         optionsProducer.RegisterOptions<UModOptions>();
