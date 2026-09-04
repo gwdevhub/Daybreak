@@ -1,6 +1,6 @@
 # Daybreak
 
-<img width="754" height="716" alt="image" src="https://github.com/user-attachments/assets/3eb74d22-a3ac-4463-8d26-8142cea3d237" />
+![Daybreak launcher][screenshot]
 
 Custom launcher for Guild Wars.
 
@@ -14,11 +14,18 @@ Custom launcher for Guild Wars.
 Please check the [wiki](https://github.com/AlexMacocian/Daybreak/wiki) for
 project description and features.
 
----
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the branching model and release
+process.
+
+______________________________________________________________________
 
 ## Architecture Overview
 
-Daybreak is a cross-platform application built with .NET 10 and Photino.Blazor. The launcher provides a native UI on each platform while sharing the majority of business logic through a common core library.
+Daybreak is a cross-platform application built with .NET 10 and Photino.Blazor.
+The launcher provides a native UI on each platform while sharing the majority of
+business logic through a common core library.
 
 ### Project Structure
 
@@ -56,17 +63,17 @@ graph TB
 
 ### Component Descriptions
 
-| Project | Description |
-| ------- | ----------- |
-| **Daybreak.Windows** | Windows executable with WebView2, MSAL authentication, shortcuts, and native screen management |
-| **Daybreak.Linux** | Linux executable using GTK/WebKit via Photino, with Wine-based game injection |
-| **Daybreak.Core** | Shared Blazor UI, services, and configuration (multi-targeted for Windows-specific features) |
-| **Daybreak.Shared** | Common models, utilities, and interfaces used across all projects |
-| **Daybreak.Injector** | NativeAOT x86 executable that injects DLLs into the Guild Wars process |
-| **Daybreak.API** | NativeAOT x86 library injected into Guild Wars, exposes game data via WebSocket/REST |
-| **Daybreak.Installer** | Standalone installer/updater executable |
+| Project                | Description                                                                                    |
+| ---------------------- | ---------------------------------------------------------------------------------------------- |
+| **Daybreak.Windows**   | Windows executable with WebView2, MSAL authentication, shortcuts, and native screen management |
+| **Daybreak.Linux**     | Linux executable using GTK/WebKit via Photino, with Wine-based game injection                  |
+| **Daybreak.Core**      | Shared Blazor UI, services, and configuration (multi-targeted for Windows-specific features)   |
+| **Daybreak.Shared**    | Common models, utilities, and interfaces used across all projects                              |
+| **Daybreak.Injector**  | NativeAOT x86 executable that injects DLLs into the Guild Wars process                         |
+| **Daybreak.API**       | NativeAOT x86 library injected into Guild Wars, exposes game data via WebSocket/REST           |
+| **Daybreak.Installer** | Standalone installer/updater executable                                                        |
 
----
+______________________________________________________________________
 
 ## Build Requirements
 
@@ -118,11 +125,13 @@ In addition to .NET, the following are required to run Daybreak on Linux:
 - **GTK 3** and **WebKitGTK** (for Photino)
 - **Wine** (for running the Windows-based injector and Guild Wars)
 
----
+______________________________________________________________________
 
 ## Wine Integration (Linux)
 
-On Linux, Daybreak uses Wine to run the Windows-based `Daybreak.Injector.exe` and Guild Wars itself. This section documents the architecture and implementation plan.
+On Linux, Daybreak uses Wine to run the Windows-based `Daybreak.Injector.exe`
+and Guild Wars itself. This section documents the architecture and
+implementation plan.
 
 ### Architecture
 
@@ -151,7 +160,8 @@ graph LR
 
 ### Wine Prefix Management
 
-Daybreak manages a single dedicated Wine prefix for all Wine operations. This is handled by `IWinePrefixManager`:
+Daybreak manages a single dedicated Wine prefix for all Wine operations. This is
+handled by `IWinePrefixManager`:
 
 ```csharp
 public interface IWinePrefixManager
@@ -184,11 +194,12 @@ public interface IWinePrefixManager
 
 ### Path Translation
 
-Wine exposes the Linux filesystem through the `Z:` drive. The `PathUtils` class provides a method to convert native Linux paths to Wine-compatible paths:
+Wine exposes the Linux filesystem through the `Z:` drive. The `PathUtils` class
+provides a method to convert native Linux paths to Wine-compatible paths:
 
-| Linux Path | Wine Path |
-|------------|-----------|
-| `/mnt/games/Guild Wars/Gw.exe` | `Z:/mnt/games/Guild Wars/Gw.exe` |
+| Linux Path                                            | Wine Path                                               |
+| ----------------------------------------------------- | ------------------------------------------------------- |
+| `/mnt/games/Guild Wars/Gw.exe`                        | `Z:/mnt/games/Guild Wars/Gw.exe`                        |
 | `/home/user/.daybreak/Injector/Daybreak.Injector.exe` | `Z:/home/user/.daybreak/Injector/Daybreak.Injector.exe` |
 
 ```csharp
@@ -202,36 +213,47 @@ public static string ToWinePath(string linuxPath)
 
 ### Wine Debug Log
 
-Debug builds append all Wine output to `wine-debug.log` in the Daybreak output folder:
+Debug builds append all Wine output to `wine-debug.log` in the Daybreak output
+folder:
 
-```
+```text
 Daybreak.Linux/bin/Debug/net10.0/linux-x64/wine-debug.log
 ```
 
-This is the place to look when Guild Wars dies without an error. Guild Wars is a grandchild of the Wine process Daybreak starts, so its stderr would otherwise go to a pipe nobody reads and the crash report would be lost. Wine runs `winedbg --auto` on a crash, so the log contains the faulting stack — including managed frames when `Daybreak.API` is at fault:
+This is the place to look when Guild Wars dies without an error. Guild Wars is a
+grandchild of the Wine process Daybreak starts, so its stderr would otherwise go
+to a pipe nobody reads and the crash report would be lost. Wine runs
+`winedbg --auto` on a crash, so the log contains the faulting stack — including
+managed frames when `Daybreak.API` is at fault:
 
-```
+```text
 err:eventlog:ReportEventW L"Message: Access Violation: Attempted to read or write protected memory..."
 err:eventlog:ReportEventW L"   at Daybreak.API.Interop.GuildWars.GuildWarsArray`1.Enumerator.get_Current()"
 err:eventlog:ReportEventW L"   at Daybreak.API.Services.CharacterSelectService...
 err:seh:NtRaiseException Unhandled exception code c0000409
 ```
 
-Note that `Daybreak.API` is NativeAOT, which cannot throw `AccessViolationException`. A bad pointer read therefore calls `FailFast` and terminates Guild Wars instantly, with nothing written to `Daybreak.API.log`.
+Note that `Daybreak.API` is NativeAOT, which cannot throw
+`AccessViolationException`. A bad pointer read therefore calls `FailFast` and
+terminates Guild Wars instantly, with nothing written to `Daybreak.API.log`.
 
-Each launch is delimited by a `===== <timestamp> <command> =====` header. The log is append-only, so delete it when it gets large.
+Each launch is delimited by a `===== <timestamp> <command> =====` header. The
+log is append-only, so delete it when it gets large.
 
 Environment variables:
 
-| Variable | Effect |
-|----------|--------|
-| `DAYBREAK_WINE_DEBUG` | `1` forces logging on, `0` off. Defaults to on for Debug builds, off for Release. |
+| Variable                       | Effect                                                                                                                                        |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DAYBREAK_WINE_DEBUG`          | `1` forces logging on, `0` off. Defaults to on for Debug builds, off for Release.                                                             |
 | `DAYBREAK_WINE_DEBUG_CHANNELS` | Sets `WINEDEBUG`, e.g. `+seh`. Unset by default — Wine's default `err` class already reports crashes, and trace channels slow the game badly. |
 
----
+______________________________________________________________________
 
 ## Credits
 
 - Daybreak project is distributed under [MIT license](https://mit-license.org/)
 - Tango icons - [LordBiro](https://wiki.guildwars.com/wiki/User:LordBiro)
-  - Icons `Daybreak/wwwroot/img/tango` are distributed under [GFDL license](https://en.wikipedia.org/wiki/GNU_Free_Documentation_License)
+  - Icons `Daybreak/wwwroot/img/tango` are distributed under
+    [GFDL license](https://en.wikipedia.org/wiki/GNU_Free_Documentation_License)
+
+[screenshot]: https://github.com/user-attachments/assets/3eb74d22-a3ac-4463-8d26-8142cea3d237
