@@ -274,7 +274,7 @@ public sealed class WinePrefixManager(
             return false;
         }
 
-        var computerName = Environment.MachineName;
+        var computerName = ComputerNameUtils.SanitizeComputerName(Environment.MachineName);
         var useDnsComputerNameConfigured = await this.AddRegistryValue(
             WineNetworkRegistryKey,
             "UseDnsComputerName",
