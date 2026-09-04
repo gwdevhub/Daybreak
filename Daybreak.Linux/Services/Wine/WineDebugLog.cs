@@ -57,22 +57,29 @@ internal static class WineDebugLog
     /// <c>/bin/sh</c> with stderr appended to <see cref="LogPath"/>.
     /// </summary>
     /// <remarks>
-    /// The command is passed as a single positional parameter and re-parsed with
-    /// <c>eval</c> so the caller's existing double-quoting (paths such as
-    /// <c>"Z:\...\Guild Wars\Gw.exe"</c> contain spaces) keeps working unchanged.
+    /// The command is split here and handed to the shell as separate positional parameters,
+    /// then executed with <c>exec "$@"</c>. The shell must never re-parse the command as source:
+    /// doing so applies a second round of expansion to values Daybreak has already quoted, so a
+    /// launch argument containing <c>$</c>, a backtick or a glob would be rewritten before the
+    /// game ever saw it. Splitting with <see cref="CommandLineUtils.SplitCommandLine"/> keeps the
+    /// argument vector identical to the one .NET builds when the log is disabled.
     /// </remarks>
     public static void Apply(ProcessStartInfo startInfo)
     {
         var logPath = LogPath;
-        var command = $"\"{startInfo.FileName}\" {startInfo.Arguments}";
+        var arguments = CommandLineUtils.SplitCommandLine(startInfo.Arguments);
+        var fileName = startInfo.FileName;
 
         startInfo.FileName = "/bin/sh";
         startInfo.Arguments = string.Empty;
         startInfo.ArgumentList.Add("-c");
-        startInfo.ArgumentList.Add("log=\"$1\"; shift; eval \"exec $* 2>>'$log'\"");
-        startInfo.ArgumentList.Add("daybreak-wine");
+        startInfo.ArgumentList.Add("exec \"$@\" 2>>\"$0\"");
         startInfo.ArgumentList.Add(logPath);
-        startInfo.ArgumentList.Add(command);
+        startInfo.ArgumentList.Add(fileName);
+        foreach (var argument in arguments)
+        {
+            startInfo.ArgumentList.Add(argument);
+        }
 
         if (Channels is { } channels)
         {
