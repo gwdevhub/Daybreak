@@ -8977,7 +8977,7 @@ public static unsafe partial class GWCA
                 internal const float Nearby = 252.0f;
                 internal const float Spellcast = 1248.0f;
                 internal const float Spirit = 2512.0f;
-                internal const float SpiritExtended = 3500.0f;
+                internal const float SpiritExtended = 3000.0f;
                 internal const float Touch = 144.0f;
             }
         }
@@ -9625,11 +9625,11 @@ public static unsafe partial class GWCA
                 kChangeTarget, // 0x10000020, wparam = UIPacket::kChangeTarget*
                 kMessage_0x10000021, // 0x10000021
                 kMessage_0x10000022, // 0x10000022
-                kMessage_0x10000023, // 0x10000023
-                kAgentSkillActivated, // 0x10000024, kAgentSkillPacket
-                kAgentSkillActivatedInstantly, // 0x10000025, kAgentSkillPacket
-                kAgentSkillCancelled, // 0x10000026, kAgentSkillPacket
-                kAgentSkillStartedCast, // 0x10000027, wparam = UIPacket::kAgentStartCasting*
+                kAgentSkillCancelled, // 0x10000023, wparam = kAgentSkillPacket; "<agent> canceled <skill>"
+                kAgentSkillActivated, // 0x10000024, wparam = kAgentSkillPacket; "<agent> executed <skill>"
+                kAgentSkillActivatedInstantly, // 0x10000025, wparam = kAgentSkillPacket; "<agent> used <skill>"
+                kAgentSkillInterrupted, // 0x10000026, wparam = kAgentSkillPacket; "<agent> was interrupted while using <skill>"
+                kAgentSkillStartedCast, // 0x10000027, wparam = UIPacket::kAgentSkillStartedCast*; "<agent> is warming up <skill>"
                 kMessage_0x10000028, // 0x10000028
                 kShowMapEntryMessage, // 0x10000029, wparam = { wchar_t* title, wchar_t* subtitle }
                 kSetCurrentPlayerData, // 0x1000002a, fired after setting the worldcontext player name
@@ -15740,10 +15740,10 @@ namespace Daybreak.API.Interop.GuildWars
         kChangeTarget,
         kMessage_0x10000021,
         kMessage_0x10000022,
-        kMessage_0x10000023,
+        kAgentSkillCancelled,
         kAgentSkillActivated,
         kAgentSkillActivatedInstantly,
-        kAgentSkillCancelled,
+        kAgentSkillInterrupted,
         kAgentSkillStartedCast,
         kMessage_0x10000028,
         kShowMapEntryMessage,
@@ -19702,7 +19702,7 @@ namespace Daybreak.API.Interop.GuildWars
         public uint AgentId;
         public global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID SkillId;
         public float Duration;
-        public uint H000c;
+        public float H000c;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
