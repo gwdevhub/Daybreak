@@ -415,7 +415,8 @@ public sealed class CharacterSelectService(
                 }
 
                 var availableCharsContext = this.gameContextService.GetAvailableChars();
-                if (availableCharsContext.IsNull)
+                if (!availableCharsContext.IsValid ||
+                    !availableCharsContext.Pointer->IsValid)
                 {
                     scopedLogger.LogError("Available characters context is not initialized");
                     return default;
