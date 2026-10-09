@@ -29,7 +29,7 @@ public static unsafe partial class GWCA
     // [NAMESPACE] GWCA.GW.Chat.TextColor popped at line 54
     // [NAMESPACE] GWCA.GW.Constants popped at line 17
     // [NAMESPACE] GWCA.GW.Constants.DialogID popped at line 282
-    // [NAMESPACE] GWCA.GW.Constants.ItemID popped at line 201
+    // [NAMESPACE] GWCA.GW.Constants.ItemID popped at line 204
     // [NAMESPACE] GWCA.GW.Constants.ModelID.Minipet.SummoningStone.FoW.UW.FoW.Urgoz.Deep.DoA.EotnDungeons.BonusMissionPack.EotnDungeons popped at line 445
     // [NAMESPACE] GWCA.GW.Constants.ModelID.Minipet.SummoningStone.FoW.UW.FoW.Urgoz.Deep.DoA.PolymockSummon popped at line 385
     // [NAMESPACE] GWCA.GW.Constants.Preference popped at line 62
@@ -59,7 +59,7 @@ public static unsafe partial class GWCA
     // [NAMESPACE] GWCA.GW.StoC popped at line 45
     // [NAMESPACE] GWCA.GW.TargetFilter popped at line 126
     // [NAMESPACE] GWCA.GW.Trade popped at line 22
-    // [NAMESPACE] GWCA.GW.UI popped at line 833
+    // [NAMESPACE] GWCA.GW.UI popped at line 826
     // [NAMESPACE] GWCA.GW.UI.UIPacket popped at line 30
     // [NAMESPACE] GWCA.GWCA popped at line 15
     // GWCA.GW.AccountContext: 9 fields [OK]
@@ -87,7 +87,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.CapeDesign: 7 fields [OK]
     // GWCA.GW.CharacterInformation: 4 fields [OK]
     // GWCA.GW.CharAdjustment: 4 fields [OK]
-    // GWCA.GW.CharContext: 34 fields [OK]
+    // GWCA.GW.CharContext: 35 fields [OK]
     // GWCA.GW.Chat.ChatBuffer: 4 fields [OK]
     // GWCA.GW.Chat.ChatMessage: 4 fields [OK]
     // GWCA.GW.Cinematic: 2 fields [OK]
@@ -122,7 +122,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.Item: 26 fields [OK]
     // GWCA.GW.ItemContext: 38 fields [OK]
     // GWCA.GW.ItemData: 5 fields [OK]
-    // GWCA.GW.ItemFormula: 5 fields [OK]
+    // GWCA.GW.ItemFormula: 6 fields [OK]
     // GWCA.GW.ItemListFrame: 0 fields [SKIP: no fields]
     // GWCA.GW.ItemModifier: 1 fields [OK]
     // GWCA.GW.LoginCharacter: 2 fields [OK]
@@ -242,6 +242,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.UI.UIPacket.kChangeTarget: 6 fields [OK]
     // GWCA.GW.UI.UIPacket.kChatLinkClicked: 3 fields [OK]
     // GWCA.GW.UI.UIPacket.kCompassDraw: 4 fields [OK]
+    // GWCA.GW.UI.UIPacket.kCompassPing: 3 fields [OK]
     // GWCA.GW.UI.UIPacket.kDialogueMessage: 5 fields [OK]
     // GWCA.GW.UI.UIPacket.kEffectAdd: 2 fields [OK]
     // GWCA.GW.UI.UIPacket.kErrorMessage: 2 fields [OK]
@@ -8449,8 +8450,10 @@ public static unsafe partial class GWCA
                 internal const int ChocolateBunny = 22644;
                 internal const int Cider = 28435;
                 internal const int ConsArmor = 24860;
+                internal const int ConsEmpoweringFeast = 38618;
                 internal const int ConsEssence = 24859;
                 internal const int ConsGrail = 24861;
+                internal const int ConsTrifecta = 38619;
                 internal const int Corns = 28432;
                 internal const int CremeBrulee = 15528;
                 internal const int CrystallineSword = 399;
@@ -9749,7 +9752,7 @@ public static unsafe partial class GWCA
                 kDialogueMessageUpdated, // 0x1000009c
                 kLogout, // 0x1000009d, wparam = { bool unknown, bool character_select }
                 kCompassDraw, // 0x1000009e, wparam = UIPacket::kCompassDraw*
-                kMessage_0x1000009f, // 0x1000009f
+                kCompassPing, // 0x1000009f, wparam = UIPacket::kCompassPing*
                 kMessage_0x100000a0, // 0x100000a0
                 kMessage_0x100000a1, // 0x100000a1
                 kOnScreenMessage, // 0x100000a2, wparam = wchar_** encoded_string
@@ -9865,196 +9868,199 @@ public static unsafe partial class GWCA
                 kMessage_0x10000110, // 0x10000110
                 kMapChange, // 0x10000111, wparam = map id
                 kMessage_0x10000112, // 0x10000112
-                kMessage_0x10000113, // 0x10000113
-                kMessage_0x10000114, // 0x10000114
-                kCalledTargetChange, // 0x10000115, wparam = { player_number, target_id }
-                kMessage_0x10000116, // 0x10000116
-                kMessage_0x10000117, // 0x10000117
-                kMessage_0x10000118, // 0x10000118
-                kErrorMessage, // 0x10000119, wparam = { int error_index, wchar_t* error_encoded_string }
-                kPartyHardModeChanged, // 0x1000011a, wparam = { int is_hard_mode }
-                kPartyAddHenchman, // 0x1000011b
-                kPartyRemoveHenchman, // 0x1000011c
-                kMessage_0x1000011d, // 0x1000011d
-                kPartyAddHero, // 0x1000011e
-                kPartyRemoveHero, // 0x1000011f
-                kMessage_0x10000120, // 0x10000120
-                kMessage_0x10000121, // 0x10000121
-                kMessage_0x10000122, // 0x10000122
-                kMessage_0x10000123, // 0x10000123
-                kPartyAddPlayer, // 0x10000124
-                kMessage_0x10000125, // 0x10000125
-                kPartyRemovePlayer, // 0x10000126
-                kMessage_0x10000127, // 0x10000127
-                kMessage_0x10000128, // 0x10000128
-                kMessage_0x10000129, // 0x10000129
-                kDisableEnterMissionBtn, // 0x1000012a, wparam = boolean (1 = disabled, 0 = enabled)
-                kMessage_0x1000012b, // 0x1000012b
-                kMessage_0x1000012c, // 0x1000012c
-                kShowCancelEnterMissionBtn, // 0x1000012d
-                kMessage_0x1000012e, // 0x1000012e
-                kPartyDefeated, // 0x1000012f
-                kMessage_0x10000130, // 0x10000130
-                kMessage_0x10000131, // 0x10000131
-                kMessage_0x10000132, // 0x10000132
-                kPartySearchCreated, // 0x10000133, wparam = GW::PartySearch*
-                kPartySearchIdChanged, // 0x10000134, wparam = uint32_t* party_search_id
-                kPartySearchRemoved, // 0x10000135, wparam = uint32_t* party_search_id
-                kPartySearchUpdated, // 0x10000136, wparam = GW::PartySearch*
-                kPartySearchInviteReceived, // 0x10000137, wparam = UIPacket::kPartySearchInviteReceived*
-                kMessage_0x10000138, // 0x10000138
-                kPartySearchInviteSent, // 0x10000139
-                kPartyShowConfirmDialog, // 0x1000013a, wparam = UIPacket::kPartyShowConfirmDialog
-                kMessage_0x1000013b, // 0x1000013b
-                kMessage_0x1000013c, // 0x1000013c
-                kMessage_0x1000013d, // 0x1000013d
-                kMessage_0x1000013e, // 0x1000013e
-                kMessage_0x1000013f, // 0x1000013f
-                kPreferenceEnumChanged, // 0x10000140, wparam = UiPacket::kPreferenceEnumChanged
-                kPreferenceFlagChanged, // 0x10000141, wparam = UiPacket::kPreferenceFlagChanged
-                kPreferenceValueChanged, // 0x10000142, wparam = UiPacket::kPreferenceValueChanged
-                kUIPositionChanged, // 0x10000143, wparam = UIPacket::kUIPositionChanged
-                kPreBuildLoginScene, // 0x10000144, Called with no args right before login scene is drawn
-                kMessage_0x10000145, // 0x10000145
-                kMessage_0x10000146, // 0x10000146
-                kMessage_0x10000147, // 0x10000147
-                kMessage_0x10000148, // 0x10000148
-                kMessage_0x10000149, // 0x10000149
-                kMessage_0x1000014a, // 0x1000014a
-                kMessage_0x1000014b, // 0x1000014b
-                kMessage_0x1000014c, // 0x1000014c
-                kMessage_0x1000014d, // 0x1000014d
-                kQuestAdded, // 0x1000014e, wparam = { quest_id, ... }
-                kQuestDetailsChanged, // 0x1000014f, wparam = { quest_id, ... }
-                kQuestRemoved, // 0x10000150, wparam = { quest_id, ... }
-                kClientActiveQuestChanged, // 0x10000151, wparam = { quest_id, ... }. Triggered when the game requests the current quest to change
-                kMessage_0x10000152, // 0x10000152
-                kServerActiveQuestChanged, // 0x10000153, wparam = UIPacket::kServerActiveQuestChanged*. Triggered when the server requests the current quest to change
-                kUnknownQuestRelated, // 0x10000154
-                kMessage_0x10000155, // 0x10000155
-                kDungeonComplete, // 0x10000156
-                kMissionComplete, // 0x10000157
-                kMessage_0x10000158, // 0x10000158
-                kVanquishComplete, // 0x10000159
-                kObjectiveAdd, // 0x1000015a, wparam = UIPacket::kObjectiveAdd*
-                kObjectiveComplete, // 0x1000015b, wparam = UIPacket::kObjectiveComplete*
-                kObjectiveUpdated, // 0x1000015c, wparam = UIPacket::kObjectiveUpdated*
-                kMessage_0x1000015d, // 0x1000015d
-                kMessage_0x1000015e, // 0x1000015e
-                kMessage_0x1000015f, // 0x1000015f
-                kMessage_0x10000160, // 0x10000160
-                kMessage_0x10000161, // 0x10000161
-                kMessage_0x10000162, // 0x10000162
-                kMessage_0x10000163, // 0x10000163
-                kMessage_0x10000164, // 0x10000164
-                kTradeSessionStart, // 0x10000165, wparam = { trade_state, player_number }
-                kMessage_0x10000166, // 0x10000166
-                kMessage_0x10000167, // 0x10000167
-                kMessage_0x10000168, // 0x10000168
-                kMessage_0x10000169, // 0x10000169
-                kMessage_0x1000016a, // 0x1000016a
-                kTradeSessionUpdated, // 0x1000016b, no args
-                kMessage_0x1000016c, // 0x1000016c
-                kMessage_0x1000016d, // 0x1000016d
-                kMessage_0x1000016e, // 0x1000016e
-                kMessage_0x1000016e_1, // 0x1000016f, added to GW 2026-04-28
-                kMessage_0x1000016f, // 0x10000170
-                kMessage_0x10000170, // 0x10000171
-                kMessage_0x10000171, // 0x10000172
-                kMessage_0x10000172, // 0x10000173
-                kMessage_0x10000173, // 0x10000174
-                kMessage_0x10000174, // 0x10000175
-                kCheckUIState, // 0x10000176
-                kMessage_0x10000176, // 0x10000177
-                kMessage_0x10000177, // 0x10000178
-                kMessage_0x10000178, // 0x10000179
-                kMessage_0x10000178_1, // 0x1000017a, added to GW 2026-02-26
-                kMessage_0x10000178_2, // 0x1000017b, added to GW 2026-02-26
-                kMessage_0x10000178_3, // 0x1000017c, added to GW 2026-02-26
-                kDestroyUIPositionOverlay, // 0x1000017d
-                kEnableUIPositionOverlay, // 0x1000017e, wparam = uint32_t enable
-                kMessage_0x1000017b, // 0x1000017f
-                kGuildHall, // 0x10000180, wparam = gh key (uint32_t[4])
-                kMessage_0x1000017d, // 0x10000181
-                kLeaveGuildHall, // 0x10000182
-                kTravel, // 0x10000183
-                kOpenWikiUrl, // 0x10000184, wparam = char* url
-                kMessage_0x10000181, // 0x10000185
-                kOpenUrlNoPrompt, // 0x10000186, wparam = char* url
-                kSetPreGameContext_Value0, // 0x10000187, wparam = uint32_t value
-                kMessage_0x10000184, // 0x10000188
-                kGetPreGameContext_Value0, // 0x10000189, lparam = *uint32_t value_out
-                kSetPreGameContext_Value1, // 0x1000018a, wparam = uint32_t value     , added to GW 2026-02-06
-                kGetPreGameContext_Value1, // 0x1000018b, lparam = *uint32_t value_out, added to GW 2026-02-06
-                kMessage_0x10000186, // 0x1000018c
-                kMessage_0x10000187, // 0x1000018d
-                kMessage_0x10000188, // 0x1000018e
-                kMessage_0x10000189, // 0x1000018f
-                kMessage_0x1000018a, // 0x10000190
-                kMessage_0x1000018b, // 0x10000191
-                kMessage_0x1000018c, // 0x10000192
-                kMessage_0x1000018d, // 0x10000193
-                kMessage_0x1000018d_2, // 0x10000194, added to GW 2026-06-17
-                kAppendMessageToChat, // 0x10000195, wparam = wchar_t* message
-                kMessage_0x1000018f, // 0x10000196
-                kMessage_0x10000190, // 0x10000197
-                kMessage_0x10000191, // 0x10000198
-                kMessage_0x10000192, // 0x10000199
-                kMessage_0x10000193, // 0x1000019a
-                kMessage_0x10000194, // 0x1000019b
-                kMessage_0x10000195, // 0x1000019c
-                kMessage_0x10000196, // 0x1000019d
-                kMessage_0x10000197, // 0x1000019e
-                kMessage_0x10000198, // 0x1000019f
-                kMessage_0x10000199, // 0x100001a0
-                kMessage_0x1000019a, // 0x100001a1
-                kMessage_0x1000019b, // 0x100001a2
-                kHideHeroPanel, // 0x100001a3, wparam = hero_id
-                kShowHeroPanel, // 0x100001a4, wparam = hero_id
-                kMessage_0x1000019e, // 0x100001a5
-                kMessage_0x1000019f, // 0x100001a6
-                kQuerySuppressedKeyAction, // 0x100001a7, wparam = 0, lparam = bool*. Used to check if the suppress action is pressed (usually shift)
-                kGetInventoryAgentId, // 0x100001a8, wparam = 0, lparam = uint32_t* agent_id_out. Used to fetch which agent is selected
-                kInventoryRelated1, // 0x100001a9, added to GW 2026-02-26
-                kInventoryRelated2, // 0x100001aa, added to GW 2026-02-26
-                kInventoryRelated3, // 0x100001ab, added to GW 2026-02-26
-                kInventoryRelated4, // 0x100001ac, added to GW 2026-04-28
-                kInventoryRelated4_1, // 0x100001ad, added to GW 2026-08-07
-                kEquipItem, // 0x100001ae, wparam = { item_id, agent_id }
-                kMoveItem, // 0x100001af, wparam = { item_id, to_bag, to_slot, bool prompt }
-                kItemRelated_1, // 0x100001b0
-                kItemTooltip, // 0x100001b1
-                kItemRelated_3, // 0x100001b2, added to GW 2026-02-26
-                kItemRelated_4, // 0x100001b3, added to GW 2026-02-26
-                kItemRelated_5, // 0x100001b4, added to GW 2026-04-28
-                kInitiateTrade, // 0x100001b5
-                kMessage_0x100001a7, // 0x100001b6
-                kMessage_0x100001a8, // 0x100001b7
-                kMessage_0x100001a9, // 0x100001b8
-                kMessage_0x100001aa, // 0x100001b9
-                kPartySearchWindowDestroyed, // 0x100001ba
-                kMessage_0x100001ac, // 0x100001bb
-                kPartySearchWindowCreated, // 0x100001bc
-                kMessage_0x100001ae, // 0x100001bd
-                kMessage_0x100001af, // 0x100001be
-                kMessage_0x100001b0, // 0x100001bf
-                kMessage_0x100001b1, // 0x100001c0
-                kMessage_0x100001b2, // 0x100001c1
-                kMessage_0x100001b3, // 0x100001c2
-                kMessage_0x100001b4, // 0x100001c3
-                kMessage_0x100001b5, // 0x100001c4
-                kInventoryAgentChanged, // 0x100001c5, Triggered when inventory needs updating due to agent change; no args
-                kInventoryRelated_1, // 0x100001c6
-                kInventoryRelated_2, // 0x100001c7
-                kMissionStatusRelated, // 0x100001c8
-                kUnused_1c2, // 0x100001c9
-                kCollapseExpandSkillListSection, // 0x100001ca
-                kPromptLoadTemplate, // 0x100001cb
-                kOpenTemplateManager, // 0x100001cc
-                kPromptSaveTemplate, // 0x100001cd
-                kOpenTemplate, // 0x100001ce, wparam = GW::UI::ChatTemplate*
-                kTemplateRelated_3, // 0x100001cf
-                kTemplateRelated_4, // 0x100001d0
+                kAttribBtnRelated, // 0x10000113, added to GW 2026-09-30
+                kMessage_0x10000113, // 0x10000114
+                kMessage_0x10000114, // 0x10000115
+                kCalledTargetChange, // 0x10000116, wparam = { player_number, target_id }
+                kMessage_0x10000116, // 0x10000117
+                kMessage_0x10000117, // 0x10000118
+                kMessage_0x10000118, // 0x10000119
+                kErrorMessage, // 0x1000011a, wparam = { int error_index, wchar_t* error_encoded_string }
+                kPartyHardModeChanged, // 0x1000011b, wparam = { int is_hard_mode }
+                kPartyAddHenchman, // 0x1000011c
+                kPartyRemoveHenchman, // 0x1000011d
+                kMessage_0x1000011d, // 0x1000011e
+                kPartyAddHero, // 0x1000011f
+                kPartyRemoveHero, // 0x10000120
+                kMessage_0x10000120, // 0x10000121
+                kMessage_0x10000121, // 0x10000122
+                kMessage_0x10000122, // 0x10000123
+                kMessage_0x10000123, // 0x10000124
+                kPartyAddPlayer, // 0x10000125
+                kMessage_0x10000125, // 0x10000126
+                kPartyRemovePlayer, // 0x10000127
+                kMessage_0x10000127, // 0x10000128
+                kMessage_0x10000128, // 0x10000129
+                kMessage_0x10000129, // 0x1000012a
+                kDisableEnterMissionBtn, // 0x1000012b, wparam = boolean (1 = disabled, 0 = enabled)
+                kMessage_0x1000012b, // 0x1000012c
+                kMessage_0x1000012c, // 0x1000012d
+                kShowCancelEnterMissionBtn, // 0x1000012e
+                kMessage_0x1000012e, // 0x1000012f
+                kPartyDefeated, // 0x10000130
+                kMessage_0x10000130, // 0x10000131
+                kMessage_0x10000131, // 0x10000132
+                kMessage_0x10000132, // 0x10000133
+                kPartySearchCreated, // 0x10000134, wparam = GW::PartySearch*
+                kPartySearchIdChanged, // 0x10000135, wparam = uint32_t* party_search_id
+                kPartySearchRemoved, // 0x10000136, wparam = uint32_t* party_search_id
+                kPartySearchUpdated, // 0x10000137, wparam = GW::PartySearch*
+                kPartySearchInviteReceived, // 0x10000138, wparam = UIPacket::kPartySearchInviteReceived*
+                kMessage_0x10000138, // 0x10000139
+                kPartySearchInviteSent, // 0x1000013a
+                kPartyShowConfirmDialog, // 0x1000013b, wparam = UIPacket::kPartyShowConfirmDialog
+                kMessage_0x1000013b, // 0x1000013c
+                kMessage_0x1000013c, // 0x1000013d
+                kMessage_0x1000013d, // 0x1000013e
+                kMessage_0x1000013e, // 0x1000013f
+                kMessage_0x1000013f, // 0x10000140
+                kPreferenceEnumChanged, // 0x10000141, wparam = UiPacket::kPreferenceEnumChanged
+                kPreferenceFlagChanged, // 0x10000142, wparam = UiPacket::kPreferenceFlagChanged
+                kPreferenceValueChanged, // 0x10000143, wparam = UiPacket::kPreferenceValueChanged
+                kUIPositionChanged, // 0x10000144, wparam = UIPacket::kUIPositionChanged
+                kPreBuildLoginScene, // 0x10000145, Called with no args right before login scene is drawn
+                kMessage_0x10000145, // 0x10000146
+                kMessage_0x10000146, // 0x10000147
+                kProximityInteractionRelated_1, // 0x10000148, added to GW 2026-09-30
+                kMessage_0x10000147, // 0x10000149
+                kMessage_0x10000148, // 0x1000014a
+                kMessage_0x10000149, // 0x1000014b
+                kMessage_0x1000014a, // 0x1000014c
+                kMessage_0x1000014b, // 0x1000014d
+                kMessage_0x1000014c, // 0x1000014e
+                kMessage_0x1000014d, // 0x1000014f
+                kQuestAdded, // 0x10000150, wparam = { quest_id, ... }
+                kQuestDetailsChanged, // 0x10000151, wparam = { quest_id, ... }
+                kQuestRemoved, // 0x10000152, wparam = { quest_id, ... }
+                kClientActiveQuestChanged, // 0x10000153, wparam = { quest_id, ... }. Triggered when the game requests the current quest to change
+                kMessage_0x10000152, // 0x10000154
+                kServerActiveQuestChanged, // 0x10000155, wparam = UIPacket::kServerActiveQuestChanged*. Triggered when the server requests the current quest to change
+                kUnknownQuestRelated, // 0x10000156
+                kMessage_0x10000155, // 0x10000157
+                kDungeonComplete, // 0x10000158
+                kMissionComplete, // 0x10000159
+                kMessage_0x10000158, // 0x1000015a
+                kVanquishComplete, // 0x1000015b
+                kObjectiveAdd, // 0x1000015c, wparam = UIPacket::kObjectiveAdd*
+                kObjectiveComplete, // 0x1000015d, wparam = UIPacket::kObjectiveComplete*
+                kObjectiveUpdated, // 0x1000015e, wparam = UIPacket::kObjectiveUpdated*
+                kMessage_0x1000015d, // 0x1000015f
+                kMessage_0x1000015e, // 0x10000160
+                kMessage_0x1000015f, // 0x10000161
+                kMessage_0x10000160, // 0x10000162
+                kMessage_0x10000161, // 0x10000163
+                kMessage_0x10000162, // 0x10000164
+                kMessage_0x10000163, // 0x10000165
+                kMessage_0x10000164, // 0x10000166
+                kTradeSessionStart, // 0x10000167, wparam = { trade_state, player_number }
+                kMessage_0x10000166, // 0x10000168
+                kMessage_0x10000167, // 0x10000169
+                kMessage_0x10000168, // 0x1000016a
+                kMessage_0x10000169, // 0x1000016b
+                kMessage_0x1000016a, // 0x1000016c
+                kTradeSessionUpdated, // 0x1000016d, no args
+                kMessage_0x1000016c, // 0x1000016e
+                kMessage_0x1000016d, // 0x1000016f
+                kMessage_0x1000016e, // 0x10000170
+                kMessage_0x1000016e_1, // 0x10000171, added to GW 2026-04-28
+                kMessage_0x1000016f, // 0x10000172
+                kMessage_0x10000170, // 0x10000173
+                kMessage_0x10000171, // 0x10000174
+                kMessage_0x10000172, // 0x10000175
+                kMessage_0x10000173, // 0x10000176
+                kMessage_0x10000174, // 0x10000177
+                kCheckUIState, // 0x10000178
+                kMessage_0x10000176, // 0x10000179
+                kMessage_0x10000177, // 0x1000017a
+                kMessage_0x10000178, // 0x1000017b
+                kMessage_0x10000178_1, // 0x1000017c, added to GW 2026-02-26
+                kMessage_0x10000178_2, // 0x1000017d, added to GW 2026-02-26
+                kMessage_0x10000178_3, // 0x1000017e, added to GW 2026-02-26
+                kDestroyUIPositionOverlay, // 0x1000017f
+                kEnableUIPositionOverlay, // 0x10000180, wparam = uint32_t enable
+                kProximityInteractionRelated_2, // 0x10000181, added to GW 2026-09-30, no args
+                kMessage_0x1000017b, // 0x10000182
+                kGuildHall, // 0x10000183, wparam = gh key (uint32_t[4])
+                kMessage_0x1000017d, // 0x10000184
+                kLeaveGuildHall, // 0x10000185
+                kTravel, // 0x10000186
+                kOpenWikiUrl, // 0x10000187, wparam = char* url
+                kMessage_0x10000181, // 0x10000188
+                kOpenUrlNoPrompt, // 0x10000189, wparam = char* url
+                kSetPreGameContext_Value0, // 0x1000018a, wparam = uint32_t value
+                kMessage_0x10000184, // 0x1000018b
+                kGetPreGameContext_Value0, // 0x1000018c, lparam = *uint32_t value_out
+                kSetPreGameContext_Value1, // 0x1000018d, wparam = uint32_t value     , added to GW 2026-02-06
+                kGetPreGameContext_Value1, // 0x1000018e, lparam = *uint32_t value_out, added to GW 2026-02-06
+                kMessage_0x10000186, // 0x1000018f
+                kMessage_0x10000187, // 0x10000190
+                kMessage_0x10000188, // 0x10000191
+                kMessage_0x10000189, // 0x10000192
+                kMessage_0x1000018a, // 0x10000193
+                kMessage_0x1000018b, // 0x10000194
+                kMessage_0x1000018c, // 0x10000195
+                kMessage_0x1000018d, // 0x10000196
+                kMessage_0x1000018d_2, // 0x10000197, added to GW 2026-06-17
+                kAppendMessageToChat, // 0x10000198, wparam = wchar_t* message
+                kMessage_0x1000018f, // 0x10000199
+                kMessage_0x10000190, // 0x1000019a
+                kMessage_0x10000191, // 0x1000019b
+                kMessage_0x10000192, // 0x1000019c
+                kMessage_0x10000193, // 0x1000019d
+                kMessage_0x10000194, // 0x1000019e
+                kMessage_0x10000195, // 0x1000019f
+                kMessage_0x10000196, // 0x100001a0
+                kMessage_0x10000197, // 0x100001a1
+                kMessage_0x10000198, // 0x100001a2
+                kMessage_0x10000199, // 0x100001a3
+                kMessage_0x1000019a, // 0x100001a4
+                kMessage_0x1000019b, // 0x100001a5
+                kHideHeroPanel, // 0x100001a6, wparam = hero_id
+                kShowHeroPanel, // 0x100001a7, wparam = hero_id
+                kMessage_0x1000019e, // 0x100001a8
+                kMessage_0x1000019f, // 0x100001a9
+                kQuerySuppressedKeyAction, // 0x100001aa, wparam = 0, lparam = bool*. Used to check if the suppress action is pressed (usually shift)
+                kGetInventoryAgentId, // 0x100001ab, wparam = 0, lparam = uint32_t* agent_id_out. Used to fetch which agent is selected
+                kInventoryRelated1, // 0x100001ac, added to GW 2026-02-26
+                kInventoryRelated2, // 0x100001ad, added to GW 2026-02-26
+                kInventoryRelated3, // 0x100001ae, added to GW 2026-02-26
+                kInventoryRelated4, // 0x100001af, added to GW 2026-04-28
+                kInventoryRelated4_1, // 0x100001b0, added to GW 2026-08-07
+                kEquipItem, // 0x100001b1, wparam = { item_id, agent_id }
+                kMoveItem, // 0x100001b2, wparam = { item_id, to_bag, to_slot, bool prompt }
+                kItemRelated_1, // 0x100001b3
+                kItemTooltip, // 0x100001b4
+                kItemRelated_3, // 0x100001b5, added to GW 2026-02-26
+                kItemRelated_4, // 0x100001b6, added to GW 2026-02-26
+                kItemRelated_5, // 0x100001b7, added to GW 2026-04-28
+                kInitiateTrade, // 0x100001b8
+                kMessage_0x100001a7, // 0x100001b9
+                kMessage_0x100001a8, // 0x100001ba
+                kMessage_0x100001a9, // 0x100001bb
+                kMessage_0x100001aa, // 0x100001bc
+                kPartySearchWindowDestroyed, // 0x100001bd
+                kMessage_0x100001ac, // 0x100001be
+                kPartySearchWindowCreated, // 0x100001bf
+                kMessage_0x100001ae, // 0x100001c0
+                kMessage_0x100001af, // 0x100001c1
+                kMessage_0x100001b0, // 0x100001c2
+                kMessage_0x100001b1, // 0x100001c3
+                kMessage_0x100001b2, // 0x100001c4
+                kMessage_0x100001b3, // 0x100001c5
+                kMessage_0x100001b4, // 0x100001c6
+                kMessage_0x100001b5, // 0x100001c7
+                kInventoryAgentChanged, // 0x100001c8, Triggered when inventory needs updating due to agent change; no args
+                kInventoryRelated_1, // 0x100001c9
+                kInventoryRelated_2, // 0x100001ca
+                kMissionStatusRelated, // 0x100001cb
+                kUnused_1c2, // 0x100001cc
+                kCollapseExpandSkillListSection, // 0x100001cd
+                kPromptLoadTemplate, // 0x100001ce
+                kOpenTemplateManager, // 0x100001cf
+                kPromptSaveTemplate, // 0x100001d0
+                kOpenTemplate, // 0x100001d1, wparam = GW::UI::ChatTemplate*
+                kTemplateRelated_3, // 0x100001d2
+                kTemplateRelated_4, // 0x100001d3
                 kSendLoadSkillTemplate = 0x30000000 | 0x3, // 0x30000003, wparam = SkillbarMgr::SkillTemplate*
                 kSendPingWeaponSet = 0x30000000 | 0x4, // 0x30000004, wparam = UIPacket::kSendPingWeaponSet*
                 kSendMoveItem = 0x30000000 | 0x5, // 0x30000005, wparam = UIPacket::kSendMoveItem*
@@ -15864,7 +15870,7 @@ namespace Daybreak.API.Interop.GuildWars
         kDialogueMessageUpdated,
         kLogout,
         kCompassDraw,
-        kMessage_0x1000009f,
+        kCompassPing,
         kMessage_0x100000a0,
         kMessage_0x100000a1,
         kOnScreenMessage,
@@ -15980,6 +15986,7 @@ namespace Daybreak.API.Interop.GuildWars
         kMessage_0x10000110,
         kMapChange,
         kMessage_0x10000112,
+        kAttribBtnRelated,
         kMessage_0x10000113,
         kMessage_0x10000114,
         kCalledTargetChange,
@@ -16032,6 +16039,7 @@ namespace Daybreak.API.Interop.GuildWars
         kPreBuildLoginScene,
         kMessage_0x10000145,
         kMessage_0x10000146,
+        kProximityInteractionRelated_1,
         kMessage_0x10000147,
         kMessage_0x10000148,
         kMessage_0x10000149,
@@ -16088,6 +16096,7 @@ namespace Daybreak.API.Interop.GuildWars
         kMessage_0x10000178_3,
         kDestroyUIPositionOverlay,
         kEnableUIPositionOverlay,
+        kProximityInteractionRelated_2,
         kMessage_0x1000017b,
         kGuildHall,
         kMessage_0x1000017d,
@@ -16636,15 +16645,15 @@ namespace Daybreak.API.Interop.GuildWars
     public unsafe struct AgentLiving
     {
         [global::System.Runtime.InteropServices.FieldOffset(0x00C4)]
-        public uint Owner;
+        public uint Owner; // AgentItem only; TList offset field for Livings (see above).
         [global::System.Runtime.InteropServices.FieldOffset(0x00C8)]
-        public uint H00C8;
-        [global::System.Runtime.InteropServices.FieldOffset(0x00CC)]
-        public uint H00CC;
+        public global::Daybreak.API.Interop.GuildWars.TLink ActionQueue; // Internal; next_node low bit set = empty.
         [global::System.Runtime.InteropServices.FieldOffset(0x00D0)]
-        public uint H00D0;
+        public uint H00D0; // Internal; TList offset field for action_queue_recycle.
         [global::System.Runtime.InteropServices.FieldOffset(0x00D4)]
-        public fixed uint H00D4[3];
+        public global::Daybreak.API.Interop.GuildWars.TLink ActionQueueRecycle; // Internal; see above.
+        [global::System.Runtime.InteropServices.FieldOffset(0x00DC)]
+        public uint H00DC; // Unidentified.
         [global::System.Runtime.InteropServices.FieldOffset(0x00E0)]
         public float AnimationType;
         [global::System.Runtime.InteropServices.FieldOffset(0x00E4)]
@@ -16714,9 +16723,9 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0154)]
         public uint H0154;
         [global::System.Runtime.InteropServices.FieldOffset(0x0158)]
-        public uint ModelState; // Different values for different states of the model.
+        public uint ModelState; // Different values for different states of the model. Bit 0x400 (internal): action_queue_recycle above has pending nodes.
         [global::System.Runtime.InteropServices.FieldOffset(0x015C)]
-        public uint TypeMap; // Odd variable! 0x08 = dead, 0xC00 = boss, 0x40000 = spirit, 0x400000 = player
+        public uint TypeMap; // Odd variable! 0x08 = dead, 0xC00 = boss, 0x40000 = spirit, 0x400000 = player. Bit 0x10000 (internal): action_queue above is being torn down.
         [global::System.Runtime.InteropServices.FieldOffset(0x0160)]
         public fixed uint H0160[4];
         [global::System.Runtime.InteropServices.FieldOffset(0x0170)]
@@ -16744,7 +16753,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x01B8)]
         public ushort Skill; // 0 = not using a skill. Anything else is the Id of that skill
         [global::System.Runtime.InteropServices.FieldOffset(0x01BA)]
-        public ushort H01BA;
+        public ushort H01BA; // Low byte (internal): per-agent index/tint used when formatting skill activated/stopped/interrupted floating text.
         [global::System.Runtime.InteropServices.FieldOffset(0x01BC)]
         public byte WeaponItemType;
         [global::System.Runtime.InteropServices.FieldOffset(0x01BD)]
@@ -17053,7 +17062,7 @@ namespace Daybreak.API.Interop.GuildWars
         public byte Scale; // percent
     }
 
-    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x440)]
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x444)]
     public unsafe struct CharContext
     {
         [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
@@ -17095,34 +17104,36 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x01BC)]
         public fixed uint H01BC[27];
         [global::System.Runtime.InteropServices.FieldOffset(0x0228)]
-        public uint DistrictNumber;
+        public uint H0228;
         [global::System.Runtime.InteropServices.FieldOffset(0x022C)]
-        public global::Daybreak.API.Interop.GWCA.GW.Constants.Language Language;
+        public uint DistrictNumber;
         [global::System.Runtime.InteropServices.FieldOffset(0x0230)]
-        public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID ObserveMapId;
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.Language Language;
         [global::System.Runtime.InteropServices.FieldOffset(0x0234)]
-        public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID CurrentMapId;
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID ObserveMapId;
         [global::System.Runtime.InteropServices.FieldOffset(0x0238)]
-        public global::Daybreak.API.Interop.GWCA.GW.Constants.InstanceType ObserveMapType;
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.MapID CurrentMapId;
         [global::System.Runtime.InteropServices.FieldOffset(0x023C)]
-        public global::Daybreak.API.Interop.GWCA.GW.Constants.InstanceType CurrentMapType;
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.InstanceType ObserveMapType;
         [global::System.Runtime.InteropServices.FieldOffset(0x0240)]
-        public fixed uint H0240[5];
-        [global::System.Runtime.InteropServices.FieldOffset(0x0254)]
+        public global::Daybreak.API.Interop.GWCA.GW.Constants.InstanceType CurrentMapType;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0244)]
+        public fixed uint H0244[5];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0258)]
         public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> ObserverMatches;
-        [global::System.Runtime.InteropServices.FieldOffset(0x0264)]
-        public fixed uint H0264[17];
-        [global::System.Runtime.InteropServices.FieldOffset(0x02A8)]
-        public uint PlayerFlags; // bitwise something
+        [global::System.Runtime.InteropServices.FieldOffset(0x0268)]
+        public fixed uint H0268[17];
         [global::System.Runtime.InteropServices.FieldOffset(0x02AC)]
-        public uint PlayerNumber;
+        public uint PlayerFlags; // bitwise something
         [global::System.Runtime.InteropServices.FieldOffset(0x02B0)]
-        public fixed uint H02B0[40];
-        [global::System.Runtime.InteropServices.FieldOffset(0x0350)]
-        public global::Daybreak.API.Interop.GuildWars.ProgressBarContext* ProgressBar; // seems to never be nullptr
+        public uint PlayerNumber;
+        [global::System.Runtime.InteropServices.FieldOffset(0x02B4)]
+        public fixed uint H02B4[40];
         [global::System.Runtime.InteropServices.FieldOffset(0x0354)]
-        public fixed uint H0354[27];
-        [global::System.Runtime.InteropServices.FieldOffset(0x03C0)]
+        public global::Daybreak.API.Interop.GuildWars.ProgressBarContext* ProgressBar; // seems to never be nullptr
+        [global::System.Runtime.InteropServices.FieldOffset(0x0358)]
+        public fixed uint H0358[27];
+        [global::System.Runtime.InteropServices.FieldOffset(0x03C4)]
         public fixed char PlayerEmail[64];
     }
 
@@ -17820,7 +17831,7 @@ namespace Daybreak.API.Interop.GuildWars
         public uint Interaction;
     }
 
-    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x14)]
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x18)]
     public unsafe struct ItemFormula
     {
         public uint H0000;
@@ -17828,6 +17839,7 @@ namespace Daybreak.API.Interop.GuildWars
         public uint SkillPointCost;
         public uint MaterialCostCount;
         public global::Daybreak.API.Interop.GuildWars.MaterialCost* MaterialCostBuffer; // NB: The game stores a cached array of material amounts that the player has in inventory; we don't care about it though!
+        public uint H0014; // added to GW 2026-09-30
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
@@ -19749,6 +19761,14 @@ namespace Daybreak.API.Interop.GuildWars
         public uint SessionId;
         public uint NumberOfPoints;
         public global::Daybreak.API.Interop.GuildWars.CompassPoint* Points;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct kCompassPing
+    {
+        public global::Daybreak.API.Interop.GuildWars.CompassPoint Point;
+        public uint Color;
+        public byte Muted;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
