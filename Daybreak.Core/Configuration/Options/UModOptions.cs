@@ -13,10 +13,12 @@ public sealed class UModOptions
     public bool Enabled { get; set; }
 
     [JsonPropertyName(nameof(AutoEnableMods))]
+    [ModSetting]
     [OptionName(Name = "Auto-Enable Mods", Description = "If true, mods loaded into Daybreak will be enabled by default")]
     public bool AutoEnableMods { get; set; } = true;
 
     [JsonPropertyName(nameof(Mods))]
+    [ModSetting]
     [OptionIgnore]
     [OptionSynchronizationIgnore]
     public List<UModEntry> Mods { get; set; } = [];

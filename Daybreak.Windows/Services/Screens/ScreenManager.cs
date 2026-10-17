@@ -97,16 +97,24 @@ internal sealed class ScreenManager(
     }
 
     public bool MoveGuildwarsToScreen(Screen screen)
+        => this.MoveGuildwarsToWindow(screen, GetMainWindowHandle());
+
+    public bool MoveGuildwarsToScreen(Screen screen, uint processId)
+    {
+        using var process = Process.GetProcessById(checked((int)processId));
+        return this.MoveGuildwarsToWindow(screen, process.MainWindowHandle);
+    }
+
+    private bool MoveGuildwarsToWindow(Screen screen, IntPtr? hwnd)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         scopedLogger.LogDebug("Attempting to move guildwars to screen {screenId}", screen.Id);
-        var hwnd = GetMainWindowHandle();
-        if (!hwnd.HasValue)
+        if (!hwnd.HasValue || hwnd.Value == IntPtr.Zero)
         {
             return false;
         }
 
-        NativeMethods.SetWindowPos(
+        return NativeMethods.SetWindowPos(
             hwnd.Value,
             NativeMethods.HWND_TOP,
             screen.Size.Left,
@@ -115,7 +123,6 @@ internal sealed class ScreenManager(
             screen.Size.Height,
             NativeMethods.SWP_SHOWWINDOW
         );
-        return true;
     }
 
     public Rectangle GetSavedPosition()

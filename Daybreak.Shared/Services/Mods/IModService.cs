@@ -1,4 +1,5 @@
 ﻿using Daybreak.Shared.Models.Async;
+using Daybreak.Shared.Models.LaunchConfigurations;
 using Daybreak.Shared.Models.Mods;
 
 namespace Daybreak.Shared.Services.Mods;
@@ -69,6 +70,9 @@ public interface IModService
     /// <returns></returns>
     IEnumerable<string> GetCustomArguments();
 
+    IEnumerable<string> GetCustomArguments(LaunchConfigurationWithCredentials? configuration) =>
+        this.GetCustomArguments();
+
     /// <summary>
     /// Called before starting the guild wars process.
     /// Do mod preparation here.
@@ -110,6 +114,9 @@ public interface IModService
     /// This method is only called if <see cref="CanCustomManage"/> is true.
     /// </remarks>
     Task OnCustomManagement(CancellationToken cancellationToken);
+
+    Task OnCustomManagement(LaunchConfigurationWithCredentials? configuration, CancellationToken cancellationToken) =>
+        this.OnCustomManagement(cancellationToken);
 
     /// <summary>
     /// Determines asynchronously whether the mod can be updated.
