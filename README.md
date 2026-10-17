@@ -73,6 +73,19 @@ graph TB
 | **Daybreak.API**       | NativeAOT x86 library injected into Guild Wars, exposes game data via WebSocket/REST           |
 | **Daybreak.Installer** | Standalone installer/updater executable                                                        |
 
+### Mod loadout settings
+
+Launch configurations store each mod's enabled state and optional runtime
+overrides. [ModSettingsProvider][mod-settings-provider] resolves those overrides
+against current global options and returns detached settings, so editing one
+loadout cannot change another. Only properties marked with
+[ModSettingAttribute][mod-setting-attribute] can be overridden; installation and
+update state stay global. Mod callbacks receive the launch configuration
+explicitly, including argument generation and custom management.
+
+[mod-settings-provider]: Daybreak.Core/Services/Mods/ModSettingsProvider.cs
+[mod-setting-attribute]: Daybreak.Shared/Attributes/ModSettingAttribute.cs
+
 ______________________________________________________________________
 
 ## Build Requirements

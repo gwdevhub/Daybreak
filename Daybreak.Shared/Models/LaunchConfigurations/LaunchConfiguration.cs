@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Daybreak.Shared.Models.Mods;
 
 namespace Daybreak.Shared.Models.LaunchConfigurations;
 
@@ -22,8 +23,21 @@ public sealed class LaunchConfiguration
     [JsonPropertyName(nameof(SteamSupport))]
     public bool? SteamSupport { get; set; } = true;
 
-    [JsonPropertyName(nameof(EnabledMods))]
-    public List<string>? EnabledMods { get; set; }
+    public Dictionary<string, ModLoadoutEntry> ModLoadout { get; set; } = [];
+
+    // Read legacy loadouts without writing the old representation back to disk.
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<string>? EnabledMods
+    {
+        get => null;
+        set
+        {
+            foreach (var name in value ?? [])
+            {
+                this.ModLoadout.TryAdd(name, new ModLoadoutEntry { IsEnabled = true });
+            }
+        }
+    }
 
     [JsonPropertyName(nameof(CustomModLoadoutEnabled))]
     public bool? CustomModLoadoutEnabled { get; set; }

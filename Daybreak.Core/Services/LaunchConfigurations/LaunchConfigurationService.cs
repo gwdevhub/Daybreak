@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models.LaunchConfigurations;
+using Daybreak.Shared.Models.Mods;
 using Daybreak.Shared.Services.Credentials;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.LaunchConfigurations;
@@ -106,7 +107,7 @@ internal sealed class LaunchConfigurationService(
             config.Executable = launchConfigurationWithCredentials.ExecutablePath;
             config.Arguments = launchConfigurationWithCredentials.Arguments;
             config.SteamSupport = launchConfigurationWithCredentials.SteamSupport;
-            config.EnabledMods = launchConfigurationWithCredentials.EnabledMods;
+            config.ModLoadout = CopyModLoadout(launchConfigurationWithCredentials.ModLoadout);
             config.CustomModLoadoutEnabled = launchConfigurationWithCredentials.CustomModLoadoutEnabled;
             config.Color = launchConfigurationWithCredentials.Color;
             var options = this.liveUpdateableOptions.CurrentValue;
@@ -123,7 +124,7 @@ internal sealed class LaunchConfigurationService(
             Identifier = launchConfigurationWithCredentials.Identifier,
             Arguments = launchConfigurationWithCredentials.Arguments,
             SteamSupport = launchConfigurationWithCredentials.SteamSupport,
-            EnabledMods = launchConfigurationWithCredentials.EnabledMods,
+            ModLoadout = CopyModLoadout(launchConfigurationWithCredentials.ModLoadout),
             CustomModLoadoutEnabled = launchConfigurationWithCredentials.CustomModLoadoutEnabled,
             Color = launchConfigurationWithCredentials.Color
         });
@@ -154,7 +155,7 @@ internal sealed class LaunchConfigurationService(
             Arguments = launchConfiguration.Arguments,
             Name = launchConfiguration.Name,
             SteamSupport = launchConfiguration.SteamSupport ?? true,
-            EnabledMods = launchConfiguration.EnabledMods,
+            ModLoadout = CopyModLoadout(launchConfiguration.ModLoadout),
             CustomModLoadoutEnabled = launchConfiguration.CustomModLoadoutEnabled ?? false,
             Color = launchConfiguration.Color
         };
@@ -175,9 +176,16 @@ internal sealed class LaunchConfigurationService(
             Arguments = launchConfigurationWithCredentials.Arguments,
             Name = launchConfigurationWithCredentials.Name,
             SteamSupport = launchConfigurationWithCredentials.SteamSupport,
-            EnabledMods = launchConfigurationWithCredentials.EnabledMods,
+            ModLoadout = CopyModLoadout(launchConfigurationWithCredentials.ModLoadout),
             CustomModLoadoutEnabled = launchConfigurationWithCredentials.CustomModLoadoutEnabled,
             Color = launchConfigurationWithCredentials.Color
         };
     }
+
+    private static Dictionary<string, ModLoadoutEntry> CopyModLoadout(Dictionary<string, ModLoadoutEntry> loadout) =>
+        loadout.ToDictionary(pair => pair.Key, pair => new ModLoadoutEntry
+        {
+            IsEnabled = pair.Value.IsEnabled,
+            Settings = pair.Value.Settings.ToDictionary(setting => setting.Key, setting => setting.Value.Clone()),
+        });
 }

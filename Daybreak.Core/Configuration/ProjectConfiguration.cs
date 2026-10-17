@@ -167,6 +167,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IInternetCheckingService, InternetCheckingService>();
         services.AddSingleton<INotificationStorage, InMemoryNotificationStorage>();
         services.AddSingleton<IModsManager, ModsManager>();
+        services.AddScoped<IModSettingsProvider, ModSettingsProvider>();
         services.AddSingleton<IPluginsService, PluginsService>();
         services.AddSingleton<IAttachedApiAccessor, AttachedApiAccessor>();
         services.AddSingleton<PrivilegeContext>();

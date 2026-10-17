@@ -22,6 +22,9 @@
 @page "/mods/screen-selector"
 @using Daybreak.Shared.Models
 @code{
+    [Parameter]
+    public string? LaunchConfigurationIdentifier { get; set; }
+
     public string GetScreenStyle(Screen screen)
     {
         // Calculate the bounding box of all screens

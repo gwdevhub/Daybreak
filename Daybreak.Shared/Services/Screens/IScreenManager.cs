@@ -9,6 +9,7 @@ public interface IScreenManager
     void SaveWindowPositionAndSize();
     void MoveWindowToSavedPosition();
     bool MoveGuildwarsToScreen(Screen screen);
+    bool MoveGuildwarsToScreen(Screen screen, uint processId) => this.MoveGuildwarsToScreen(screen);
     void ResetSavedPosition();
     Rectangle GetSavedPosition();
 }

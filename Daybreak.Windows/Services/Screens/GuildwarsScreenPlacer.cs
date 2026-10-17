@@ -1,8 +1,10 @@
 using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Async;
+using Daybreak.Shared.Models.LaunchConfigurations;
 using Daybreak.Shared.Models.Mods;
 using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.Mods;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Screens;
 using Daybreak.Views.Mods;
@@ -16,6 +18,7 @@ namespace Daybreak.Windows.Services.Screens;
 
 internal sealed class GuildwarsScreenPlacer(
     IOptionsProvider optionsProvider,
+    IModSettingsProvider modSettingsProvider,
     IViewManager viewManager,
     INotificationService notificationService,
     IOptionsMonitor<GuildWarsScreenPlacerOptions> liveOptions,
@@ -68,8 +71,12 @@ internal sealed class GuildwarsScreenPlacer(
     }
 
     public Task OnCustomManagement(CancellationToken cancellationToken)
+        => this.OnCustomManagement(null, cancellationToken);
+
+    public Task OnCustomManagement(LaunchConfigurationWithCredentials? configuration, CancellationToken cancellationToken)
     {
-        this.viewManager.ShowView<ScreenSelectorView>();
+        this.viewManager.ShowView<ScreenSelectorView>(
+            (nameof(ScreenSelectorView.LaunchConfigurationIdentifier), configuration?.Identifier ?? string.Empty));
         return Task.CompletedTask;
     }
 
@@ -80,30 +87,31 @@ internal sealed class GuildwarsScreenPlacer(
     public async Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        var screen = this.screenManager.Screens.Skip(this.liveOptions.CurrentValue.DesiredScreen).FirstOrDefault();
-        if (screen.Id != this.liveOptions.CurrentValue.DesiredScreen)
+        var options = modSettingsProvider.Get(this.Name, this.liveOptions.CurrentValue, guildWarsStartedContext.ApplicationLauncherContext.LaunchConfiguration);
+        var screen = this.screenManager.Screens.Cast<Screen?>().FirstOrDefault(s => s?.Id == options.DesiredScreen);
+        if (screen is null)
         {
             this.notificationService.NotifyError(
                 title: "Failed to move Guild Wars window",
-                description: $"Failed to move Guild Wars to desired screen {this.liveOptions.CurrentValue.DesiredScreen}. Screen id is invalid");
-            scopedLogger.LogError("Failed to move guild wars to desired screen {screenId}. Screen id is invalid", this.liveOptions.CurrentValue.DesiredScreen);
+                description: $"Failed to move Guild Wars to desired screen {options.DesiredScreen}. Screen id is invalid");
+            scopedLogger.LogError("Failed to move guild wars to desired screen {screenId}. Screen id is invalid", options.DesiredScreen);
             return;
         }
 
         await Task.Delay(Delay, cancellationToken);
-        if (!this.screenManager.MoveGuildwarsToScreen(screen))
+        if (!this.screenManager.MoveGuildwarsToScreen(screen.Value, guildWarsStartedContext.ApplicationLauncherContext.ProcessId))
         {
             this.notificationService.NotifyError(
                 title: "Failed to move Guild Wars window",
-                description: $"Failed to move Guild Wars to desired screen {this.liveOptions.CurrentValue.DesiredScreen}. Failed to move window");
-            scopedLogger.LogError("Failed to move guild wars to desired screen {screenId}. Failed to move window", this.liveOptions.CurrentValue.DesiredScreen);
+                description: $"Failed to move Guild Wars to desired screen {options.DesiredScreen}. Failed to move window");
+            scopedLogger.LogError("Failed to move guild wars to desired screen {screenId}. Failed to move window", options.DesiredScreen);
         }
         else
         {
             this.notificationService.NotifyInformation(
                 title: "Moved Guild Wars window",
-                description: $"Moved Guild Wars to desired screen {this.liveOptions.CurrentValue.DesiredScreen}");
-            scopedLogger.LogInformation("Moved guild wars to desired screen {screenId}", this.liveOptions.CurrentValue.DesiredScreen);
+                description: $"Moved Guild Wars to desired screen {options.DesiredScreen}");
+            scopedLogger.LogInformation("Moved guild wars to desired screen {screenId}", options.DesiredScreen);
         }
 
         return;
@@ -122,15 +130,20 @@ internal sealed class GuildwarsScreenPlacer(
         return this.screenManager.Screens;
     }
 
-    public void SetDesiredScreen(Screen screen)
+    public void SetDesiredScreen(Screen screen) => this.SetDesiredScreen(screen, null);
+
+    public void SetDesiredScreen(Screen screen, LaunchConfigurationWithCredentials? configuration)
     {
-        var options = this.liveOptions.CurrentValue;
+        var options = modSettingsProvider.Get(this.Name, this.liveOptions.CurrentValue, configuration);
         options.DesiredScreen = screen.Id;
-        this.optionsProvider.SaveOption(options);
+        modSettingsProvider.Save(this.Name, options, configuration);
     }
 
-    public Screen? GetDesiredScreen()
+    public Screen? GetDesiredScreen() => this.GetDesiredScreen(null);
+
+    public Screen? GetDesiredScreen(LaunchConfigurationWithCredentials? configuration)
     {
-        return this.screenManager.Screens.Skip(this.liveOptions.CurrentValue.DesiredScreen).FirstOrDefault();
+        var options = modSettingsProvider.Get(this.Name, this.liveOptions.CurrentValue, configuration);
+        return this.screenManager.Screens.Cast<Screen?>().FirstOrDefault(screen => screen?.Id == options.DesiredScreen);
     }
 }
