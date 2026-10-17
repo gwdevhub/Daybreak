@@ -1,6 +1,7 @@
 ﻿using System.Extensions.Core;
 using Daybreak.Models;
 using Daybreak.Shared.Models.LaunchConfigurations;
+using Daybreak.Shared.Models.Mods;
 using Daybreak.Shared.Services.LaunchConfigurations;
 using Daybreak.Shared.Services.Mods;
 using Daybreak.Shared.Services.Notifications;
@@ -53,7 +54,7 @@ public sealed class ModsViewModel(
             foreach (var mod in globalMods)
             {
                 // Mods that cannot be disabled are always enabled
-                mod.IsEnabled = !mod.CanDisable || config.EnabledMods?.Any(m => m == mod.Name) is true;
+                mod.IsEnabled = !mod.CanDisable || (config.ModLoadout.TryGetValue(mod.Name, out var entry) && entry.IsEnabled);
             }
         }
         else
@@ -80,20 +81,19 @@ public sealed class ModsViewModel(
         mod.IsEnabled = !mod.IsEnabled;
         if (this.LaunchConfiguration is not null)
         {
-            if (mod.IsEnabled)
+            if (!this.LaunchConfiguration.ModLoadout.TryGetValue(mod.Name, out var entry))
             {
-                this.LaunchConfiguration.EnabledMods ??= [];
-                if (!this.LaunchConfiguration.EnabledMods.Any(m => m == mod.Name))
-                {
-                    this.LaunchConfiguration.EnabledMods.Add(mod.Name);
-                }
-            }
-            else
-            {
-                this.LaunchConfiguration.EnabledMods?.Remove(mod.Name);
+                entry = new ModLoadoutEntry();
+                this.LaunchConfiguration.ModLoadout.Add(mod.Name, entry);
             }
 
-            this.launchConfigurationService.SaveConfiguration(this.LaunchConfiguration);
+            entry.IsEnabled = mod.IsEnabled;
+            if (!this.launchConfigurationService.SaveConfiguration(this.LaunchConfiguration))
+            {
+                mod.IsEnabled = !mod.IsEnabled;
+                entry.IsEnabled = mod.IsEnabled;
+                this.notificationService.NotifyError("Failed to save mod loadout", "The launch configuration could not be saved.");
+            }
         }
         else
         {
@@ -115,7 +115,29 @@ public sealed class ModsViewModel(
             return;
         }
 
-        await mod.ModService.OnCustomManagement(CancellationToken.None);
+        await mod.ModService.OnCustomManagement(this.LaunchConfiguration, CancellationToken.None);
+    }
+
+    public bool HasCustomSettings(ModListEntry mod) =>
+        this.LaunchConfiguration?.ModLoadout.TryGetValue(mod.Name, out var entry) is true && entry.Settings.Count > 0;
+
+    public void ResetSettings(ModListEntry mod)
+    {
+        if (this.LaunchConfiguration is not { } configuration ||
+            !configuration.ModLoadout.TryGetValue(mod.Name, out var entry))
+        {
+            return;
+        }
+
+        var previous = entry.Settings;
+        entry.Settings = [];
+        if (!this.launchConfigurationService.SaveConfiguration(configuration))
+        {
+            entry.Settings = previous;
+            this.notificationService.NotifyError("Failed to reset mod settings", "The launch configuration could not be saved.");
+        }
+
+        this.RefreshView();
     }
 
     public async Task UpdateMod(ModListEntry mod)

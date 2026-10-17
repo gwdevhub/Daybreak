@@ -55,3 +55,7 @@
 
 @page "/mods/umod"
 @inherits ViewBase<UModManagementView, UModManagementViewModel>
+@code {
+    [Parameter]
+    public string? LaunchConfigurationIdentifier { get; set; }
+}

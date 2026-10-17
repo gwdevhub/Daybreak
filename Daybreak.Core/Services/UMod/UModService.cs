@@ -2,12 +2,15 @@
 using Daybreak.Services.Toolbox.Models;
 using Daybreak.Utils;
 using Daybreak.Shared.Models.Async;
+using Daybreak.Shared.Models.LaunchConfigurations;
 using Daybreak.Shared.Models.Mods;
 using Daybreak.Shared.Models.UMod;
 using Daybreak.Shared.Services.Downloads;
 using Daybreak.Shared.Services.Github;
 using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.Mods;
+using Daybreak.Shared.Services.LaunchConfigurations;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.UMod;
 using Daybreak.Shared.Utils;
@@ -19,6 +22,7 @@ using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
+using System.Text.Json;
 using TrailBlazr.Services;
 using Daybreak.Shared;
 
@@ -27,6 +31,8 @@ namespace Daybreak.Services.UMod;
 internal sealed class UModService(
     PhotinoWindow photinoWindow,
     IOptionsProvider optionsProvider,
+    IModSettingsProvider modSettingsProvider,
+    ILaunchConfigurationService launchConfigurationService,
     IViewManager viewManager,
     IProcessInjector processInjector,
     IModPathResolver modPathResolver,
@@ -133,8 +139,12 @@ internal sealed class UModService(
     }
 
     public Task OnCustomManagement(CancellationToken cancellationToken)
+        => this.OnCustomManagement(null, cancellationToken);
+
+    public Task OnCustomManagement(LaunchConfigurationWithCredentials? configuration, CancellationToken cancellationToken)
     {
-        this.viewManager.ShowView<UModManagementView>();
+        this.viewManager.ShowView<UModManagementView>(
+            (nameof(UModManagementView.LaunchConfigurationIdentifier), configuration?.Identifier ?? string.Empty));
         return Task.CompletedTask;
     }
 
@@ -151,8 +161,13 @@ internal sealed class UModService(
     public async Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        var modListFilePath = Path.Combine(UModDirectory, UModModList);
-        var lines = this.uModOptions.CurrentValue.Mods
+        // gMod reads modlist.txt next to its DLL. Give each process its own copy.
+        var instanceDirectory = Path.Combine(UModDirectory, "Instances", guildWarsCreatedContext.ApplicationLauncherContext.ProcessId.ToString());
+        Directory.CreateDirectory(instanceDirectory);
+        var dllPath = Path.Combine(instanceDirectory, UModDll);
+        File.Copy(Path.Combine(UModDirectory, UModDll), dllPath, overwrite: true);
+        var modListFilePath = Path.Combine(instanceDirectory, UModModList);
+        var lines = this.GetMods(guildWarsCreatedContext.ApplicationLauncherContext.LaunchConfiguration)
             .Where(e => e.Enabled && e.PathToFile is not null)
             .Select(e => e.PathToFile)
             .OfType<string>()
@@ -174,7 +189,9 @@ internal sealed class UModService(
             .ToList();
 
         await File.WriteAllLinesAsync(modListFilePath, lines, cancellationToken);
-        var result = await this.processInjector.Inject(guildWarsCreatedContext.ApplicationLauncherContext.Process, Path.Combine(UModDirectory, UModDll), cancellationToken);
+        var process = guildWarsCreatedContext.ApplicationLauncherContext.Process;
+        _ = this.CleanupInstance(process, instanceDirectory);
+        var result = await this.processInjector.Inject(process, dllPath, cancellationToken);
         if (result)
         {
             this.notificationService.NotifyInformation(
@@ -203,7 +220,9 @@ internal sealed class UModService(
         return true;
     }
 
-    public bool AddMod(string pathToTpf, bool? imported = default)
+    public bool AddMod(string pathToTpf, bool? imported = default) => this.AddMod(pathToTpf, imported, null);
+
+    public bool AddMod(string pathToTpf, bool? imported, LaunchConfigurationWithCredentials? configuration)
     {
         var fullPath = Path.GetFullPath(pathToTpf);
         if (!File.Exists(pathToTpf))
@@ -211,29 +230,31 @@ internal sealed class UModService(
             return false;
         }
 
-        if (this.uModOptions.CurrentValue.Mods.Any(m => m.PathToFile == fullPath))
+        var options = modSettingsProvider.Get(this.Name, this.uModOptions.CurrentValue, configuration);
+        if (options.Mods.Any(m => m.PathToFile == fullPath))
         {
             return true;
         }
 
         var entry = new UModEntry
         {
-            Enabled = this.uModOptions.CurrentValue.AutoEnableMods,
+            Enabled = options.AutoEnableMods,
             PathToFile = fullPath,
             Name = Path.GetFileNameWithoutExtension(fullPath),
             Imported = imported is true
         };
 
-        var options = this.uModOptions.CurrentValue;
         options.Mods.Add(entry);
-        this.optionsProvider.SaveOption(options);
+        modSettingsProvider.Save(this.Name, options, configuration);
         return true;
     }
 
-    public bool RemoveMod(string pathToTpf)
+    public bool RemoveMod(string pathToTpf) => this.RemoveMod(pathToTpf, null);
+
+    public bool RemoveMod(string pathToTpf, LaunchConfigurationWithCredentials? configuration)
     {
         var fullPath = Path.GetFullPath(pathToTpf);
-        var mods = this.uModOptions.CurrentValue.Mods;
+        var mods = this.GetMods(configuration);
         var maybeMod = mods.FirstOrDefault(m => m.PathToFile == fullPath);
         if (maybeMod is null)
         {
@@ -241,10 +262,14 @@ internal sealed class UModService(
         }
 
         mods.Remove(maybeMod);
-        this.SaveMods(mods);
+        this.SaveMods(mods, configuration);
 
         // If the mod was downloaded and managed entirely through Daybreak, we can safely delete it
-        if (!maybeMod.Imported)
+        if (!maybeMod.Imported && configuration?.CustomModLoadoutEnabled is not true &&
+            !launchConfigurationService.GetLaunchConfigurations().Any(c =>
+                c.ModLoadout.TryGetValue(this.Name, out var entry) &&
+                entry.Settings.TryGetValue(nameof(UModOptions.Mods), out var textures) &&
+                textures.Deserialize<List<UModEntry>>()?.Any(m => m.PathToFile == fullPath) is true))
         {
             File.Delete(fullPath);
         }
@@ -252,22 +277,52 @@ internal sealed class UModService(
         return true;
     }
 
-    public List<UModEntry> GetMods()
+    public List<UModEntry> GetMods() => this.GetMods(null);
+
+    public List<UModEntry> GetMods(LaunchConfigurationWithCredentials? configuration)
     {
-        return this.uModOptions.CurrentValue.Mods;
+        return modSettingsProvider.Get(this.Name, this.uModOptions.CurrentValue, configuration).Mods;
     }
 
-    public void SaveMods(List<UModEntry> list)
+    public void SaveMods(List<UModEntry> list) => this.SaveMods(list, null);
+
+    public void SaveMods(List<UModEntry> list, LaunchConfigurationWithCredentials? configuration)
     {
-        var options = this.uModOptions.CurrentValue;
+        var options = modSettingsProvider.Get(this.Name, this.uModOptions.CurrentValue, configuration);
         options.Mods = list;
-        this.optionsProvider.SaveOption(options);
+        modSettingsProvider.Save(this.Name, options, configuration);
     }
 
-    public async Task<IReadOnlyCollection<string>> LoadModsFromDisk(CancellationToken cancellationToken)
+    public Task<IReadOnlyCollection<string>> LoadModsFromDisk(CancellationToken cancellationToken) =>
+        this.LoadModsFromDisk(cancellationToken, null);
+
+    public async Task<IReadOnlyCollection<string>> LoadModsFromDisk(CancellationToken cancellationToken, LaunchConfigurationWithCredentials? configuration)
     {
         var files = await this.photinoWindow.ShowOpenFileAsync("Select Mod Files", multiSelect: true, filters: [("Zip Files", ["zip"]), ("TPF Files", ["tpf"])]);
-        return [.. files.Where(f => this.AddMod(f, imported: true))];
+        return [.. files.Where(f => this.AddMod(f, imported: true, configuration: configuration))];
+    }
+
+    private async Task CleanupInstance(Process process, string directory)
+    {
+        try
+        {
+            await process.WaitForExitAsync();
+            File.Delete(Path.Combine(directory, UModModList));
+            File.Delete(Path.Combine(directory, UModDll));
+            Directory.Delete(directory);
+        }
+        catch (IOException ex)
+        {
+            this.logger.LogWarning(ex, "Failed to clean up gMod instance directory {Directory}", directory);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            this.logger.LogWarning(ex, "Failed to clean up gMod instance directory {Directory}", directory);
+        }
+        catch (InvalidOperationException ex)
+        {
+            this.logger.LogWarning(ex, "Failed to monitor gMod process for cleanup of {Directory}", directory);
+        }
     }
 
     public async Task CheckAndUpdateUMod(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)

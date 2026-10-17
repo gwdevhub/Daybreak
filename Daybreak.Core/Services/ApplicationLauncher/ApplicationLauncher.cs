@@ -199,7 +199,7 @@ internal sealed class ApplicationLauncher(
 
         if (launchConfigurationWithCredentials.CustomModLoadoutEnabled)
         {
-            scopedLogger.LogDebug("Custom mod loadout enabled. Overriding mod list with: {modList}", string.Join(',', launchConfigurationWithCredentials.EnabledMods ?? []));
+            scopedLogger.LogDebug("Custom mod loadout enabled. Overriding mod list with: {modList}", string.Join(',', launchConfigurationWithCredentials.ModLoadout.Where(pair => pair.Value.IsEnabled).Select(pair => pair.Key)));
         }
 
         var mods = this.modsManager.GetMods();
@@ -207,7 +207,7 @@ internal sealed class ApplicationLauncher(
             .Where(m =>
             {
                 var willRun = m.IsInstalled && (launchConfigurationWithCredentials.CustomModLoadoutEnabled
-                        ? !m.CanDisable || (launchConfigurationWithCredentials.EnabledMods?.Contains(m.Name) is true)
+                        ? !m.CanDisable || (launchConfigurationWithCredentials.ModLoadout.TryGetValue(m.Name, out var entry) && entry.IsEnabled)
                         : m.IsEnabled);
                 scopedLogger.LogDebug(
                         "Checking {ModName}.\nIsInstalled: {isInstalled}.\nCanDisable: {canDisable}.\nIsEnabled: {isEnabled}.\nWillRun: {willRun}",
@@ -235,7 +235,7 @@ internal sealed class ApplicationLauncher(
 
         foreach (var mod in enabledMods)
         {
-            args.AddRange(mod.GetCustomArguments());
+            args.AddRange(mod.GetCustomArguments(launchConfigurationWithCredentials));
         }
 
         if (!args.Any(a => a.StartsWith("-character")))
@@ -277,6 +277,7 @@ internal sealed class ApplicationLauncher(
             Process = process,
             ExecutablePath = executable,
             ProcessId = 0,
+            LaunchConfiguration = launchConfigurationWithCredentials,
         };
         var guildWarsStartingDisabledContext = new GuildWarsStartingDisabledContext
         {
@@ -394,6 +395,7 @@ internal sealed class ApplicationLauncher(
             ExecutablePath = executable,
             Process = process,
             ProcessId = (uint)pId,
+            LaunchConfiguration = launchConfigurationWithCredentials,
         };
         var guildWarsCreatedContext = new GuildWarsCreatedContext
         {
@@ -635,6 +637,7 @@ internal sealed class ApplicationLauncher(
                     .ExecutablePath,
                 Process = guildWarsApplicationLaunchContext.GuildWarsProcess,
                 ProcessId = guildWarsApplicationLaunchContext.ProcessId,
+                LaunchConfiguration = guildWarsApplicationLaunchContext.LaunchConfiguration,
             },
             LoadedModules = [.. this.GetLoadedModules(guildWarsApplicationLaunchContext)],
         };
@@ -685,6 +688,7 @@ internal sealed class ApplicationLauncher(
                     .ExecutablePath,
                 Process = guildWarsApplicationLaunchContext.GuildWarsProcess,
                 ProcessId = guildWarsApplicationLaunchContext.ProcessId,
+                LaunchConfiguration = guildWarsApplicationLaunchContext.LaunchConfiguration,
             },
             LoadedModules = [.. this.GetLoadedModules(guildWarsApplicationLaunchContext)],
         };

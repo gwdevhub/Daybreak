@@ -2,12 +2,14 @@
 using Daybreak.Services.LaunchConfigurations;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.LaunchConfigurations;
+using Daybreak.Shared.Models.Mods;
 using Daybreak.Shared.Services.Credentials;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.Options;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using System.Text.Json;
 
 namespace Daybreak.Tests.Services.LaunchConfigurations;
 
@@ -226,5 +228,59 @@ public sealed class LaunchConfigurationServiceTests
         var cfg = new LaunchConfigurationWithCredentials { Identifier = "x", ExecutablePath = null };
 
         this.service.IsValid(cfg).Should().BeTrue();
+    }
+
+    [TestMethod]
+    public void LegacyLoadout_MigratesEnabledMods_WithoutSnapshottingSettings()
+    {
+        var legacy = JsonSerializer.Deserialize<LaunchConfiguration>(
+            """{"Identifier":"cfg-1","CredentialsIdentifier":"cred-1","CustomModLoadoutEnabled":true,"EnabledMods":["gMod","Auto screen placer"]}""")!;
+        this.SeedCredentials(new LoginCredentials { Identifier = "cred-1" });
+        this.options.LaunchConfigurations = [legacy];
+
+        var configuration = this.service.GetLaunchConfigurations().Single();
+        this.service.SaveConfiguration(configuration).Should().BeTrue();
+        var json = JsonSerializer.Serialize(this.options);
+
+        configuration.ModLoadout.Keys.Should().BeEquivalentTo("gMod", "Auto screen placer");
+        configuration.ModLoadout.Values.Should().OnlyContain(entry => entry.IsEnabled && entry.Settings.Count == 0);
+        json.Should().NotContain("\"EnabledMods\"");
+        JsonSerializer.Deserialize<LaunchConfigurationServiceOptions>(json)!
+            .LaunchConfigurations.Single().ModLoadout.Should().HaveCount(2);
+    }
+
+    [TestMethod]
+    public void LoadoutSettings_SurviveCreateUpdateAndBulkSave_WithoutAliasingReads()
+    {
+        var credentials = new LoginCredentials { Identifier = "cred-1" };
+        this.SeedCredentials(credentials);
+        var configuration = new LaunchConfigurationWithCredentials
+        {
+            Identifier = "cfg-1",
+            Credentials = credentials,
+            CustomModLoadoutEnabled = true,
+            ModLoadout = new()
+            {
+                ["Auto screen placer"] = new ModLoadoutEntry
+                {
+                    IsEnabled = true,
+                    Settings = new() { ["DesiredScreen"] = JsonSerializer.SerializeToElement(2) },
+                },
+            },
+        };
+        this.service.SaveConfiguration(configuration).Should().BeTrue();
+        configuration.ModLoadout["Auto screen placer"].Settings.Clear();
+
+        var loaded = this.service.GetLaunchConfigurations().Single();
+        loaded.ModLoadout["Auto screen placer"].Settings["DesiredScreen"] = JsonSerializer.SerializeToElement(1);
+        this.options.LaunchConfigurations.Single().ModLoadout["Auto screen placer"]
+            .Settings["DesiredScreen"].GetInt32().Should().Be(2);
+        this.service.SaveConfiguration(loaded).Should().BeTrue();
+        loaded.ModLoadout["Auto screen placer"].Settings.Clear();
+        this.service.SaveLaunchConfigurations([this.service.GetLaunchConfigurations().Single()]);
+
+        var restored = this.service.GetLaunchConfigurations().Single();
+        restored.ModLoadout["Auto screen placer"].Settings["DesiredScreen"].GetInt32().Should().Be(1);
+        restored.ModLoadout["Auto screen placer"].IsEnabled.Should().BeTrue();
     }
 }

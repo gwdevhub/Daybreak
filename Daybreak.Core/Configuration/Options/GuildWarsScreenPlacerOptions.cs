@@ -11,5 +11,6 @@ public sealed class GuildWarsScreenPlacerOptions
     public bool Enabled { get; set; }
 
     [JsonPropertyName(nameof(DesiredScreen))]
+    [ModSetting]
     public int DesiredScreen { get; set; }
 }

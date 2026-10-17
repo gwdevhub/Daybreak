@@ -1,4 +1,7 @@
-﻿namespace Daybreak.Shared.Models.LaunchConfigurations;
+﻿using Daybreak.Shared.Models.Mods;
+using System.Text.Json;
+
+namespace Daybreak.Shared.Models.LaunchConfigurations;
 
 public sealed class LaunchConfigurationWithCredentials : IEquatable<LaunchConfigurationWithCredentials>
 {
@@ -8,7 +11,7 @@ public sealed class LaunchConfigurationWithCredentials : IEquatable<LaunchConfig
     public string? Arguments { get; set; }
     public bool SteamSupport { get; set; } = true;
     public LoginCredentials? Credentials { get; set; }
-    public List<string>? EnabledMods { get; set; }
+    public Dictionary<string, ModLoadoutEntry> ModLoadout { get; set; } = [];
     public bool CustomModLoadoutEnabled { get; set; }
     public string? Color { get; set; }
 
@@ -32,7 +35,14 @@ public sealed class LaunchConfigurationWithCredentials : IEquatable<LaunchConfig
             this.Credentials?.Equals(other.Credentials) is true &&
             this.SteamSupport == other.SteamSupport &&
 
-            this.EnabledMods?.SequenceEqual(other.EnabledMods ?? []) is true &&
+            this.ModLoadout.Count == other.ModLoadout.Count &&
+            this.ModLoadout.All(pair =>
+                other.ModLoadout.TryGetValue(pair.Key, out var entry) &&
+                pair.Value.IsEnabled == entry.IsEnabled &&
+                pair.Value.Settings.Count == entry.Settings.Count &&
+                pair.Value.Settings.All(setting =>
+                    entry.Settings.TryGetValue(setting.Key, out var value) &&
+                    JsonElement.DeepEquals(setting.Value, value))) &&
             this.CustomModLoadoutEnabled == other.CustomModLoadoutEnabled &&
 
             ((this.Color is null && other.Color is null) ||

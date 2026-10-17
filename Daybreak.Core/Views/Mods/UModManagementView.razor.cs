@@ -1,4 +1,6 @@
 ﻿using Daybreak.Shared.Models.UMod;
+using Daybreak.Shared.Models.LaunchConfigurations;
+using Daybreak.Shared.Services.LaunchConfigurations;
 using Daybreak.Shared.Services.UMod;
 using Microsoft.Extensions.Logging;
 using System.Extensions;
@@ -8,19 +10,24 @@ namespace Daybreak.Views.Mods;
 
 public sealed class UModManagementViewModel(
     IUModService uModService,
+    ILaunchConfigurationService launchConfigurationService,
     ILogger<UModManagementViewModel> logger)
     : ViewModelBase<UModManagementViewModel, UModManagementView>
 {
     private readonly IUModService uModService = uModService;
     private readonly ILogger<UModManagementViewModel> logger = logger;
+    private LaunchConfigurationWithCredentials? configuration;
 
     public List<UModEntry> Mods { get; } = [];
     public bool IsLoadingMods { get; private set; }
 
     public override ValueTask ParametersSet(UModManagementView view, CancellationToken cancellationToken)
     {
+        this.configuration = string.IsNullOrEmpty(view.LaunchConfigurationIdentifier) ? null :
+            launchConfigurationService.GetLaunchConfigurations().FirstOrDefault(c => c.Identifier == view.LaunchConfigurationIdentifier)
+                ?? throw new InvalidOperationException("Launch configuration no longer exists");
         this.Mods.ClearAnd()
-            .AddRange(this.uModService.GetMods());
+            .AddRange(this.uModService.GetMods(this.configuration));
         this.RefreshView();
         return base.ParametersSet(view, cancellationToken);
     }
@@ -29,11 +36,11 @@ public sealed class UModManagementViewModel(
     {
         this.IsLoadingMods = true;
         await this.RefreshViewAsync();
-        var modsLoaded = await this.uModService.LoadModsFromDisk(CancellationToken.None);
+        var modsLoaded = await this.uModService.LoadModsFromDisk(CancellationToken.None, this.configuration);
         if (modsLoaded.Count > 0)
         {
             this.Mods.ClearAnd()
-                .AddRange(this.uModService.GetMods());
+                .AddRange(this.uModService.GetMods(this.configuration));
         }
 
         this.IsLoadingMods = false;
@@ -47,16 +54,16 @@ public sealed class UModManagementViewModel(
             return;
         }
 
-        this.uModService.RemoveMod(uModEntry.PathToFile);
+        this.uModService.RemoveMod(uModEntry.PathToFile, this.configuration);
         this.Mods.ClearAnd()
-            .AddRange(this.uModService.GetMods());
+            .AddRange(this.uModService.GetMods(this.configuration));
         this.RefreshView();
     }
 
     public void ToggleMod(UModEntry uModEntry)
     {
         uModEntry.Enabled = !uModEntry.Enabled;
-        this.uModService.SaveMods(this.Mods);
+        this.uModService.SaveMods(this.Mods, this.configuration);
         this.RefreshView();
     }
 
@@ -70,7 +77,7 @@ public sealed class UModManagementViewModel(
 
         this.Mods.RemoveAt(index);
         this.Mods.Insert(index - 1, uModEntry);
-        this.uModService.SaveMods(this.Mods);
+        this.uModService.SaveMods(this.Mods, this.configuration);
         this.RefreshView();
     }
 
@@ -84,7 +91,7 @@ public sealed class UModManagementViewModel(
 
         this.Mods.RemoveAt(index);
         this.Mods.Insert(index + 1, uModEntry);
-        this.uModService.SaveMods(this.Mods);
+        this.uModService.SaveMods(this.Mods, this.configuration);
         this.RefreshView();
     }
 }
