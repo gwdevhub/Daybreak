@@ -4,7 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="CommunityToolkit.Authentication.Msal" Version="7.1.4" />
-    <PackageVersion Include="coverlet.collector" Version="10.0.1" />
+    <PackageVersion Include="coverlet.collector" Version="10.1.0" />
     <PackageVersion Include="DiffPlex" Version="1.9.0" />
     <PackageVersion Include="FluentAssertions" Version="8.10.0" />
     <PackageVersion Include="HtmlAgilityPack" Version="1.13.0" />
