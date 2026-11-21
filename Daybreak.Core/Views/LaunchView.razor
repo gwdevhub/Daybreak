@@ -3,7 +3,43 @@
 @using Daybreak.Shared.Models.ColorPalette
 @page "/launch"
 
+<div class="layout-toggle-container">
+    <button class="layout-toggle-button" title="@(this.ViewModel.UseCardLayout ? "Switch to classic view" : "Switch to card view")"
+            @onclick="this.ViewModel.ToggleLayout">
+        @(this.ViewModel.UseCardLayout ? "Classic view" : "Card view")
+    </button>
+</div>
+
 <div class="launch-container">
+@if (this.ViewModel.UseCardLayout)
+{
+    <div class="account-grid">
+        @foreach (var config in this.ViewModel.LaunchConfigurations)
+        {
+            <div class="account-card @(config.GameRunning || config.CanKill ? "running" : "")"
+                 style="@this.GetCardStyle(config)">
+                <div class="config-info">
+                    <div class="config-name">@GetDisplayName(config)</div>
+                    @if (!string.IsNullOrEmpty(config.Configuration?.ExecutablePath))
+                    {
+                        <div class="config-path" title="@config.Configuration.ExecutablePath">@config.Configuration.ExecutablePath</div>
+                    }
+                    @if (config.CanKill || config.CanAttach)
+                    {
+                        <div class="config-status">@(config.CanAttach ? "Running (API available)" : "Running")</div>
+                    }
+                </div>
+                <button class="card-launch-button @(config.CanKill ? "kill" : "")"
+                        disabled="@(!this.ViewModel.CanInteract(config))"
+                        @onclick="() => this.ViewModel.LaunchConfiguration(config)">
+                    @this.ViewModel.GetCardButtonText(config)
+                </button>
+            </div>
+        }
+    </div>
+}
+else
+{
     <div class="launch-button-container">
         <!-- Main Launch Button with Dropdown -->
         <div class="launch-button-group" style="@this.GetButtonGroupStyle()">
@@ -55,10 +91,10 @@
             </div>
         }
     </div>
+}
 </div>
 
-<!-- Click outside to close dropdown -->
-@if (this.ViewModel.IsDropdownOpen)
+@if (!this.ViewModel.UseCardLayout && this.ViewModel.IsDropdownOpen)
 {
     <div class="dropdown-backdrop" @onclick="this.ViewModel.CloseDropdown" />
 }
@@ -66,6 +102,23 @@
 @code {
     [Parameter]
     public string? AutoLaunchConfigurationId { get; set; }
+
+    private static string GetDisplayName(LauncherViewContext config) =>
+        config.Configuration?.Name is null or ""
+            ? config.Configuration?.Credentials?.Username ?? "Unknown User"
+            : config.Configuration.Name;
+
+    private string GetCardStyle(LauncherViewContext config)
+    {
+        var colorName = config.Configuration?.Color;
+        if (string.IsNullOrWhiteSpace(colorName))
+        {
+            return string.Empty;
+        }
+
+        var accentColor = AccentColor.Accents.FirstOrDefault(a => a.Name.ToString() == colorName);
+        return accentColor is null ? string.Empty : $"border-left: 6px solid {accentColor.Hex};";
+    }
 
     private string GetButtonGroupStyle()
     {
