@@ -77,6 +77,7 @@
     <PackageReference Include="Net.Sdk.Web.Extensions" />
     <PackageReference Include="Net.Sdk.Web.Extensions.SourceGenerators" />
     <PackageReference Include="PeNet" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" />
     <PackageReference Include="Serilog" />
     <PackageReference Include="Serilog.Extensions.Logging" />
     <PackageReference Include="Serilog.Settings.Configuration" />
