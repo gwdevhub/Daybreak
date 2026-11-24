@@ -1,7 +1,7 @@
 ﻿<div class="empty-state">
-    <FluentIcon Value="@this.Icon" Color="Color.Neutral" />
+    <FluentIcon Value="@this.Icon" Color="Color.Default" />
     <div class="empty-message">@this.Message</div>
-    <FluentButton Appearance="Appearance.Accent"
+    <FluentButton Appearance="ButtonAppearance.Primary"
                   Disabled="@this.Disabled"
                   IconStart="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Add())"
                   Title="@this.ActionText"

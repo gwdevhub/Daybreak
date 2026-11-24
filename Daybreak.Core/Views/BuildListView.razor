@@ -47,7 +47,7 @@
                                     else if (entry.BuildEntry is Daybreak.Shared.Models.Builds.TeamBuildEntry)
                                     {
                                         <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.PeopleTeam())"
-                                                    Color="Color.Neutral" />
+                                                    Color="Color.Default" />
                                     }
 
                                     <div class="build-name">@entry.BuildEntry.Name</div>
@@ -58,7 +58,7 @@
                                     <div class="build-toolbox-marker">Toolbox build</div>
                                 }
                                 <div class="build-actions" @onclick="@(() => this.ViewModel.DeleteBuild(entry))" @onclick:stopPropagation="true" @onmouseenter="this.ViewModel.CloseSnippet">
-                                    <FluentButton Appearance="Appearance.Stealth"
+                                    <FluentButton Appearance="ButtonAppearance.Subtle"
                                                   IconOnly="true">
                                         <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Delete())" />
                                     </FluentButton>
@@ -76,7 +76,7 @@
                 else if (!this.ViewModel.IsLoading)
                 {
                     <div class="empty-state">
-                        <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size48.Search())" Color="Color.Neutral" />
+                        <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size48.Search())" Color="Color.Default" />
                         <div class="empty-message">
                             @if (string.IsNullOrEmpty(this.ViewModel.SearchTerm))
                             {

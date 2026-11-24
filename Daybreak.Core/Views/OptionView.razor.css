@@ -82,46 +82,33 @@
         color: var(--neutral-foreground-rest);
     }
 
-::deep .option-control fluent-text-field,
-::deep .option-control fluent-select,
-::deep .option-control fluent-option,
-::deep .option-control fluent-number-field {
+::deep .option-control fluent-text-input,
+::deep .option-control fluent-dropdown,
+::deep .option-control fluent-option {
     font-size: var(--font-size-medium) !important;
     width: 250px !important;
     justify-content: flex-end !important;
     border-radius: 6px !important;
 }
 
-    ::deep .option-control fluent-text-field::part(root),
-    ::deep .option-control fluent-select::part(root),
-    ::deep .option-control fluent-number-field::part(root) {
+    ::deep .option-control fluent-text-input::part(root),
+    ::deep .option-control fluent-dropdown::part(root) {
         overflow: hidden;
     }
 
-    ::deep .option-control fluent-text-field::part(control),
-    ::deep .option-control fluent-select::part(control),
-    ::deep .option-control fluent-number-field::part(control) {
+    ::deep .option-control fluent-text-input::part(control),
+    ::deep .option-control fluent-dropdown::part(control) {
         font-size: var(--font-size-medium) !important;
         width: 250px !important;
     }
 
-    ::deep .option-control fluent-number-field::part(step-up-button),
-    ::deep .option-control fluent-number-field::part(step-down-button) {
+    ::deep .option-control [button-step] {
         width: calc(var(--font-size-medium) * 1.5) !important;
         height: calc(var(--font-size-medium) * 1.2) !important;
-        right: 2px !important;
         font-size: calc(var(--font-size-medium) * 0.8) !important;
     }
 
-    ::deep .option-control fluent-number-field::part(step-up-button) {
-        top: 1px !important;
-    }
-
-    ::deep .option-control fluent-number-field::part(step-down-button) {
-        bottom: 1px !important;
-    }
-
-    ::deep .option-control fluent-number-field::part(control) {
+    ::deep .option-control fluent-text-input[inputmode="numeric"]::part(control) {
         padding-right: calc(var(--font-size-medium) * 0) !important;
         width: 220px !important;
         max-width: 220px !important;

@@ -31,7 +31,7 @@
               <div class="launch-config-reorder-buttons">
                 @if (index > 0)
                 {
-                  <FluentButton Appearance="Appearance.Stealth"
+                  <FluentButton Appearance="ButtonAppearance.Subtle"
                                 IconOnly="true"
                                 Title="Move up"
                                 OnClick="@(() => this.ViewModel.MoveConfigUp(config))">
@@ -40,7 +40,7 @@
                 }
                 @if (index < this.ViewModel.LaunchConfigurations.Count - 1)
                 {
-                  <FluentButton Appearance="Appearance.Stealth"
+                  <FluentButton Appearance="ButtonAppearance.Subtle"
                                 IconOnly="true"
                                 Title="Move down"
                                 OnClick="@(() => this.ViewModel.MoveConfigDown(config))">
@@ -54,12 +54,14 @@
                 <FluentLabel>Identifier</FluentLabel>
               </div>
               <div class="launch-config-identifier-field">
-                <FluentTextField Value="@config.Identifier" ReadOnly="true" Spellcheck="false"
+                <FluentTextInput Value="@config.Identifier" ReadOnly="true" Spellcheck="false"
                                  Placeholder="Launch config identifier">
-                  <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Delete())"
-                              @onclick="@(() => this.ViewModel.DeleteLaunchConfiguration(config))" slot="end" Color="Color.Neutral"
-                              Title="Delete launch configuration" />
-                </FluentTextField>
+                  <EndTemplate>
+                    <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Delete())"
+                                @onclick="@(() => this.ViewModel.DeleteLaunchConfiguration(config))" Color="Color.Default"
+                                Title="Delete launch configuration" />
+                  </EndTemplate>
+                </FluentTextInput>
               </div>
             </div>
             <div class="launch-config-name">
@@ -67,9 +69,9 @@
                 <FluentLabel>Name</FluentLabel>
               </div>
               <div class="launch-config-name-field">
-                <FluentTextField Value="@config.Name"
+                <FluentTextInput Value="@config.Name"
                                  ValueChanged="@((newValue) => this.ViewModel.CustomNameChanged(config, newValue))" Spellcheck="false"
-                                 Immediate="true" ImmediateDelay="500" InputMode="InputMode.Text" AutoComplete="false"
+                                 Immediate="true" ImmediateDelay="500" InputMode="TextInputMode.Text" AutoComplete="false"
                                  Placeholder="Custom name" />
               </div>
             </div>
@@ -78,10 +80,10 @@
                 <FluentLabel>Accent Color</FluentLabel>
               </div>
               <div class="launch-config-color-field">
-                <FluentSelect TOption="string" Multiple="false" Width="100%" Position="SelectPosition.Below"
+                <FluentSelect TOption="string" TValue="string" Multiple="false" Width="100%"
                               Items="@this.ViewModel.AvailableColors"
-                              SelectedOption="@(config.Color ?? string.Empty)"
-                              SelectedOptionChanged="@((newValue) => this.ViewModel.ColorChanged(config, newValue))">
+                              Value="@(config.Color ?? string.Empty)"
+                              ValueChanged="@((newValue) => this.ViewModel.ColorChanged(config, newValue))">
                   <OptionTemplate>
                     <div class="color-option">
                       @if (!string.IsNullOrWhiteSpace(context))
@@ -99,9 +101,9 @@
                 <FluentLabel>Executable</FluentLabel>
               </div>
               <div class="launch-config-executable-field">
-                <FluentSelect TOption="string" Multiple="false" Width="100%" Position="SelectPosition.Below"
-                              Items="@this.ViewModel.Executables" SelectedOption="@config.ExecutablePath"
-                              SelectedOptionChanged="@((newValue) => this.ViewModel.ExecutableChanged(config, newValue))">
+                <FluentSelect TOption="string" TValue="string" Multiple="false" Width="100%"
+                              Items="@this.ViewModel.Executables" Value="@config.ExecutablePath"
+                              ValueChanged="@((newValue) => this.ViewModel.ExecutableChanged(config, newValue))">
                   <OptionTemplate>
                     <div title="@(context)">
                       @(string.IsNullOrWhiteSpace(context) ? "Any Executable" : context)
@@ -115,10 +117,10 @@
                 <FluentLabel>Credentials</FluentLabel>
               </div>
               <div class="launch-config-credentials-field">
-                <FluentSelect TOption="string" Multiple="false" Width="100%" Position="SelectPosition.Below"
+                <FluentSelect TOption="string" TValue="string" Multiple="false" Width="100%"
                               Items="@this.ViewModel.Credentials.Select(c => c.Identifier ?? string.Empty)"
-                              SelectedOption="@(config.Credentials?.Identifier ?? string.Empty)"
-                              SelectedOptionChanged="@((newValue) => this.ViewModel.CredentialsChanged(config, newValue))">
+                              Value="@(config.Credentials?.Identifier ?? string.Empty)"
+                              ValueChanged="@((newValue) => this.ViewModel.CredentialsChanged(config, newValue))">
                   <OptionTemplate>
                     @(this.ViewModel.Credentials.FirstOrDefault(c => c.Identifier == context)?.Username ?? "Unknown")
                   </OptionTemplate>
@@ -130,9 +132,9 @@
                 <FluentLabel>Custom Arguments</FluentLabel>
               </div>
               <div class="launch-config-args-field">
-                <FluentTextField Value="@config.Arguments"
+                <FluentTextInput Value="@config.Arguments"
                                  ValueChanged="@((newValue) => this.ViewModel.CustomArgsChanged(config, newValue))" Spellcheck="false"
-                                 Immediate="true" ImmediateDelay="500" InputMode="InputMode.Text" AutoComplete="false"
+                                 Immediate="true" ImmediateDelay="500" InputMode="TextInputMode.Text" AutoComplete="false"
                                  Placeholder="Launch arguments" />
               </div>
             </div>
@@ -152,7 +154,7 @@
               <div class="launch-config-custom-mods-field">
                 <FluentCheckbox Value="@config.CustomModLoadoutEnabled"
                                 ValueChanged="@((newValue) => this.ViewModel.CustomModLoadoutChanged(config, newValue))" />
-                <FluentButton Appearance="Appearance.Neutral" 
+                <FluentButton Appearance="ButtonAppearance.Default"
                               @onclick="@(() => this.ViewModel.ManageCustomMods(config))"
                               Disabled="@(!config.CustomModLoadoutEnabled)"
                               Title="Manage custom mods for this launch configuration">

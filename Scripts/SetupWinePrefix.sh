@@ -18,7 +18,7 @@
 set -euo pipefail
 
 # ─── configuration ────────────────────────────────────────────────────────────
-DOTNET_SDK_CHANNEL="${DOTNET_SDK_CHANNEL:-10.0}"
+DOTNET_SDK_CHANNEL="${DOTNET_SDK_CHANNEL:-11.0}"
 # Pinned, not "latest": the SDK's bundled Roslyn must be >= the
 # Microsoft.CodeAnalysis.CSharp version referenced by Daybreak.Generators
 # (see Directory.Packages.props). A generator built against a newer Roslyn is
@@ -26,8 +26,9 @@ DOTNET_SDK_CHANNEL="${DOTNET_SDK_CHANNEL:-10.0}"
 # compile with a wall of "GWCAEquivalentAttribute could not be found" errors.
 #   SDK 10.0.300 -> Roslyn 5.6.0.0
 #   SDK 10.0.400 -> Roslyn 5.9.0.0
+#   SDK 11.0.100 -> Roslyn 5.12.0.0
 # Set DOTNET_SDK_VERSION=latest to track the newest SDK in the channel.
-DOTNET_SDK_VERSION="${DOTNET_SDK_VERSION:-10.0.400}"
+DOTNET_SDK_VERSION="${DOTNET_SDK_VERSION:-11.0.100}"
 LLVM_VERSION="${LLVM_VERSION:-22.1.5}"
 XWIN_VERSION="${XWIN_VERSION:-0.9.0}"
 WINEPREFIX_DEFAULT="$HOME/.wine-daybreak"

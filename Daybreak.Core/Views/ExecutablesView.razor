@@ -26,13 +26,13 @@
                             <FluentLabel>Path</FluentLabel>
                         </div>
                         <div class="executable-field">
-                            <FluentTextField Value="@executable.Path"
+                            <FluentTextInput Value="@executable.Path"
                                              ReadOnly="true"
-                                             Appearance="FluentInputAppearance.Outline"
+                                             Appearance="TextInputAppearance.Outline"
                                              AutoComplete="off"
                                              Placeholder="Path">
-                                <div class="executable-field-controls"
-                                     slot="end">
+                                <EndTemplate>
+                                <div class="executable-field-controls">
                                     @if (executable.Validating)
                                     {
                                         <div class="loading-circle">
@@ -46,33 +46,34 @@
                                     else if (executable.Valid)
                                     {
                                         <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.CheckmarkCircle())"
-                                                    Color="Color.Neutral"
+                                                    Color="Color.Default"
                                                     Title="Executable is valid" />
                                     }
                                     else if (executable.NeedsUpdate)
                                     {
                                         <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowDownload())"
                                                     @onclick="@(() => this.ViewModel.UpdateExecutable(executable))"
-                                                    Color="Color.Neutral"
+                                                    Color="Color.Default"
                                                     Title="Update executable" />
                                     }
                                     else
                                     {
                                         <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.CheckmarkCircleWarning())"
-                                                    Color="Color.Neutral"
+                                                    Color="Color.Default"
                                                     Title="Executable is invalid" />
                                     }
 
                                     <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.FolderOpen())"
                                                 @onclick="@(() => { if (executable.Locked) { return; } this.ViewModel.ModifyPath(executable); })"
-                                                Color="Color.Neutral"
+                                                Color="Color.Default"
                                                 Title="Modify path" />
                                     <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Delete())"
                                                 @onclick="@(() => { if (executable.Locked) { return; } this.ViewModel.RemoveExecutable(executable); })"
-                                                Color="Color.Neutral"
+                                                Color="Color.Default"
                                                 Title="Remove executable" />
                                 </div>
-                            </FluentTextField>
+                                </EndTemplate>
+                            </FluentTextInput>
                         </div>
                     </div>
                 }

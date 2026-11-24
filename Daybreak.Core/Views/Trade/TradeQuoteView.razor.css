@@ -19,21 +19,19 @@
     align-items: center;
 }
 
-::deep .alert-row p.fluent-typography,
-::deep .alert-row fluent-text-field,
-::deep .alert-row fluent-number-field,
-::deep .alert-row fluent-select,
+::deep .alert-row label,
+::deep .alert-row fluent-text-input,
+::deep .alert-row fluent-dropdown,
 ::deep .alert-row fluent-checkbox {
     font-size: var(--font-size-medium) !important;
 }
 
-::deep .alert-row fluent-text-field::part(control),
-::deep .alert-row fluent-number-field::part(control),
-::deep .alert-row fluent-select::part(control) {
+::deep .alert-row fluent-text-input::part(control),
+::deep .alert-row fluent-dropdown::part(control) {
     font-size: var(--font-size-medium) !important;
 }
 
-::deep .alert-item fluent-select::part(listbox) {
+::deep .alert-item fluent-listbox {
     max-height: 200px !important;
     overflow-y: auto !important;
 }

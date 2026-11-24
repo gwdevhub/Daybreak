@@ -96,31 +96,31 @@
 }
 
 /* Limit dropdown height to prevent container overflow */
-.launch-config-executable-field ::deep fluent-select::part(listbox),
-.launch-config-credentials-field ::deep fluent-select::part(listbox),
-.launch-config-color-field ::deep fluent-select::part(listbox) {
+.launch-config-executable-field ::deep fluent-listbox,
+.launch-config-credentials-field ::deep fluent-listbox,
+.launch-config-color-field ::deep fluent-listbox {
     max-height: 150px;
     overflow-y: auto;
     overflow-x: hidden;
 }
 
 /* Scrollbar styling for the dropdown */
-.launch-config-executable-field ::deep fluent-select::part(listbox)::-webkit-scrollbar,
-.launch-config-credentials-field ::deep fluent-select::part(listbox)::-webkit-scrollbar,
-.launch-config-color-field ::deep fluent-select::part(listbox)::-webkit-scrollbar {
+.launch-config-executable-field ::deep fluent-listbox::-webkit-scrollbar,
+.launch-config-credentials-field ::deep fluent-listbox::-webkit-scrollbar,
+.launch-config-color-field ::deep fluent-listbox::-webkit-scrollbar {
     width: 6px;
 }
 
-.launch-config-executable-field ::deep fluent-select::part(listbox)::-webkit-scrollbar-track,
-.launch-config-credentials-field ::deep fluent-select::part(listbox)::-webkit-scrollbar-track,
-.launch-config-color-field ::deep fluent-select::part(listbox)::-webkit-scrollbar-track {
+.launch-config-executable-field ::deep fluent-listbox::-webkit-scrollbar-track,
+.launch-config-credentials-field ::deep fluent-listbox::-webkit-scrollbar-track,
+.launch-config-color-field ::deep fluent-listbox::-webkit-scrollbar-track {
     background: color-mix(in srgb, var(--neutral-fill-rest) 30%, transparent);
     border-radius: 3px;
 }
 
-.launch-config-executable-field ::deep fluent-select::part(listbox)::-webkit-scrollbar-thumb,
-.launch-config-credentials-field ::deep fluent-select::part(listbox)::-webkit-scrollbar-thumb,
-.launch-config-color-field ::deep fluent-select::part(listbox)::-webkit-scrollbar-thumb {
+.launch-config-executable-field ::deep fluent-listbox::-webkit-scrollbar-thumb,
+.launch-config-credentials-field ::deep fluent-listbox::-webkit-scrollbar-thumb,
+.launch-config-color-field ::deep fluent-listbox::-webkit-scrollbar-thumb {
     background: color-mix(in srgb, var(--neutral-fill-strong-rest) 80%, transparent);
     border-radius: 3px;
 }
@@ -138,31 +138,31 @@
     font-size: var(--font-size-large) !important;
 }
 
-.launch-config-identifier-field ::deep fluent-text-field,
-.launch-config-executable-field ::deep fluent-text-field,
-.launch-config-credentials-field ::deep fluent-text-field,
-.launch-config-name-field ::deep fluent-text-field,
-.launch-config-args-field ::deep fluent-text-field,
-.launch-config-steam-field ::deep fluent-text-field,
-.launch-config-custom-mods-field ::deep fluent-text-field,
-.launch-config-color-field ::deep fluent-text-field {
+.launch-config-identifier-field ::deep fluent-text-input,
+.launch-config-executable-field ::deep fluent-text-input,
+.launch-config-credentials-field ::deep fluent-text-input,
+.launch-config-name-field ::deep fluent-text-input,
+.launch-config-args-field ::deep fluent-text-input,
+.launch-config-steam-field ::deep fluent-text-input,
+.launch-config-custom-mods-field ::deep fluent-text-input,
+.launch-config-color-field ::deep fluent-text-input {
     width: 100%;
     box-sizing: border-box !important;
     font-size: var(--font-size-large);
 }
 
-.launch-config-identifier-field ::deep fluent-select,
-.launch-config-executable-field ::deep fluent-select,
-.launch-config-credentials-field ::deep fluent-select,
-.launch-config-name-field ::deep fluent-select,
-.launch-config-args-field ::deep fluent-select,
-.launch-config-steam-field ::deep fluent-select,
-.launch-config-custom-mods-field ::deep fluent-select,
-.launch-config-color-field ::deep fluent-select {
+.launch-config-identifier-field ::deep fluent-dropdown,
+.launch-config-executable-field ::deep fluent-dropdown,
+.launch-config-credentials-field ::deep fluent-dropdown,
+.launch-config-name-field ::deep fluent-dropdown,
+.launch-config-args-field ::deep fluent-dropdown,
+.launch-config-steam-field ::deep fluent-dropdown,
+.launch-config-custom-mods-field ::deep fluent-dropdown,
+.launch-config-color-field ::deep fluent-dropdown {
     width: 100%;
     box-sizing: border-box !important;
     font-size: var(--font-size-large) !important;
-    --type-ramp-base-font-size: var(--font-size-large);
+    --fontSizeBase300: var(--font-size-large);
 }
 
 /* Color option styling */

@@ -8,14 +8,14 @@
                 <div class="version-info">
                     <div class="version-icon">
                         <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size20.Tag())"
-                                    Color="Color.Neutral" />
+                                    Color="Color.Default" />
                     </div>
                     <span class="version-name">@version.ToString()</span>
                 </div>
                 <div class="version-actions"
                      @onclick="@(() => this.ViewModel.DownloadVersion(version))"
                      @onclick:stopPropagation="true">
-                    <FluentButton Appearance="Appearance.Stealth"
+                    <FluentButton Appearance="ButtonAppearance.Subtle"
                                   IconOnly="true"
                                   Title="Download version">
                         <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowDownload())" />

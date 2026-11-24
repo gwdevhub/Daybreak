@@ -28,13 +28,13 @@
         <div class="mod-row-right">
           @if (this.ViewModel.HasCustomSettings(mod))
           {
-            <FluentButton Appearance="Appearance.Stealth" OnClick="@(() => this.ViewModel.ResetSettings(mod))">
+            <FluentButton Appearance="ButtonAppearance.Subtle" OnClick="@(() => this.ViewModel.ResetSettings(mod))">
               Use global settings
             </FluentButton>
           }
           <div class="mod-toggle @((mod.IsInstalled && mod.CanDisable ? string.Empty : "disabled"))">
             <FluentLabel class="label">@(mod.IsEnabled ? "Enabled" : "Disabled")</FluentLabel>
-            <FluentSwitch Value="@(mod.IsEnabled)" Disabled="@(!mod.IsInstalled || !mod.CanDisable)" @onchange="() => this.ViewModel.ToggleMod(mod)" />
+            <FluentSwitch Value="@(mod.IsEnabled)" Disabled="@(!mod.IsInstalled || !mod.CanDisable)" ValueChanged="@(_ => this.ViewModel.ToggleMod(mod))" />
           </div>
           @if (mod.Loading)
           {
