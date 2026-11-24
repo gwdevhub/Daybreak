@@ -49,6 +49,7 @@ using Daybreak.Services.TradeChat.Models;
 using Daybreak.Services.TradeChat.Notifications;
 using Daybreak.Services.UMod;
 using Daybreak.Services.Updater;
+using Daybreak.Services.Wiki;
 using Daybreak.Shared.Models.Plugins;
 using Daybreak.Shared.Services.Api;
 using Daybreak.Shared.Services.ApplicationArguments;
@@ -83,6 +84,7 @@ using Daybreak.Shared.Services.Toolbox;
 using Daybreak.Shared.Services.TradeChat;
 using Daybreak.Shared.Services.UMod;
 using Daybreak.Shared.Services.Updater;
+using Daybreak.Shared.Services.Wiki;
 using Daybreak.Services.Graph;
 using Daybreak.Themes;
 using Daybreak.Views;
@@ -167,6 +169,7 @@ public class ProjectConfiguration : PluginConfigurationBase
             sp.GetRequiredService<INotificationService>().Cast<NotificationService>()
         );
         services.AddSingleton<IInternetCheckingService, InternetCheckingService>();
+        services.AddSingleton<IWikiPageLoader, WikiPageLoader>();
         services.AddSingleton<INotificationStorage, InMemoryNotificationStorage>();
         services.AddSingleton<IModsManager, ModsManager>();
         services.AddScoped<IModSettingsProvider, ModSettingsProvider>();
@@ -584,6 +587,10 @@ public class ProjectConfiguration : PluginConfigurationBase
             .Build()
             .RegisterHttpClient<GraphClient>()
             .WithMessageHandler(SetupLoggingAndMetrics<GraphClient>)
+            .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
+            .Build()
+            .RegisterHttpClient<WikiPageLoader>()
+            .WithMessageHandler(SetupLoggingAndMetrics<WikiPageLoader>)
             .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
             .Build();
     }

@@ -7,14 +7,6 @@
     width: 100%;
 }
 
-.browser-frame {
-    flex: 1;
-    height: 100%;
-    width: 100%;
-    margin: -2px;
-    border: none;
-}
-
 .browser-toggle-button {
     position: absolute;
     top: 4px;

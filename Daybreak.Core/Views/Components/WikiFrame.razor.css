@@ -1,0 +1,28 @@
+.wiki-frame-container {
+    position: relative;
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.wiki-frame {
+    flex: 1;
+    height: 100%;
+    width: 100%;
+    border: none;
+    background: white;
+}
+
+.wiki-frame-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: color-mix(in srgb, var(--neutral-fill-rest) 70%, transparent);
+    color: var(--neutral-foreground-rest);
+}
