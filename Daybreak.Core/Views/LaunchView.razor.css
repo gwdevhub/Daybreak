@@ -95,29 +95,6 @@
         color: white;
     }
 
-.layout-toggle-container {
-    position: fixed;
-    left: 50%;
-    bottom: 3rem;
-    transform: translateX(-50%);
-    z-index: 1100;
-}
-
-.layout-toggle-button {
-    padding: 0.4rem 1rem;
-    border: none;
-    border-radius: 6px;
-    background: var(--neutral-fill-rest);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
-    color: var(--accent-foreground-rest);
-    font-size: var(--font-size-small);
-    cursor: pointer;
-}
-
-    .layout-toggle-button:hover {
-        background: var(--neutral-fill-hover);
-    }
-
 /* Classic view (button + dropdown) */
 .launch-button-container {
     position: relative;

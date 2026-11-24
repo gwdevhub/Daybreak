@@ -3,10 +3,17 @@
 @using Daybreak.Shared.Models.ColorPalette
 @page "/launch"
 
-<div class="layout-toggle-container">
-    <button class="layout-toggle-button" title="@(this.ViewModel.UseCardLayout ? "Switch to classic view" : "Switch to card view")"
-            @onclick="this.ViewModel.ToggleLayout">
-        @(this.ViewModel.UseCardLayout ? "Classic view" : "Card view")
+<div class="title-bar-additional-btns-left">
+    <button class="title-bar-btn" @onclick="this.ViewModel.ToggleLayout"
+            title="@(this.ViewModel.UseCardLayout ? "Switch to classic view" : "Switch to card view")">
+        @if (this.ViewModel.UseCardLayout)
+        {
+            <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.RectangleLandscape()" />
+        }
+        else
+        {
+            <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Grid()" />
+        }
     </button>
 </div>
 
