@@ -1,33 +1,33 @@
-﻿::deep fluent-select::part(listbox) {
+﻿::deep fluent-listbox {
     max-height: 200px;
     overflow-y: auto;
     overflow-x: hidden;
 }
 
-::deep fluent-select fluent-option {
+::deep fluent-dropdown fluent-option {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-::deep fluent-select {
+::deep fluent-dropdown {
     position: relative;
 }
 
-::deep fluent-select::part(listbox)::-webkit-scrollbar {
+::deep fluent-listbox::-webkit-scrollbar {
     width: 6px;
 }
 
-::deep fluent-select::part(listbox)::-webkit-scrollbar-track {
+::deep fluent-listbox::-webkit-scrollbar-track {
     background: color-mix(in srgb, var(--neutral-fill-rest) 30%, transparent);
     border-radius: 3px;
 }
 
-::deep fluent-select::part(listbox)::-webkit-scrollbar-thumb {
+::deep fluent-listbox::-webkit-scrollbar-thumb {
     background: color-mix(in srgb, var(--neutral-fill-strong-rest) 80%, transparent);
     border-radius: 3px;
 }
 
-::deep fluent-select::part(listbox)::-webkit-scrollbar-thumb:hover {
+::deep fluent-listbox::-webkit-scrollbar-thumb:hover {
     background: color-mix(in srgb, var(--neutral-fill-strong-hover) 80%, transparent);
 }

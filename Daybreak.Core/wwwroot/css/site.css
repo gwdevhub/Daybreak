@@ -1,5 +1,3 @@
-/* FluentUI tokens defined here: https://github.com/microsoft/fluentui-blazor/blob/dev/src/Extensions/DesignToken.Generator/DesignTokenConstants.cs */
-
 /* Base styles for the Blazor application */
 html, body {
     margin: 0;
@@ -17,6 +15,55 @@ html, body {
 
 /* App Container */
 .app-container {
+    /* Keep Daybreak's palette names while Fluent UI v5 supplies the theme. */
+    --accent-base: var(--colorBrandBackground);
+    --accent-fill-rest: var(--colorBrandBackground);
+    --accent-fill-hover: var(--colorBrandBackgroundHover);
+    --accent-fill-active: var(--colorBrandBackgroundPressed);
+    --accent-fill-focus: var(--colorBrandBackgroundSelected);
+    --accent-fill-stealth-rest: var(--colorSubtleBackground);
+    --accent-fill-subtle-rest: var(--colorBrandBackground2);
+    --accent-foreground-rest: var(--colorBrandForeground1);
+    --accent-foreground-hover: var(--colorBrandForegroundLinkHover);
+    --accent-foreground-cut-rest: var(--colorNeutralForegroundOnBrand);
+    --accent-stroke-active: var(--colorCompoundBrandStrokePressed);
+    --accent-stroke-control-rest: var(--colorCompoundBrandStroke);
+    --accent-stroke-control-default: var(--colorCompoundBrandStroke);
+    --accent-stroke-control-active: var(--colorCompoundBrandStrokePressed);
+    --foreground-on-accent-rest: var(--colorNeutralForegroundOnBrand);
+    --foreground-on-accent-rest-large: var(--colorNeutralForegroundOnBrand);
+    --neutral-foreground-on-accent-rest: var(--colorNeutralForegroundOnBrand);
+    --neutral-fill-rest: var(--colorNeutralBackground1);
+    --neutral-fill-hover: var(--colorNeutralBackground1Hover);
+    --neutral-fill-active: var(--colorNeutralBackground1Pressed);
+    --neutral-fill-secondary-hover: var(--colorNeutralBackground2Hover);
+    --neutral-fill-secondary-active: var(--colorNeutralBackground2Pressed);
+    --neutral-fill-stealth-rest: var(--colorSubtleBackground);
+    --neutral-fill-strong-rest: var(--colorNeutralForeground3);
+    --neutral-fill-strong-hover: var(--colorNeutralForeground3Hover);
+    --neutral-fill-subtle-rest: var(--colorSubtleBackground);
+    --neutral-fill-subtle-hover: var(--colorSubtleBackgroundHover);
+    --neutral-fill-subtle-active: var(--colorSubtleBackgroundPressed);
+    --neutral-foreground-rest: var(--colorNeutralForeground1);
+    --neutral-foreground-2: var(--colorNeutralForeground2);
+    --neutral-foreground-3: var(--colorNeutralForeground3);
+    --neutral-foreground-hint: var(--colorNeutralForeground3);
+    --neutral-foreground-disabled: var(--colorNeutralForegroundDisabled);
+    --neutral-input-rest: var(--colorNeutralForeground1);
+    --neutral-layer-1: var(--colorNeutralBackground1);
+    --neutral-layer-2: var(--colorNeutralBackground2);
+    --neutral-layer-floating: var(--colorNeutralBackground1);
+    --neutral-stroke-rest: var(--colorNeutralStroke1);
+    --neutral-stroke-hover: var(--colorNeutralStroke1Hover);
+    --neutral-stroke-accessible: var(--colorNeutralStrokeAccessible);
+    --neutral-stroke-control-default: var(--colorNeutralStroke1);
+    --neutral-stroke-divider: var(--colorNeutralStroke2);
+    --neutral-stroke-divider-rest: var(--colorNeutralStroke2);
+    --fontSizeBase200: var(--font-size-small);
+    --fontSizeBase300: var(--font-size-medium);
+    --fontSizeBase400: var(--font-size-large);
+    --lineHeightBase300: calc(var(--font-size-medium) * 1.5);
+    color: var(--neutral-foreground-rest);
     display: flex;
     flex-direction: column;
     height: 100vh;

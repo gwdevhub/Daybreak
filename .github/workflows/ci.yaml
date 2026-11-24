@@ -24,7 +24,7 @@ jobs:
       - name: Install .NET
         uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: "10.x"
+          dotnet-version: "11.x"
 
       - name: Build Windows project
         run: dotnet build Daybreak.Windows/Daybreak.Windows.csproj -c $env:Configuration
@@ -57,7 +57,7 @@ jobs:
       - name: Install .NET
         uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: "10.x"
+          dotnet-version: "11.x"
 
       - name: Build Linux project
         run: dotnet build Daybreak.Linux/Daybreak.Linux.csproj -c $Configuration

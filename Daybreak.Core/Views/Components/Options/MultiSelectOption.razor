@@ -4,13 +4,10 @@
         <div class="option-description">@this.Description</div>
     </div>
     <div class="option-control">
-        <FluentSelect TOption="string" @bind-Value="this.SelectedValue" 
-                      @onchange="OnSelectionChanged">
-            @foreach (var option in this.PossibleValues)
-            {
-                <FluentOption TOption="string" Value="@option.ToString()">@option.ToString()</FluentOption>
-            }
-        </FluentSelect>
+        <FluentSelect TOption="string" TValue="string"
+                      Items="@this.PossibleValues.Select(option => option.ToString() ?? string.Empty)"
+                      Value="@this.SelectedValue"
+                      ValueChanged="@this.OnSelectionChanged" />
     </div>
 </div>
 
@@ -34,9 +31,9 @@
         return result;
     }
 
-    private void OnSelectionChanged(ChangeEventArgs e)
+    private void OnSelectionChanged(string? value)
     {
-        var selectedString = e.Value?.ToString() ?? string.Empty;
+        var selectedString = value ?? string.Empty;
         this.SelectedValue = selectedString;
 
         // Find the matching enum value

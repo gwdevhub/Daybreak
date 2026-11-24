@@ -14,20 +14,21 @@
                 </div>
                 <div class="alert-row alert-id">
                     <FluentLabel>ID</FluentLabel>
-                    <FluentTextField @bind-Value="@this.ViewModel.Alert.Id" ReadOnly="true" />
+                    <FluentTextInput @bind-Value="@this.ViewModel.Alert.Id" ReadOnly="true" />
                 </div>
                 <div class="alert-row alert-name">
                     <FluentLabel>Name</FluentLabel>
-                    <FluentTextField @bind-Value="@this.ViewModel.Alert.Name" @bind-Value:after="@this.ViewModel.SaveAlertChanges" />
+                    <FluentTextInput @bind-Value="@this.ViewModel.Alert.Name" @bind-Value:after="@this.ViewModel.SaveAlertChanges" />
                 </div>
                 <div class="alert-row alert-item">
                     <FluentLabel>Item</FluentLabel>
                     <FluentSelect TOption="Daybreak.Shared.Models.Guildwars.ItemBase"
+                                  TValue="int"
                                   Items="@ItemOptions"
                                   OptionText="@(i => i.Name ?? $"Item {i.Id}")"
-                                  OptionValue="@(i => i.Id.ToString())"
-                                  @bind-SelectedOption="SelectedItem"
-                                  @bind-SelectedOption:after="@OnItemSelected">
+                                  OptionValue="@(i => i.Id)"
+                                  @bind-Value="this.ViewModel.Alert.ItemId"
+                                  @bind-Value:after="@this.ViewModel.SaveAlertChanges">
                         <OptionTemplate Context="item">
                             @if (item is Daybreak.Shared.Models.Guildwars.IIconUrlEntity iconEntity)
                             {
@@ -43,7 +44,7 @@
                 </div>
                 <div class="alert-row alert-quote-upper-price">
                     <FluentLabel>Upper price target</FluentLabel>
-                    <FluentNumberField @bind-Value="@this.ViewModel.Alert.UpperPriceTarget" @bind-Value:after="@this.ViewModel.SaveAlertChanges" />
+                    <FluentNumberInput @bind-Value="@this.ViewModel.Alert.UpperPriceTarget" @bind-Value:after="@this.ViewModel.SaveAlertChanges" />
                 </div>
                 <div class="alert-row alert-quote-lower-price-check">
                     <FluentLabel>Lower price target enabled</FluentLabel>
@@ -51,7 +52,7 @@
                 </div>
                 <div class="alert-row alert-quote-lower-price">
                     <FluentLabel>Lower price target</FluentLabel>
-                    <FluentNumberField @bind-Value="@this.ViewModel.Alert.LowerPriceTarget" @bind-Value:after="@this.ViewModel.SaveAlertChanges" />
+                    <FluentNumberInput @bind-Value="@this.ViewModel.Alert.LowerPriceTarget" @bind-Value:after="@this.ViewModel.SaveAlertChanges" />
                 </div>
             </div>
         </div>
@@ -67,21 +68,4 @@
     private IEnumerable<Daybreak.Shared.Models.Guildwars.ItemBase> ItemOptions =>
         Daybreak.Shared.Models.Guildwars.ItemBase.AllItems
             .OrderBy(i => i.Name ?? string.Empty);
-
-    private Daybreak.Shared.Models.Guildwars.ItemBase? SelectedItem
-    {
-        get => ItemOptions.FirstOrDefault(i => i.Id == this.ViewModel.Alert?.ItemId);
-        set
-        {
-            if (this.ViewModel.Alert is not null && value is not null)
-            {
-                this.ViewModel.Alert.ItemId = value.Id;
-            }
-        }
-    }
-
-    private void OnItemSelected()
-    {
-        this.ViewModel.SaveAlertChanges();
-    }
 }

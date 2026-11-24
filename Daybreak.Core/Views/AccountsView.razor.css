@@ -67,9 +67,9 @@
     font-size: var(--font-size-large) !important;
 }
 
-.identifier-field ::deep fluent-text-field,
-.username-field ::deep fluent-text-field,
-.password-field ::deep fluent-text-field {
+.identifier-field ::deep fluent-text-input,
+.username-field ::deep fluent-text-input,
+.password-field ::deep fluent-text-input {
     width: 100%;
     box-sizing: border-box !important;
     font-size: var(--font-size-large);

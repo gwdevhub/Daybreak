@@ -26,17 +26,18 @@
                                 <FluentLabel>Identifier</FluentLabel>
                             </div>
                             <div class="identifier-field">
-                                <FluentTextField Value="@credential.LoginCredentials.Identifier"
-                                                 Appearance="FluentInputAppearance.Outline"
+                                <FluentTextInput Value="@credential.LoginCredentials.Identifier"
+                                                 Appearance="TextInputAppearance.Outline"
                                                  AutoComplete="off"
                                                  ReadOnly="true"
                                                  Placeholder="Identifier">
-                                    <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Delete())"
-                                                @onclick="@(() => this.ViewModel.RemoveCredential(credential))"
-                                                slot="end"
-                                                Color="Color.Neutral"
-                                                Title="Delete account" />
-                                </FluentTextField>
+                                    <EndTemplate>
+                                        <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Delete())"
+                                                    @onclick="@(() => this.ViewModel.RemoveCredential(credential))"
+                                                    Color="Color.Default"
+                                                    Title="Delete account" />
+                                    </EndTemplate>
+                                </FluentTextInput>
                             </div>
                         </div>
                         <div class="username-row">
@@ -44,14 +45,14 @@
                                 <FluentLabel>Username</FluentLabel>
                             </div>
                             <div class="username-field">
-                                <FluentTextField Value="@credential.LoginCredentials.Username"
+                                <FluentTextInput Value="@credential.LoginCredentials.Username"
                                                  ValueChanged="@(e => this.ViewModel.UsernameChanged(credential, e))"
-                                                 Appearance="FluentInputAppearance.Outline"
+                                                 Appearance="TextInputAppearance.Outline"
                                                  AutoComplete="off"
                                                  Immediate="true"
                                                  ImmediateDelay="500"
-                                                 InputMode="InputMode.Text"
-                                                 TextFieldType="TextFieldType.Email"
+                                                 InputMode="TextInputMode.Text"
+                                                 TextInputType="TextInputType.Email"
                                                  Placeholder="Username" />
                             </div>
                         </div>
@@ -60,32 +61,32 @@
                                 <FluentLabel>Password</FluentLabel>
                             </div>
                             <div class="password-field">
-                                <FluentTextField Value="@credential.LoginCredentials.Password"
+                                <FluentTextInput Value="@credential.LoginCredentials.Password"
                                                  ValueChanged="@(e => this.ViewModel.PasswordChanged(credential, e))"
-                                                 Appearance="FluentInputAppearance.Outline"
+                                                 Appearance="TextInputAppearance.Outline"
                                                  AutoComplete="off"
                                                  Immediate="true"
                                                  ImmediateDelay="500"
-                                                 InputMode="InputMode.Text"
-                                                 TextFieldType="@(credential.PasswordVisible ? TextFieldType.Text : TextFieldType.Password)"
+                                                 InputMode="TextInputMode.Text"
+                                                 TextInputType="@(credential.PasswordVisible ? TextInputType.Text : TextInputType.Password)"
                                                  Placeholder="Password">
-                                    @if (credential.PasswordVisible)
-                                    {
-                                        <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Eye())"
-                                                    @onclick="@(() => this.ViewModel.TogglePasswordVisibility(credential))"
-                                                    slot="end"
-                                                    Color="Color.Neutral"
-                                                    Title="Hide password" />
-                                    }
-                                    else
-                                    {
-                                        <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.EyeOff())"
-                                                    @onclick="@(() => this.ViewModel.TogglePasswordVisibility(credential))"
-                                                    slot="end"
-                                                    Color="Color.Neutral"
-                                                    Title="Show password" />
-                                    }
-                                </FluentTextField>
+                                    <EndTemplate>
+                                        @if (credential.PasswordVisible)
+                                        {
+                                            <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Eye())"
+                                                        @onclick="@(() => this.ViewModel.TogglePasswordVisibility(credential))"
+                                                        Color="Color.Default"
+                                                        Title="Hide password" />
+                                        }
+                                        else
+                                        {
+                                            <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.EyeOff())"
+                                                        @onclick="@(() => this.ViewModel.TogglePasswordVisibility(credential))"
+                                                        Color="Color.Default"
+                                                        Title="Show password" />
+                                        }
+                                    </EndTemplate>
+                                </FluentTextInput>
                             </div>
                         </div>
                     </div>
