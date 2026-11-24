@@ -384,7 +384,7 @@ public sealed class MainPlayerService : IDisposable
                 if (gameContext.IsNull ||
                     gameContext.Pointer->Character is null ||
                     gameContext.Pointer->World is null ||
-                    gameContext.Pointer->Party is 0 ||
+                    gameContext.Pointer->Party is null ||
                     currentMapInfo.IsNull)
                 {
                     scopedLogger.LogError("Game context is not initialized");

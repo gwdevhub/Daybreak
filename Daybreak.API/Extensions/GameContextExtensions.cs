@@ -58,7 +58,7 @@ public static unsafe class GameContextExtensions
         heroes = default;
         henchmen = default;
         if (gameContext.IsNull ||
-            gameContext.Pointer->Party is 0)
+            gameContext.Pointer->Party is null)
         {
             return false;
         }

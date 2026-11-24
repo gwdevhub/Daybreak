@@ -13,20 +13,48 @@ namespace Daybreak.API.Interop
 {
 
 /// <summary>
-/// P/Invoke bindings for 560 C++ exports from gwca.dll (0 skipped).
-/// Nested classes mirror the C++ namespace hierarchy (e.g. GW::Agents → GWCA.GW.Agents).
+/// P/Invoke bindings for 550 C exports from gwca.dll (0 skipped).
+/// Nested classes mirror the export names (e.g. GW_Agents_GetAgentByID → GWCA.GW.Agents.GetAgentByID).
 /// Types annotated with [GWCAEquivalent] are used in signatures where available.
 /// </summary>
 public static unsafe partial class GWCA
 {
     private const string DllName = "gwca.dll";
+
+    public const uint AbiVersion = 0x040D0100u;
+    public const ulong ExportSchema = 0x641353bac54269e0UL;
+
+    [StructLayout(LayoutKind.Explicit, Size = 24)]
+    public struct ValidateApiRequest
+    {
+        [FieldOffset(0)] public uint Size;
+        [FieldOffset(4)] public uint Abi;
+        [FieldOffset(8)] public ulong Schema;
+        [FieldOffset(16)] public uint PointerSize;
+        [FieldOffset(20)] public uint Reserved;
+    }
+
+    public enum ValidateApiStatus : uint
+    {
+        Success,
+        InvalidArgument,
+        IncompatibleApi,
+        IncompatibleArchitecture,
+        MissingExport,
+    }
+
+    /// <summary>
+    /// <c>ValidateApiStatus (__cdecl*)(const ValidateApiRequest*)</c>. Resolve it per module handle:
+    /// a [LibraryImport] would bind every gwca.dll import to whichever copy it resolved first.
+    /// </summary>
+    public const string ValidateApiExport = "GWCA_ValidateApi";
     // ═══════════════════════════════════════════════════
     // Parsed structs diagnostic:
-    // [NAMESPACE] GWCA.GW popped at line 46
-    // [NAMESPACE] GWCA.GW.Agents popped at line 211
-    // [NAMESPACE] GWCA.GW.CameraMgr popped at line 34
-    // [NAMESPACE] GWCA.GW.Chat popped at line 13
-    // [NAMESPACE] GWCA.GW.Chat.TextColor popped at line 54
+    // [NAMESPACE] GWCA.GW popped at line 80
+    // [NAMESPACE] GWCA.GW.Agents popped at line 7
+    // [NAMESPACE] GWCA.GW.CameraMgr popped at line 51
+    // [NAMESPACE] GWCA.GW.Chat popped at line 7
+    // [NAMESPACE] GWCA.GW.Chat.TextColor popped at line 56
     // [NAMESPACE] GWCA.GW.Constants popped at line 17
     // [NAMESPACE] GWCA.GW.Constants.DialogID popped at line 282
     // [NAMESPACE] GWCA.GW.Constants.ItemID popped at line 204
@@ -35,32 +63,56 @@ public static unsafe partial class GWCA
     // [NAMESPACE] GWCA.GW.Constants.Preference popped at line 62
     // [NAMESPACE] GWCA.GW.Constants.Range popped at line 239
     // [NAMESPACE] GWCA.GW.Constants.SqrRange popped at line 249
-    // [NAMESPACE] GWCA.GW.Effects popped at line 58
-    // [NAMESPACE] GWCA.GW.EventMgr popped at line 83
-    // [NAMESPACE] GWCA.GW.FriendListMgr popped at line 35
-    // [NAMESPACE] GWCA.GW.GameThread popped at line 31
-    // [NAMESPACE] GWCA.GW.GuildMgr popped at line 21
-    // [NAMESPACE] GWCA.GW.Hook popped at line 127
-    // [NAMESPACE] GWCA.GW.Items popped at line 97
-    // [NAMESPACE] GWCA.GW.Map popped at line 166
-    // [NAMESPACE] GWCA.GW.MemoryMgr popped at line 28
-    // [NAMESPACE] GWCA.GW.Merchant popped at line 30
+    // [NAMESPACE] GWCA.GW.Effects popped at line 76
+    // [NAMESPACE] GWCA.GW.EventMgr popped at line 18
+    // [NAMESPACE] GWCA.GW.FriendListMgr popped at line 18
+    // [NAMESPACE] GWCA.GW.GameThread popped at line 32
+    // [NAMESPACE] GWCA.GW.GuildMgr popped at line 42
+    // [NAMESPACE] GWCA.GW.GW popped at line 235
+    // [NAMESPACE] GWCA.GW.GW.Agents popped at line 409
+    // [NAMESPACE] GWCA.GW.GW.CameraMgr popped at line 106
+    // [NAMESPACE] GWCA.GW.GW.Chat popped at line 263
+    // [NAMESPACE] GWCA.GW.GW.Effects popped at line 139
+    // [NAMESPACE] GWCA.GW.GW.EventMgr popped at line 113
+    // [NAMESPACE] GWCA.GW.GW.FriendListMgr popped at line 147
+    // [NAMESPACE] GWCA.GW.GW.GameThread popped at line 79
+    // [NAMESPACE] GWCA.GW.GW.GuildMgr popped at line 95
+    // [NAMESPACE] GWCA.GW.GW.GW popped at line 584
+    // [NAMESPACE] GWCA.GW.GW.Hook popped at line 246
+    // [NAMESPACE] GWCA.GW.GW.Items popped at line 417
+    // [NAMESPACE] GWCA.GW.GW.Map popped at line 345
+    // [NAMESPACE] GWCA.GW.GW.MemoryMgr popped at line 74
+    // [NAMESPACE] GWCA.GW.GW.Merchant popped at line 80
+    // [NAMESPACE] GWCA.GW.GW.PartyMgr popped at line 375
+    // [NAMESPACE] GWCA.GW.GW.PlayerMgr popped at line 155
+    // [NAMESPACE] GWCA.GW.GW.QuestMgr popped at line 118
+    // [NAMESPACE] GWCA.GW.GW.Render popped at line 331
+    // [NAMESPACE] GWCA.GW.GW.Scanner popped at line 342
+    // [NAMESPACE] GWCA.GW.GW.SkillbarMgr popped at line 259
+    // [NAMESPACE] GWCA.GW.GW.StoC popped at line 105
+    // [NAMESPACE] GWCA.GW.GW.Trade popped at line 79
+    // [NAMESPACE] GWCA.GW.GW.UI popped at line 1468
+    // [NAMESPACE] GWCA.GW.Hook popped at line 160
+    // [NAMESPACE] GWCA.GW.Items popped at line 18
+    // [NAMESPACE] GWCA.GW.Map popped at line 202
+    // [NAMESPACE] GWCA.GW.MemoryMgr popped at line 36
+    // [NAMESPACE] GWCA.GW.Merchant popped at line 32
     // [NAMESPACE] GWCA.GW.Packet popped at line 91
     // [NAMESPACE] GWCA.GW.Packet.StoC popped at line 86
     // [NAMESPACE] GWCA.GW.Packet.StoC.GenericValueID popped at line 58
     // [NAMESPACE] GWCA.GW.Packet.StoC.JumboMessageType popped at line 70
     // [NAMESPACE] GWCA.GW.Packet.StoC.JumboMessageValue popped at line 78
-    // [NAMESPACE] GWCA.GW.PartyMgr popped at line 107
-    // [NAMESPACE] GWCA.GW.PlayerMgr popped at line 56
-    // [NAMESPACE] GWCA.GW.QuestMgr popped at line 43
-    // [NAMESPACE] GWCA.GW.Render popped at line 167
-    // [NAMESPACE] GWCA.GW.Scanner popped at line 119
-    // [NAMESPACE] GWCA.GW.SkillbarMgr popped at line 43
-    // [NAMESPACE] GWCA.GW.StoC popped at line 45
-    // [NAMESPACE] GWCA.GW.TargetFilter popped at line 126
-    // [NAMESPACE] GWCA.GW.Trade popped at line 22
-    // [NAMESPACE] GWCA.GW.UI popped at line 826
-    // [NAMESPACE] GWCA.GW.UI.UIPacket popped at line 30
+    // [NAMESPACE] GWCA.GW.PartyMgr popped at line 157
+    // [NAMESPACE] GWCA.GW.PlayerMgr popped at line 77
+    // [NAMESPACE] GWCA.GW.QuestMgr popped at line 60
+    // [NAMESPACE] GWCA.GW.Render popped at line 198
+    // [NAMESPACE] GWCA.GW.Scanner popped at line 178
+    // [NAMESPACE] GWCA.GW.SkillbarMgr popped at line 47
+    // [NAMESPACE] GWCA.GW.StoC popped at line 44
+    // [NAMESPACE] GWCA.GW.TargetFilter popped at line 129
+    // [NAMESPACE] GWCA.GW.Trade popped at line 36
+    // [NAMESPACE] GWCA.GW.UI popped at line 65
+    // [NAMESPACE] GWCA.GW.UI.UIPacket popped at line 31
     // [NAMESPACE] GWCA.GWCA popped at line 15
     // GWCA.GW.AccountContext: 9 fields [OK]
     // GWCA.GW.AccountInfo: 7 fields [OK]
@@ -87,7 +139,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.CapeDesign: 7 fields [OK]
     // GWCA.GW.CharacterInformation: 4 fields [OK]
     // GWCA.GW.CharAdjustment: 4 fields [OK]
-    // GWCA.GW.CharContext: 35 fields [OK]
+    // GWCA.GW.CharContext: 37 fields [OK]
     // GWCA.GW.Chat.ChatBuffer: 4 fields [OK]
     // GWCA.GW.Chat.ChatMessage: 4 fields [OK]
     // GWCA.GW.Cinematic: 2 fields [OK]
@@ -98,7 +150,6 @@ public static unsafe partial class GWCA
     // GWCA.GW.EditableTextFrame: 0 fields [SKIP: no fields]
     // GWCA.GW.Effect: 6 fields [OK]
     // GWCA.GW.EquipmentVTable: 0 fields [SKIP: no fields]
-    // GWCA.GW.FrameWithValue: 0 fields [SKIP: no fields]
     // GWCA.GW.Friend: 7 fields [OK]
     // GWCA.GW.FriendList: 8 fields [SKIP: unresolved typedef in field friends: FriendsListArray]
     // GWCA.GW.GadgetContext: 1 fields [OK]
@@ -117,7 +168,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.HeroInfo: 35 fields [OK]
     // GWCA.GW.HeroPartyMember: 6 fields [OK]
     // GWCA.GW.Hook.HookTarget: 1 fields [OK]
-    // GWCA.GW.Inventory: 39 fields [OK]
+    // GWCA.GW.Inventory: 40 fields [OK]
     // GWCA.GW.InventoryTableEntry: 3 fields [OK]
     // GWCA.GW.Item: 26 fields [OK]
     // GWCA.GW.ItemContext: 38 fields [OK]
@@ -155,9 +206,9 @@ public static unsafe partial class GWCA
     // GWCA.GW.Packet.StoC.PacketBase: 1 fields [OK]
     // GWCA.GW.PartyAlly: 3 fields [OK]
     // GWCA.GW.PartyAttribute: 2 fields [OK]
-    // GWCA.GW.PartyContext: 16 fields [SKIP: complex template in field requests: TList<PartyInfo>]
+    // GWCA.GW.PartyContext: 16 fields [OK]
     // GWCA.GW.PartyInfo: 7 fields [OK]
-    // GWCA.GW.PartyMemberMoraleInfo: 4 fields [OK]
+    // GWCA.GW.PartyMemberMoraleInfo: 3 fields [OK]
     // GWCA.GW.PartyMoraleLink: 3 fields [OK]
     // GWCA.GW.PartySearch: 13 fields [OK]
     // GWCA.GW.PartySearchContext: 5 fields [OK]
@@ -177,10 +228,10 @@ public static unsafe partial class GWCA
     // GWCA.GW.PrioQ: 2 fields [OK]
     // GWCA.GW.PrioQLink: 4 fields [SKIP: template param T in field pq]
     // GWCA.GW.ProfessionState: 5 fields [OK]
-    // GWCA.GW.ProgressBarContext: 5 fields [OK]
+    // GWCA.GW.ProgressBarContext: 11 fields [OK]
     // GWCA.GW.PropByType: 2 fields [OK]
     // GWCA.GW.PropModelInfo: 5 fields [OK]
-    // GWCA.GW.PropsContext: 6 fields [SKIP: complex template in field propsByType: Array<TList<PropByType>>]
+    // GWCA.GW.PropsContext: 6 fields [OK]
     // GWCA.GW.PvPItemInfo: 1 fields [OK]
     // GWCA.GW.PvPItemUpgradeInfo: 10 fields [OK]
     // GWCA.GW.Quest: 11 fields [OK]
@@ -208,7 +259,9 @@ public static unsafe partial class GWCA
     // GWCA.GW.TextCache: 1 fields [OK]
     // GWCA.GW.TextParser: 14 fields [OK]
     // GWCA.GW.THash: 5 fields [SKIP: template param T in field m_fullList]
-    // GWCA.GW.THashLink: 6 fields [SKIP: template param T in field elem]
+    // GWCA.GW.THashKeyIdentity: 0 fields [SKIP: no fields]
+    // GWCA.GW.THashKeyVal: 0 fields [SKIP: no fields]
+    // GWCA.GW.THashLink: 3 fields [SKIP: template param T in field m_linkToFull]
     // GWCA.GW.Title: 11 fields [OK]
     // GWCA.GW.TitleClientData: 3 fields [OK]
     // GWCA.GW.TitleTier: 3 fields [OK]
@@ -228,7 +281,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.UI.Frame: 83 fields [SKIP: unresolved typedef in field relation: FrameRelation]
     // GWCA.GW.UI.FrameInteractionCallback: 3 fields [OK]
     // GWCA.GW.UI.FramePosition: 17 fields [OK]
-    // GWCA.GW.UI.FrameRelation: 6 fields [SKIP: complex template in field children: TList<FrameRelation>]
+    // GWCA.GW.UI.FrameRelation: 6 fields [OK]
     // GWCA.GW.UI.InteractionMessage: 3 fields [OK]
     // GWCA.GW.UI.MapEntryMessage: 2 fields [OK]
     // GWCA.GW.UI.TooltipInfo: 8 fields [OK]
@@ -304,7 +357,7 @@ public static unsafe partial class GWCA
     // GWCA.GW.Vec3f: 3 fields [OK]
     // GWCA.GW.VisibleEffect: 3 fields [OK]
     // GWCA.GW.WeaponSet: 2 fields [OK]
-    // GWCA.GW.WorldContext: 107 fields [OK]
+    // GWCA.GW.WorldContext: 104 fields [OK]
     // GWCA.GW.WorldMapContext: 21 fields [OK]
     // GWCA.GW.XNode: 4 fields [OK]
     // GWCA.GW.YNode: 3 fields [OK]
@@ -317,421 +370,424 @@ public static unsafe partial class GWCA
     public static partial class GW
     {
 
-        // GW::DisableHooks
-        [LibraryImport(DllName, EntryPoint = "?DisableHooks@GW@@YAXXZ")]
+        // void __cdecl GW_DisableHooks() noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_DisableHooks")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         public static partial void DisableHooks();
 
-        // GW::EnableHooks
-        [LibraryImport(DllName, EntryPoint = "?EnableHooks@GW@@YAXXZ")]
+        // void __cdecl GW_EnableHooks() noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_EnableHooks")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         public static partial void EnableHooks();
 
-        // GW::FatalAssert
-        [LibraryImport(DllName, EntryPoint = "?FatalAssert@GW@@YAXPBD0I0@Z")]
+        // void __cdecl GW_FatalAssert(const char* expr, const char* file, unsigned int line, const char* function) noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_FatalAssert")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        public static partial void FatalAssert(byte* ptr1, nint ptr2, uint value3, nint ptr4);
+        public static partial void FatalAssert(byte* expr, byte* file, uint line, byte* function);
 
-        // GW::GetAccountContext
-        [LibraryImport(DllName, EntryPoint = "?GetAccountContext@GW@@YAPAUAccountContext@1@XZ")]
+        // uint32_t __cdecl GW_GetAbiVersion() noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_GetAbiVersion")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        public static partial uint GetAbiVersion();
+
+        // AccountContext* __cdecl GW_GetAccountContext() noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_GetAccountContext")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         public static partial global::Daybreak.API.Interop.GuildWars.AccountContext* GetAccountContext();
 
-        // GW::GetAgentContext
-        [LibraryImport(DllName, EntryPoint = "?GetAgentContext@GW@@YAPAUAgentContext@1@XZ")]
+        // AgentContext* __cdecl GW_GetAgentContext() noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_GetAgentContext")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         public static partial global::Daybreak.API.Interop.GuildWars.AgentContext* GetAgentContext();
 
-        // GW::GetAvailableChars
-        [LibraryImport(DllName, EntryPoint = "?GetAvailableChars@GW@@YAPAV?$Array@UCharacterInformation@GW@@@1@XZ")]
+        // Array < CharacterInformation >* __cdecl GW_GetAvailableChars() noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_GetAvailableChars")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.CharacterInformation>* GetAvailableChars();
 
-        // GW::GetCharContext
-        [LibraryImport(DllName, EntryPoint = "?GetCharContext@GW@@YAPAUCharContext@1@XZ")]
+        // CharContext* __cdecl GW_GetCharContext() noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_GetCharContext")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         public static partial global::Daybreak.API.Interop.GuildWars.CharContext* GetCharContext();
 
-        // GW::GetDistance
-        [LibraryImport(DllName, EntryPoint = "?GetDistance@GW@@YAMABUVec2f@1@0@Z")]
+        // float __cdecl GW_GetDistance2D(const Vec2f& p1, const Vec2f& p2) noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_GetDistance2D")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        public static partial float GetDistance(global::Daybreak.API.Interop.GuildWars.Vec2fStruct* vector21, nint ptr2);
+        public static partial float GetDistance2D(global::Daybreak.API.Interop.GuildWars.Vec2fStruct* p1, global::Daybreak.API.Interop.GuildWars.Vec2fStruct* p2);
 
-        // GW::GetDistance
-        [LibraryImport(DllName, EntryPoint = "?GetDistance@GW@@YAMUVec3f@1@0@Z")]
+        // float __cdecl GW_GetDistance3D(Vec3f p1, Vec3f p2) noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_GetDistance3D")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        public static partial float GetDistance(global::Daybreak.API.Interop.GuildWars.Vec3fStruct vec3fStruct1, nint ptr2);
+        public static partial float GetDistance3D(global::Daybreak.API.Interop.GuildWars.Vec3fStruct p1, global::Daybreak.API.Interop.GuildWars.Vec3fStruct p2);
 
-        // GW::GetGameContext
-        [LibraryImport(DllName, EntryPoint = "?GetGameContext@GW@@YAPAUGameContext@1@XZ")]
+        // GameContext* __cdecl GW_GetGameContext() noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_GetGameContext")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         public static partial global::Daybreak.API.Interop.GuildWars.GameContext* GetGameContext();
 
-        // GW::GetGameplayContext | returns TODO: map struct GW::GameplayContext
-        // [LibraryImport(DllName, EntryPoint = "?GetGameplayContext@GW@@YAPAUGameplayContext@1@XZ")]
+        // GameplayContext* __cdecl GW_GetGameplayContext() noexcept | returns TODO: map struct GameplayContext
+        // [LibraryImport(DllName, EntryPoint = "GW_GetGameplayContext")]
         // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         // public static partial GameplayContext* GetGameplayContext();
 
-        // GW::GetGuildContext
-        [LibraryImport(DllName, EntryPoint = "?GetGuildContext@GW@@YAPAUGuildContext@1@XZ")]
+        // GuildContext* __cdecl GW_GetGuildContext() noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_GetGuildContext")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         public static partial global::Daybreak.API.Interop.GuildWars.GuildContext* GetGuildContext();
 
-        // GW::GetItemContext
-        [LibraryImport(DllName, EntryPoint = "?GetItemContext@GW@@YAPAUItemContext@1@XZ")]
+        // ItemContext* __cdecl GW_GetItemContext() noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_GetItemContext")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         public static partial global::Daybreak.API.Interop.GuildWars.ItemContext* GetItemContext();
 
-        // GW::GetMapContext
-        [LibraryImport(DllName, EntryPoint = "?GetMapContext@GW@@YAPAUMapContext@1@XZ")]
+        // MapContext* __cdecl GW_GetMapContext() noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_GetMapContext")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         public static partial global::Daybreak.API.Interop.GuildWars.MapContext* GetMapContext();
 
-        // GW::GetNorm
-        [LibraryImport(DllName, EntryPoint = "?GetNorm@GW@@YAMUVec2f@1@@Z")]
+        // float __cdecl GW_GetNorm2D(Vec2f p) noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_GetNorm2D")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        public static partial float GetNorm(global::Daybreak.API.Interop.GuildWars.Vec2fStruct vec2fStruct);
+        public static partial float GetNorm2D(global::Daybreak.API.Interop.GuildWars.Vec2fStruct p);
 
-        // GW::GetNorm
-        [LibraryImport(DllName, EntryPoint = "?GetNorm@GW@@YAMUVec3f@1@@Z")]
+        // float __cdecl GW_GetNorm3D(Vec3f p) noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_GetNorm3D")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        public static partial float GetNorm(global::Daybreak.API.Interop.GuildWars.Vec3fStruct vec3fStruct);
+        public static partial float GetNorm3D(global::Daybreak.API.Interop.GuildWars.Vec3fStruct p);
 
-        // GW::GetPartyContext | returns TODO: map struct GW::PartyContext
-        // [LibraryImport(DllName, EntryPoint = "?GetPartyContext@GW@@YAPAUPartyContext@1@XZ")]
-        // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        // public static partial PartyContext* GetPartyContext();
+        // PartyContext* __cdecl GW_GetPartyContext() noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_GetPartyContext")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        public static partial global::Daybreak.API.Interop.GuildWars.PartyContext* GetPartyContext();
 
-        // GW::GetPreGameContext
-        [LibraryImport(DllName, EntryPoint = "?GetPreGameContext@GW@@YAPAUPreGameContext@1@XZ")]
+        // PreGameContext* __cdecl GW_GetPreGameContext() noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_GetPreGameContext")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         public static partial global::Daybreak.API.Interop.GuildWars.PreGameContext* GetPreGameContext();
 
-        // GW::GetWorldContext
-        [LibraryImport(DllName, EntryPoint = "?GetWorldContext@GW@@YAPAUWorldContext@1@XZ")]
+        // TradeContext* __cdecl GW_GetTradeContext() noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_GetTradeContext")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        public static partial global::Daybreak.API.Interop.GuildWars.TradeContext* GetTradeContext();
+
+        // WorldContext* __cdecl GW_GetWorldContext() noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_GetWorldContext")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         public static partial global::Daybreak.API.Interop.GuildWars.WorldContext* GetWorldContext();
 
-        // GW::Hash
-        [LibraryImport(DllName, EntryPoint = "?Hash@GW@@YAIPBXI@Z")]
+        // uint32_t __cdecl GW_Hash(const void* data, size_t size) noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_Hash")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        public static partial uint Hash(void* ptr1, uint value2);
+        public static partial uint Hash(void* data, nuint size);
 
-        // GW::Hash16
-        [LibraryImport(DllName, EntryPoint = "?Hash16@GW@@YAIG@Z")]
+        // uint32_t __cdecl GW_Hash16(uint16_t data) noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_Hash16")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        public static partial uint Hash16(ushort value);
+        public static partial uint Hash16(ushort data);
 
-        // GW::Hash32
-        [LibraryImport(DllName, EntryPoint = "?Hash32@GW@@YAII@Z")]
+        // uint32_t __cdecl GW_Hash32(uint32_t data) noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_Hash32")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        public static partial uint Hash32(uint value);
+        public static partial uint Hash32(uint data);
 
-        // GW::Hash8
-        [LibraryImport(DllName, EntryPoint = "?Hash8@GW@@YAIE@Z")]
+        // uint32_t __cdecl GW_Hash8(uint8_t data) noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_Hash8")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        public static partial uint Hash8(byte value);
+        public static partial uint Hash8(byte data);
 
-        // GW::HashWString
-        [LibraryImport(DllName, EntryPoint = "?HashWString@GW@@YAIPB_WI@Z")]
+        // uint32_t __cdecl GW_HashWString(const wchar_t* str, uint32_t maxLength) noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_HashWString")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        public static partial uint HashWString(ushort* ptr1, uint value2);
+        public static partial uint HashWString(ushort* str, uint maxLength);
 
-        // GW::Initialize
-        [LibraryImport(DllName, EntryPoint = "?Initialize@GW@@YA_NXZ")]
+        // bool __cdecl GW_Initialize() noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_Initialize")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         [return: MarshalAs(UnmanagedType.U1)]
         public static partial bool Initialize();
 
-        // GW::LogMessage — varargs, requires manual interop
+        // GW_LogMessageV — va_list, requires manual interop
 
-        // GW::RegisterLogHandler
-        [LibraryImport(DllName, EntryPoint = "?RegisterLogHandler@GW@@YAXP6AXPAXW4LogLevel@1@PBD2I2@Z0@Z")]
+        // void __cdecl GW_RegisterLogHandler(LogHandler handler, void* context) noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_RegisterLogHandler")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        public static partial void RegisterLogHandler(nint callback1, nint ptr2);
+        public static partial void RegisterLogHandler(nint handler, void* context);
 
-        // GW::RegisterPanicHandler
-        [LibraryImport(DllName, EntryPoint = "?RegisterPanicHandler@GW@@YAXP6AXPAXPBD1I1@Z0@Z")]
+        // void __cdecl GW_RegisterPanicHandler(PanicHandler handler, void* context) noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_RegisterPanicHandler")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        public static partial void RegisterPanicHandler(nint callback1, nint ptr2);
+        public static partial void RegisterPanicHandler(nint handler, void* context);
 
-        // GW::Rotate
-        [LibraryImport(DllName, EntryPoint = "?Rotate@GW@@YA?AUVec2f@1@U21@M@Z")]
+        // void __cdecl GW_RotateNative(Vec2f value, float rotation, Vec2f* result) noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_RotateNative")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        public static partial global::Daybreak.API.Interop.GuildWars.Vec2fStruct Rotate(global::Daybreak.API.Interop.GuildWars.Vec2fStruct vec2fStruct1, float value2);
+        public static partial void RotateNative(global::Daybreak.API.Interop.GuildWars.Vec2fStruct value, float rotation, global::Daybreak.API.Interop.GuildWars.Vec2fStruct* result);
 
-        // GW::Terminate
-        [LibraryImport(DllName, EntryPoint = "?Terminate@GW@@YAXXZ")]
+        // void __cdecl GW_TerminateNative() noexcept
+        [LibraryImport(DllName, EntryPoint = "GW_TerminateNative")]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        public static partial void Terminate();
+        public static partial void TerminateNative();
 
         public static partial class Agents
         {
 
-            // GW::Agents::ChangeTarget
-            [LibraryImport(DllName, EntryPoint = "?ChangeTarget@Agents@GW@@YA_NI@Z")]
+            // bool __cdecl GW_Agents_ChangeTarget(AgentID agent_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_ChangeTarget")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool ChangeTarget(uint value);
+            public static partial bool ChangeTarget(uint agentId);
 
-            // GW::Agents::ChangeTarget
-            [LibraryImport(DllName, EntryPoint = "?ChangeTarget@Agents@GW@@YA_NPBUAgent@2@@Z")]
+            // uint32_t __cdecl GW_Agents_CountAllegianceInRange(GW::Constants::Allegiance allegiance, float sqr_range) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_CountAllegianceInRange")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial uint CountAllegianceInRange(global::Daybreak.API.Interop.GWCA.GW.Constants.Allegiance allegiance, float sqrRange);
+
+            // AgentArray* __cdecl GW_Agents_GetAgentArray() noexcept | returns TODO: map struct AgentArray
+            // [LibraryImport(DllName, EntryPoint = "GW_Agents_GetAgentArray")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial AgentArray* GetAgentArray();
+
+            // Agent* __cdecl GW_Agents_GetAgentByID(uint32_t id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_GetAgentByID")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial global::Daybreak.API.Interop.GuildWars.Agent* GetAgentByID(uint id);
+
+            // AgentCharData* __cdecl GW_Agents_GetAgentCharData(uint32_t agent_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_GetAgentCharData")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial global::Daybreak.API.Interop.GuildWars.AgentCharData* GetAgentCharData(uint agentId);
+
+            // wchar_t* __cdecl GW_Agents_GetAgentEncNameByAgent(const Agent* agent) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_GetAgentEncNameByAgent")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial ushort* GetAgentEncNameByAgent(global::Daybreak.API.Interop.GuildWars.Agent* agent);
+
+            // wchar_t* __cdecl GW_Agents_GetAgentEncNameById(uint32_t agent_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_GetAgentEncNameById")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial ushort* GetAgentEncNameById(uint agentId);
+
+            // uint32_t __cdecl GW_Agents_GetAgentIdByLoginNumber(uint32_t login_number) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_GetAgentIdByLoginNumber")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial uint GetAgentIdByLoginNumber(uint loginNumber);
+
+            // bool __cdecl GW_Agents_GetAgentMatchesFlags(const Agent* gwca_arg0, AgentTargetFlags flags) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_GetAgentMatchesFlags")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool ChangeTarget(global::Daybreak.API.Interop.GuildWars.Agent* agent);
+            public static partial bool GetAgentMatchesFlags(global::Daybreak.API.Interop.GuildWars.Agent* gwcaArg0, global::Daybreak.API.Interop.GWCA.GW.AgentTargetFlags flags);
 
-            // GW::Agents::CountAllegianceInRange
-            [LibraryImport(DllName, EntryPoint = "?CountAllegianceInRange@Agents@GW@@YAIW4Allegiance@Constants@2@M@Z")]
+            // GW::Constants::ProfessionByte __cdecl GW_Agents_GetAgentPrimary(uint32_t agent_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_GetAgentPrimary")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint CountAllegianceInRange(global::Daybreak.API.Interop.GWCA.GW.Constants.Allegiance allegiance1, float value2);
+            public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.ProfessionByte GetAgentPrimary(uint agentId);
 
-            // GW::Agents::GetAgentArray
-            [LibraryImport(DllName, EntryPoint = "?GetAgentArray@Agents@GW@@YAPAV?$Array@PAUAgent@GW@@@2@XZ")]
+            // GW::Constants::ProfessionByte __cdecl GW_Agents_GetAgentSecondary(uint32_t agent_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_GetAgentSecondary")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint>* GetAgentArray();
+            public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.ProfessionByte GetAgentSecondary(uint agentId);
 
-            // GW::Agents::GetAgentByID
-            [LibraryImport(DllName, EntryPoint = "?GetAgentByID@Agents@GW@@YAPAUAgent@2@I@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.Agent* GetAgentByID(uint value);
-
-            // GW::Agents::GetAgentCharData
-            [LibraryImport(DllName, EntryPoint = "?GetAgentCharData@Agents@GW@@YAPAUAgentCharData@2@I@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.AgentCharData* GetAgentCharData(uint value);
-
-            // GW::Agents::GetAgentEncName
-            [LibraryImport(DllName, EntryPoint = "?GetAgentEncName@Agents@GW@@YAPA_WI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial ushort* GetAgentEncName(uint value);
-
-            // GW::Agents::GetAgentEncName
-            [LibraryImport(DllName, EntryPoint = "?GetAgentEncName@Agents@GW@@YAPA_WPBUAgent@2@@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial ushort* GetAgentEncName(global::Daybreak.API.Interop.GuildWars.Agent* agent);
-
-            // GW::Agents::GetAgentIdByLoginNumber
-            [LibraryImport(DllName, EntryPoint = "?GetAgentIdByLoginNumber@Agents@GW@@YAII@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint GetAgentIdByLoginNumber(uint value);
-
-            // GW::Agents::GetAgentMatchesFlags
-            [LibraryImport(DllName, EntryPoint = "?GetAgentMatchesFlags@Agents@GW@@YA_NPBUAgent@2@W4AgentTargetFlags@2@@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool GetAgentMatchesFlags(global::Daybreak.API.Interop.GuildWars.Agent* agent1, global::Daybreak.API.Interop.GWCA.GW.AgentTargetFlags agentTargetFlags2);
-
-            // GW::Agents::GetAgentPrimary
-            [LibraryImport(DllName, EntryPoint = "?GetAgentPrimary@Agents@GW@@YA?AW4ProfessionByte@Constants@2@I@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.ProfessionByte GetAgentPrimary(uint value);
-
-            // GW::Agents::GetAgentSecondary
-            [LibraryImport(DllName, EntryPoint = "?GetAgentSecondary@Agents@GW@@YA?AW4ProfessionByte@Constants@2@I@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.ProfessionByte GetAgentSecondary(uint value);
-
-            // GW::Agents::GetAmountOfPlayersInInstance
-            [LibraryImport(DllName, EntryPoint = "?GetAmountOfPlayersInInstance@Agents@GW@@YAIXZ")]
+            // uint32_t __cdecl GW_Agents_GetAmountOfPlayersInInstance() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_GetAmountOfPlayersInInstance")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetAmountOfPlayersInInstance();
 
-            // GW::Agents::GetControlledCharacter
-            [LibraryImport(DllName, EntryPoint = "?GetControlledCharacter@Agents@GW@@YAPAUAgentLiving@2@XZ")]
+            // AgentLiving* __cdecl GW_Agents_GetControlledCharacter() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_GetControlledCharacter")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GuildWars.AgentLiving* GetControlledCharacter();
 
-            // GW::Agents::GetControlledCharacterId
-            [LibraryImport(DllName, EntryPoint = "?GetControlledCharacterId@Agents@GW@@YAIXZ")]
+            // uint32_t __cdecl GW_Agents_GetControlledCharacterId() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_GetControlledCharacterId")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetControlledCharacterId();
 
-            // GW::Agents::GetEvaluatedTargetId
-            [LibraryImport(DllName, EntryPoint = "?GetEvaluatedTargetId@Agents@GW@@YAIXZ")]
+            // uint32_t __cdecl GW_Agents_GetEvaluatedTargetId() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_GetEvaluatedTargetId")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetEvaluatedTargetId();
 
-            // GW::Agents::GetHeroAgentID
-            [LibraryImport(DllName, EntryPoint = "?GetHeroAgentID@Agents@GW@@YAII@Z")]
+            // AgentID __cdecl GW_Agents_GetHeroAgentID(uint32_t hero_index) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_GetHeroAgentID")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint GetHeroAgentID(uint value);
+            public static partial uint GetHeroAgentID(uint heroIndex);
 
-            // GW::Agents::GetMapAgentArray
-            [LibraryImport(DllName, EntryPoint = "?GetMapAgentArray@Agents@GW@@YAPAV?$Array@UMapAgent@GW@@@2@XZ")]
+            // MapAgentArray* __cdecl GW_Agents_GetMapAgentArray() noexcept | returns TODO: map struct MapAgentArray
+            // [LibraryImport(DllName, EntryPoint = "GW_Agents_GetMapAgentArray")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial MapAgentArray* GetMapAgentArray();
+
+            // MapAgent* __cdecl GW_Agents_GetMapAgentByID(uint32_t agent_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_GetMapAgentByID")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.MapAgent>* GetMapAgentArray();
+            public static partial global::Daybreak.API.Interop.GuildWars.MapAgent* GetMapAgentByID(uint agentId);
 
-            // GW::Agents::GetMapAgentByID
-            [LibraryImport(DllName, EntryPoint = "?GetMapAgentByID@Agents@GW@@YAPAUMapAgent@2@I@Z")]
+            // NPCArray* __cdecl GW_Agents_GetNPCArray() noexcept | returns TODO: map struct NPCArray
+            // [LibraryImport(DllName, EntryPoint = "GW_Agents_GetNPCArray")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial NPCArray* GetNPCArray();
+
+            // NPC* __cdecl GW_Agents_GetNPCByID(uint32_t npc_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_GetNPCByID")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.MapAgent* GetMapAgentByID(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.NPC* GetNPCByID(uint npcId);
 
-            // GW::Agents::GetNPCArray
-            [LibraryImport(DllName, EntryPoint = "?GetNPCArray@Agents@GW@@YAPAV?$Array@UNPC@GW@@@2@XZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.NPC>* GetNPCArray();
-
-            // GW::Agents::GetNPCByID
-            [LibraryImport(DllName, EntryPoint = "?GetNPCByID@Agents@GW@@YAPAUNPC@2@I@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.NPC* GetNPCByID(uint value);
-
-            // GW::Agents::GetObservingId
-            [LibraryImport(DllName, EntryPoint = "?GetObservingId@Agents@GW@@YAIXZ")]
+            // uint32_t __cdecl GW_Agents_GetObservingId() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_GetObservingId")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetObservingId();
 
-            // GW::Agents::GetPlayerArray
-            [LibraryImport(DllName, EntryPoint = "?GetPlayerArray@Agents@GW@@YAPAV?$Array@UPlayer@GW@@@2@XZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.Player>* GetPlayerArray();
+            // PlayerArray* __cdecl GW_Agents_GetPlayerArray() noexcept | returns TODO: map struct PlayerArray
+            // [LibraryImport(DllName, EntryPoint = "GW_Agents_GetPlayerArray")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial PlayerArray* GetPlayerArray();
 
-            // GW::Agents::GetPlayerByID
-            [LibraryImport(DllName, EntryPoint = "?GetPlayerByID@Agents@GW@@YAPAUAgent@2@I@Z")]
+            // Agent* __cdecl GW_Agents_GetPlayerByID(uint32_t player_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_GetPlayerByID")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.Agent* GetPlayerByID(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.Agent* GetPlayerByID(uint playerId);
 
-            // GW::Agents::GetPlayerNameByLoginNumber
-            [LibraryImport(DllName, EntryPoint = "?GetPlayerNameByLoginNumber@Agents@GW@@YAPA_WI@Z")]
+            // wchar_t* __cdecl GW_Agents_GetPlayerNameByLoginNumber(uint32_t login_number) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_GetPlayerNameByLoginNumber")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial ushort* GetPlayerNameByLoginNumber(uint value);
+            public static partial ushort* GetPlayerNameByLoginNumber(uint loginNumber);
 
-            // GW::Agents::GetTargetAsAgentLiving
-            [LibraryImport(DllName, EntryPoint = "?GetTargetAsAgentLiving@Agents@GW@@YAPAUAgentLiving@2@XZ")]
+            // AgentLiving* __cdecl GW_Agents_GetTargetAsAgentLiving() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_GetTargetAsAgentLiving")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GuildWars.AgentLiving* GetTargetAsAgentLiving();
 
-            // GW::Agents::GetTargetId
-            [LibraryImport(DllName, EntryPoint = "?GetTargetId@Agents@GW@@YAIXZ")]
+            // uint32_t __cdecl GW_Agents_GetTargetId() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_GetTargetId")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetTargetId();
 
-            // GW::Agents::InteractAgent
-            [LibraryImport(DllName, EntryPoint = "?InteractAgent@Agents@GW@@YA_NPBUAgent@2@_N@Z")]
+            // bool __cdecl GW_Agents_InteractAgent(const Agent* agent, bool call_target) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_InteractAgent")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool InteractAgent(global::Daybreak.API.Interop.GuildWars.Agent* agent1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            public static partial bool InteractAgent(global::Daybreak.API.Interop.GuildWars.Agent* agent, [MarshalAs(UnmanagedType.U1)] bool callTarget);
 
-            // GW::Agents::IsObserving
-            [LibraryImport(DllName, EntryPoint = "?IsObserving@Agents@GW@@YA_NXZ")]
+            // bool __cdecl GW_Agents_IsObserving() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_IsObserving")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool IsObserving();
 
-            // GW::Agents::Move
-            [LibraryImport(DllName, EntryPoint = "?Move@Agents@GW@@YA_NMMI@Z")]
+            // bool __cdecl GW_Agents_Move(GamePos pos) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_Move")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool Move(float value1, float value2, uint value3);
+            public static partial bool Move(global::Daybreak.API.Interop.GuildWars.GamePos pos);
 
-            // GW::Agents::Move
-            [LibraryImport(DllName, EntryPoint = "?Move@Agents@GW@@YA_NUGamePos@2@@Z")]
+            // bool __cdecl GW_Agents_RefreshAgentNameTag(const Agent* gwca_arg0) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_RefreshAgentNameTag")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool Move(global::Daybreak.API.Interop.GuildWars.GamePos gamePos);
+            public static partial bool RefreshAgentNameTag(global::Daybreak.API.Interop.GuildWars.Agent* gwcaArg0);
 
-            // GW::Agents::RefreshAgentNameTag
-            [LibraryImport(DllName, EntryPoint = "?RefreshAgentNameTag@Agents@GW@@YA_NPBUAgent@2@@Z")]
+            // bool __cdecl GW_Agents_SendDialog(uint32_t dialog_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Agents_SendDialog")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool RefreshAgentNameTag(global::Daybreak.API.Interop.GuildWars.Agent* agent);
-
-            // GW::Agents::SendDialog
-            [LibraryImport(DllName, EntryPoint = "?SendDialog@Agents@GW@@YA_NI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SendDialog(uint value);
+            public static partial bool SendDialog(uint dialogId);
         }
 
         public static partial class ButtonFrame
         {
 
-            // GW::ButtonFrame::Click
-            [LibraryImport(DllName, EntryPoint = "?Click@ButtonFrame@GW@@QAE_NXZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double Click(nint self);
-
-            // GW::ButtonFrame::Create | returns TODO: map struct GW::ButtonFrame
-            // [LibraryImport(DllName, EntryPoint = "?Create@ButtonFrame@GW@@SAPAU12@IIIPB_W0@Z")]
+            // bool __cdecl GW_ButtonFrame_Click(ButtonFrame* self) noexcept | self: TODO: map struct ButtonFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_ButtonFrame_Click")]
             // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // public static partial ButtonFrame* Create(uint value1, uint value2, uint value3, ushort* ptr4, nint ptr5);
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool Click(ButtonFrame* self);
 
-            // GW::ButtonFrame::DoubleClick
-            [LibraryImport(DllName, EntryPoint = "?DoubleClick@ButtonFrame@GW@@QAE_NXZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double DoubleClick(nint self);
+            // ButtonFrame* __cdecl GW_ButtonFrame_Create(uint32_t parent_frame_id, uint32_t flags, uint32_t child_offset_id, const wchar_t* button_label, const wchar_t* frame_label) noexcept | returns TODO: map struct ButtonFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_ButtonFrame_Create")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial ButtonFrame* Create(uint parentFrameId, uint flags, uint childOffsetId, ushort* buttonLabel, ushort* frameLabel);
 
-            // GW::ButtonFrame::GetLabel
-            [LibraryImport(DllName, EntryPoint = "?GetLabel@ButtonFrame@GW@@QAE_NPAPB_W@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double GetLabel(nint self, void* ptr2);
+            // bool __cdecl GW_ButtonFrame_DoubleClick(ButtonFrame* self) noexcept | self: TODO: map struct ButtonFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_ButtonFrame_DoubleClick")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool DoubleClick(ButtonFrame* self);
 
-            // GW::ButtonFrame::MouseAction
-            [LibraryImport(DllName, EntryPoint = "?MouseAction@ButtonFrame@GW@@QAE_NW4ActionState@UIPacket@UI@2@@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double MouseAction(nint self, global::Daybreak.API.Interop.GWCA.GW.UI.UIPacket.ActionState actionState2);
+            // bool __cdecl GW_ButtonFrame_GetLabel(ButtonFrame* self, const wchar_t** enc_string) noexcept | self: TODO: map struct ButtonFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_ButtonFrame_GetLabel")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool GetLabel(ButtonFrame* self, nint* encString);
 
-            // GW::ButtonFrame::SetLabel
-            [LibraryImport(DllName, EntryPoint = "?SetLabel@ButtonFrame@GW@@QAE_NPB_W@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double SetLabel(nint self, ushort* ptr2);
+            // bool __cdecl GW_ButtonFrame_MouseAction(ButtonFrame* self, UI::UIPacket::ActionState action) noexcept | self: TODO: map struct ButtonFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_ButtonFrame_MouseAction")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool MouseAction(ButtonFrame* self, global::Daybreak.API.Interop.GWCA.GW.UI.UIPacket.ActionState action);
+
+            // bool __cdecl GW_ButtonFrame_SetLabel(ButtonFrame* self, const wchar_t* enc_string) noexcept | self: TODO: map struct ButtonFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_ButtonFrame_SetLabel")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool SetLabel(ButtonFrame* self, ushort* encString);
         }
 
         public static partial class CameraMgr
         {
 
-            // GW::CameraMgr::ComputeCamPos
-            [LibraryImport(DllName, EntryPoint = "?ComputeCamPos@CameraMgr@GW@@YA?AUVec3f@2@M@Z")]
+            // void __cdecl GW_CameraMgr_ComputeCamPos(float dist, Vec3f* out) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_CameraMgr_ComputeCamPos")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.Vec3fStruct ComputeCamPos(float value);
+            public static partial void ComputeCamPos(float dist, global::Daybreak.API.Interop.GuildWars.Vec3fStruct* @out);
 
-            // GW::CameraMgr::GetCamera
-            [LibraryImport(DllName, EntryPoint = "?GetCamera@CameraMgr@GW@@YAPAUCamera@2@XZ")]
+            // Camera* __cdecl GW_CameraMgr_GetCamera() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_CameraMgr_GetCamera")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GuildWars.Camera* GetCamera();
 
-            // GW::CameraMgr::GetCameraUnlock
-            [LibraryImport(DllName, EntryPoint = "?GetCameraUnlock@CameraMgr@GW@@YA_NXZ")]
+            // bool __cdecl GW_CameraMgr_GetCameraUnlock() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_CameraMgr_GetCameraUnlock")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool GetCameraUnlock();
 
-            // GW::CameraMgr::GetFieldOfView
-            [LibraryImport(DllName, EntryPoint = "?GetFieldOfView@CameraMgr@GW@@YAMXZ")]
+            // float __cdecl GW_CameraMgr_GetFieldOfView() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_CameraMgr_GetFieldOfView")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial float GetFieldOfView();
 
-            // GW::CameraMgr::GetYaw
-            [LibraryImport(DllName, EntryPoint = "?GetYaw@CameraMgr@GW@@YAMXZ")]
+            // float __cdecl GW_CameraMgr_GetYaw() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_CameraMgr_GetYaw")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial float GetYaw();
 
-            // GW::CameraMgr::SetFieldOfView
-            [LibraryImport(DllName, EntryPoint = "?SetFieldOfView@CameraMgr@GW@@YA_NM@Z")]
+            // bool __cdecl GW_CameraMgr_SetFieldOfView(float fov) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_CameraMgr_SetFieldOfView")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SetFieldOfView(float value);
+            public static partial bool SetFieldOfView(float fov);
 
-            // GW::CameraMgr::SetFog
-            [LibraryImport(DllName, EntryPoint = "?SetFog@CameraMgr@GW@@YA_N_N@Z")]
+            // bool __cdecl GW_CameraMgr_SetFog(bool flag) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_CameraMgr_SetFog")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool SetFog([MarshalAs(UnmanagedType.U1)] bool flag);
 
-            // GW::CameraMgr::SetMaxDist
-            [LibraryImport(DllName, EntryPoint = "?SetMaxDist@CameraMgr@GW@@YA_NM@Z")]
+            // bool __cdecl GW_CameraMgr_SetMaxDist(float dist) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_CameraMgr_SetMaxDist")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SetMaxDist(float value);
+            public static partial bool SetMaxDist(float dist);
 
-            // GW::CameraMgr::UnlockCam
-            [LibraryImport(DllName, EntryPoint = "?UnlockCam@CameraMgr@GW@@YA_N_N@Z")]
+            // bool __cdecl GW_CameraMgr_UnlockCam(bool flag) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_CameraMgr_UnlockCam")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool UnlockCam([MarshalAs(UnmanagedType.U1)] bool flag);
 
-            // GW::CameraMgr::UpdateCameraPos
-            [LibraryImport(DllName, EntryPoint = "?UpdateCameraPos@CameraMgr@GW@@YA_NXZ")]
+            // bool __cdecl GW_CameraMgr_UpdateCameraPos() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_CameraMgr_UpdateCameraPos")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool UpdateCameraPos();
@@ -740,318 +796,329 @@ public static unsafe partial class GWCA
         public static partial class Chat
         {
 
-            // GW::Chat::AddToChatLog
-            [LibraryImport(DllName, EntryPoint = "?AddToChatLog@Chat@GW@@YA_NPA_WI@Z")]
+            // bool __cdecl GW_Chat_AddToChatLog(wchar_t* message, uint32_t channel) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Chat_AddToChatLog")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool AddToChatLog(ushort* ptr1, uint value2);
+            public static partial bool AddToChatLog(ushort* message, uint channel);
 
-            // GW::Chat::CreateCommand
-            [LibraryImport(DllName, EntryPoint = "?CreateCommand@Chat@GW@@YAXPAUHookEntry@2@PB_WP6AXPAUHookStatus@2@1HPBQA_W@Z@Z")]
+            // void __cdecl GW_Chat_CreateCommand(GW::HookEntry* entry, const wchar_t* cmd, ChatCommandCallback callback) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Chat_CreateCommand")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void CreateCommand(global::Daybreak.API.Interop.HookEntry* hookEntry1, ushort* ptr2, nint callback3);
+            public static partial void CreateCommand(global::Daybreak.API.Interop.HookEntry* entry, ushort* cmd, nint callback);
 
-            // GW::Chat::DeleteCommand
-            [LibraryImport(DllName, EntryPoint = "?DeleteCommand@Chat@GW@@YAXPAUHookEntry@2@PB_W@Z")]
+            // void __cdecl GW_Chat_DeleteCommand(GW::HookEntry* entry, const wchar_t* cmd) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Chat_DeleteCommand")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void DeleteCommand(global::Daybreak.API.Interop.HookEntry* hookEntry1, ushort* ptr2);
+            public static partial void DeleteCommand(global::Daybreak.API.Interop.HookEntry* entry, ushort* cmd);
 
-            // GW::Chat::GetChannel
-            [LibraryImport(DllName, EntryPoint = "?GetChannel@Chat@GW@@YA?AW4Channel@12@D@Z")]
+            // Channel __cdecl GW_Chat_GetChannel(char opcode) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Chat_GetChannel")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GWCA.GW.Chat.Channel GetChannel(byte value);
+            public static partial global::Daybreak.API.Interop.GWCA.GW.Chat.Channel GetChannel(byte opcode);
 
-            // GW::Chat::GetChannel
-            [LibraryImport(DllName, EntryPoint = "?GetChannel@Chat@GW@@YA?AW4Channel@12@_W@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GWCA.GW.Chat.Channel GetChannel(ushort value);
+            // void __cdecl GW_Chat_GetChannelColors(Channel chan, Color* sender, Color* message) noexcept | sender: TODO: map struct Color | message: TODO: map struct Color
+            // [LibraryImport(DllName, EntryPoint = "GW_Chat_GetChannelColors")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial void GetChannelColors(global::Daybreak.API.Interop.GWCA.GW.Chat.Channel chan, Color* sender, Color* message);
 
-            // GW::Chat::GetChannelColors
-            [LibraryImport(DllName, EntryPoint = "?GetChannelColors@Chat@GW@@YAXW4Channel@12@PAI1@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void GetChannelColors(global::Daybreak.API.Interop.GWCA.GW.Chat.Channel channel1, uint* ptr2, nint ptr3);
-
-            // GW::Chat::GetChatLog
-            [LibraryImport(DllName, EntryPoint = "?GetChatLog@Chat@GW@@YAPAUChatBuffer@12@XZ")]
+            // Chat::ChatBuffer* __cdecl GW_Chat_GetChatLog() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Chat_GetChatLog")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GuildWars.ChatBuffer* GetChatLog();
 
-            // GW::Chat::GetCurrentChatChannel
-            [LibraryImport(DllName, EntryPoint = "?GetCurrentChatChannel@Chat@GW@@YA?AW4Channel@12@XZ")]
+            // Channel __cdecl GW_Chat_GetCurrentChatChannel() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Chat_GetCurrentChatChannel")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GWCA.GW.Chat.Channel GetCurrentChatChannel();
 
-            // GW::Chat::GetDefaultColors
-            [LibraryImport(DllName, EntryPoint = "?GetDefaultColors@Chat@GW@@YAXW4Channel@12@PAI1@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void GetDefaultColors(global::Daybreak.API.Interop.GWCA.GW.Chat.Channel channel1, uint* ptr2, nint ptr3);
+            // void __cdecl GW_Chat_GetDefaultColors(Channel chan, Color* sender, Color* message) noexcept | sender: TODO: map struct Color | message: TODO: map struct Color
+            // [LibraryImport(DllName, EntryPoint = "GW_Chat_GetDefaultColors")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial void GetDefaultColors(global::Daybreak.API.Interop.GWCA.GW.Chat.Channel chan, Color* sender, Color* message);
 
-            // GW::Chat::GetIsTyping
-            [LibraryImport(DllName, EntryPoint = "?GetIsTyping@Chat@GW@@YA_NXZ")]
+            // bool __cdecl GW_Chat_GetIsTyping() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Chat_GetIsTyping")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool GetIsTyping();
 
-            // GW::Chat::SendChat
-            [LibraryImport(DllName, EntryPoint = "?SendChat@Chat@GW@@YA_NDPBD@Z")]
+            // bool __cdecl GW_Chat_SendChatChannelA(char channel, const char* msg) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Chat_SendChatChannelA")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SendChat(byte value1, byte* ptr2);
+            public static partial bool SendChatChannelA(byte channel, byte* msg);
 
-            // GW::Chat::SendChat
-            [LibraryImport(DllName, EntryPoint = "?SendChat@Chat@GW@@YA_NDPB_W@Z")]
+            // bool __cdecl GW_Chat_SendChatChannelW(char channel, const wchar_t* msg) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Chat_SendChatChannelW")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SendChat(byte value1, ushort* ptr2);
+            public static partial bool SendChatChannelW(byte channel, ushort* msg);
 
-            // GW::Chat::SendChat
-            [LibraryImport(DllName, EntryPoint = "?SendChat@Chat@GW@@YA_NPBD@Z")]
+            // bool __cdecl GW_Chat_SendChatCurrentA(const char* msg) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Chat_SendChatCurrentA")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SendChat(byte* ptr);
+            public static partial bool SendChatCurrentA(byte* msg);
 
-            // GW::Chat::SendChat
-            [LibraryImport(DllName, EntryPoint = "?SendChat@Chat@GW@@YA_NPB_W0@Z")]
+            // bool __cdecl GW_Chat_SendChatCurrentW(const wchar_t* msg) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Chat_SendChatCurrentW")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SendChat(ushort* ptr1, nint ptr2);
+            public static partial bool SendChatCurrentW(ushort* msg);
 
-            // GW::Chat::SendChat
-            [LibraryImport(DllName, EntryPoint = "?SendChat@Chat@GW@@YA_NPB_W@Z")]
+            // bool __cdecl GW_Chat_SendWhisper(const wchar_t* to, const wchar_t* msg) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Chat_SendWhisper")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SendChat(ushort* ptr);
+            public static partial bool SendWhisper(ushort* to, ushort* msg);
 
-            // GW::Chat::SetMessageColor
-            [LibraryImport(DllName, EntryPoint = "?SetMessageColor@Chat@GW@@YAIW4Channel@12@I@Z")]
+            // Color __cdecl GW_Chat_SetMessageColor(Channel chan, Color col) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Chat_SetMessageColor")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint SetMessageColor(global::Daybreak.API.Interop.GWCA.GW.Chat.Channel channel1, uint value2);
+            public static partial uint SetMessageColor(global::Daybreak.API.Interop.GWCA.GW.Chat.Channel chan, uint col);
 
-            // GW::Chat::SetSenderColor
-            [LibraryImport(DllName, EntryPoint = "?SetSenderColor@Chat@GW@@YAIW4Channel@12@I@Z")]
+            // Color __cdecl GW_Chat_SetSenderColor(Channel chan, Color col) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Chat_SetSenderColor")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint SetSenderColor(global::Daybreak.API.Interop.GWCA.GW.Chat.Channel channel1, uint value2);
+            public static partial uint SetSenderColor(global::Daybreak.API.Interop.GWCA.GW.Chat.Channel chan, uint col);
 
-            // GW::Chat::SetTimestampsColor
-            [LibraryImport(DllName, EntryPoint = "?SetTimestampsColor@Chat@GW@@YAXI@Z")]
+            // void __cdecl GW_Chat_SetTimestampsColor(Color color) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Chat_SetTimestampsColor")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void SetTimestampsColor(uint value);
+            public static partial void SetTimestampsColor(uint color);
 
-            // GW::Chat::SetTimestampsFormat
-            [LibraryImport(DllName, EntryPoint = "?SetTimestampsFormat@Chat@GW@@YAX_N0@Z")]
+            // void __cdecl GW_Chat_SetTimestampsFormat(bool use_24h, bool show_timestamp_seconds) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Chat_SetTimestampsFormat")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void SetTimestampsFormat([MarshalAs(UnmanagedType.U1)] bool flag1, nint ptr2);
+            public static partial void SetTimestampsFormat([MarshalAs(UnmanagedType.U1)] bool use24h, [MarshalAs(UnmanagedType.U1)] bool showTimestampSeconds);
 
-            // GW::Chat::ToggleTimestamps
-            [LibraryImport(DllName, EntryPoint = "?ToggleTimestamps@Chat@GW@@YAX_N@Z")]
+            // void __cdecl GW_Chat_ToggleTimestamps(bool enable) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Chat_ToggleTimestamps")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void ToggleTimestamps([MarshalAs(UnmanagedType.U1)] bool flag);
+            public static partial void ToggleTimestamps([MarshalAs(UnmanagedType.U1)] bool enable);
 
-            // GW::Chat::WriteChat
-            [LibraryImport(DllName, EntryPoint = "?WriteChat@Chat@GW@@YAXW4Channel@12@PB_W1_N@Z")]
+            // void __cdecl GW_Chat_WriteChat(Channel channel, const wchar_t* message, const wchar_t* sender, bool transient) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Chat_WriteChat")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void WriteChat(global::Daybreak.API.Interop.GWCA.GW.Chat.Channel channel1, ushort* ptr2, nint ptr3, [MarshalAs(UnmanagedType.U1)] bool flag4);
+            public static partial void WriteChat(global::Daybreak.API.Interop.GWCA.GW.Chat.Channel channel, ushort* message, ushort* sender, [MarshalAs(UnmanagedType.U1)] bool transient);
 
-            // GW::Chat::WriteChatEnc
-            [LibraryImport(DllName, EntryPoint = "?WriteChatEnc@Chat@GW@@YAXW4Channel@12@PB_W1_N@Z")]
+            // void __cdecl GW_Chat_WriteChatEnc(Channel channel, const wchar_t* message, const wchar_t* sender, bool transient) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Chat_WriteChatEnc")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void WriteChatEnc(global::Daybreak.API.Interop.GWCA.GW.Chat.Channel channel1, ushort* ptr2, nint ptr3, [MarshalAs(UnmanagedType.U1)] bool flag4);
+            public static partial void WriteChatEnc(global::Daybreak.API.Interop.GWCA.GW.Chat.Channel channel, ushort* message, ushort* sender, [MarshalAs(UnmanagedType.U1)] bool transient);
 
-            // GW::Chat::WriteChatF — varargs, requires manual interop
+            // GW_Chat_WriteChatV — va_list, requires manual interop
         }
 
         public static partial class CheckboxFrame
         {
 
-            // GW::CheckboxFrame::Create | returns TODO: map struct GW::CheckboxFrame
-            // [LibraryImport(DllName, EntryPoint = "?Create@CheckboxFrame@GW@@SAPAU12@IIIPB_W0@Z")]
+            // CheckboxFrame* __cdecl GW_CheckboxFrame_Create(uint32_t parent_frame_id, uint32_t flags, uint32_t child_offset_id, const wchar_t* text_label_enc_string, const wchar_t* frame_label) noexcept | returns TODO: map struct CheckboxFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_CheckboxFrame_Create")]
             // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // public static partial CheckboxFrame* Create(uint value1, uint value2, uint value3, ushort* ptr4, nint ptr5);
+            // public static partial CheckboxFrame* Create(uint parentFrameId, uint flags, uint childOffsetId, ushort* textLabelEncString, ushort* frameLabel);
 
-            // GW::CheckboxFrame::GetValue
-            [LibraryImport(DllName, EntryPoint = "?GetValue@CheckboxFrame@GW@@UAEIXZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial void GetValue(nint self);
+            // uint32_t __cdecl GW_CheckboxFrame_GetValue(CheckboxFrame* self) noexcept | self: TODO: map struct CheckboxFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_CheckboxFrame_GetValue")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial uint GetValue(CheckboxFrame* self);
 
-            // GW::CheckboxFrame::IsChecked
-            [LibraryImport(DllName, EntryPoint = "?IsChecked@CheckboxFrame@GW@@QAE_NXZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double IsChecked(nint self);
+            // bool __cdecl GW_CheckboxFrame_IsChecked(CheckboxFrame* self) noexcept | self: TODO: map struct CheckboxFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_CheckboxFrame_IsChecked")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool IsChecked(CheckboxFrame* self);
 
-            // GW::CheckboxFrame::SetChecked
-            [LibraryImport(DllName, EntryPoint = "?SetChecked@CheckboxFrame@GW@@QAE_N_N@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double SetChecked(nint self, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            // bool __cdecl GW_CheckboxFrame_SetChecked(CheckboxFrame* self, bool checked) noexcept | self: TODO: map struct CheckboxFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_CheckboxFrame_SetChecked")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool SetChecked(CheckboxFrame* self, [MarshalAs(UnmanagedType.U1)] bool @checked);
 
-            // GW::CheckboxFrame::SetValue
-            [LibraryImport(DllName, EntryPoint = "?SetValue@CheckboxFrame@GW@@UAE_NI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double SetValue(nint self, uint value2);
+            // bool __cdecl GW_CheckboxFrame_SetValue(CheckboxFrame* self, uint32_t value) noexcept | self: TODO: map struct CheckboxFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_CheckboxFrame_SetValue")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool SetValue(CheckboxFrame* self, uint value);
         }
 
         public static partial class DropdownFrame
         {
 
-            // GW::DropdownFrame::AddOption
-            [LibraryImport(DllName, EntryPoint = "?AddOption@DropdownFrame@GW@@QAE_NPB_WI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double AddOption(nint self, ushort* ptr2, uint value3);
+            // bool __cdecl GW_DropdownFrame_AddOption(DropdownFrame* self, const wchar_t* label_enc_string, uint32_t value) noexcept | self: TODO: map struct DropdownFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_DropdownFrame_AddOption")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool AddOption(DropdownFrame* self, ushort* labelEncString, uint value);
 
-            // GW::DropdownFrame::GetCount
-            [LibraryImport(DllName, EntryPoint = "?GetCount@DropdownFrame@GW@@QAE_NPAI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double GetCount(nint self, uint* ptr2);
+            // bool __cdecl GW_DropdownFrame_GetCount(DropdownFrame* self, uint32_t* count) noexcept | self: TODO: map struct DropdownFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_DropdownFrame_GetCount")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool GetCount(DropdownFrame* self, uint* count);
 
-            // GW::DropdownFrame::GetOptionIndex
-            [LibraryImport(DllName, EntryPoint = "?GetOptionIndex@DropdownFrame@GW@@QAE_NIPAI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double GetOptionIndex(nint self, uint value2, uint* ptr3);
+            // bool __cdecl GW_DropdownFrame_GetOptionIndex(DropdownFrame* self, uint32_t value, uint32_t* index) noexcept | self: TODO: map struct DropdownFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_DropdownFrame_GetOptionIndex")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool GetOptionIndex(DropdownFrame* self, uint value, uint* index);
 
-            // GW::DropdownFrame::GetOptionValue
-            [LibraryImport(DllName, EntryPoint = "?GetOptionValue@DropdownFrame@GW@@QAE_NIPAI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double GetOptionValue(nint self, uint value2, uint* ptr3);
+            // bool __cdecl GW_DropdownFrame_GetOptionValue(DropdownFrame* self, uint32_t index, uint32_t* value) noexcept | self: TODO: map struct DropdownFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_DropdownFrame_GetOptionValue")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool GetOptionValue(DropdownFrame* self, uint index, uint* value);
 
-            // GW::DropdownFrame::GetOptions | returns TODO: map struct vector
-            // [LibraryImport(DllName, EntryPoint = "?GetOptions@DropdownFrame@GW@@QAE?AV?$vector@IV?$allocator@I@std@@@std@@XZ")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            // public static partial vector* GetOptions(nint self, nint ptr2, nint ptr3, nint ptr4);
+            // uint32_t __cdecl GW_DropdownFrame_GetOptions(DropdownFrame* self, uint32_t* buffer, uint32_t capacity) noexcept | self: TODO: map struct DropdownFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_DropdownFrame_GetOptions")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial uint GetOptions(DropdownFrame* self, uint* buffer, uint capacity);
 
-            // GW::DropdownFrame::GetSelectedIndex
-            [LibraryImport(DllName, EntryPoint = "?GetSelectedIndex@DropdownFrame@GW@@QAE_NPAI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double GetSelectedIndex(nint self, uint* ptr2);
+            // bool __cdecl GW_DropdownFrame_GetSelectedIndex(DropdownFrame* self, uint32_t* index) noexcept | self: TODO: map struct DropdownFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_DropdownFrame_GetSelectedIndex")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool GetSelectedIndex(DropdownFrame* self, uint* index);
 
-            // GW::DropdownFrame::GetValue
-            [LibraryImport(DllName, EntryPoint = "?GetValue@DropdownFrame@GW@@UAEIXZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial void GetValue(nint self);
+            // uint32_t __cdecl GW_DropdownFrame_GetValue(DropdownFrame* self) noexcept | self: TODO: map struct DropdownFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_DropdownFrame_GetValue")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial uint GetValue(DropdownFrame* self);
 
-            // GW::DropdownFrame::HasValueMapping
-            [LibraryImport(DllName, EntryPoint = "?HasValueMapping@DropdownFrame@GW@@QAE_NXZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double HasValueMapping(nint self);
+            // bool __cdecl GW_DropdownFrame_HasValueMapping(DropdownFrame* self) noexcept | self: TODO: map struct DropdownFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_DropdownFrame_HasValueMapping")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool HasValueMapping(DropdownFrame* self);
 
-            // GW::DropdownFrame::SelectIndex
-            [LibraryImport(DllName, EntryPoint = "?SelectIndex@DropdownFrame@GW@@QAE_NI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double SelectIndex(nint self, uint value2);
+            // bool __cdecl GW_DropdownFrame_SelectIndex(DropdownFrame* self, uint32_t index) noexcept | self: TODO: map struct DropdownFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_DropdownFrame_SelectIndex")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool SelectIndex(DropdownFrame* self, uint index);
 
-            // GW::DropdownFrame::SelectOption
-            [LibraryImport(DllName, EntryPoint = "?SelectOption@DropdownFrame@GW@@QAE_NI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double SelectOption(nint self, uint value2);
+            // bool __cdecl GW_DropdownFrame_SelectOption(DropdownFrame* self, uint32_t value) noexcept | self: TODO: map struct DropdownFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_DropdownFrame_SelectOption")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool SelectOption(DropdownFrame* self, uint value);
 
-            // GW::DropdownFrame::SetValue
-            [LibraryImport(DllName, EntryPoint = "?SetValue@DropdownFrame@GW@@UAE_NI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double SetValue(nint self, uint value2);
+            // bool __cdecl GW_DropdownFrame_SetValue(DropdownFrame* self, uint32_t value) noexcept | self: TODO: map struct DropdownFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_DropdownFrame_SetValue")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool SetValue(DropdownFrame* self, uint value);
         }
 
         public static partial class EditableTextFrame
         {
 
-            // GW::EditableTextFrame::GetValue
-            [LibraryImport(DllName, EntryPoint = "?GetValue@EditableTextFrame@GW@@QAEPB_WXZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial nint GetValue(nint self, ushort value2);
+            // const wchar_t* __cdecl GW_EditableTextFrame_GetValue(EditableTextFrame* self) noexcept | self: TODO: map struct EditableTextFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_EditableTextFrame_GetValue")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial ushort* GetValue(EditableTextFrame* self);
 
-            // GW::EditableTextFrame::IsReadOnly
-            [LibraryImport(DllName, EntryPoint = "?IsReadOnly@EditableTextFrame@GW@@QAE_NXZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double IsReadOnly(nint self);
+            // bool __cdecl GW_EditableTextFrame_IsReadOnly(EditableTextFrame* self) noexcept | self: TODO: map struct EditableTextFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_EditableTextFrame_IsReadOnly")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool IsReadOnly(EditableTextFrame* self);
 
-            // GW::EditableTextFrame::SetMaxLength
-            [LibraryImport(DllName, EntryPoint = "?SetMaxLength@EditableTextFrame@GW@@QAE_NI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double SetMaxLength(nint self, uint value2);
+            // bool __cdecl GW_EditableTextFrame_SetMaxLength(EditableTextFrame* self, uint32_t max_length) noexcept | self: TODO: map struct EditableTextFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_EditableTextFrame_SetMaxLength")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool SetMaxLength(EditableTextFrame* self, uint maxLength);
 
-            // GW::EditableTextFrame::SetReadOnly
-            [LibraryImport(DllName, EntryPoint = "?SetReadOnly@EditableTextFrame@GW@@QAE_N_N@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double SetReadOnly(nint self, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            // bool __cdecl GW_EditableTextFrame_SetReadOnly(EditableTextFrame* self, bool readonly) noexcept | self: TODO: map struct EditableTextFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_EditableTextFrame_SetReadOnly")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool SetReadOnly(EditableTextFrame* self, [MarshalAs(UnmanagedType.U1)] bool @readonly);
 
-            // GW::EditableTextFrame::SetValue
-            [LibraryImport(DllName, EntryPoint = "?SetValue@EditableTextFrame@GW@@QAE_NPB_W@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double SetValue(nint self, ushort* ptr2);
+            // bool __cdecl GW_EditableTextFrame_SetValue(EditableTextFrame* self, const wchar_t* value) noexcept | self: TODO: map struct EditableTextFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_EditableTextFrame_SetValue")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool SetValue(EditableTextFrame* self, ushort* value);
         }
 
         public static partial class Effect
         {
 
-            // GW::Effect::GetTimeElapsed
-            [LibraryImport(DllName, EntryPoint = "?GetTimeElapsed@Effect@GW@@QBEKXZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial void GetTimeElapsed(nint self);
+            // DWORD __cdecl GW_Effect_GetTimeElapsed(const Effect* self) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Effect_GetTimeElapsed")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial uint GetTimeElapsed(global::Daybreak.API.Interop.GuildWars.EffectData* self);
 
-            // GW::Effect::GetTimeRemaining
-            [LibraryImport(DllName, EntryPoint = "?GetTimeRemaining@Effect@GW@@QBEKXZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial void GetTimeRemaining(nint self);
+            // DWORD __cdecl GW_Effect_GetTimeRemaining(const Effect* self) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Effect_GetTimeRemaining")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial uint GetTimeRemaining(global::Daybreak.API.Interop.GuildWars.EffectData* self);
         }
 
         public static partial class Effects
         {
 
-            // GW::Effects::DropBuff
-            [LibraryImport(DllName, EntryPoint = "?DropBuff@Effects@GW@@YA_NI@Z")]
+            // bool __cdecl GW_Effects_DropBuff(uint32_t buff_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Effects_DropBuff")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool DropBuff(uint value);
+            public static partial bool DropBuff(uint buffId);
 
-            // GW::Effects::GetAgentBuffs
-            [LibraryImport(DllName, EntryPoint = "?GetAgentBuffs@Effects@GW@@YAPAV?$Array@UBuff@GW@@@2@I@Z")]
+            // BuffArray* __cdecl GW_Effects_GetAgentBuffs(uint32_t agent_id) noexcept | returns TODO: map struct BuffArray
+            // [LibraryImport(DllName, EntryPoint = "GW_Effects_GetAgentBuffs")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial BuffArray* GetAgentBuffs(uint agentId);
+
+            // EffectArray* __cdecl GW_Effects_GetAgentEffects(uint32_t agent_id) noexcept | returns TODO: map struct EffectArray
+            // [LibraryImport(DllName, EntryPoint = "GW_Effects_GetAgentEffects")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial EffectArray* GetAgentEffects(uint agentId);
+
+            // AgentEffects* __cdecl GW_Effects_GetAgentEffectsArray(uint32_t agent_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Effects_GetAgentEffectsArray")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.Buff>* GetAgentBuffs();
+            public static partial global::Daybreak.API.Interop.GuildWars.AgentEffects* GetAgentEffectsArray(uint agentId);
 
-            // GW::Effects::GetAgentEffects
-            [LibraryImport(DllName, EntryPoint = "?GetAgentEffects@Effects@GW@@YAPAV?$Array@UEffect@GW@@@2@I@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.EffectData>* GetAgentEffects();
-
-            // GW::Effects::GetAgentEffectsArray
-            [LibraryImport(DllName, EntryPoint = "?GetAgentEffectsArray@Effects@GW@@YAPAUAgentEffects@2@I@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.AgentEffects* GetAgentEffectsArray(uint value);
-
-            // GW::Effects::GetAlcoholLevel
-            [LibraryImport(DllName, EntryPoint = "?GetAlcoholLevel@Effects@GW@@YAIXZ")]
+            // uint32_t __cdecl GW_Effects_GetAlcoholLevel() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Effects_GetAlcoholLevel")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetAlcoholLevel();
 
-            // GW::Effects::GetDrunkAf
-            [LibraryImport(DllName, EntryPoint = "?GetDrunkAf@Effects@GW@@YAXMI@Z")]
+            // void __cdecl GW_Effects_GetDrunkAf(float intensity, uint32_t tint) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Effects_GetDrunkAf")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void GetDrunkAf(float value1, uint value2);
+            public static partial void GetDrunkAf(float intensity, uint tint);
 
-            // GW::Effects::GetPartyEffectsArray
-            [LibraryImport(DllName, EntryPoint = "?GetPartyEffectsArray@Effects@GW@@YAPAV?$Array@UAgentEffects@GW@@@2@XZ")]
+            // AgentEffectsArray* __cdecl GW_Effects_GetPartyEffectsArray() noexcept | returns TODO: map struct AgentEffectsArray
+            // [LibraryImport(DllName, EntryPoint = "GW_Effects_GetPartyEffectsArray")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial AgentEffectsArray* GetPartyEffectsArray();
+
+            // Buff* __cdecl GW_Effects_GetPlayerBuffBySkillId(Constants::SkillID skill_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Effects_GetPlayerBuffBySkillId")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.AgentEffects>* GetPartyEffectsArray();
+            public static partial global::Daybreak.API.Interop.GuildWars.Buff* GetPlayerBuffBySkillId(global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillId);
 
-            // GW::Effects::GetPlayerBuffBySkillId
-            [LibraryImport(DllName, EntryPoint = "?GetPlayerBuffBySkillId@Effects@GW@@YAPAUBuff@2@W4SkillID@Constants@2@@Z")]
+            // BuffArray* __cdecl GW_Effects_GetPlayerBuffs() noexcept | returns TODO: map struct BuffArray
+            // [LibraryImport(DllName, EntryPoint = "GW_Effects_GetPlayerBuffs")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial BuffArray* GetPlayerBuffs();
+
+            // Effect* __cdecl GW_Effects_GetPlayerEffectBySkillId(Constants::SkillID skill_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Effects_GetPlayerEffectBySkillId")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.Buff* GetPlayerBuffBySkillId(global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillID);
+            public static partial global::Daybreak.API.Interop.GuildWars.EffectData* GetPlayerEffectBySkillId(global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillId);
 
-            // GW::Effects::GetPlayerBuffs
-            [LibraryImport(DllName, EntryPoint = "?GetPlayerBuffs@Effects@GW@@YAPAV?$Array@UBuff@GW@@@2@XZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.Buff>* GetPlayerBuffs();
+            // EffectArray* __cdecl GW_Effects_GetPlayerEffects() noexcept | returns TODO: map struct EffectArray
+            // [LibraryImport(DllName, EntryPoint = "GW_Effects_GetPlayerEffects")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial EffectArray* GetPlayerEffects();
 
-            // GW::Effects::GetPlayerEffectBySkillId
-            [LibraryImport(DllName, EntryPoint = "?GetPlayerEffectBySkillId@Effects@GW@@YAPAUEffect@2@W4SkillID@Constants@2@@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.EffectData* GetPlayerEffectBySkillId(global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillID);
-
-            // GW::Effects::GetPlayerEffects
-            [LibraryImport(DllName, EntryPoint = "?GetPlayerEffects@Effects@GW@@YAPAV?$Array@UEffect@GW@@@2@XZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.EffectData>* GetPlayerEffects();
-
-            // GW::Effects::GetPlayerEffectsArray
-            [LibraryImport(DllName, EntryPoint = "?GetPlayerEffectsArray@Effects@GW@@YAPAUAgentEffects@2@XZ")]
+            // AgentEffects* __cdecl GW_Effects_GetPlayerEffectsArray() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Effects_GetPlayerEffectsArray")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GuildWars.AgentEffects* GetPlayerEffectsArray();
         }
@@ -1059,816 +1126,817 @@ public static unsafe partial class GWCA
         public static partial class EventMgr
         {
 
-            // GW::EventMgr::RegisterEventCallback | function3: TODO: map struct function
-            // [LibraryImport(DllName, EntryPoint = "?RegisterEventCallback@EventMgr@GW@@YAXPAUHookEntry@2@W4EventID@12@ABV?$function@$$A6AXPAUHookStatus@GW@@W4EventID@EventMgr@2@PAXI@Z@std@@H@Z")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // public static partial void RegisterEventCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, global::Daybreak.API.Interop.GWCA.GW.EventMgr.EventID eventID2, function* function3, global::Daybreak.API.Interop.GWCA.GW.EventMgr.EventID eventID4, void* ptr5, uint value6);
-
-            // GW::EventMgr::RemoveEventCallback
-            [LibraryImport(DllName, EntryPoint = "?RemoveEventCallback@EventMgr@GW@@YAXPAUHookEntry@2@W4EventID@12@@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void RemoveEventCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, global::Daybreak.API.Interop.GWCA.GW.EventMgr.EventID eventID2);
-
-            // GW::EventMgr::SendEventMessage
-            [LibraryImport(DllName, EntryPoint = "?SendEventMessage@EventMgr@GW@@YA_NW4EventID@12@PAXI@Z")]
+            // bool __cdecl GW_EventMgr_RegisterEventCallback(HookEntry* entry, EventID event_id, NativeEventCallback callback, void* context, int32_t altitude) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_EventMgr_RegisterEventCallback")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SendEventMessage(global::Daybreak.API.Interop.GWCA.GW.EventMgr.EventID eventID1, void* ptr2, uint value3);
+            public static partial bool RegisterEventCallback(global::Daybreak.API.Interop.HookEntry* entry, global::Daybreak.API.Interop.GWCA.GW.EventMgr.EventID eventId, nint callback, void* context, int altitude);
+
+            // void __cdecl GW_EventMgr_RemoveEventCallbackNative(HookEntry* entry, EventID event_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_EventMgr_RemoveEventCallbackNative")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial void RemoveEventCallbackNative(global::Daybreak.API.Interop.HookEntry* entry, global::Daybreak.API.Interop.GWCA.GW.EventMgr.EventID eventId);
+
+            // bool __cdecl GW_EventMgr_SendEventMessage(EventID event_id, void* packet_bytes, uint32_t packet_bytes_len) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_EventMgr_SendEventMessage")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool SendEventMessage(global::Daybreak.API.Interop.GWCA.GW.EventMgr.EventID eventId, void* packetBytes, uint packetBytesLen);
         }
 
         public static partial class FriendListMgr
         {
 
-            // GW::FriendListMgr::AddFriend
-            [LibraryImport(DllName, EntryPoint = "?AddFriend@FriendListMgr@GW@@YA_NPB_W0@Z")]
+            // bool __cdecl GW_FriendListMgr_AddFriend(const wchar_t* name, const wchar_t* alias) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_FriendListMgr_AddFriend")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool AddFriend(ushort* ptr1, nint ptr2);
+            public static partial bool AddFriend(ushort* name, ushort* alias);
 
-            // GW::FriendListMgr::AddIgnore
-            [LibraryImport(DllName, EntryPoint = "?AddIgnore@FriendListMgr@GW@@YA_NPB_W0@Z")]
+            // bool __cdecl GW_FriendListMgr_AddIgnore(const wchar_t* name, const wchar_t* alias) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_FriendListMgr_AddIgnore")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool AddIgnore(ushort* ptr1, nint ptr2);
+            public static partial bool AddIgnore(ushort* name, ushort* alias);
 
-            // GW::FriendListMgr::ChangeFriendType
-            [LibraryImport(DllName, EntryPoint = "?ChangeFriendType@FriendListMgr@GW@@YA_NPAUFriend@2@W4FriendType@2@@Z")]
+            // bool __cdecl GW_FriendListMgr_ChangeFriendType(Friend* _friend, FriendType type) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_FriendListMgr_ChangeFriendType")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool ChangeFriendType(global::Daybreak.API.Interop.GuildWars.Friend* friend1, global::Daybreak.API.Interop.GWCA.GW.FriendType friendType2);
+            public static partial bool ChangeFriendType(global::Daybreak.API.Interop.GuildWars.Friend* friend, global::Daybreak.API.Interop.GWCA.GW.FriendType type);
 
-            // GW::FriendListMgr::GetFriend
-            [LibraryImport(DllName, EntryPoint = "?GetFriend@FriendListMgr@GW@@YAPAUFriend@2@I@Z")]
+            // Friend* __cdecl GW_FriendListMgr_GetFriendByIndex(uint32_t index) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_FriendListMgr_GetFriendByIndex")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.Friend* GetFriend(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.Friend* GetFriendByIndex(uint index);
 
-            // GW::FriendListMgr::GetFriend
-            [LibraryImport(DllName, EntryPoint = "?GetFriend@FriendListMgr@GW@@YAPAUFriend@2@PBE@Z")]
+            // Friend* __cdecl GW_FriendListMgr_GetFriendByName(const wchar_t* alias, const wchar_t* charname, FriendType type) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_FriendListMgr_GetFriendByName")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.Friend* GetFriend(byte* ptr);
+            public static partial global::Daybreak.API.Interop.GuildWars.Friend* GetFriendByName(ushort* alias, ushort* charname, global::Daybreak.API.Interop.GWCA.GW.FriendType type);
 
-            // GW::FriendListMgr::GetFriend
-            [LibraryImport(DllName, EntryPoint = "?GetFriend@FriendListMgr@GW@@YAPAUFriend@2@PB_W0W4FriendType@2@@Z")]
+            // Friend* __cdecl GW_FriendListMgr_GetFriendByUuid(const uint8_t* uuid) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_FriendListMgr_GetFriendByUuid")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.Friend* GetFriend(ushort* ptr1, nint ptr2, global::Daybreak.API.Interop.GWCA.GW.FriendType friendType3);
+            public static partial global::Daybreak.API.Interop.GuildWars.Friend* GetFriendByUuid(byte* uuid);
 
-            // GW::FriendListMgr::GetFriendList | returns TODO: map struct GW::FriendList
-            // [LibraryImport(DllName, EntryPoint = "?GetFriendList@FriendListMgr@GW@@YAPAUFriendList@2@XZ")]
+            // FriendList* __cdecl GW_FriendListMgr_GetFriendList() noexcept | returns TODO: map struct FriendList
+            // [LibraryImport(DllName, EntryPoint = "GW_FriendListMgr_GetFriendList")]
             // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             // public static partial FriendList* GetFriendList();
 
-            // GW::FriendListMgr::GetMyStatus
-            [LibraryImport(DllName, EntryPoint = "?GetMyStatus@FriendListMgr@GW@@YA?AW4FriendStatus@2@XZ")]
+            // FriendStatus __cdecl GW_FriendListMgr_GetMyStatus() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_FriendListMgr_GetMyStatus")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GWCA.GW.FriendStatus GetMyStatus();
 
-            // GW::FriendListMgr::GetNumberOfFriends
-            [LibraryImport(DllName, EntryPoint = "?GetNumberOfFriends@FriendListMgr@GW@@YAIW4FriendType@2@@Z")]
+            // uint32_t __cdecl GW_FriendListMgr_GetNumberOfFriends(FriendType gwca_arg0) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_FriendListMgr_GetNumberOfFriends")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint GetNumberOfFriends(global::Daybreak.API.Interop.GWCA.GW.FriendType friendType);
+            public static partial uint GetNumberOfFriends(global::Daybreak.API.Interop.GWCA.GW.FriendType gwcaArg0);
 
-            // GW::FriendListMgr::GetNumberOfIgnores
-            [LibraryImport(DllName, EntryPoint = "?GetNumberOfIgnores@FriendListMgr@GW@@YAIXZ")]
+            // uint32_t __cdecl GW_FriendListMgr_GetNumberOfIgnores() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_FriendListMgr_GetNumberOfIgnores")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetNumberOfIgnores();
 
-            // GW::FriendListMgr::GetNumberOfPartners
-            [LibraryImport(DllName, EntryPoint = "?GetNumberOfPartners@FriendListMgr@GW@@YAIXZ")]
+            // uint32_t __cdecl GW_FriendListMgr_GetNumberOfPartners() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_FriendListMgr_GetNumberOfPartners")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetNumberOfPartners();
 
-            // GW::FriendListMgr::GetNumberOfTraders
-            [LibraryImport(DllName, EntryPoint = "?GetNumberOfTraders@FriendListMgr@GW@@YAIXZ")]
+            // uint32_t __cdecl GW_FriendListMgr_GetNumberOfTraders() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_FriendListMgr_GetNumberOfTraders")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetNumberOfTraders();
 
-            // GW::FriendListMgr::RegisterFriendStatusCallback | function2: TODO: map struct function
-            // [LibraryImport(DllName, EntryPoint = "?RegisterFriendStatusCallback@FriendListMgr@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUHookStatus@GW@@PBUFriend@2@1@Z@std@@@Z")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // public static partial void RegisterFriendStatusCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, global::Daybreak.API.Interop.GuildWars.Friend* friend3, nint ptr4);
+            // bool __cdecl GW_FriendListMgr_RegisterFriendStatusCallback(HookEntry* entry, NativeFriendStatusCallback callback, void* context) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_FriendListMgr_RegisterFriendStatusCallback")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool RegisterFriendStatusCallback(global::Daybreak.API.Interop.HookEntry* entry, nint callback, void* context);
 
-            // GW::FriendListMgr::RemoveFriend
-            [LibraryImport(DllName, EntryPoint = "?RemoveFriend@FriendListMgr@GW@@YA_NPAUFriend@2@@Z")]
+            // bool __cdecl GW_FriendListMgr_RemoveFriend(Friend* _friend) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_FriendListMgr_RemoveFriend")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool RemoveFriend(global::Daybreak.API.Interop.GuildWars.Friend* friend);
 
-            // GW::FriendListMgr::RemoveFriendStatusCallback
-            [LibraryImport(DllName, EntryPoint = "?RemoveFriendStatusCallback@FriendListMgr@GW@@YAXPAUHookEntry@2@@Z")]
+            // void __cdecl GW_FriendListMgr_RemoveFriendStatusCallbackNative(HookEntry* entry) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_FriendListMgr_RemoveFriendStatusCallbackNative")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void RemoveFriendStatusCallback(global::Daybreak.API.Interop.HookEntry* hookEntry);
+            public static partial void RemoveFriendStatusCallbackNative(global::Daybreak.API.Interop.HookEntry* entry);
 
-            // GW::FriendListMgr::SetFriendListStatus
-            [LibraryImport(DllName, EntryPoint = "?SetFriendListStatus@FriendListMgr@GW@@YA_NW4FriendStatus@2@@Z")]
+            // bool __cdecl GW_FriendListMgr_SetFriendListStatus(FriendStatus status) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_FriendListMgr_SetFriendListStatus")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SetFriendListStatus(global::Daybreak.API.Interop.GWCA.GW.FriendStatus friendStatus);
+            public static partial bool SetFriendListStatus(global::Daybreak.API.Interop.GWCA.GW.FriendStatus status);
         }
 
         public static partial class GameThread
         {
 
-            // GW::GameThread::ClearCalls
-            [LibraryImport(DllName, EntryPoint = "?ClearCalls@GameThread@GW@@YAXXZ")]
+            // void __cdecl GW_GameThread_ClearCallsNative() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_GameThread_ClearCallsNative")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void ClearCalls();
+            public static partial void ClearCallsNative();
 
-            // GW::GameThread::EnableHooks
-            [LibraryImport(DllName, EntryPoint = "?EnableHooks@GameThread@GW@@YAXXZ")]
+            // void __cdecl GW_GameThread_EnableHooks() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_GameThread_EnableHooks")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial void EnableHooks();
 
-            // GW::GameThread::Enqueue | via C export
-            [LibraryImport(DllName, EntryPoint = "Enqueue")]
+            // bool __cdecl GW_GameThread_Enqueue(NativeTaskCallback callback, void* context, uint32_t force_enqueue) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_GameThread_Enqueue")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void Enqueue(nint function1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool Enqueue(nint callback, void* context, uint forceEnqueue);
 
-            // GW::GameThread::IsInGameThread
-            [LibraryImport(DllName, EntryPoint = "?IsInGameThread@GameThread@GW@@YA_NXZ")]
+            // bool __cdecl GW_GameThread_IsInGameThread() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_GameThread_IsInGameThread")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool IsInGameThread();
 
-            // GW::GameThread::RegisterGameThreadCallback | via C export
-            [LibraryImport(DllName, EntryPoint = "RegisterGameThreadCallback")]
+            // bool __cdecl GW_GameThread_RegisterGameThreadCallback(HookEntry* entry, NativeGameThreadCallback callback, void* context, int32_t altitude) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_GameThread_RegisterGameThreadCallback")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void RegisterGameThreadCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, nint function2);
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool RegisterGameThreadCallback(global::Daybreak.API.Interop.HookEntry* entry, nint callback, void* context, int altitude);
 
-            // GW::GameThread::RemoveGameThreadCallback
-            [LibraryImport(DllName, EntryPoint = "?RemoveGameThreadCallback@GameThread@GW@@YAXPAUHookEntry@2@@Z")]
+            // bool __cdecl GW_GameThread_RemoveGameThreadCallbackNative(HookEntry* entry) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_GameThread_RemoveGameThreadCallbackNative")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void RemoveGameThreadCallback(global::Daybreak.API.Interop.HookEntry* hookEntry);
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool RemoveGameThreadCallbackNative(global::Daybreak.API.Interop.HookEntry* entry);
         }
 
         public static partial class GuildMgr
         {
 
-            // GW::GuildMgr::GetCurrentGH
-            [LibraryImport(DllName, EntryPoint = "?GetCurrentGH@GuildMgr@GW@@YAPAUGuild@2@XZ")]
+            // Guild* __cdecl GW_GuildMgr_GetCurrentGH() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_GuildMgr_GetCurrentGH")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GuildWars.Guild* GetCurrentGH();
 
-            // GW::GuildMgr::GetGuildArray
-            [LibraryImport(DllName, EntryPoint = "?GetGuildArray@GuildMgr@GW@@YAPAV?$Array@PAUGuild@GW@@@2@XZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint>* GetGuildArray();
+            // GuildArray* __cdecl GW_GuildMgr_GetGuildArray() noexcept | returns TODO: map struct GuildArray
+            // [LibraryImport(DllName, EntryPoint = "GW_GuildMgr_GetGuildArray")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial GuildArray* GetGuildArray();
 
-            // GW::GuildMgr::GetGuildInfo
-            [LibraryImport(DllName, EntryPoint = "?GetGuildInfo@GuildMgr@GW@@YAPAUGuild@2@I@Z")]
+            // Guild* __cdecl GW_GuildMgr_GetGuildInfo(uint32_t guild_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_GuildMgr_GetGuildInfo")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.Guild* GetGuildInfo(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.Guild* GetGuildInfo(uint guildId);
 
-            // GW::GuildMgr::GetPlayerGuild
-            [LibraryImport(DllName, EntryPoint = "?GetPlayerGuild@GuildMgr@GW@@YAPAUGuild@2@XZ")]
+            // Guild* __cdecl GW_GuildMgr_GetPlayerGuild() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_GuildMgr_GetPlayerGuild")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GuildWars.Guild* GetPlayerGuild();
 
-            // GW::GuildMgr::GetPlayerGuildAnnouncement
-            [LibraryImport(DllName, EntryPoint = "?GetPlayerGuildAnnouncement@GuildMgr@GW@@YAPA_WXZ")]
+            // wchar_t* __cdecl GW_GuildMgr_GetPlayerGuildAnnouncement() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_GuildMgr_GetPlayerGuildAnnouncement")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial ushort* GetPlayerGuildAnnouncement();
 
-            // GW::GuildMgr::GetPlayerGuildAnnouncer
-            [LibraryImport(DllName, EntryPoint = "?GetPlayerGuildAnnouncer@GuildMgr@GW@@YAPA_WXZ")]
+            // wchar_t* __cdecl GW_GuildMgr_GetPlayerGuildAnnouncer() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_GuildMgr_GetPlayerGuildAnnouncer")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial ushort* GetPlayerGuildAnnouncer();
 
-            // GW::GuildMgr::GetPlayerGuildIndex
-            [LibraryImport(DllName, EntryPoint = "?GetPlayerGuildIndex@GuildMgr@GW@@YAIXZ")]
+            // uint32_t __cdecl GW_GuildMgr_GetPlayerGuildIndex() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_GuildMgr_GetPlayerGuildIndex")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetPlayerGuildIndex();
 
-            // GW::GuildMgr::LeaveGH
-            [LibraryImport(DllName, EntryPoint = "?LeaveGH@GuildMgr@GW@@YA_NXZ")]
+            // bool __cdecl GW_GuildMgr_LeaveGH() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_GuildMgr_LeaveGH")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool LeaveGH();
 
-            // GW::GuildMgr::TravelGH
-            [LibraryImport(DllName, EntryPoint = "?TravelGH@GuildMgr@GW@@YA_NUGHKey@2@@Z")]
+            // bool __cdecl GW_GuildMgr_TravelGHByKey(GHKey key) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_GuildMgr_TravelGHByKey")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool TravelGH(global::Daybreak.API.Interop.GuildWars.GHKey gHKey);
+            public static partial bool TravelGHByKey(global::Daybreak.API.Interop.GuildWars.GHKey key);
 
-            // GW::GuildMgr::TravelGH
-            [LibraryImport(DllName, EntryPoint = "?TravelGH@GuildMgr@GW@@YA_NXZ")]
+            // bool __cdecl GW_GuildMgr_TravelGHForPlayer() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_GuildMgr_TravelGHForPlayer")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool TravelGH();
+            public static partial bool TravelGHForPlayer();
         }
 
         public static partial class Hook
         {
 
-            // GW::Hook::CreateHook
-            [LibraryImport(DllName, EntryPoint = "?CreateHook@Hook@GW@@YAHPAPAXUHookTarget@12@0@Z")]
+            // int __cdecl GW_Hook_CreateHook(void** target, HookTarget detour, void** trampoline) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Hook_CreateHook")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial int CreateHook(void* ptr1, global::Daybreak.API.Interop.GuildWars.HookTarget hookTarget2, nint ptr3);
+            public static partial int CreateHook(nint* target, global::Daybreak.API.Interop.GuildWars.HookTarget detour, nint* trampoline);
 
-            // GW::Hook::Deinitialize
-            [LibraryImport(DllName, EntryPoint = "?Deinitialize@Hook@GW@@YAXXZ")]
+            // void __cdecl GW_Hook_Deinitialize() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Hook_Deinitialize")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial void Deinitialize();
 
-            // GW::Hook::DisableHooks
-            [LibraryImport(DllName, EntryPoint = "?DisableHooks@Hook@GW@@YAXUHookTarget@12@@Z")]
+            // void __cdecl GW_Hook_DisableHooks(HookTarget target) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Hook_DisableHooks")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void DisableHooks(global::Daybreak.API.Interop.GuildWars.HookTarget hookTarget);
+            public static partial void DisableHooks(global::Daybreak.API.Interop.GuildWars.HookTarget target);
 
-            // GW::Hook::EnableHooks
-            [LibraryImport(DllName, EntryPoint = "?EnableHooks@Hook@GW@@YAXUHookTarget@12@@Z")]
+            // void __cdecl GW_Hook_EnableHooks(HookTarget target) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Hook_EnableHooks")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void EnableHooks(global::Daybreak.API.Interop.GuildWars.HookTarget hookTarget);
+            public static partial void EnableHooks(global::Daybreak.API.Interop.GuildWars.HookTarget target);
 
-            // GW::Hook::EnterHook
-            [LibraryImport(DllName, EntryPoint = "?EnterHook@Hook@GW@@YAXXZ")]
+            // void __cdecl GW_Hook_EnterHook() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Hook_EnterHook")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial void EnterHook();
 
-            // GW::Hook::GetInHookCount
-            [LibraryImport(DllName, EntryPoint = "?GetInHookCount@Hook@GW@@YAHXZ")]
+            // int __cdecl GW_Hook_GetInHookCount() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Hook_GetInHookCount")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial int GetInHookCount();
 
-            // GW::Hook::Initialize
-            [LibraryImport(DllName, EntryPoint = "?Initialize@Hook@GW@@YAXXZ")]
+            // void __cdecl GW_Hook_Initialize() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Hook_Initialize")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial void Initialize();
 
-            // GW::Hook::LeaveHook
-            [LibraryImport(DllName, EntryPoint = "?LeaveHook@Hook@GW@@YAXXZ")]
+            // void __cdecl GW_Hook_LeaveHook() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Hook_LeaveHook")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial void LeaveHook();
 
-            // GW::Hook::RemoveHook
-            [LibraryImport(DllName, EntryPoint = "?RemoveHook@Hook@GW@@YAXUHookTarget@12@@Z")]
+            // void __cdecl GW_Hook_RemoveHook(HookTarget target) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Hook_RemoveHook")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void RemoveHook(global::Daybreak.API.Interop.GuildWars.HookTarget hookTarget);
+            public static partial void RemoveHook(global::Daybreak.API.Interop.GuildWars.HookTarget target);
         }
 
         public static partial class Item
         {
 
-            // GW::Item::GetIsMaterial
-            [LibraryImport(DllName, EntryPoint = "?GetIsMaterial@Item@GW@@QBE_NXZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double GetIsMaterial(nint self);
+            // bool __cdecl GW_Item_GetIsMaterial(const Item* self) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Item_GetIsMaterial")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool GetIsMaterial(global::Daybreak.API.Interop.GuildWars.ItemStruct* self);
 
-            // GW::Item::GetIsZcoin
-            [LibraryImport(DllName, EntryPoint = "?GetIsZcoin@Item@GW@@QBE_NXZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double GetIsZcoin(nint self);
+            // bool __cdecl GW_Item_GetIsZcoin(const Item* self) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Item_GetIsZcoin")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool GetIsZcoin(global::Daybreak.API.Interop.GuildWars.ItemStruct* self);
         }
 
         public static partial class ItemListFrame
         {
 
-            // GW::ItemListFrame::GetSelectedValue
-            [LibraryImport(DllName, EntryPoint = "?GetSelectedValue@ItemListFrame@GW@@QAE_NPAI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double GetSelectedValue(nint self, uint* ptr2);
+            // bool __cdecl GW_ItemListFrame_GetSelectedValue(ItemListFrame* self, uint32_t* selected_value) noexcept | self: TODO: map struct ItemListFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_ItemListFrame_GetSelectedValue")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool GetSelectedValue(ItemListFrame* self, uint* selectedValue);
 
-            // GW::ItemListFrame::GetSortHandler
-            [LibraryImport(DllName, EntryPoint = "?GetSortHandler@ItemListFrame@GW@@QAEP6AHII@ZXZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial nint GetSortHandler(nint self, int* ptr2, uint value3, uint value4);
+            // SortHandler_pt __cdecl GW_ItemListFrame_GetSortHandler(ItemListFrame* self) noexcept | self: TODO: map struct ItemListFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_ItemListFrame_GetSortHandler")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial nint GetSortHandler(ItemListFrame* self);
 
-            // GW::ItemListFrame::SetSortHandler
-            [LibraryImport(DllName, EntryPoint = "?SetSortHandler@ItemListFrame@GW@@QAE_NP6AHII@Z@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double SetSortHandler(nint self, nint callback2);
+            // bool __cdecl GW_ItemListFrame_SetSortHandler(ItemListFrame* self, SortHandler_pt sortHandler) noexcept | self: TODO: map struct ItemListFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_ItemListFrame_SetSortHandler")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool SetSortHandler(ItemListFrame* self, nint sortHandler);
         }
 
         public static partial class Items
         {
 
-            // GW::Items::CanAccessXunlaiChest
-            [LibraryImport(DllName, EntryPoint = "?CanAccessXunlaiChest@Items@GW@@YA_NXZ")]
+            // bool __cdecl GW_Items_CanAccessXunlaiChest() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_CanAccessXunlaiChest")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool CanAccessXunlaiChest();
 
-            // GW::Items::CanInteractWithItem
-            [LibraryImport(DllName, EntryPoint = "?CanInteractWithItem@Items@GW@@YA_NPBUItem@2@@Z")]
+            // bool __cdecl GW_Items_CanInteractWithItem(const Item* item) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_CanInteractWithItem")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool CanInteractWithItem(global::Daybreak.API.Interop.GuildWars.ItemStruct* itemStruct);
+            public static partial bool CanInteractWithItem(global::Daybreak.API.Interop.GuildWars.ItemStruct* item);
 
-            // GW::Items::CountItemByModelId
-            [LibraryImport(DllName, EntryPoint = "?CountItemByModelId@Items@GW@@YAIIHH@Z")]
+            // uint32_t __cdecl GW_Items_CountItemByModelId(uint32_t model_id, int bag_start, int bag_end) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_CountItemByModelId")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint CountItemByModelId(uint value1, int value2, int value3);
+            public static partial uint CountItemByModelId(uint modelId, int bagStart, int bagEnd);
 
-            // GW::Items::DepositGold
-            [LibraryImport(DllName, EntryPoint = "?DepositGold@Items@GW@@YAII@Z")]
+            // uint32_t __cdecl GW_Items_DepositGold(uint32_t amount) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_DepositGold")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint DepositGold(uint value);
+            public static partial uint DepositGold(uint amount);
 
-            // GW::Items::DestroyItem
-            [LibraryImport(DllName, EntryPoint = "?DestroyItem@Items@GW@@YA_NI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool DestroyItem(uint value);
-
-            // GW::Items::DropGold
-            [LibraryImport(DllName, EntryPoint = "?DropGold@Items@GW@@YA_NI@Z")]
+            // bool __cdecl GW_Items_DestroyItem(uint32_t item_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_DestroyItem")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool DropGold(uint value);
+            public static partial bool DestroyItem(uint itemId);
 
-            // GW::Items::DropItem
-            [LibraryImport(DllName, EntryPoint = "?DropItem@Items@GW@@YA_NPBUItem@2@I@Z")]
+            // bool __cdecl GW_Items_DropGold(uint32_t amount) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_DropGold")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool DropItem(global::Daybreak.API.Interop.GuildWars.ItemStruct* itemStruct1, uint value2);
+            public static partial bool DropGold(uint amount);
 
-            // GW::Items::EquipItem
-            [LibraryImport(DllName, EntryPoint = "?EquipItem@Items@GW@@YA_NPBUItem@2@I@Z")]
+            // bool __cdecl GW_Items_DropItem(const Item* item, uint32_t quantity) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_DropItem")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool EquipItem(global::Daybreak.API.Interop.GuildWars.ItemStruct* itemStruct1, uint value2);
+            public static partial bool DropItem(global::Daybreak.API.Interop.GuildWars.ItemStruct* item, uint quantity);
 
-            // GW::Items::GetBag
-            [LibraryImport(DllName, EntryPoint = "?GetBag@Items@GW@@YAPAUBag@2@W43Constants@2@@Z")]
+            // bool __cdecl GW_Items_EquipItem(const Item* item, uint32_t agent_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_EquipItem")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.BagStruct* GetBag(global::Daybreak.API.Interop.GWCA.GW.Constants.Bag bag);
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool EquipItem(global::Daybreak.API.Interop.GuildWars.ItemStruct* item, uint agentId);
 
-            // GW::Items::GetBagArray
-            [LibraryImport(DllName, EntryPoint = "?GetBagArray@Items@GW@@YAPAPAUBag@2@XZ")]
+            // Bag* __cdecl GW_Items_GetBag(Constants::Bag bag_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetBag")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void* GetBagArray();
+            public static partial global::Daybreak.API.Interop.GuildWars.BagStruct* GetBag(global::Daybreak.API.Interop.GWCA.GW.Constants.Bag bagId);
 
-            // GW::Items::GetBagByIndex
-            [LibraryImport(DllName, EntryPoint = "?GetBagByIndex@Items@GW@@YAPAUBag@2@I@Z")]
+            // Bag** __cdecl GW_Items_GetBagArray() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetBagArray")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.BagStruct* GetBagByIndex(uint value);
+            public static partial nint* GetBagArray();
 
-            // GW::Items::GetCompositeModelInfo
-            [LibraryImport(DllName, EntryPoint = "?GetCompositeModelInfo@Items@GW@@YAPBUCompositeModelInfo@2@I@Z")]
+            // Bag* __cdecl GW_Items_GetBagByIndex(uint32_t bag_index) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetBagByIndex")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.CompositeModelInfo* GetCompositeModelInfo(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.BagStruct* GetBagByIndex(uint bagIndex);
 
-            // GW::Items::GetCompositeModelInfoArray | returns TODO: map struct BaseArray
-            // [LibraryImport(DllName, EntryPoint = "?GetCompositeModelInfoArray@Items@GW@@YAABV?$BaseArray@UCompositeModelInfo@GW@@@2@XZ")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // public static partial BaseArray* GetCompositeModelInfoArray();
-
-            // GW::Items::GetEquipmentVisibility
-            [LibraryImport(DllName, EntryPoint = "?GetEquipmentVisibility@Items@GW@@YA?AW4EquipmentStatus@2@W4EquipmentType@2@@Z")]
+            // const CompositeModelInfo* __cdecl GW_Items_GetCompositeModelInfo(uint32_t model_file_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetCompositeModelInfo")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GWCA.GW.EquipmentStatus GetEquipmentVisibility(global::Daybreak.API.Interop.GWCA.GW.EquipmentType equipmentType);
+            public static partial global::Daybreak.API.Interop.GuildWars.CompositeModelInfo* GetCompositeModelInfo(uint modelFileId);
 
-            // GW::Items::GetGoldAmountInStorage
-            [LibraryImport(DllName, EntryPoint = "?GetGoldAmountInStorage@Items@GW@@YAIXZ")]
+            // const BaseArray < CompositeModelInfo >* __cdecl GW_Items_GetCompositeModelInfoArray() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetCompositeModelInfoArray")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.CompositeModelInfo>* GetCompositeModelInfoArray();
+
+            // EquipmentStatus __cdecl GW_Items_GetEquipmentVisibility(EquipmentType type) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetEquipmentVisibility")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial global::Daybreak.API.Interop.GWCA.GW.EquipmentStatus GetEquipmentVisibility(global::Daybreak.API.Interop.GWCA.GW.EquipmentType type);
+
+            // uint32_t __cdecl GW_Items_GetGoldAmountInStorage() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetGoldAmountInStorage")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetGoldAmountInStorage();
 
-            // GW::Items::GetGoldAmountOnCharacter
-            [LibraryImport(DllName, EntryPoint = "?GetGoldAmountOnCharacter@Items@GW@@YAIXZ")]
+            // uint32_t __cdecl GW_Items_GetGoldAmountOnCharacter() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetGoldAmountOnCharacter")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetGoldAmountOnCharacter();
 
-            // GW::Items::GetHeroInventory
-            [LibraryImport(DllName, EntryPoint = "?GetHeroInventory@Items@GW@@YAPAUInventory@2@W4HeroID@Constants@2@@Z")]
+            // Inventory* __cdecl GW_Items_GetHeroInventory(GW::Constants::HeroID hero_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetHeroInventory")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.Inventory* GetHeroInventory(global::Daybreak.API.Interop.GWCA.GW.Constants.HeroID heroID);
+            public static partial global::Daybreak.API.Interop.GuildWars.Inventory* GetHeroInventory(global::Daybreak.API.Interop.GWCA.GW.Constants.HeroID heroId);
 
-            // GW::Items::GetHoveredItem
-            [LibraryImport(DllName, EntryPoint = "?GetHoveredItem@Items@GW@@YAPAUItem@2@XZ")]
+            // Item* __cdecl GW_Items_GetHoveredItem() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetHoveredItem")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GuildWars.ItemStruct* GetHoveredItem();
 
-            // GW::Items::GetInventory
-            [LibraryImport(DllName, EntryPoint = "?GetInventory@Items@GW@@YAPAUInventory@2@XZ")]
+            // Inventory* __cdecl GW_Items_GetInventory() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetInventory")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GuildWars.Inventory* GetInventory();
 
-            // GW::Items::GetIsStorageOpen
-            [LibraryImport(DllName, EntryPoint = "?GetIsStorageOpen@Items@GW@@YA_NXZ")]
+            // bool __cdecl GW_Items_GetIsStorageOpen() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetIsStorageOpen")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool GetIsStorageOpen();
 
-            // GW::Items::GetItemArray
-            [LibraryImport(DllName, EntryPoint = "?GetItemArray@Items@GW@@YAPAV?$Array@PAUItem@GW@@@2@XZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint>* GetItemArray();
+            // ItemArray* __cdecl GW_Items_GetItemArray() noexcept | returns TODO: map struct ItemArray
+            // [LibraryImport(DllName, EntryPoint = "GW_Items_GetItemArray")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial ItemArray* GetItemArray();
 
-            // GW::Items::GetItemById
-            [LibraryImport(DllName, EntryPoint = "?GetItemById@Items@GW@@YAPAUItem@2@I@Z")]
+            // Item* __cdecl GW_Items_GetItemById(uint32_t item_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetItemById")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.ItemStruct* GetItemById(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.ItemStruct* GetItemById(uint itemId);
 
-            // GW::Items::GetItemByModelId
-            [LibraryImport(DllName, EntryPoint = "?GetItemByModelId@Items@GW@@YAPAUItem@2@IHH@Z")]
+            // Item* __cdecl GW_Items_GetItemByModelId(uint32_t model_id, int bag_start, int bag_end) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetItemByModelId")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.ItemStruct* GetItemByModelId(uint value1, int value2, int value3);
+            public static partial global::Daybreak.API.Interop.GuildWars.ItemStruct* GetItemByModelId(uint modelId, int bagStart, int bagEnd);
 
-            // GW::Items::GetItemByModelIdAndModifiers
-            [LibraryImport(DllName, EntryPoint = "?GetItemByModelIdAndModifiers@Items@GW@@YAPAUItem@2@IPBUItemModifier@2@IHH@Z")]
+            // Item* __cdecl GW_Items_GetItemByModelIdAndModifiers(uint32_t modelid, const ItemModifier* modifiers, uint32_t modifiers_len, int bagStart, int bagEnd) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetItemByModelIdAndModifiers")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.ItemStruct* GetItemByModelIdAndModifiers(uint value1, global::Daybreak.API.Interop.GuildWars.ItemModifier* itemModifier2, uint value3, int value4, int value5);
+            public static partial global::Daybreak.API.Interop.GuildWars.ItemStruct* GetItemByModelIdAndModifiers(uint modelid, global::Daybreak.API.Interop.GuildWars.ItemModifier* modifiers, uint modifiersLen, int bagStart, int bagEnd);
 
-            // GW::Items::GetItemBySlot
-            [LibraryImport(DllName, EntryPoint = "?GetItemBySlot@Items@GW@@YAPAUItem@2@PBUBag@2@I@Z")]
+            // Item* __cdecl GW_Items_GetItemBySlot(const Bag* bag, uint32_t slot) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetItemBySlot")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.ItemStruct* GetItemBySlot(global::Daybreak.API.Interop.GuildWars.BagStruct* bag1, uint value2);
+            public static partial global::Daybreak.API.Interop.GuildWars.ItemStruct* GetItemBySlot(global::Daybreak.API.Interop.GuildWars.BagStruct* bag, uint slot);
 
-            // GW::Items::GetItemFormula
-            [LibraryImport(DllName, EntryPoint = "?GetItemFormula@Items@GW@@YAPBUItemFormula@2@PBUItem@2@@Z")]
+            // const ItemFormula* __cdecl GW_Items_GetItemFormula(const GW::Item* item) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetItemFormula")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.ItemFormula* GetItemFormula(global::Daybreak.API.Interop.GuildWars.ItemStruct* itemStruct);
+            public static partial global::Daybreak.API.Interop.GuildWars.ItemFormula* GetItemFormula(global::Daybreak.API.Interop.GuildWars.ItemStruct* item);
 
-            // GW::Items::GetMaterialSlot
-            [LibraryImport(DllName, EntryPoint = "?GetMaterialSlot@Items@GW@@YA?AW4MaterialSlot@Constants@2@PBUItem@2@@Z")]
+            // Constants::MaterialSlot __cdecl GW_Items_GetMaterialSlot(const Item* item) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetMaterialSlot")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.MaterialSlot GetMaterialSlot(global::Daybreak.API.Interop.GuildWars.ItemStruct* itemStruct);
+            public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.MaterialSlot GetMaterialSlot(global::Daybreak.API.Interop.GuildWars.ItemStruct* item);
 
-            // GW::Items::GetMaterialStorageStackSize
-            [LibraryImport(DllName, EntryPoint = "?GetMaterialStorageStackSize@Items@GW@@YAIXZ")]
+            // uint32_t __cdecl GW_Items_GetMaterialStorageStackSize() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetMaterialStorageStackSize")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetMaterialStorageStackSize();
 
-            // GW::Items::GetPvPItemInfo
-            [LibraryImport(DllName, EntryPoint = "?GetPvPItemInfo@Items@GW@@YAPBUPvPItemInfo@2@I@Z")]
+            // const PvPItemInfo* __cdecl GW_Items_GetPvPItemInfo(uint32_t pvp_item_idx) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetPvPItemInfo")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.PvPItemInfo* GetPvPItemInfo(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.PvPItemInfo* GetPvPItemInfo(uint pvpItemIdx);
 
-            // GW::Items::GetPvPItemInfoArray | returns TODO: map struct BaseArray
-            // [LibraryImport(DllName, EntryPoint = "?GetPvPItemInfoArray@Items@GW@@YAABV?$BaseArray@UPvPItemInfo@GW@@@2@XZ")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // public static partial BaseArray* GetPvPItemInfoArray();
-
-            // GW::Items::GetPvPItemUpgrade
-            [LibraryImport(DllName, EntryPoint = "?GetPvPItemUpgrade@Items@GW@@YAPBUPvPItemUpgradeInfo@2@I@Z")]
+            // const BaseArray < PvPItemInfo >* __cdecl GW_Items_GetPvPItemInfoArray() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetPvPItemInfoArray")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.PvPItemUpgradeInfo* GetPvPItemUpgrade(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.PvPItemInfo>* GetPvPItemInfoArray();
 
-            // GW::Items::GetPvPItemUpgradeEncodedDescription
-            [LibraryImport(DllName, EntryPoint = "?GetPvPItemUpgradeEncodedDescription@Items@GW@@YA_NIPAPA_W@Z")]
+            // const PvPItemUpgradeInfo* __cdecl GW_Items_GetPvPItemUpgrade(uint32_t pvp_item_upgrade_idx) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetPvPItemUpgrade")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool GetPvPItemUpgradeEncodedDescription(uint value1, void* ptr2);
+            public static partial global::Daybreak.API.Interop.GuildWars.PvPItemUpgradeInfo* GetPvPItemUpgrade(uint pvpItemUpgradeIdx);
 
-            // GW::Items::GetPvPItemUpgradeEncodedName
-            [LibraryImport(DllName, EntryPoint = "?GetPvPItemUpgradeEncodedName@Items@GW@@YA_NIPAPA_W@Z")]
+            // bool __cdecl GW_Items_GetPvPItemUpgradeEncodedDescription(uint32_t pvp_item_upgrade_idx, wchar_t** out) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetPvPItemUpgradeEncodedDescription")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool GetPvPItemUpgradeEncodedName(uint value1, void* ptr2);
+            public static partial bool GetPvPItemUpgradeEncodedDescription(uint pvpItemUpgradeIdx, nint* @out);
 
-            // GW::Items::GetPvPItemUpgradesArray | returns TODO: map struct BaseArray
-            // [LibraryImport(DllName, EntryPoint = "?GetPvPItemUpgradesArray@Items@GW@@YAABV?$BaseArray@UPvPItemUpgradeInfo@GW@@@2@XZ")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // public static partial BaseArray* GetPvPItemUpgradesArray();
+            // bool __cdecl GW_Items_GetPvPItemUpgradeEncodedName(uint32_t pvp_item_upgrade_idx, wchar_t** out) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetPvPItemUpgradeEncodedName")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool GetPvPItemUpgradeEncodedName(uint pvpItemUpgradeIdx, nint* @out);
 
-            // GW::Items::GetSalvageSessionInfo
-            [LibraryImport(DllName, EntryPoint = "?GetSalvageSessionInfo@Items@GW@@YAPAUSalvageSessionInfo@2@XZ")]
+            // const BaseArray < PvPItemUpgradeInfo >* __cdecl GW_Items_GetPvPItemUpgradesArray() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetPvPItemUpgradesArray")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.PvPItemUpgradeInfo>* GetPvPItemUpgradesArray();
+
+            // SalvageSessionInfo* __cdecl GW_Items_GetSalvageSessionInfo() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetSalvageSessionInfo")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GuildWars.SalvageSessionInfo* GetSalvageSessionInfo();
 
-            // GW::Items::GetStoragePage
-            [LibraryImport(DllName, EntryPoint = "?GetStoragePage@Items@GW@@YA?AW4StoragePane@Constants@2@XZ")]
+            // GW::Constants::StoragePane __cdecl GW_Items_GetStoragePage() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_GetStoragePage")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.StoragePane GetStoragePage();
 
-            // GW::Items::IdentifyItem
-            [LibraryImport(DllName, EntryPoint = "?IdentifyItem@Items@GW@@YA_NII@Z")]
+            // bool __cdecl GW_Items_IdentifyItem(uint32_t identification_kit_id, uint32_t item_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_IdentifyItem")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool IdentifyItem(uint value1, uint value2);
+            public static partial bool IdentifyItem(uint identificationKitId, uint itemId);
 
-            // GW::Items::MoveItem
-            [LibraryImport(DllName, EntryPoint = "?MoveItem@Items@GW@@YA_NPBUItem@2@0I@Z")]
+            // bool __cdecl GW_Items_MoveItem(const Item* item, const Bag* bag, uint32_t slot, uint32_t quantity) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_MoveItem")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool MoveItem(global::Daybreak.API.Interop.GuildWars.ItemStruct* itemStruct1, nint ptr2, uint value3);
+            public static partial bool MoveItem(global::Daybreak.API.Interop.GuildWars.ItemStruct* item, global::Daybreak.API.Interop.GuildWars.BagStruct* bag, uint slot, uint quantity);
 
-            // GW::Items::MoveItem
-            [LibraryImport(DllName, EntryPoint = "?MoveItem@Items@GW@@YA_NPBUItem@2@PBUBag@2@II@Z")]
+            // bool __cdecl GW_Items_OpenXunlaiWindow(bool anniversary_pane_unlocked, bool storage_pane_unlocked) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_OpenXunlaiWindow")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool MoveItem(global::Daybreak.API.Interop.GuildWars.ItemStruct* itemStruct1, global::Daybreak.API.Interop.GuildWars.BagStruct* bag2, uint value3, uint value4);
+            public static partial bool OpenXunlaiWindow([MarshalAs(UnmanagedType.U1)] bool anniversaryPaneUnlocked, [MarshalAs(UnmanagedType.U1)] bool storagePaneUnlocked);
 
-            // GW::Items::MoveItem
-            [LibraryImport(DllName, EntryPoint = "?MoveItem@Items@GW@@YA_NPBUItem@2@W4Bag@Constants@2@II@Z")]
+            // bool __cdecl GW_Items_PickUpItem(const Item* item, uint32_t call_target) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_PickUpItem")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool MoveItem(global::Daybreak.API.Interop.GuildWars.ItemStruct* itemStruct1, global::Daybreak.API.Interop.GWCA.GW.Constants.Bag bag2, uint value3, uint value4);
+            public static partial bool PickUpItem(global::Daybreak.API.Interop.GuildWars.ItemStruct* item, uint callTarget);
 
-            // GW::Items::OpenXunlaiWindow
-            [LibraryImport(DllName, EntryPoint = "?OpenXunlaiWindow@Items@GW@@YA_N_N0@Z")]
+            // bool __cdecl GW_Items_PingWeaponSet(uint32_t agent_id, uint32_t weapon_item_id, uint32_t offhand_item_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_PingWeaponSet")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool OpenXunlaiWindow([MarshalAs(UnmanagedType.U1)] bool flag1, nint ptr2);
+            public static partial bool PingWeaponSet(uint agentId, uint weaponItemId, uint offhandItemId);
 
-            // GW::Items::PickUpItem
-            [LibraryImport(DllName, EntryPoint = "?PickUpItem@Items@GW@@YA_NPBUItem@2@I@Z")]
+            // bool __cdecl GW_Items_RegisterItemClickCallback(HookEntry* entry, NativeItemClickCallback callback, void* context) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_RegisterItemClickCallback")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool PickUpItem(global::Daybreak.API.Interop.GuildWars.ItemStruct* itemStruct1, uint value2);
+            public static partial bool RegisterItemClickCallback(global::Daybreak.API.Interop.HookEntry* entry, nint callback, void* context);
 
-            // GW::Items::PingWeaponSet
-            [LibraryImport(DllName, EntryPoint = "?PingWeaponSet@Items@GW@@YA_NIII@Z")]
+            // bool __cdecl GW_Items_RemoveItemClickCallbackNative(HookEntry* entry) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_RemoveItemClickCallbackNative")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool PingWeaponSet(uint value1, uint value2, uint value3);
+            public static partial bool RemoveItemClickCallbackNative(global::Daybreak.API.Interop.HookEntry* entry);
 
-            // GW::Items::RegisterItemClickCallback | function2: TODO: map struct function
-            // [LibraryImport(DllName, EntryPoint = "?RegisterItemClickCallback@Items@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUHookStatus@GW@@PAUkMouseAction@UIPacket@UI@2@PAUItem@2@@Z@std@@@Z")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // public static partial void RegisterItemClickCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, global::Daybreak.API.Interop.GuildWars.kMouseAction* kMouseAction3, global::Daybreak.API.Interop.GuildWars.ItemStruct* itemStruct4);
-
-            // GW::Items::RemoveItemClickCallback
-            [LibraryImport(DllName, EntryPoint = "?RemoveItemClickCallback@Items@GW@@YAXPAUHookEntry@2@@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void RemoveItemClickCallback(global::Daybreak.API.Interop.HookEntry* hookEntry);
-
-            // GW::Items::SalvageMaterials
-            [LibraryImport(DllName, EntryPoint = "?SalvageMaterials@Items@GW@@YA_NXZ")]
+            // bool __cdecl GW_Items_SalvageMaterials() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_SalvageMaterials")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool SalvageMaterials();
 
-            // GW::Items::SalvageSessionCancel
-            [LibraryImport(DllName, EntryPoint = "?SalvageSessionCancel@Items@GW@@YA_NXZ")]
+            // bool __cdecl GW_Items_SalvageSessionCancel() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_SalvageSessionCancel")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool SalvageSessionCancel();
 
-            // GW::Items::SalvageStart
-            [LibraryImport(DllName, EntryPoint = "?SalvageStart@Items@GW@@YA_NII@Z")]
+            // bool __cdecl GW_Items_SalvageStart(uint32_t salvage_kit_id, uint32_t item_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_SalvageStart")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SalvageStart(uint value1, uint value2);
+            public static partial bool SalvageStart(uint salvageKitId, uint itemId);
 
-            // GW::Items::SetEquipmentVisibility
-            [LibraryImport(DllName, EntryPoint = "?SetEquipmentVisibility@Items@GW@@YA_NW4EquipmentType@2@W4EquipmentStatus@2@@Z")]
+            // bool __cdecl GW_Items_SetEquipmentVisibility(EquipmentType type, EquipmentStatus state) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_SetEquipmentVisibility")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SetEquipmentVisibility(global::Daybreak.API.Interop.GWCA.GW.EquipmentType equipmentType1, global::Daybreak.API.Interop.GWCA.GW.EquipmentStatus equipmentStatus2);
+            public static partial bool SetEquipmentVisibility(global::Daybreak.API.Interop.GWCA.GW.EquipmentType type, global::Daybreak.API.Interop.GWCA.GW.EquipmentStatus state);
 
-            // GW::Items::UseItem
-            [LibraryImport(DllName, EntryPoint = "?UseItem@Items@GW@@YA_NPBUItem@2@@Z")]
+            // bool __cdecl GW_Items_UseItem(const Item* item) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_UseItem")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool UseItem(global::Daybreak.API.Interop.GuildWars.ItemStruct* itemStruct);
+            public static partial bool UseItem(global::Daybreak.API.Interop.GuildWars.ItemStruct* item);
 
-            // GW::Items::UseItemByModelId
-            [LibraryImport(DllName, EntryPoint = "?UseItemByModelId@Items@GW@@YA_NIHH@Z")]
+            // bool __cdecl GW_Items_UseItemByModelId(uint32_t model_id, int bag_start, int bag_end) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_UseItemByModelId")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool UseItemByModelId(uint value1, int value2, int value3);
+            public static partial bool UseItemByModelId(uint modelId, int bagStart, int bagEnd);
 
-            // GW::Items::WithdrawGold
-            [LibraryImport(DllName, EntryPoint = "?WithdrawGold@Items@GW@@YAII@Z")]
+            // uint32_t __cdecl GW_Items_WithdrawGold(uint32_t amount) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Items_WithdrawGold")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint WithdrawGold(uint value);
+            public static partial uint WithdrawGold(uint amount);
         }
 
         public static partial class Map
         {
 
-            // GW::Map::CancelEnterChallenge
-            [LibraryImport(DllName, EntryPoint = "?CancelEnterChallenge@Map@GW@@YA_NXZ")]
+            // bool __cdecl GW_Map_CancelEnterChallenge() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Map_CancelEnterChallenge")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool CancelEnterChallenge();
 
-            // GW::Map::CreateMapContext
-            [LibraryImport(DllName, EntryPoint = "?CreateMapContext@Map@GW@@YAPAUMapContext@2@I@Z")]
+            // MapContext* __cdecl GW_Map_CreateMapContext(uint32_t map_file_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Map_CreateMapContext")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.MapContext* CreateMapContext(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.MapContext* CreateMapContext(uint mapFileId);
 
-            // GW::Map::DestroyMapContext
-            [LibraryImport(DllName, EntryPoint = "?DestroyMapContext@Map@GW@@YA_NPAUMapContext@2@@Z")]
+            // bool __cdecl GW_Map_DestroyMapContext(MapContext* gwca_arg0) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Map_DestroyMapContext")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool DestroyMapContext(global::Daybreak.API.Interop.GuildWars.MapContext* mapContext);
+            public static partial bool DestroyMapContext(global::Daybreak.API.Interop.GuildWars.MapContext* gwcaArg0);
 
-            // GW::Map::EnterChallenge
-            [LibraryImport(DllName, EntryPoint = "?EnterChallenge@Map@GW@@YA_NXZ")]
+            // bool __cdecl GW_Map_EnterChallenge() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Map_EnterChallenge")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool EnterChallenge();
 
-            // GW::Map::GetDistrict
-            [LibraryImport(DllName, EntryPoint = "?GetDistrict@Map@GW@@YAHXZ")]
+            // int __cdecl GW_Map_GetDistrict() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Map_GetDistrict")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial int GetDistrict();
 
-            // GW::Map::GetDistrictCount
-            [LibraryImport(DllName, EntryPoint = "?GetDistrictCount@Map@GW@@YAIXZ")]
+            // size_t __cdecl GW_Map_GetDistrictCount() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Map_GetDistrictCount")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint GetDistrictCount();
+            public static partial nuint GetDistrictCount();
 
-            // GW::Map::GetFoesKilled
-            [LibraryImport(DllName, EntryPoint = "?GetFoesKilled@Map@GW@@YAIXZ")]
+            // uint32_t __cdecl GW_Map_GetFoesKilled() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Map_GetFoesKilled")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetFoesKilled();
 
-            // GW::Map::GetFoesToKill
-            [LibraryImport(DllName, EntryPoint = "?GetFoesToKill@Map@GW@@YAIXZ")]
+            // uint32_t __cdecl GW_Map_GetFoesToKill() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Map_GetFoesToKill")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetFoesToKill();
 
-            // GW::Map::GetInstanceTime
-            [LibraryImport(DllName, EntryPoint = "?GetInstanceTime@Map@GW@@YAIXZ")]
+            // uint32_t __cdecl GW_Map_GetInstanceTime() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Map_GetInstanceTime")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetInstanceTime();
 
-            // GW::Map::GetInstanceType
-            [LibraryImport(DllName, EntryPoint = "?GetInstanceType@Map@GW@@YA?AW4InstanceType@Constants@2@XZ")]
+            // Constants::InstanceType __cdecl GW_Map_GetInstanceType() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Map_GetInstanceType")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.InstanceType GetInstanceType();
 
-            // GW::Map::GetIsInCinematic
-            [LibraryImport(DllName, EntryPoint = "?GetIsInCinematic@Map@GW@@YA_NXZ")]
+            // bool __cdecl GW_Map_GetIsInCinematic() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Map_GetIsInCinematic")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool GetIsInCinematic();
 
-            // GW::Map::GetIsMapLoaded
-            [LibraryImport(DllName, EntryPoint = "?GetIsMapLoaded@Map@GW@@YA_NXZ")]
+            // bool __cdecl GW_Map_GetIsMapLoaded() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Map_GetIsMapLoaded")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool GetIsMapLoaded();
 
-            // GW::Map::GetIsMapUnlocked
-            [LibraryImport(DllName, EntryPoint = "?GetIsMapUnlocked@Map@GW@@YA_NW4MapID@Constants@2@@Z")]
+            // bool __cdecl GW_Map_GetIsMapUnlocked(Constants::MapID map_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Map_GetIsMapUnlocked")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool GetIsMapUnlocked(global::Daybreak.API.Interop.GWCA.GW.Constants.MapID mapID);
+            public static partial bool GetIsMapUnlocked(global::Daybreak.API.Interop.GWCA.GW.Constants.MapID mapId);
 
-            // GW::Map::GetIsObserving
-            [LibraryImport(DllName, EntryPoint = "?GetIsObserving@Map@GW@@YA_NXZ")]
+            // bool __cdecl GW_Map_GetIsObserving() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Map_GetIsObserving")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool GetIsObserving();
 
-            // GW::Map::GetLanguage
-            [LibraryImport(DllName, EntryPoint = "?GetLanguage@Map@GW@@YA?AW4Language@Constants@2@XZ")]
+            // GW::Constants::Language __cdecl GW_Map_GetLanguage() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Map_GetLanguage")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.Language GetLanguage();
 
-            // GW::Map::GetMapID
-            [LibraryImport(DllName, EntryPoint = "?GetMapID@Map@GW@@YA?AW4MapID@Constants@2@XZ")]
+            // Constants::MapID __cdecl GW_Map_GetMapID() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Map_GetMapID")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.MapID GetMapID();
 
-            // GW::Map::GetMapInfo
-            [LibraryImport(DllName, EntryPoint = "?GetMapInfo@Map@GW@@YAPAUAreaInfo@2@W4MapID@Constants@2@@Z")]
+            // AreaInfo* __cdecl GW_Map_GetMapInfo(Constants::MapID map_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Map_GetMapInfo")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.AreaInfo* GetMapInfo(global::Daybreak.API.Interop.GWCA.GW.Constants.MapID mapID);
+            public static partial global::Daybreak.API.Interop.GuildWars.AreaInfo* GetMapInfo(global::Daybreak.API.Interop.GWCA.GW.Constants.MapID mapId);
 
-            // GW::Map::GetMissionMapContext
-            [LibraryImport(DllName, EntryPoint = "?GetMissionMapContext@Map@GW@@YAPAUMissionMapContext@2@XZ")]
+            // MissionMapContext* __cdecl GW_Map_GetMissionMapContext() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Map_GetMissionMapContext")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GuildWars.MissionMapContext* GetMissionMapContext();
 
-            // GW::Map::GetMissionMapIconArray
-            [LibraryImport(DllName, EntryPoint = "?GetMissionMapIconArray@Map@GW@@YAPAV?$Array@UMissionMapIcon@GW@@@2@XZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.MissionMapIcon>* GetMissionMapIconArray();
-
-            // GW::Map::GetPathingMap
-            // [LibraryImport(DllName, EntryPoint = "?GetPathingMap@Map@GW@@YAPAV?$Array@UPathingMap@GW@@@2@XZ")]
+            // MissionMapIconArray* __cdecl GW_Map_GetMissionMapIconArray() noexcept | returns TODO: map struct MissionMapIconArray
+            // [LibraryImport(DllName, EntryPoint = "GW_Map_GetMissionMapIconArray")]
             // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint>* GetPathingMap();
+            // public static partial MissionMapIconArray* GetMissionMapIconArray();
 
-            // GW::Map::GetRegion
-            [LibraryImport(DllName, EntryPoint = "?GetRegion@Map@GW@@YA?AW4ServerRegion@Constants@2@XZ")]
+            // PathingMapArray* __cdecl GW_Map_GetPathingMap() noexcept | returns TODO: map struct PathingMapArray
+            // [LibraryImport(DllName, EntryPoint = "GW_Map_GetPathingMap")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial PathingMapArray* GetPathingMap();
+
+            // GW::Constants::ServerRegion __cdecl GW_Map_GetRegion() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Map_GetRegion")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.ServerRegion GetRegion();
 
-            // GW::Map::GetWorldMapContext
-            [LibraryImport(DllName, EntryPoint = "?GetWorldMapContext@Map@GW@@YAPAUWorldMapContext@2@XZ")]
+            // WorldMapContext* __cdecl GW_Map_GetWorldMapContext() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Map_GetWorldMapContext")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GuildWars.WorldMapContext* GetWorldMapContext();
 
-            // GW::Map::LanguageFromDistrict
-            [LibraryImport(DllName, EntryPoint = "?LanguageFromDistrict@Map@GW@@YA?AW4Language@Constants@2@W4District@42@@Z")]
+            // Constants::Language __cdecl GW_Map_LanguageFromDistrict(const GW::Constants::District _district) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Map_LanguageFromDistrict")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.Language LanguageFromDistrict(global::Daybreak.API.Interop.GWCA.GW.Constants.District district);
 
-            // GW::Map::QueryAltitude
-            [LibraryImport(DllName, EntryPoint = "?QueryAltitude@Map@GW@@YAMPBUGamePos@2@MPAUMapContext@2@@Z")]
+            // float __cdecl GW_Map_QueryAltitude(const GamePos* pos, float radius, GW::MapContext* context) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Map_QueryAltitude")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial float QueryAltitude(global::Daybreak.API.Interop.GuildWars.GamePos* gamePos1, float value2, global::Daybreak.API.Interop.GuildWars.MapContext* mapContext3);
+            public static partial float QueryAltitude(global::Daybreak.API.Interop.GuildWars.GamePos* pos, float radius, global::Daybreak.API.Interop.GuildWars.MapContext* context);
 
-            // GW::Map::RegionFromDistrict
-            [LibraryImport(DllName, EntryPoint = "?RegionFromDistrict@Map@GW@@YA?AW4ServerRegion@Constants@2@W4District@42@@Z")]
+            // Constants::ServerRegion __cdecl GW_Map_RegionFromDistrict(const GW::Constants::District _district) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Map_RegionFromDistrict")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.ServerRegion RegionFromDistrict(global::Daybreak.API.Interop.GWCA.GW.Constants.District district);
 
-            // GW::Map::SkipCinematic
-            [LibraryImport(DllName, EntryPoint = "?SkipCinematic@Map@GW@@YA_NXZ")]
+            // bool __cdecl GW_Map_SkipCinematic() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Map_SkipCinematic")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool SkipCinematic();
 
-            // GW::Map::Travel
-            [LibraryImport(DllName, EntryPoint = "?Travel@Map@GW@@YA_NW4MapID@Constants@2@W4District@42@H@Z")]
+            // bool __cdecl GW_Map_TravelByDistrict(Constants::MapID map_id, Constants::District district, int district_number) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Map_TravelByDistrict")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool Travel(global::Daybreak.API.Interop.GWCA.GW.Constants.MapID mapID1, global::Daybreak.API.Interop.GWCA.GW.Constants.District district2, int value3);
+            public static partial bool TravelByDistrict(global::Daybreak.API.Interop.GWCA.GW.Constants.MapID mapId, global::Daybreak.API.Interop.GWCA.GW.Constants.District district, int districtNumber);
 
-            // GW::Map::Travel
-            [LibraryImport(DllName, EntryPoint = "?Travel@Map@GW@@YA_NW4MapID@Constants@2@W4ServerRegion@42@HW4Language@42@@Z")]
+            // bool __cdecl GW_Map_TravelByRegion(Constants::MapID map_id, GW::Constants::ServerRegion region, int district_number, GW::Constants::Language language) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Map_TravelByRegion")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool Travel(global::Daybreak.API.Interop.GWCA.GW.Constants.MapID mapID1, global::Daybreak.API.Interop.GWCA.GW.Constants.ServerRegion serverRegion2, int value3, global::Daybreak.API.Interop.GWCA.GW.Constants.Language language4);
+            public static partial bool TravelByRegion(global::Daybreak.API.Interop.GWCA.GW.Constants.MapID mapId, global::Daybreak.API.Interop.GWCA.GW.Constants.ServerRegion region, int districtNumber, global::Daybreak.API.Interop.GWCA.GW.Constants.Language language);
         }
 
         public static partial class MemoryMgr
         {
 
-            // GW::MemoryMgr::GetGWVersion
-            [LibraryImport(DllName, EntryPoint = "?GetGWVersion@MemoryMgr@GW@@YAIXZ")]
+            // uint32_t __cdecl GW_MemoryMgr_GetGWVersion() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_MemoryMgr_GetGWVersion")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetGWVersion();
 
-            // GW::MemoryMgr::GetGWWindowHandle
-            [LibraryImport(DllName, EntryPoint = "?GetGWWindowHandle@MemoryMgr@GW@@YAPAUHWND__@@XZ")]
+            // HWND __cdecl GW_MemoryMgr_GetGWWindowHandle() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_MemoryMgr_GetGWWindowHandle")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GWHwnd* GetGWWindowHandle();
+            public static partial nint GetGWWindowHandle();
 
-            // GW::MemoryMgr::GetPersonalDir
-            [LibraryImport(DllName, EntryPoint = "?GetPersonalDir@MemoryMgr@GW@@YA_NIPA_W@Z")]
+            // bool __cdecl GW_MemoryMgr_GetPersonalDir(size_t buf_len, wchar_t* buf) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_MemoryMgr_GetPersonalDir")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool GetPersonalDir(uint value1, ushort* ptr2);
+            public static partial bool GetPersonalDir(nuint bufLen, ushort* buf);
 
-            // GW::MemoryMgr::GetSkillTimer
-            [LibraryImport(DllName, EntryPoint = "?GetSkillTimer@MemoryMgr@GW@@YAKXZ")]
+            // DWORD __cdecl GW_MemoryMgr_GetSkillTimer() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_MemoryMgr_GetSkillTimer")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetSkillTimer();
 
-            // GW::MemoryMgr::MemAlloc
-            [LibraryImport(DllName, EntryPoint = "?MemAlloc@MemoryMgr@GW@@YAPAXI@Z")]
+            // void* __cdecl GW_MemoryMgr_MemAlloc(size_t size) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_MemoryMgr_MemAlloc")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void* MemAlloc(uint value);
+            public static partial void* MemAlloc(nuint size);
 
-            // GW::MemoryMgr::MemFree
-            [LibraryImport(DllName, EntryPoint = "?MemFree@MemoryMgr@GW@@YAXPAX@Z")]
+            // void __cdecl GW_MemoryMgr_MemFree(void* buf) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_MemoryMgr_MemFree")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void MemFree(void* ptr);
+            public static partial void MemFree(void* buf);
 
-            // GW::MemoryMgr::MemRealloc
-            [LibraryImport(DllName, EntryPoint = "?MemRealloc@MemoryMgr@GW@@YAPAXPAXI@Z")]
+            // void* __cdecl GW_MemoryMgr_MemRealloc(void* buf, size_t newSize) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_MemoryMgr_MemRealloc")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void* MemRealloc(void* ptr1, uint value2);
+            public static partial void* MemRealloc(void* buf, nuint newSize);
         }
 
         public static partial class MemoryPatcher
         {
 
-            // GW::MemoryPatcher::DisableHooks
-            [LibraryImport(DllName, EntryPoint = "?DisableHooks@MemoryPatcher@GW@@SAXXZ")]
+            // void __cdecl GW_MemoryPatcher_DisableHooks() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_MemoryPatcher_DisableHooks")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial void DisableHooks();
 
-            // GW::MemoryPatcher::EnableHooks
-            [LibraryImport(DllName, EntryPoint = "?EnableHooks@MemoryPatcher@GW@@SAXXZ")]
+            // void __cdecl GW_MemoryPatcher_EnableHooks() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_MemoryPatcher_EnableHooks")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial void EnableHooks();
 
-            // GW::MemoryPatcher::Reset
-            [LibraryImport(DllName, EntryPoint = "?Reset@MemoryPatcher@GW@@QAEXXZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial void Reset(nint self);
+            // void __cdecl GW_MemoryPatcher_Reset(MemoryPatcher* self) noexcept | self: TODO: map struct MemoryPatcher
+            // [LibraryImport(DllName, EntryPoint = "GW_MemoryPatcher_Reset")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial void Reset(MemoryPatcher* self);
 
-            // GW::MemoryPatcher::SetPatch
-            [LibraryImport(DllName, EntryPoint = "?SetPatch@MemoryPatcher@GW@@QAEXIPBDI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial uint SetPatch(nint self, byte* ptr2, uint value3);
+            // void __cdecl GW_MemoryPatcher_SetPatch(MemoryPatcher* self, uintptr_t addr, const char* patch, size_t size) noexcept | self: TODO: map struct MemoryPatcher
+            // [LibraryImport(DllName, EntryPoint = "GW_MemoryPatcher_SetPatch")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial void SetPatch(MemoryPatcher* self, nuint addr, byte* patch, nuint size);
 
-            // GW::MemoryPatcher::SetRedirect
-            [LibraryImport(DllName, EntryPoint = "?SetRedirect@MemoryPatcher@GW@@QAE_NIPAX@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double SetRedirect(nint self, uint value2, void* ptr3);
+            // bool __cdecl GW_MemoryPatcher_SetRedirect(MemoryPatcher* self, uintptr_t call_instruction_address, void* redirect_func) noexcept | self: TODO: map struct MemoryPatcher
+            // [LibraryImport(DllName, EntryPoint = "GW_MemoryPatcher_SetRedirect")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool SetRedirect(MemoryPatcher* self, nuint callInstructionAddress, void* redirectFunc);
 
-            // GW::MemoryPatcher::TogglePatch
-            [LibraryImport(DllName, EntryPoint = "?TogglePatch@MemoryPatcher@GW@@QAE_N_N@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double TogglePatch(nint self, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            // bool __cdecl GW_MemoryPatcher_TogglePatch(MemoryPatcher* self, bool flag) noexcept | self: TODO: map struct MemoryPatcher
+            // [LibraryImport(DllName, EntryPoint = "GW_MemoryPatcher_TogglePatch")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool TogglePatch(MemoryPatcher* self, [MarshalAs(UnmanagedType.U1)] bool flag);
         }
 
         public static partial class Merchant
         {
 
-            // GW::Merchant::GetMerchantItems
-            [LibraryImport(DllName, EntryPoint = "?GetMerchantItems@Merchant@GW@@YAIW4TransactionType@12@IPAI@Z")]
+            // size_t __cdecl GW_Merchant_GetMerchantItems(TransactionType type, size_t buffer_len, uint32_t* buffer) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Merchant_GetMerchantItems")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint GetMerchantItems(global::Daybreak.API.Interop.GWCA.GW.Merchant.TransactionType transactionType1, uint value2, uint* ptr3);
+            public static partial nuint GetMerchantItems(global::Daybreak.API.Interop.GWCA.GW.Merchant.TransactionType type, nuint bufferLen, uint* buffer);
 
-            // GW::Merchant::RequestQuote
-            [LibraryImport(DllName, EntryPoint = "?RequestQuote@Merchant@GW@@YA_NW4TransactionType@12@I@Z")]
+            // bool __cdecl GW_Merchant_RequestQuote(TransactionType type, uint32_t item_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Merchant_RequestQuote")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool RequestQuote(global::Daybreak.API.Interop.GWCA.GW.Merchant.TransactionType transactionType1, uint value2);
+            public static partial bool RequestQuote(global::Daybreak.API.Interop.GWCA.GW.Merchant.TransactionType type, uint itemId);
 
-            // GW::Merchant::TransactItems
-            [LibraryImport(DllName, EntryPoint = "?TransactItems@Merchant@GW@@YA_NXZ")]
+            // bool __cdecl GW_Merchant_TransactItems() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Merchant_TransactItems")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool TransactItems();
@@ -1877,601 +1945,608 @@ public static unsafe partial class GWCA
         public static partial class MultiLineTextLabelFrame
         {
 
-            // GW::MultiLineTextLabelFrame::GetDecodedLabel
-            [LibraryImport(DllName, EntryPoint = "?GetDecodedLabel@MultiLineTextLabelFrame@GW@@QAEPB_WXZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial nint GetDecodedLabel(nint self, ushort value2);
+            // const wchar_t* __cdecl GW_MultiLineTextLabelFrame_GetDecodedLabel(MultiLineTextLabelFrame* self) noexcept | self: TODO: map struct MultiLineTextLabelFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_MultiLineTextLabelFrame_GetDecodedLabel")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial ushort* GetDecodedLabel(MultiLineTextLabelFrame* self);
 
-            // GW::MultiLineTextLabelFrame::GetEncodedLabel
-            [LibraryImport(DllName, EntryPoint = "?GetEncodedLabel@MultiLineTextLabelFrame@GW@@QAEPB_WXZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial nint GetEncodedLabel(nint self, ushort value2);
+            // const wchar_t* __cdecl GW_MultiLineTextLabelFrame_GetEncodedLabel(MultiLineTextLabelFrame* self) noexcept | self: TODO: map struct MultiLineTextLabelFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_MultiLineTextLabelFrame_GetEncodedLabel")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial ushort* GetEncodedLabel(MultiLineTextLabelFrame* self);
 
-            // GW::MultiLineTextLabelFrame::SetLabel
-            [LibraryImport(DllName, EntryPoint = "?SetLabel@MultiLineTextLabelFrame@GW@@QAE_NPB_W@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double SetLabel(nint self, ushort* ptr2);
+            // bool __cdecl GW_MultiLineTextLabelFrame_SetLabel(MultiLineTextLabelFrame* self, const wchar_t* enc_string) noexcept | self: TODO: map struct MultiLineTextLabelFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_MultiLineTextLabelFrame_SetLabel")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool SetLabel(MultiLineTextLabelFrame* self, ushort* encString);
         }
 
         public static partial class NPCEquipment
         {
 
-            // GW::NPCEquipment::GetType
-            [LibraryImport(DllName, EntryPoint = "?GetType@NPCEquipment@GW@@QAEIXZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial void GetType(nint self);
+            // uint32_t __cdecl GW_NPCEquipment_GetType(NPCEquipment* self) noexcept | self: TODO: map struct NPCEquipment
+            // [LibraryImport(DllName, EntryPoint = "GW_NPCEquipment_GetType")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial uint GetType(NPCEquipment* self);
 
-            // GW::NPCEquipment::RedrawEquipmentSlot
-            [LibraryImport(DllName, EntryPoint = "?RedrawEquipmentSlot@NPCEquipment@GW@@QAE_NI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double RedrawEquipmentSlot(nint self, uint value2);
+            // bool __cdecl GW_NPCEquipment_RedrawEquipmentSlot(NPCEquipment* self, uint32_t slot) noexcept | self: TODO: map struct NPCEquipment
+            // [LibraryImport(DllName, EntryPoint = "GW_NPCEquipment_RedrawEquipmentSlot")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool RedrawEquipmentSlot(NPCEquipment* self, uint slot);
 
-            // GW::NPCEquipment::UndrawEquipmentSlot
-            [LibraryImport(DllName, EntryPoint = "?UndrawEquipmentSlot@NPCEquipment@GW@@QAE_NI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double UndrawEquipmentSlot(nint self, uint value2);
+            // bool __cdecl GW_NPCEquipment_UndrawEquipmentSlot(NPCEquipment* self, uint32_t slot) noexcept | self: TODO: map struct NPCEquipment
+            // [LibraryImport(DllName, EntryPoint = "GW_NPCEquipment_UndrawEquipmentSlot")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool UndrawEquipmentSlot(NPCEquipment* self, uint slot);
         }
 
         public static partial class PartyMgr
         {
 
-            // GW::PartyMgr::AddHenchman
-            [LibraryImport(DllName, EntryPoint = "?AddHenchman@PartyMgr@GW@@YA_NI@Z")]
+            // bool __cdecl GW_PartyMgr_AddHenchman(uint32_t agent_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_AddHenchman")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool AddHenchman(uint value);
+            public static partial bool AddHenchman(uint agentId);
 
-            // GW::PartyMgr::AddHero
-            [LibraryImport(DllName, EntryPoint = "?AddHero@PartyMgr@GW@@YA_NW4HeroID@Constants@2@@Z")]
+            // bool __cdecl GW_PartyMgr_AddHero(GW::Constants::HeroID heroid) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_AddHero")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool AddHero(global::Daybreak.API.Interop.GWCA.GW.Constants.HeroID heroID);
+            public static partial bool AddHero(global::Daybreak.API.Interop.GWCA.GW.Constants.HeroID heroid);
 
-            // GW::PartyMgr::FlagAll
-            [LibraryImport(DllName, EntryPoint = "?FlagAll@PartyMgr@GW@@YA_NUGamePos@2@@Z")]
+            // bool __cdecl GW_PartyMgr_FlagAll(GamePos pos) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_FlagAll")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool FlagAll(global::Daybreak.API.Interop.GuildWars.GamePos gamePos);
+            public static partial bool FlagAll(global::Daybreak.API.Interop.GuildWars.GamePos pos);
 
-            // GW::PartyMgr::FlagHero
-            [LibraryImport(DllName, EntryPoint = "?FlagHero@PartyMgr@GW@@YA_NIUGamePos@2@@Z")]
+            // bool __cdecl GW_PartyMgr_FlagHero(uint32_t hero_index, GamePos pos) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_FlagHero")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool FlagHero(uint value1, global::Daybreak.API.Interop.GuildWars.GamePos gamePos2);
+            public static partial bool FlagHero(uint heroIndex, global::Daybreak.API.Interop.GuildWars.GamePos pos);
 
-            // GW::PartyMgr::GetAgentAttributes
-            [LibraryImport(DllName, EntryPoint = "?GetAgentAttributes@PartyMgr@GW@@YAPAUAttribute@2@I@Z")]
+            // Attribute* __cdecl GW_PartyMgr_GetAgentAttributes(uint32_t agent_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_GetAgentAttributes")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.AttributeStruct* GetAgentAttributes(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.AttributeStruct* GetAgentAttributes(uint agentId);
 
-            // GW::PartyMgr::GetHeroAgentID
-            [LibraryImport(DllName, EntryPoint = "?GetHeroAgentID@PartyMgr@GW@@YAII@Z")]
+            // uint32_t __cdecl GW_PartyMgr_GetHeroAgentID(uint32_t hero_index) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_GetHeroAgentID")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint GetHeroAgentID(uint value);
+            public static partial uint GetHeroAgentID(uint heroIndex);
 
-            // GW::PartyMgr::GetHeroConstData
-            [LibraryImport(DllName, EntryPoint = "?GetHeroConstData@PartyMgr@GW@@YAPAUHeroConstData@2@W4HeroID@Constants@2@@Z")]
+            // HeroConstData* __cdecl GW_PartyMgr_GetHeroConstData(GW::Constants::HeroID hero_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_GetHeroConstData")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.HeroConstData* GetHeroConstData(global::Daybreak.API.Interop.GWCA.GW.Constants.HeroID heroID);
+            public static partial global::Daybreak.API.Interop.GuildWars.HeroConstData* GetHeroConstData(global::Daybreak.API.Interop.GWCA.GW.Constants.HeroID heroId);
 
-            // GW::PartyMgr::GetHeroInfo
-            [LibraryImport(DllName, EntryPoint = "?GetHeroInfo@PartyMgr@GW@@YAPAUHeroInfo@2@W4HeroID@Constants@2@@Z")]
+            // HeroInfo* __cdecl GW_PartyMgr_GetHeroInfo(GW::Constants::HeroID hero_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_GetHeroInfo")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.HeroInfo* GetHeroInfo(global::Daybreak.API.Interop.GWCA.GW.Constants.HeroID heroID);
+            public static partial global::Daybreak.API.Interop.GuildWars.HeroInfo* GetHeroInfo(global::Daybreak.API.Interop.GWCA.GW.Constants.HeroID heroId);
 
-            // GW::PartyMgr::GetIsHardModeUnlocked
-            [LibraryImport(DllName, EntryPoint = "?GetIsHardModeUnlocked@PartyMgr@GW@@YA_NXZ")]
+            // bool __cdecl GW_PartyMgr_GetIsHardModeUnlocked() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_GetIsHardModeUnlocked")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool GetIsHardModeUnlocked();
 
-            // GW::PartyMgr::GetIsLeader
-            [LibraryImport(DllName, EntryPoint = "?GetIsLeader@PartyMgr@GW@@YA_NXZ")]
+            // bool __cdecl GW_PartyMgr_GetIsLeader() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_GetIsLeader")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool GetIsLeader();
 
-            // GW::PartyMgr::GetIsPartyDefeated
-            [LibraryImport(DllName, EntryPoint = "?GetIsPartyDefeated@PartyMgr@GW@@YA_NXZ")]
+            // bool __cdecl GW_PartyMgr_GetIsPartyDefeated() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_GetIsPartyDefeated")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool GetIsPartyDefeated();
 
-            // GW::PartyMgr::GetIsPartyInHardMode
-            [LibraryImport(DllName, EntryPoint = "?GetIsPartyInHardMode@PartyMgr@GW@@YA_NXZ")]
+            // bool __cdecl GW_PartyMgr_GetIsPartyInHardMode() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_GetIsPartyInHardMode")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool GetIsPartyInHardMode();
 
-            // GW::PartyMgr::GetIsPartyLoaded
-            [LibraryImport(DllName, EntryPoint = "?GetIsPartyLoaded@PartyMgr@GW@@YA_NXZ")]
+            // bool __cdecl GW_PartyMgr_GetIsPartyLoaded() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_GetIsPartyLoaded")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool GetIsPartyLoaded();
 
-            // GW::PartyMgr::GetIsPartyTicked
-            [LibraryImport(DllName, EntryPoint = "?GetIsPartyTicked@PartyMgr@GW@@YA_NXZ")]
+            // bool __cdecl GW_PartyMgr_GetIsPartyTicked() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_GetIsPartyTicked")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool GetIsPartyTicked();
 
-            // GW::PartyMgr::GetIsPlayerTicked
-            [LibraryImport(DllName, EntryPoint = "?GetIsPlayerTicked@PartyMgr@GW@@YA_NI@Z")]
+            // bool __cdecl GW_PartyMgr_GetIsPlayerTicked(uint32_t player_index) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_GetIsPlayerTicked")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool GetIsPlayerTicked(uint value);
+            public static partial bool GetIsPlayerTicked(uint playerIndex);
 
-            // GW::PartyMgr::GetPartyHenchmanCount
-            [LibraryImport(DllName, EntryPoint = "?GetPartyHenchmanCount@PartyMgr@GW@@YAIXZ")]
+            // uint32_t __cdecl GW_PartyMgr_GetPartyHenchmanCount() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_GetPartyHenchmanCount")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetPartyHenchmanCount();
 
-            // GW::PartyMgr::GetPartyHeroCount
-            [LibraryImport(DllName, EntryPoint = "?GetPartyHeroCount@PartyMgr@GW@@YAIXZ")]
+            // uint32_t __cdecl GW_PartyMgr_GetPartyHeroCount() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_GetPartyHeroCount")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetPartyHeroCount();
 
-            // GW::PartyMgr::GetPartyInfo
-            [LibraryImport(DllName, EntryPoint = "?GetPartyInfo@PartyMgr@GW@@YAPAUPartyInfo@2@I@Z")]
+            // PartyInfo* __cdecl GW_PartyMgr_GetPartyInfo(uint32_t party_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_GetPartyInfo")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.PartyInfo* GetPartyInfo(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.PartyInfo* GetPartyInfo(uint partyId);
 
-            // GW::PartyMgr::GetPartyPlayerCount
-            [LibraryImport(DllName, EntryPoint = "?GetPartyPlayerCount@PartyMgr@GW@@YAIXZ")]
+            // uint32_t __cdecl GW_PartyMgr_GetPartyPlayerCount() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_GetPartyPlayerCount")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetPartyPlayerCount();
 
-            // GW::PartyMgr::GetPartySearch
-            [LibraryImport(DllName, EntryPoint = "?GetPartySearch@PartyMgr@GW@@YAPAUPartySearch@2@I@Z")]
+            // PartySearch* __cdecl GW_PartyMgr_GetPartySearch(uint32_t party_search_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_GetPartySearch")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.PartySearch* GetPartySearch(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.PartySearch* GetPartySearch(uint partySearchId);
 
-            // GW::PartyMgr::GetPartySize
-            [LibraryImport(DllName, EntryPoint = "?GetPartySize@PartyMgr@GW@@YAIXZ")]
+            // uint32_t __cdecl GW_PartyMgr_GetPartySize() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_GetPartySize")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetPartySize();
 
-            // GW::PartyMgr::GetPetInfo
-            [LibraryImport(DllName, EntryPoint = "?GetPetInfo@PartyMgr@GW@@YAPAUPetInfo@2@I@Z")]
+            // PetInfo* __cdecl GW_PartyMgr_GetPetInfo(uint32_t owner_agent_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_GetPetInfo")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.PetInfo* GetPetInfo(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.PetInfo* GetPetInfo(uint ownerAgentId);
 
-            // GW::PartyMgr::InvitePlayer
-            [LibraryImport(DllName, EntryPoint = "?InvitePlayer@PartyMgr@GW@@YA_NI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool InvitePlayer(uint value);
-
-            // GW::PartyMgr::InvitePlayer
-            [LibraryImport(DllName, EntryPoint = "?InvitePlayer@PartyMgr@GW@@YA_NPB_W@Z")]
+            // bool __cdecl GW_PartyMgr_InvitePlayerById(uint32_t player_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_InvitePlayerById")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool InvitePlayer(ushort* ptr);
+            public static partial bool InvitePlayerById(uint playerId);
 
-            // GW::PartyMgr::KickAllHeroes
-            [LibraryImport(DllName, EntryPoint = "?KickAllHeroes@PartyMgr@GW@@YA_NXZ")]
+            // bool __cdecl GW_PartyMgr_InvitePlayerByName(const wchar_t* player_name) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_InvitePlayerByName")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool InvitePlayerByName(ushort* playerName);
+
+            // bool __cdecl GW_PartyMgr_KickAllHeroes() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_KickAllHeroes")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool KickAllHeroes();
 
-            // GW::PartyMgr::KickHenchman
-            [LibraryImport(DllName, EntryPoint = "?KickHenchman@PartyMgr@GW@@YA_NI@Z")]
+            // bool __cdecl GW_PartyMgr_KickHenchman(uint32_t agent_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_KickHenchman")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool KickHenchman(uint value);
+            public static partial bool KickHenchman(uint agentId);
 
-            // GW::PartyMgr::KickHero
-            [LibraryImport(DllName, EntryPoint = "?KickHero@PartyMgr@GW@@YA_NW4HeroID@Constants@2@@Z")]
+            // bool __cdecl GW_PartyMgr_KickHero(GW::Constants::HeroID heroid) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_KickHero")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool KickHero(global::Daybreak.API.Interop.GWCA.GW.Constants.HeroID heroID);
+            public static partial bool KickHero(global::Daybreak.API.Interop.GWCA.GW.Constants.HeroID heroid);
 
-            // GW::PartyMgr::KickPlayer
-            [LibraryImport(DllName, EntryPoint = "?KickPlayer@PartyMgr@GW@@YA_NI@Z")]
+            // bool __cdecl GW_PartyMgr_KickPlayer(uint32_t player_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_KickPlayer")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool KickPlayer(uint value);
+            public static partial bool KickPlayer(uint playerId);
 
-            // GW::PartyMgr::LeaveParty
-            [LibraryImport(DllName, EntryPoint = "?LeaveParty@PartyMgr@GW@@YA_NXZ")]
+            // bool __cdecl GW_PartyMgr_LeaveParty() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_LeaveParty")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool LeaveParty();
 
-            // GW::PartyMgr::RespondToPartyRequest
-            [LibraryImport(DllName, EntryPoint = "?RespondToPartyRequest@PartyMgr@GW@@YA_NI_N@Z")]
+            // bool __cdecl GW_PartyMgr_RespondToPartyRequest(uint32_t party_id, bool accept) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_RespondToPartyRequest")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool RespondToPartyRequest(uint value1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            public static partial bool RespondToPartyRequest(uint partyId, [MarshalAs(UnmanagedType.U1)] bool accept);
 
-            // GW::PartyMgr::ReturnToOutpost
-            [LibraryImport(DllName, EntryPoint = "?ReturnToOutpost@PartyMgr@GW@@YA_NXZ")]
+            // bool __cdecl GW_PartyMgr_ReturnToOutpost() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_ReturnToOutpost")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool ReturnToOutpost();
 
-            // GW::PartyMgr::SearchParty
-            [LibraryImport(DllName, EntryPoint = "?SearchParty@PartyMgr@GW@@YA_NIPB_W@Z")]
+            // bool __cdecl GW_PartyMgr_SearchParty(uint32_t search_type, const wchar_t* advertisement) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_SearchParty")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SearchParty(uint value1, ushort* ptr2);
+            public static partial bool SearchParty(uint searchType, ushort* advertisement);
 
-            // GW::PartyMgr::SearchPartyCancel
-            [LibraryImport(DllName, EntryPoint = "?SearchPartyCancel@PartyMgr@GW@@YA_NXZ")]
+            // bool __cdecl GW_PartyMgr_SearchPartyCancel() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_SearchPartyCancel")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool SearchPartyCancel();
 
-            // GW::PartyMgr::SearchPartyReply
-            [LibraryImport(DllName, EntryPoint = "?SearchPartyReply@PartyMgr@GW@@YA_NI_N@Z")]
+            // bool __cdecl GW_PartyMgr_SearchPartyReply(uint32_t party_search_id, bool accept) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_SearchPartyReply")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SearchPartyReply(uint value1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            public static partial bool SearchPartyReply(uint partySearchId, [MarshalAs(UnmanagedType.U1)] bool accept);
 
-            // GW::PartyMgr::SetHardMode
-            [LibraryImport(DllName, EntryPoint = "?SetHardMode@PartyMgr@GW@@YA_N_N@Z")]
+            // bool __cdecl GW_PartyMgr_SetHardMode(bool flag) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_SetHardMode")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool SetHardMode([MarshalAs(UnmanagedType.U1)] bool flag);
 
-            // GW::PartyMgr::SetHeroBehavior
-            [LibraryImport(DllName, EntryPoint = "?SetHeroBehavior@PartyMgr@GW@@YA_NIW4HeroBehavior@2@@Z")]
+            // bool __cdecl GW_PartyMgr_SetHeroBehavior(uint32_t hero_agent_id, HeroBehavior behavior) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_SetHeroBehavior")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SetHeroBehavior(uint value1, global::Daybreak.API.Interop.GWCA.GW.HeroBehavior heroBehavior2);
+            public static partial bool SetHeroBehavior(uint heroAgentId, global::Daybreak.API.Interop.GWCA.GW.HeroBehavior behavior);
 
-            // GW::PartyMgr::SetHeroSkillDisabled
-            [LibraryImport(DllName, EntryPoint = "?SetHeroSkillDisabled@PartyMgr@GW@@YA_NII_N@Z")]
+            // bool __cdecl GW_PartyMgr_SetHeroSkillDisabled(uint32_t hero_agent_id, uint32_t slot_index, bool disabled) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_SetHeroSkillDisabled")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SetHeroSkillDisabled(uint value1, uint value2, [MarshalAs(UnmanagedType.U1)] bool flag3);
+            public static partial bool SetHeroSkillDisabled(uint heroAgentId, uint slotIndex, [MarshalAs(UnmanagedType.U1)] bool disabled);
 
-            // GW::PartyMgr::SetHeroTarget
-            [LibraryImport(DllName, EntryPoint = "?SetHeroTarget@PartyMgr@GW@@YA_NII@Z")]
+            // bool __cdecl GW_PartyMgr_SetHeroTarget(uint32_t hero_agent_id, uint32_t target_agent_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_SetHeroTarget")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SetHeroTarget(uint value1, uint value2);
+            public static partial bool SetHeroTarget(uint heroAgentId, uint targetAgentId);
 
-            // GW::PartyMgr::SetPetBehavior
-            [LibraryImport(DllName, EntryPoint = "?SetPetBehavior@PartyMgr@GW@@YA_NIW4HeroBehavior@2@@Z")]
+            // bool __cdecl GW_PartyMgr_SetPetBehavior(uint32_t owner_agent_id, HeroBehavior behavior) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_SetPetBehavior")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SetPetBehavior(uint value1, global::Daybreak.API.Interop.GWCA.GW.HeroBehavior heroBehavior2);
+            public static partial bool SetPetBehavior(uint ownerAgentId, global::Daybreak.API.Interop.GWCA.GW.HeroBehavior behavior);
 
-            // GW::PartyMgr::SetTickToggle
-            [LibraryImport(DllName, EntryPoint = "?SetTickToggle@PartyMgr@GW@@YAX_N@Z")]
+            // void __cdecl GW_PartyMgr_SetTickToggle(bool enable) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_SetTickToggle")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void SetTickToggle([MarshalAs(UnmanagedType.U1)] bool flag);
+            public static partial void SetTickToggle([MarshalAs(UnmanagedType.U1)] bool enable);
 
-            // GW::PartyMgr::Tick
-            [LibraryImport(DllName, EntryPoint = "?Tick@PartyMgr@GW@@YA_N_N@Z")]
+            // bool __cdecl GW_PartyMgr_Tick(bool flag) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_Tick")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool Tick([MarshalAs(UnmanagedType.U1)] bool flag);
 
-            // GW::PartyMgr::UnflagAll
-            [LibraryImport(DllName, EntryPoint = "?UnflagAll@PartyMgr@GW@@YA_NXZ")]
+            // bool __cdecl GW_PartyMgr_UnflagAll() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_UnflagAll")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool UnflagAll();
 
-            // GW::PartyMgr::UnflagHero
-            [LibraryImport(DllName, EntryPoint = "?UnflagHero@PartyMgr@GW@@YA_NI@Z")]
+            // bool __cdecl GW_PartyMgr_UnflagHero(uint32_t hero_index) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PartyMgr_UnflagHero")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool UnflagHero(uint value);
+            public static partial bool UnflagHero(uint heroIndex);
         }
 
         public static partial class PlayerMgr
         {
 
-            // GW::PlayerMgr::ChangeSecondProfession
-            [LibraryImport(DllName, EntryPoint = "?ChangeSecondProfession@PlayerMgr@GW@@YA_NW4Profession@Constants@2@I@Z")]
+            // bool __cdecl GW_PlayerMgr_ChangeSecondProfession(Constants::Profession prof, uint32_t hero_index) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PlayerMgr_ChangeSecondProfession")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool ChangeSecondProfession(global::Daybreak.API.Interop.GWCA.GW.Constants.Profession profession1, uint value2);
+            public static partial bool ChangeSecondProfession(global::Daybreak.API.Interop.GWCA.GW.Constants.Profession prof, uint heroIndex);
 
-            // GW::PlayerMgr::GetActiveTitle
-            [LibraryImport(DllName, EntryPoint = "?GetActiveTitle@PlayerMgr@GW@@YAPAUTitle@2@XZ")]
+            // Title* __cdecl GW_PlayerMgr_GetActiveTitle() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PlayerMgr_GetActiveTitle")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GuildWars.Title* GetActiveTitle();
 
-            // GW::PlayerMgr::GetActiveTitleId
-            [LibraryImport(DllName, EntryPoint = "?GetActiveTitleId@PlayerMgr@GW@@YA?AW4TitleID@Constants@2@XZ")]
+            // Constants::TitleID __cdecl GW_PlayerMgr_GetActiveTitleId() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PlayerMgr_GetActiveTitleId")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.TitleID GetActiveTitleId();
 
-            // GW::PlayerMgr::GetAmountOfPlayersInInstance
-            [LibraryImport(DllName, EntryPoint = "?GetAmountOfPlayersInInstance@PlayerMgr@GW@@YAIXZ")]
+            // uint32_t __cdecl GW_PlayerMgr_GetAmountOfPlayersInInstance() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PlayerMgr_GetAmountOfPlayersInInstance")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetAmountOfPlayersInInstance();
 
-            // GW::PlayerMgr::GetPlayerAgentId
-            [LibraryImport(DllName, EntryPoint = "?GetPlayerAgentId@PlayerMgr@GW@@YAII@Z")]
+            // uint32_t __cdecl GW_PlayerMgr_GetPlayerAgentId(uint32_t player_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PlayerMgr_GetPlayerAgentId")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint GetPlayerAgentId(uint value);
+            public static partial uint GetPlayerAgentId(uint playerId);
 
-            // GW::PlayerMgr::GetPlayerArray
-            [LibraryImport(DllName, EntryPoint = "?GetPlayerArray@PlayerMgr@GW@@YAPAV?$Array@UPlayer@GW@@@2@XZ")]
+            // PlayerArray* __cdecl GW_PlayerMgr_GetPlayerArray() noexcept | returns TODO: map struct PlayerArray
+            // [LibraryImport(DllName, EntryPoint = "GW_PlayerMgr_GetPlayerArray")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial PlayerArray* GetPlayerArray();
+
+            // Player* __cdecl GW_PlayerMgr_GetPlayerByID(uint32_t player_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PlayerMgr_GetPlayerByID")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.Player>* GetPlayerArray();
+            public static partial global::Daybreak.API.Interop.GuildWars.Player* GetPlayerByID(uint playerId);
 
-            // GW::PlayerMgr::GetPlayerByID
-            [LibraryImport(DllName, EntryPoint = "?GetPlayerByID@PlayerMgr@GW@@YAPAUPlayer@2@I@Z")]
+            // Player* __cdecl GW_PlayerMgr_GetPlayerByName(const wchar_t* name) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PlayerMgr_GetPlayerByName")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.Player* GetPlayerByID(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.Player* GetPlayerByName(ushort* name);
 
-            // GW::PlayerMgr::GetPlayerByName
-            [LibraryImport(DllName, EntryPoint = "?GetPlayerByName@PlayerMgr@GW@@YAPAUPlayer@2@PB_W@Z")]
+            // wchar_t* __cdecl GW_PlayerMgr_GetPlayerName(uint32_t player_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PlayerMgr_GetPlayerName")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.Player* GetPlayerByName(ushort* ptr);
+            public static partial ushort* GetPlayerName(uint playerId);
 
-            // GW::PlayerMgr::GetPlayerName
-            [LibraryImport(DllName, EntryPoint = "?GetPlayerName@PlayerMgr@GW@@YAPA_WI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial ushort* GetPlayerName(uint value);
-
-            // GW::PlayerMgr::GetPlayerNumber
-            [LibraryImport(DllName, EntryPoint = "?GetPlayerNumber@PlayerMgr@GW@@YAIXZ")]
+            // PlayerNumber __cdecl GW_PlayerMgr_GetPlayerNumber() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PlayerMgr_GetPlayerNumber")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetPlayerNumber();
 
-            // GW::PlayerMgr::GetTitleData
-            [LibraryImport(DllName, EntryPoint = "?GetTitleData@PlayerMgr@GW@@YAPAUTitleClientData@2@W4TitleID@Constants@2@@Z")]
+            // TitleClientData* __cdecl GW_PlayerMgr_GetTitleData(Constants::TitleID title_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PlayerMgr_GetTitleData")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.TitleClientData* GetTitleData(global::Daybreak.API.Interop.GWCA.GW.Constants.TitleID titleID);
+            public static partial global::Daybreak.API.Interop.GuildWars.TitleClientData* GetTitleData(global::Daybreak.API.Interop.GWCA.GW.Constants.TitleID titleId);
 
-            // GW::PlayerMgr::GetTitleTrack
-            [LibraryImport(DllName, EntryPoint = "?GetTitleTrack@PlayerMgr@GW@@YAPAUTitle@2@W4TitleID@Constants@2@@Z")]
+            // Title* __cdecl GW_PlayerMgr_GetTitleTrack(Constants::TitleID title_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PlayerMgr_GetTitleTrack")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.Title* GetTitleTrack(global::Daybreak.API.Interop.GWCA.GW.Constants.TitleID titleID);
+            public static partial global::Daybreak.API.Interop.GuildWars.Title* GetTitleTrack(global::Daybreak.API.Interop.GWCA.GW.Constants.TitleID titleId);
 
-            // GW::PlayerMgr::RemoveActiveTitle
-            [LibraryImport(DllName, EntryPoint = "?RemoveActiveTitle@PlayerMgr@GW@@YA_NXZ")]
+            // bool __cdecl GW_PlayerMgr_RemoveActiveTitle() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PlayerMgr_RemoveActiveTitle")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool RemoveActiveTitle();
 
-            // GW::PlayerMgr::SetActiveTitle
-            [LibraryImport(DllName, EntryPoint = "?SetActiveTitle@PlayerMgr@GW@@YA_NW4TitleID@Constants@2@@Z")]
+            // bool __cdecl GW_PlayerMgr_SetActiveTitle(Constants::TitleID title_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PlayerMgr_SetActiveTitle")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SetActiveTitle(global::Daybreak.API.Interop.GWCA.GW.Constants.TitleID titleID);
+            public static partial bool SetActiveTitle(global::Daybreak.API.Interop.GWCA.GW.Constants.TitleID titleId);
 
-            // GW::PlayerMgr::SetPlayerName
-            [LibraryImport(DllName, EntryPoint = "?SetPlayerName@PlayerMgr@GW@@YAPA_WIPB_W@Z")]
+            // wchar_t* __cdecl GW_PlayerMgr_SetPlayerName(uint32_t player_id, const wchar_t* replace_name) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_PlayerMgr_SetPlayerName")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial ushort* SetPlayerName(uint value1, ushort* ptr2);
+            public static partial ushort* SetPlayerName(uint playerId, ushort* replaceName);
         }
 
         public static partial class ProgressBar
         {
 
-            // GW::ProgressBar::GetValue
-            [LibraryImport(DllName, EntryPoint = "?GetValue@ProgressBar@GW@@UAEIXZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial void GetValue(nint self);
+            // uint32_t __cdecl GW_ProgressBar_GetValue(ProgressBar* self) noexcept | self: TODO: map struct ProgressBar
+            // [LibraryImport(DllName, EntryPoint = "GW_ProgressBar_GetValue")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial uint GetValue(ProgressBar* self);
 
-            // GW::ProgressBar::SetColorId
-            [LibraryImport(DllName, EntryPoint = "?SetColorId@ProgressBar@GW@@QAE_NI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double SetColorId(nint self, uint value2);
+            // bool __cdecl GW_ProgressBar_SetColorId(ProgressBar* self, uint32_t color_id) noexcept | self: TODO: map struct ProgressBar
+            // [LibraryImport(DllName, EntryPoint = "GW_ProgressBar_SetColorId")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool SetColorId(ProgressBar* self, uint colorId);
 
-            // GW::ProgressBar::SetMax
-            [LibraryImport(DllName, EntryPoint = "?SetMax@ProgressBar@GW@@QAE_NI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double SetMax(nint self, uint value2);
+            // bool __cdecl GW_ProgressBar_SetMax(ProgressBar* self, uint32_t value) noexcept | self: TODO: map struct ProgressBar
+            // [LibraryImport(DllName, EntryPoint = "GW_ProgressBar_SetMax")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool SetMax(ProgressBar* self, uint value);
 
-            // GW::ProgressBar::SetStyle
-            [LibraryImport(DllName, EntryPoint = "?SetStyle@ProgressBar@GW@@QAE_NW4ProgressBarStyle@12@@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double SetStyle(nint self, global::Daybreak.API.Interop.GWCA.GW.ProgressBarStyle progressBarStyle2);
+            // bool __cdecl GW_ProgressBar_SetStyle(ProgressBar* self, ProgressBar::ProgressBarStyle style) noexcept | self: TODO: map struct ProgressBar
+            // [LibraryImport(DllName, EntryPoint = "GW_ProgressBar_SetStyle")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool SetStyle(ProgressBar* self, global::Daybreak.API.Interop.GWCA.GW.ProgressBarStyle style);
 
-            // GW::ProgressBar::SetValue
-            [LibraryImport(DllName, EntryPoint = "?SetValue@ProgressBar@GW@@UAE_NI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double SetValue(nint self, uint value2);
+            // bool __cdecl GW_ProgressBar_SetValue(ProgressBar* self, uint32_t value) noexcept | self: TODO: map struct ProgressBar
+            // [LibraryImport(DllName, EntryPoint = "GW_ProgressBar_SetValue")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool SetValue(ProgressBar* self, uint value);
         }
 
         public static partial class QuestMgr
         {
 
-            // GW::QuestMgr::AbandonQuest
-            [LibraryImport(DllName, EntryPoint = "?AbandonQuest@QuestMgr@GW@@YA_NPAUQuest@2@@Z")]
+            // bool __cdecl GW_QuestMgr_AbandonQuest(Quest* quest) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_QuestMgr_AbandonQuest")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool AbandonQuest(global::Daybreak.API.Interop.GuildWars.Quest* quest);
 
-            // GW::QuestMgr::AbandonQuestId
-            [LibraryImport(DllName, EntryPoint = "?AbandonQuestId@QuestMgr@GW@@YA_NW4QuestID@Constants@2@@Z")]
+            // bool __cdecl GW_QuestMgr_AbandonQuestId(Constants::QuestID quest_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_QuestMgr_AbandonQuestId")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool AbandonQuestId(global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID questID);
+            public static partial bool AbandonQuestId(global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID questId);
 
-            // GW::QuestMgr::GetActiveQuest
-            [LibraryImport(DllName, EntryPoint = "?GetActiveQuest@QuestMgr@GW@@YAPAUQuest@2@XZ")]
+            // Quest* __cdecl GW_QuestMgr_GetActiveQuest() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_QuestMgr_GetActiveQuest")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GuildWars.Quest* GetActiveQuest();
 
-            // GW::QuestMgr::GetActiveQuestId
-            [LibraryImport(DllName, EntryPoint = "?GetActiveQuestId@QuestMgr@GW@@YA?AW4QuestID@Constants@2@XZ")]
+            // GW::Constants::QuestID __cdecl GW_QuestMgr_GetActiveQuestId() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_QuestMgr_GetActiveQuestId")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID GetActiveQuestId();
 
-            // GW::QuestMgr::GetQuest
-            [LibraryImport(DllName, EntryPoint = "?GetQuest@QuestMgr@GW@@YAPAUQuest@2@W4QuestID@Constants@2@@Z")]
+            // Quest* __cdecl GW_QuestMgr_GetQuest(GW::Constants::QuestID gwca_arg0) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_QuestMgr_GetQuest")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.Quest* GetQuest(global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID questID);
+            public static partial global::Daybreak.API.Interop.GuildWars.Quest* GetQuest(global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID gwcaArg0);
 
-            // GW::QuestMgr::GetQuestEntryGroupName
-            [LibraryImport(DllName, EntryPoint = "?GetQuestEntryGroupName@QuestMgr@GW@@YA_NW4QuestID@Constants@2@PA_WI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool GetQuestEntryGroupName(global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID questID1, ushort* ptr2, uint value3);
-
-            // GW::QuestMgr::GetQuestLog
-            [LibraryImport(DllName, EntryPoint = "?GetQuestLog@QuestMgr@GW@@YAPAV?$Array@UQuest@GW@@@2@XZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.Quest>* GetQuestLog();
-
-            // GW::QuestMgr::RequestQuestInfo
-            [LibraryImport(DllName, EntryPoint = "?RequestQuestInfo@QuestMgr@GW@@YA_NPBUQuest@2@_N@Z")]
+            // bool __cdecl GW_QuestMgr_GetQuestEntryGroupName(GW::Constants::QuestID quest_id, wchar_t* out, size_t out_len) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_QuestMgr_GetQuestEntryGroupName")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool RequestQuestInfo(global::Daybreak.API.Interop.GuildWars.Quest* quest1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            public static partial bool GetQuestEntryGroupName(global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID questId, ushort* @out, nuint outLen);
 
-            // GW::QuestMgr::RequestQuestInfoId
-            [LibraryImport(DllName, EntryPoint = "?RequestQuestInfoId@QuestMgr@GW@@YA_NW4QuestID@Constants@2@_N@Z")]
+            // QuestLog* __cdecl GW_QuestMgr_GetQuestLog() noexcept | returns TODO: map struct QuestLog
+            // [LibraryImport(DllName, EntryPoint = "GW_QuestMgr_GetQuestLog")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial QuestLog* GetQuestLog();
+
+            // bool __cdecl GW_QuestMgr_RequestQuestInfo(const Quest* quest, bool update_markers) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_QuestMgr_RequestQuestInfo")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool RequestQuestInfoId(global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID questID1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            public static partial bool RequestQuestInfo(global::Daybreak.API.Interop.GuildWars.Quest* quest, [MarshalAs(UnmanagedType.U1)] bool updateMarkers);
 
-            // GW::QuestMgr::SetActiveQuest
-            [LibraryImport(DllName, EntryPoint = "?SetActiveQuest@QuestMgr@GW@@YA_NPAUQuest@2@@Z")]
+            // bool __cdecl GW_QuestMgr_RequestQuestInfoId(Constants::QuestID quest_id, bool update_markers) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_QuestMgr_RequestQuestInfoId")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool RequestQuestInfoId(global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID questId, [MarshalAs(UnmanagedType.U1)] bool updateMarkers);
+
+            // bool __cdecl GW_QuestMgr_SetActiveQuest(Quest* quest) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_QuestMgr_SetActiveQuest")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool SetActiveQuest(global::Daybreak.API.Interop.GuildWars.Quest* quest);
 
-            // GW::QuestMgr::SetActiveQuestId
-            [LibraryImport(DllName, EntryPoint = "?SetActiveQuestId@QuestMgr@GW@@YA_NW4QuestID@Constants@2@@Z")]
+            // bool __cdecl GW_QuestMgr_SetActiveQuestId(Constants::QuestID quest_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_QuestMgr_SetActiveQuestId")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SetActiveQuestId(global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID questID);
+            public static partial bool SetActiveQuestId(global::Daybreak.API.Interop.GWCA.GW.Constants.QuestID questId);
         }
 
         public static partial class Render
         {
 
-            // GW::Render::EnableHooks
-            [LibraryImport(DllName, EntryPoint = "?EnableHooks@Render@GW@@YAXXZ")]
+            // void __cdecl GW_Render_EnableHooks() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Render_EnableHooks")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial void EnableHooks();
 
-            // GW::Render::FlushCommandQueue
-            [LibraryImport(DllName, EntryPoint = "?FlushCommandQueue@Render@GW@@YAXXZ")]
+            // void __cdecl GW_Render_FlushCommandQueue() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Render_FlushCommandQueue")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial void FlushCommandQueue();
 
-            // GW::Render::GetBackend
-            [LibraryImport(DllName, EntryPoint = "?GetBackend@Render@GW@@YA?AW4Backend@12@XZ")]
+            // Backend __cdecl GW_Render_GetBackend() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Render_GetBackend")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GWCA.GW.Render.Backend GetBackend();
 
-            // GW::Render::GetDevice | returns TODO: map struct IDirect3DDevice9
-            // [LibraryImport(DllName, EntryPoint = "?GetDevice@Render@GW@@YAPAUIDirect3DDevice9@@XZ")]
+            // IDirect3DDevice9* __cdecl GW_Render_GetDevice() noexcept | returns TODO: map struct IDirect3DDevice9
+            // [LibraryImport(DllName, EntryPoint = "GW_Render_GetDevice")]
             // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             // public static partial IDirect3DDevice9* GetDevice();
 
-            // GW::Render::GetFieldOfView
-            [LibraryImport(DllName, EntryPoint = "?GetFieldOfView@Render@GW@@YAMXZ")]
+            // float __cdecl GW_Render_GetFieldOfView() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Render_GetFieldOfView")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial float GetFieldOfView();
 
-            // GW::Render::GetFrameCallback
-            [LibraryImport(DllName, EntryPoint = "?GetFrameCallback@Render@GW@@YAP6AXXZXZ")]
+            // FrameCallback __cdecl GW_Render_GetFrameCallback() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Render_GetFrameCallback")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial nint GetFrameCallback();
 
-            // GW::Render::GetFrameLimit
-            [LibraryImport(DllName, EntryPoint = "?GetFrameLimit@Render@GW@@YAIXZ")]
+            // uint32_t __cdecl GW_Render_GetFrameLimit() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Render_GetFrameLimit")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetFrameLimit();
 
-            // GW::Render::GetGlesDevice
-            [LibraryImport(DllName, EntryPoint = "?GetGlesDevice@Render@GW@@YAPAUGlesDevice@12@XZ")]
+            // GlesDevice* __cdecl GW_Render_GetGlesDevice() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Render_GetGlesDevice")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GuildWars.GlesDevice* GetGlesDevice();
 
-            // GW::Render::GetGlesRenderCallback
-            [LibraryImport(DllName, EntryPoint = "?GetGlesRenderCallback@Render@GW@@YAP6AXPAUGlesDevice@12@@ZXZ")]
+            // GlesRenderCallback __cdecl GW_Render_GetGlesRenderCallback() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Render_GetGlesRenderCallback")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial nint GetGlesRenderCallback();
 
-            // GW::Render::GetGlesResetCallback
-            [LibraryImport(DllName, EntryPoint = "?GetGlesResetCallback@Render@GW@@YAP6AXPAUGlesDevice@12@@ZXZ")]
+            // GlesRenderCallback __cdecl GW_Render_GetGlesResetCallback() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Render_GetGlesResetCallback")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial nint GetGlesResetCallback();
 
-            // GW::Render::GetGraphicsRendererValue
-            [LibraryImport(DllName, EntryPoint = "?GetGraphicsRendererValue@Render@GW@@YAIW4Metric@12@I@Z")]
+            // uint32_t __cdecl GW_Render_GetGraphicsRendererValue(Metric metric_id, uint32_t renderer_mode) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Render_GetGraphicsRendererValue")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint GetGraphicsRendererValue(global::Daybreak.API.Interop.GWCA.GW.Render.Metric metric1, uint value2);
+            public static partial uint GetGraphicsRendererValue(global::Daybreak.API.Interop.GWCA.GW.Render.Metric metricId, uint rendererMode);
 
-            // GW::Render::GetIsFullscreen
-            [LibraryImport(DllName, EntryPoint = "?GetIsFullscreen@Render@GW@@YAHXZ")]
+            // int __cdecl GW_Render_GetIsFullscreen() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Render_GetIsFullscreen")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial int GetIsFullscreen();
 
-            // GW::Render::GetRenderCallback
-            [LibraryImport(DllName, EntryPoint = "?GetRenderCallback@Render@GW@@YAP6AXPAUIDirect3DDevice9@@@ZXZ")]
+            // RenderCallback __cdecl GW_Render_GetRenderCallback() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Render_GetRenderCallback")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial nint GetRenderCallback();
 
-            // GW::Render::GetRendererMode
-            [LibraryImport(DllName, EntryPoint = "?GetRendererMode@Render@GW@@YA?AW4RendererMode@12@XZ")]
+            // RendererMode __cdecl GW_Render_GetRendererMode() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Render_GetRendererMode")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GWCA.GW.Render.RendererMode GetRendererMode();
 
-            // GW::Render::GetResetCallback
-            [LibraryImport(DllName, EntryPoint = "?GetResetCallback@Render@GW@@YAP6AXPAUIDirect3DDevice9@@@ZXZ")]
+            // RenderCallback __cdecl GW_Render_GetResetCallback() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Render_GetResetCallback")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial nint GetResetCallback();
 
-            // GW::Render::GetViewportHeight
-            [LibraryImport(DllName, EntryPoint = "?GetViewportHeight@Render@GW@@YAIXZ")]
+            // uint32_t __cdecl GW_Render_GetViewportHeight() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Render_GetViewportHeight")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetViewportHeight();
 
-            // GW::Render::GetViewportWidth
-            [LibraryImport(DllName, EntryPoint = "?GetViewportWidth@Render@GW@@YAIXZ")]
+            // uint32_t __cdecl GW_Render_GetViewportWidth() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Render_GetViewportWidth")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetViewportWidth();
 
-            // GW::Render::GetWindowHandle
-            [LibraryImport(DllName, EntryPoint = "?GetWindowHandle@Render@GW@@YAPAUHWND__@@XZ")]
+            // HWND __cdecl GW_Render_GetWindowHandle() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Render_GetWindowHandle")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GWHwnd* GetWindowHandle();
+            public static partial nint GetWindowHandle();
 
-            // GW::Render::SetFog
-            [LibraryImport(DllName, EntryPoint = "?SetFog@Render@GW@@YA_N_N@Z")]
+            // bool __cdecl GW_Render_SetFog(bool enabled) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Render_SetFog")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SetFog([MarshalAs(UnmanagedType.U1)] bool flag);
+            public static partial bool SetFog([MarshalAs(UnmanagedType.U1)] bool enabled);
 
-            // GW::Render::SetFrameCallback
-            [LibraryImport(DllName, EntryPoint = "?SetFrameCallback@Render@GW@@YAXP6AXXZ@Z")]
+            // void __cdecl GW_Render_SetFrameCallback(FrameCallback callback) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Render_SetFrameCallback")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial void SetFrameCallback(nint callback);
 
-            // GW::Render::SetFrameLimit
-            [LibraryImport(DllName, EntryPoint = "?SetFrameLimit@Render@GW@@YA_NI@Z")]
+            // bool __cdecl GW_Render_SetFrameLimit(uint32_t value) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Render_SetFrameLimit")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool SetFrameLimit(uint value);
 
-            // GW::Render::SetGlesRenderCallback
-            [LibraryImport(DllName, EntryPoint = "?SetGlesRenderCallback@Render@GW@@YAXP6AXPAUGlesDevice@12@@Z@Z")]
+            // void __cdecl GW_Render_SetGlesRenderCallback(GlesRenderCallback callback) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Render_SetGlesRenderCallback")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial void SetGlesRenderCallback(nint callback);
 
-            // GW::Render::SetGlesResetCallback
-            [LibraryImport(DllName, EntryPoint = "?SetGlesResetCallback@Render@GW@@YAXP6AXPAUGlesDevice@12@@Z@Z")]
+            // void __cdecl GW_Render_SetGlesResetCallback(GlesRenderCallback callback) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Render_SetGlesResetCallback")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial void SetGlesResetCallback(nint callback);
 
-            // GW::Render::SetGraphicsRendererValue
-            [LibraryImport(DllName, EntryPoint = "?SetGraphicsRendererValue@Render@GW@@YA_NW4Metric@12@II@Z")]
+            // bool __cdecl GW_Render_SetGraphicsRendererValue(Metric metric_id, uint32_t value, uint32_t renderer_mode) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Render_SetGraphicsRendererValue")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SetGraphicsRendererValue(global::Daybreak.API.Interop.GWCA.GW.Render.Metric metric1, uint value2, uint value3);
+            public static partial bool SetGraphicsRendererValue(global::Daybreak.API.Interop.GWCA.GW.Render.Metric metricId, uint value, uint rendererMode);
 
-            // GW::Render::SetRenderCallback
-            [LibraryImport(DllName, EntryPoint = "?SetRenderCallback@Render@GW@@YAXP6AXPAUIDirect3DDevice9@@@Z@Z")]
+            // void __cdecl GW_Render_SetRenderCallback(RenderCallback callback) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Render_SetRenderCallback")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial void SetRenderCallback(nint callback);
 
-            // GW::Render::SetResetCallback
-            [LibraryImport(DllName, EntryPoint = "?SetResetCallback@Render@GW@@YAXP6AXPAUIDirect3DDevice9@@@Z@Z")]
+            // void __cdecl GW_Render_SetResetCallback(RenderCallback callback) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Render_SetResetCallback")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial void SetResetCallback(nint callback);
         }
@@ -2479,977 +2554,954 @@ public static unsafe partial class GWCA
         public static partial class Scanner
         {
 
-            // GW::Scanner::Find
-            [LibraryImport(DllName, EntryPoint = "?Find@Scanner@GW@@YAIPBD0HW4ScannerSection@2@@Z")]
+            // uintptr_t __cdecl GW_Scanner_Find(const char* pattern, const char* mask, int offset, ScannerSection section) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Scanner_Find")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint Find(byte* ptr1, nint ptr2, int value3, global::Daybreak.API.Interop.GWCA.GW.ScannerSection scannerSection4);
+            public static partial nuint Find(byte* pattern, byte* mask, int offset, global::Daybreak.API.Interop.GWCA.GW.ScannerSection section);
 
-            // GW::Scanner::FindAssertion
-            [LibraryImport(DllName, EntryPoint = "?FindAssertion@Scanner@GW@@YAIPBD0IH@Z")]
+            // uintptr_t __cdecl GW_Scanner_FindAssertion(const char* assertion_file, const char* assertion_msg, uint32_t line_number, int offset) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Scanner_FindAssertion")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint FindAssertion(byte* ptr1, nint ptr2, uint value3, int value4);
+            public static partial nuint FindAssertion(byte* assertionFile, byte* assertionMsg, uint lineNumber, int offset);
 
-            // GW::Scanner::FindInRange
-            [LibraryImport(DllName, EntryPoint = "?FindInRange@Scanner@GW@@YAIPBD0HKK@Z")]
+            // uintptr_t __cdecl GW_Scanner_FindInRange(const char* pattern, const char* mask, int offset, DWORD start, DWORD end) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Scanner_FindInRange")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint FindInRange(byte* ptr1, nint ptr2, int value3, uint value4, uint value5);
+            public static partial nuint FindInRange(byte* pattern, byte* mask, int offset, uint start, uint end);
 
-            // GW::Scanner::FindNth
-            [LibraryImport(DllName, EntryPoint = "?FindNth@Scanner@GW@@YAIPBD0IHW4ScannerSection@2@@Z")]
+            // uintptr_t __cdecl GW_Scanner_FindNth(const char* pattern, const char* mask, size_t nth, int offset, ScannerSection section) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Scanner_FindNth")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint FindNth(byte* ptr1, nint ptr2, uint value3, int value4, global::Daybreak.API.Interop.GWCA.GW.ScannerSection scannerSection5);
+            public static partial nuint FindNth(byte* pattern, byte* mask, nuint nth, int offset, global::Daybreak.API.Interop.GWCA.GW.ScannerSection section);
 
-            // GW::Scanner::FindNthUseOfString
-            [LibraryImport(DllName, EntryPoint = "?FindNthUseOfString@Scanner@GW@@YAIPBDIHW4ScannerSection@2@@Z")]
+            // uintptr_t __cdecl GW_Scanner_FindNthUseOfStringA(const char* str, size_t nth, int offset, ScannerSection section) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Scanner_FindNthUseOfStringA")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint FindNthUseOfString(byte* ptr1, uint value2, int value3, global::Daybreak.API.Interop.GWCA.GW.ScannerSection scannerSection4);
+            public static partial nuint FindNthUseOfStringA(byte* str, nuint nth, int offset, global::Daybreak.API.Interop.GWCA.GW.ScannerSection section);
 
-            // GW::Scanner::FindNthUseOfString
-            [LibraryImport(DllName, EntryPoint = "?FindNthUseOfString@Scanner@GW@@YAIPB_WIHW4ScannerSection@2@@Z")]
+            // uintptr_t __cdecl GW_Scanner_FindNthUseOfStringW(const wchar_t* str, size_t nth, int offset, ScannerSection section) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Scanner_FindNthUseOfStringW")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint FindNthUseOfString(ushort* ptr1, uint value2, int value3, global::Daybreak.API.Interop.GWCA.GW.ScannerSection scannerSection4);
+            public static partial nuint FindNthUseOfStringW(ushort* str, nuint nth, int offset, global::Daybreak.API.Interop.GWCA.GW.ScannerSection section);
 
-            // GW::Scanner::FindUseOfString
-            [LibraryImport(DllName, EntryPoint = "?FindUseOfString@Scanner@GW@@YAIPBDHW4ScannerSection@2@@Z")]
+            // uintptr_t __cdecl GW_Scanner_FindUseOfStringA(const char* str, int offset, ScannerSection section) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Scanner_FindUseOfStringA")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint FindUseOfString(byte* ptr1, int value2, global::Daybreak.API.Interop.GWCA.GW.ScannerSection scannerSection3);
+            public static partial nuint FindUseOfStringA(byte* str, int offset, global::Daybreak.API.Interop.GWCA.GW.ScannerSection section);
 
-            // GW::Scanner::FindUseOfString
-            [LibraryImport(DllName, EntryPoint = "?FindUseOfString@Scanner@GW@@YAIPB_WHW4ScannerSection@2@@Z")]
+            // uintptr_t __cdecl GW_Scanner_FindUseOfStringW(const wchar_t* str, int offset, ScannerSection section) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Scanner_FindUseOfStringW")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint FindUseOfString(ushort* ptr1, int value2, global::Daybreak.API.Interop.GWCA.GW.ScannerSection scannerSection3);
+            public static partial nuint FindUseOfStringW(ushort* str, int offset, global::Daybreak.API.Interop.GWCA.GW.ScannerSection section);
 
-            // GW::Scanner::FunctionFromNearCall
-            [LibraryImport(DllName, EntryPoint = "?FunctionFromNearCall@Scanner@GW@@YAII_N@Z")]
+            // uintptr_t __cdecl GW_Scanner_FunctionFromNearCall(uintptr_t call_instruction_address, bool check_valid_ptr) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Scanner_FunctionFromNearCall")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint FunctionFromNearCall(uint value1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            public static partial nuint FunctionFromNearCall(nuint callInstructionAddress, [MarshalAs(UnmanagedType.U1)] bool checkValidPtr);
 
-            // GW::Scanner::GetGameTlsIndex
-            [LibraryImport(DllName, EntryPoint = "?GetGameTlsIndex@Scanner@GW@@YAKXZ")]
+            // DWORD __cdecl GW_Scanner_GetGameTlsIndex() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Scanner_GetGameTlsIndex")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetGameTlsIndex();
 
-            // GW::Scanner::GetSectionAddressRange
-            [LibraryImport(DllName, EntryPoint = "?GetSectionAddressRange@Scanner@GW@@YAXW4ScannerSection@2@PAI1@Z")]
+            // void __cdecl GW_Scanner_GetSectionAddressRange(ScannerSection section, uintptr_t* start, uintptr_t* end) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Scanner_GetSectionAddressRange")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void GetSectionAddressRange(global::Daybreak.API.Interop.GWCA.GW.ScannerSection scannerSection1, uint* ptr2, nint ptr3);
+            public static partial void GetSectionAddressRange(global::Daybreak.API.Interop.GWCA.GW.ScannerSection section, nuint* start, nuint* end);
 
-            // GW::Scanner::Initialize | hINSTANCE__: TODO: map struct HINSTANCE__
-            // [LibraryImport(DllName, EntryPoint = "?Initialize@Scanner@GW@@YAXPAUHINSTANCE__@@@Z")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // public static partial void Initialize(HINSTANCE__* hINSTANCE__);
-
-            // GW::Scanner::Initialize
-            [LibraryImport(DllName, EntryPoint = "?Initialize@Scanner@GW@@YAXPBD@Z")]
+            // void __cdecl GW_Scanner_InitializeByName(const char* moduleName) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Scanner_InitializeByName")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void Initialize(byte* ptr);
+            public static partial void InitializeByName(byte* moduleName);
 
-            // GW::Scanner::IsValidPtr
-            [LibraryImport(DllName, EntryPoint = "?IsValidPtr@Scanner@GW@@YA_NIW4ScannerSection@2@@Z")]
+            // void __cdecl GW_Scanner_InitializeForModule(HMODULE hModule) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Scanner_InitializeForModule")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial void InitializeForModule(nint hModule);
+
+            // bool __cdecl GW_Scanner_IsValidPtr(uintptr_t address, ScannerSection section) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Scanner_IsValidPtr")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool IsValidPtr(uint value1, global::Daybreak.API.Interop.GWCA.GW.ScannerSection scannerSection2);
+            public static partial bool IsValidPtr(nuint address, global::Daybreak.API.Interop.GWCA.GW.ScannerSection section);
 
-            // GW::Scanner::ToFunctionStart
-            [LibraryImport(DllName, EntryPoint = "?ToFunctionStart@Scanner@GW@@YAIII@Z")]
+            // uintptr_t __cdecl GW_Scanner_ToFunctionStart(uintptr_t call_instruction_address, uint32_t scan_range) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Scanner_ToFunctionStart")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint ToFunctionStart(uint value1, uint value2);
+            public static partial nuint ToFunctionStart(nuint callInstructionAddress, uint scanRange);
         }
 
         public static partial class ScrollableFrame
         {
 
-            // GW::ScrollableFrame::AddItem
-            [LibraryImport(DllName, EntryPoint = "?AddItem@ScrollableFrame@GW@@QAEIIIP6AXPAUInteractionMessage@UI@2@PAX1@Z@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial uint AddItem(nint self, uint value2, nint callback3);
-
-            // GW::ScrollableFrame::ClearItems
-            [LibraryImport(DllName, EntryPoint = "?ClearItems@ScrollableFrame@GW@@QAE_NXZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double ClearItems(nint self);
-
-            // GW::ScrollableFrame::Create | returns TODO: map struct GW::ScrollableFrame | scrollablePageContext4: TODO: map struct GW::ScrollableFrame::ScrollablePageContext
-            // [LibraryImport(DllName, EntryPoint = "?Create@ScrollableFrame@GW@@SAPAU12@IIIPAUScrollablePageContext@12@PB_W@Z")]
+            // uint32_t __cdecl GW_ScrollableFrame_AddItem(ScrollableFrame* self, uint32_t flags, uint32_t child_offset_id, GW::UI::UIInteractionCallback callback) noexcept | self: TODO: map struct ScrollableFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_ScrollableFrame_AddItem")]
             // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // public static partial ScrollableFrame* Create(uint value1, uint value2, uint value3, ScrollablePageContext* scrollablePageContext4, ushort* ptr5);
+            // public static partial uint AddItem(ScrollableFrame* self, uint flags, uint childOffsetId, nint callback);
 
-            // GW::ScrollableFrame::GetCount
-            [LibraryImport(DllName, EntryPoint = "?GetCount@ScrollableFrame@GW@@QAE_NPAI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double GetCount(nint self, uint* ptr2);
+            // bool __cdecl GW_ScrollableFrame_ClearItems(ScrollableFrame* self) noexcept | self: TODO: map struct ScrollableFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_ScrollableFrame_ClearItems")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool ClearItems(ScrollableFrame* self);
 
-            // GW::ScrollableFrame::GetItemFrameId
-            [LibraryImport(DllName, EntryPoint = "?GetItemFrameId@ScrollableFrame@GW@@QAEII@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial uint GetItemFrameId(nint self);
+            // ScrollableFrame* __cdecl GW_ScrollableFrame_Create(uint32_t parent_frame_id, uint32_t flags, uint32_t child_offset_id, ScrollableFrame::ScrollablePageContext* context, const wchar_t* frame_label) noexcept | returns TODO: map struct ScrollableFrame | context: TODO: map struct ScrollableFrame::ScrollablePageContext
+            // [LibraryImport(DllName, EntryPoint = "GW_ScrollableFrame_Create")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial ScrollableFrame* Create(uint parentFrameId, uint flags, uint childOffsetId, ScrollablePageContext* context, ushort* frameLabel);
 
-            // GW::ScrollableFrame::GetItems
-            [LibraryImport(DllName, EntryPoint = "?GetItems@ScrollableFrame@GW@@QAEIPAII@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial uint* GetItems(nint self, uint value2);
+            // bool __cdecl GW_ScrollableFrame_GetCount(ScrollableFrame* self, uint32_t* size) noexcept | self: TODO: map struct ScrollableFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_ScrollableFrame_GetCount")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool GetCount(ScrollableFrame* self, uint* size);
 
-            // GW::ScrollableFrame::GetPage | returns TODO: map struct GW::ItemListFrame
-            // [LibraryImport(DllName, EntryPoint = "?GetPage@ScrollableFrame@GW@@QAEPAUItemListFrame@2@XZ")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            // public static partial ItemListFrame* GetPage(nint self);
+            // uint32_t __cdecl GW_ScrollableFrame_GetItemFrameId(ScrollableFrame* self, uint32_t child_offset_id) noexcept | self: TODO: map struct ScrollableFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_ScrollableFrame_GetItemFrameId")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial uint GetItemFrameId(ScrollableFrame* self, uint childOffsetId);
 
-            // GW::ScrollableFrame::GetSelectedValue
-            [LibraryImport(DllName, EntryPoint = "?GetSelectedValue@ScrollableFrame@GW@@QAE_NPAI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double GetSelectedValue(nint self, uint* ptr2);
+            // uint32_t __cdecl GW_ScrollableFrame_GetItems(ScrollableFrame* self, uint32_t* child_frame_id_buffer, uint32_t buffer_len) noexcept | self: TODO: map struct ScrollableFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_ScrollableFrame_GetItems")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial uint GetItems(ScrollableFrame* self, uint* childFrameIdBuffer, uint bufferLen);
 
-            // GW::ScrollableFrame::GetSortHandler
-            [LibraryImport(DllName, EntryPoint = "?GetSortHandler@ScrollableFrame@GW@@QAEP6AHII@ZXZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial nint GetSortHandler(nint self, int* ptr2, uint value3, uint value4);
+            // GW::ItemListFrame* __cdecl GW_ScrollableFrame_GetPage(ScrollableFrame* self) noexcept | returns TODO: map struct GW::ItemListFrame | self: TODO: map struct ScrollableFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_ScrollableFrame_GetPage")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial ItemListFrame* GetPage(ScrollableFrame* self);
 
-            // GW::ScrollableFrame::RemoveItem
-            [LibraryImport(DllName, EntryPoint = "?RemoveItem@ScrollableFrame@GW@@QAE_NI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double RemoveItem(nint self, uint value2);
+            // bool __cdecl GW_ScrollableFrame_GetSelectedValue(ScrollableFrame* self, uint32_t* selected_value) noexcept | self: TODO: map struct ScrollableFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_ScrollableFrame_GetSelectedValue")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool GetSelectedValue(ScrollableFrame* self, uint* selectedValue);
 
-            // GW::ScrollableFrame::SetPage | returns TODO: map struct GW::ItemListFrame | scrollablePageContext2: TODO: map struct GW::ScrollableFrame::ScrollablePageContext
-            // [LibraryImport(DllName, EntryPoint = "?SetPage@ScrollableFrame@GW@@QAEPAUItemListFrame@2@PAUScrollablePageContext@12@@Z")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            // public static partial ItemListFrame* SetPage(nint self, ScrollablePageContext* scrollablePageContext2);
+            // SortHandler_pt __cdecl GW_ScrollableFrame_GetSortHandler(ScrollableFrame* self) noexcept | self: TODO: map struct ScrollableFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_ScrollableFrame_GetSortHandler")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial nint GetSortHandler(ScrollableFrame* self);
 
-            // GW::ScrollableFrame::SetSortHandler
-            [LibraryImport(DllName, EntryPoint = "?SetSortHandler@ScrollableFrame@GW@@QAE_NP6AHII@Z@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double SetSortHandler(nint self, nint callback2);
+            // bool __cdecl GW_ScrollableFrame_RemoveItem(ScrollableFrame* self, uint32_t child_offset_id) noexcept | self: TODO: map struct ScrollableFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_ScrollableFrame_RemoveItem")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool RemoveItem(ScrollableFrame* self, uint childOffsetId);
+
+            // GW::ItemListFrame* __cdecl GW_ScrollableFrame_SetPage(ScrollableFrame* self, ScrollableFrame::ScrollablePageContext* gwca_arg0) noexcept | returns TODO: map struct GW::ItemListFrame | self: TODO: map struct ScrollableFrame | gwcaArg0: TODO: map struct ScrollableFrame::ScrollablePageContext
+            // [LibraryImport(DllName, EntryPoint = "GW_ScrollableFrame_SetPage")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial ItemListFrame* SetPage(ScrollableFrame* self, ScrollablePageContext* gwcaArg0);
+
+            // bool __cdecl GW_ScrollableFrame_SetSortHandler(ScrollableFrame* self, SortHandler_pt sortHandler) noexcept | self: TODO: map struct ScrollableFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_ScrollableFrame_SetSortHandler")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool SetSortHandler(ScrollableFrame* self, nint sortHandler);
         }
 
         public static partial class Skillbar
         {
 
-            // GW::Skillbar::GetSkillById
-            [LibraryImport(DllName, EntryPoint = "?GetSkillById@Skillbar@GW@@QAEPAUSkillbarSkill@2@W4SkillID@Constants@2@PAI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.SkillbarSkillData* GetSkillById(nint self, global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillID2, uint* ptr3);
+            // SkillbarSkill* __cdecl GW_Skillbar_GetSkillById(Skillbar* self, Constants::SkillID skill_id, size_t* slot_out) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Skillbar_GetSkillById")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial global::Daybreak.API.Interop.GuildWars.SkillbarSkillData* GetSkillById(global::Daybreak.API.Interop.GuildWars.SkillbarData* self, global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillId, nuint* slotOut);
         }
 
         public static partial class SkillbarMgr
         {
 
-            // GW::SkillbarMgr::ChangeSecondProfession
-            [LibraryImport(DllName, EntryPoint = "?ChangeSecondProfession@SkillbarMgr@GW@@YA_NIW4Profession@Constants@2@@Z")]
+            // bool __cdecl GW_SkillbarMgr_ChangeSecondProfession(uint32_t agent_id, Constants::Profession profession) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_SkillbarMgr_ChangeSecondProfession")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool ChangeSecondProfession(uint value1, global::Daybreak.API.Interop.GWCA.GW.Constants.Profession profession2);
+            public static partial bool ChangeSecondProfession(uint agentId, global::Daybreak.API.Interop.GWCA.GW.Constants.Profession profession);
 
-            // GW::SkillbarMgr::DecodeSkillTemplate
-            [LibraryImport(DllName, EntryPoint = "?DecodeSkillTemplate@SkillbarMgr@GW@@YA_NAAUSkillTemplate@12@PBD@Z")]
+            // bool __cdecl GW_SkillbarMgr_DecodeSkillTemplate(SkillTemplate& skill_template, const char* temp) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_SkillbarMgr_DecodeSkillTemplate")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool DecodeSkillTemplate(global::Daybreak.API.Interop.GuildWars.SkillTemplate* skillTemplate1, byte* ptr2);
+            public static partial bool DecodeSkillTemplate(global::Daybreak.API.Interop.GuildWars.SkillTemplate* skillTemplate, byte* temp);
 
-            // GW::SkillbarMgr::EncodeSkillTemplate
-            [LibraryImport(DllName, EntryPoint = "?EncodeSkillTemplate@SkillbarMgr@GW@@YA_NABUSkillTemplate@12@PADI@Z")]
+            // bool __cdecl GW_SkillbarMgr_EncodeSkillTemplate(const SkillTemplate& skill_template, char* result, uint32_t result_len) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_SkillbarMgr_EncodeSkillTemplate")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool EncodeSkillTemplate(global::Daybreak.API.Interop.GuildWars.SkillTemplate* skillTemplate1, byte* ptr2, uint value3);
+            public static partial bool EncodeSkillTemplate(global::Daybreak.API.Interop.GuildWars.SkillTemplate* skillTemplate, byte* result, uint resultLen);
 
-            // GW::SkillbarMgr::GetAttributeConstantData
-            [LibraryImport(DllName, EntryPoint = "?GetAttributeConstantData@SkillbarMgr@GW@@YAPAUAttributeInfo@2@W4Attribute@Constants@2@@Z")]
+            // AttributeInfo* __cdecl GW_SkillbarMgr_GetAttributeConstantData(Constants::Attribute attribute_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_SkillbarMgr_GetAttributeConstantData")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.AttributeInfo* GetAttributeConstantData(global::Daybreak.API.Interop.GWCA.GW.Constants.Attribute attribute);
+            public static partial global::Daybreak.API.Interop.GuildWars.AttributeInfo* GetAttributeConstantData(global::Daybreak.API.Interop.GWCA.GW.Constants.Attribute attributeId);
 
-            // GW::SkillbarMgr::GetHeroSkillbar
-            [LibraryImport(DllName, EntryPoint = "?GetHeroSkillbar@SkillbarMgr@GW@@YAPAUSkillbar@2@I@Z")]
+            // Skillbar* __cdecl GW_SkillbarMgr_GetHeroSkillbar(uint32_t hero_index) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_SkillbarMgr_GetHeroSkillbar")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.SkillbarData* GetHeroSkillbar(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.SkillbarData* GetHeroSkillbar(uint heroIndex);
 
-            // GW::SkillbarMgr::GetHoveredSkill
-            [LibraryImport(DllName, EntryPoint = "?GetHoveredSkill@SkillbarMgr@GW@@YAPAUSkill@2@XZ")]
+            // Skill* __cdecl GW_SkillbarMgr_GetHoveredSkill() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_SkillbarMgr_GetHoveredSkill")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GuildWars.Skill* GetHoveredSkill();
 
-            // GW::SkillbarMgr::GetIsSkillLearnt
-            [LibraryImport(DllName, EntryPoint = "?GetIsSkillLearnt@SkillbarMgr@GW@@YA_NW4SkillID@Constants@2@@Z")]
+            // bool __cdecl GW_SkillbarMgr_GetIsSkillLearnt(Constants::SkillID skill_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_SkillbarMgr_GetIsSkillLearnt")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool GetIsSkillLearnt(global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillID);
+            public static partial bool GetIsSkillLearnt(global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillId);
 
-            // GW::SkillbarMgr::GetIsSkillUnlocked
-            [LibraryImport(DllName, EntryPoint = "?GetIsSkillUnlocked@SkillbarMgr@GW@@YA_NW4SkillID@Constants@2@@Z")]
+            // bool __cdecl GW_SkillbarMgr_GetIsSkillUnlocked(Constants::SkillID skill_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_SkillbarMgr_GetIsSkillUnlocked")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool GetIsSkillUnlocked(global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillID);
+            public static partial bool GetIsSkillUnlocked(global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillId);
 
-            // GW::SkillbarMgr::GetPlayerSkillbar
-            [LibraryImport(DllName, EntryPoint = "?GetPlayerSkillbar@SkillbarMgr@GW@@YAPAUSkillbar@2@XZ")]
+            // Skillbar* __cdecl GW_SkillbarMgr_GetPlayerSkillbar() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_SkillbarMgr_GetPlayerSkillbar")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GuildWars.SkillbarData* GetPlayerSkillbar();
 
-            // GW::SkillbarMgr::GetSkillConstantData
-            [LibraryImport(DllName, EntryPoint = "?GetSkillConstantData@SkillbarMgr@GW@@YAPAUSkill@2@W4SkillID@Constants@2@@Z")]
+            // Skill* __cdecl GW_SkillbarMgr_GetSkillConstantData(Constants::SkillID skill_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_SkillbarMgr_GetSkillConstantData")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.Skill* GetSkillConstantData(global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillID);
+            public static partial global::Daybreak.API.Interop.GuildWars.Skill* GetSkillConstantData(global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillId);
 
-            // GW::SkillbarMgr::GetSkillCount
-            [LibraryImport(DllName, EntryPoint = "?GetSkillCount@SkillbarMgr@GW@@YAIXZ")]
+            // uint32_t __cdecl GW_SkillbarMgr_GetSkillCount() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_SkillbarMgr_GetSkillCount")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial uint GetSkillCount();
 
-            // GW::SkillbarMgr::GetSkillSlot
-            [LibraryImport(DllName, EntryPoint = "?GetSkillSlot@SkillbarMgr@GW@@YAHW4SkillID@Constants@2@@Z")]
+            // int __cdecl GW_SkillbarMgr_GetSkillSlot(Constants::SkillID skill_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_SkillbarMgr_GetSkillSlot")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial int GetSkillSlot(global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillID);
+            public static partial int GetSkillSlot(global::Daybreak.API.Interop.GWCA.GW.Constants.SkillID skillId);
 
-            // GW::SkillbarMgr::GetSkillTemplate
-            [LibraryImport(DllName, EntryPoint = "?GetSkillTemplate@SkillbarMgr@GW@@YA_NAAUSkillTemplate@12@@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool GetSkillTemplate(global::Daybreak.API.Interop.GuildWars.SkillTemplate* skillTemplate);
-
-            // GW::SkillbarMgr::GetSkillTemplate
-            [LibraryImport(DllName, EntryPoint = "?GetSkillTemplate@SkillbarMgr@GW@@YA_NIAAUSkillTemplate@12@@Z")]
+            // bool __cdecl GW_SkillbarMgr_GetSkillTemplate(uint32_t agent_id, SkillTemplate& skill_template) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_SkillbarMgr_GetSkillTemplate")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool GetSkillTemplate(uint value1, global::Daybreak.API.Interop.GuildWars.SkillTemplate* skillTemplate2);
+            public static partial bool GetSkillTemplate(uint agentId, global::Daybreak.API.Interop.GuildWars.SkillTemplate* skillTemplate);
 
-            // GW::SkillbarMgr::GetSkillbar
-            [LibraryImport(DllName, EntryPoint = "?GetSkillbar@SkillbarMgr@GW@@YAPAUSkillbar@2@I@Z")]
+            // Skillbar* __cdecl GW_SkillbarMgr_GetSkillbar(const uint32_t agent_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_SkillbarMgr_GetSkillbar")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.SkillbarData* GetSkillbar(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.SkillbarData* GetSkillbar(uint agentId);
 
-            // GW::SkillbarMgr::GetSkillbarArray
-            [LibraryImport(DllName, EntryPoint = "?GetSkillbarArray@SkillbarMgr@GW@@YAPAV?$Array@USkillbar@GW@@@2@XZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.SkillbarData>* GetSkillbarArray();
-
-            // GW::SkillbarMgr::LoadSkillTemplate
-            [LibraryImport(DllName, EntryPoint = "?LoadSkillTemplate@SkillbarMgr@GW@@YA_NAAUSkillTemplate@12@@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool LoadSkillTemplate(global::Daybreak.API.Interop.GuildWars.SkillTemplate* skillTemplate);
-
-            // GW::SkillbarMgr::LoadSkillTemplate
-            [LibraryImport(DllName, EntryPoint = "?LoadSkillTemplate@SkillbarMgr@GW@@YA_NIAAUSkillTemplate@12@@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool LoadSkillTemplate(uint value1, global::Daybreak.API.Interop.GuildWars.SkillTemplate* skillTemplate2);
-
-            // GW::SkillbarMgr::LoadSkillTemplate
-            [LibraryImport(DllName, EntryPoint = "?LoadSkillTemplate@SkillbarMgr@GW@@YA_NIPBD@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool LoadSkillTemplate(uint value1, byte* ptr2);
-
-            // GW::SkillbarMgr::LoadSkillTemplate
-            [LibraryImport(DllName, EntryPoint = "?LoadSkillTemplate@SkillbarMgr@GW@@YA_NPBD@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool LoadSkillTemplate(byte* ptr);
-
-            // GW::SkillbarMgr::RegisterDecodeTemplateHeaderCallback | function2: TODO: map struct function
-            // [LibraryImport(DllName, EntryPoint = "?RegisterDecodeTemplateHeaderCallback@SkillbarMgr@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUHookStatus@GW@@PAUSkillTemplate@SkillbarMgr@2@PAXPAE@Z@std@@H@Z")]
+            // SkillbarArray* __cdecl GW_SkillbarMgr_GetSkillbarArray() noexcept | returns TODO: map struct SkillbarArray
+            // [LibraryImport(DllName, EntryPoint = "GW_SkillbarMgr_GetSkillbarArray")]
             // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // public static partial void RegisterDecodeTemplateHeaderCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, global::Daybreak.API.Interop.GuildWars.SkillTemplate* skillTemplate3, void* ptr4, byte* ptr5);
+            // public static partial SkillbarArray* GetSkillbarArray();
 
-            // GW::SkillbarMgr::RegisterDecodeTemplateStringCallback | function2: TODO: map struct function
-            // [LibraryImport(DllName, EntryPoint = "?RegisterDecodeTemplateStringCallback@SkillbarMgr@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUHookStatus@GW@@PB_WPAUSkillTemplate@SkillbarMgr@2@PAHPAE@Z@std@@H@Z")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // public static partial void RegisterDecodeTemplateStringCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, ushort* ptr3, global::Daybreak.API.Interop.GuildWars.SkillTemplate* skillTemplate4, int* ptr5, byte* ptr6);
-
-            // GW::SkillbarMgr::RegisterGetAccountTemplateDataCallback | function2: TODO: map struct function
-            // [LibraryImport(DllName, EntryPoint = "?RegisterGetAccountTemplateDataCallback@SkillbarMgr@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUHookStatus@GW@@IPAUSkillTemplate@SkillbarMgr@2@PAH2@Z@std@@H@Z")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // public static partial void RegisterGetAccountTemplateDataCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, uint value3, global::Daybreak.API.Interop.GuildWars.SkillTemplate* skillTemplate4, int* ptr5, nint ptr6);
-
-            // GW::SkillbarMgr::RegisterLoadSkillTemplateCallback | function2: TODO: map struct function
-            // [LibraryImport(DllName, EntryPoint = "?RegisterLoadSkillTemplateCallback@SkillbarMgr@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUHookStatus@GW@@IPAUSkillTemplate@SkillbarMgr@2@@Z@std@@H@Z")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // public static partial void RegisterLoadSkillTemplateCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, uint value3, global::Daybreak.API.Interop.GuildWars.SkillTemplate* skillTemplate4);
-
-            // GW::SkillbarMgr::RegisterUpdateTemplateDisplayCallback | function2: TODO: map struct function
-            // [LibraryImport(DllName, EntryPoint = "?RegisterUpdateTemplateDisplayCallback@SkillbarMgr@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUHookStatus@GW@@PAI@Z@std@@H@Z")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // public static partial void RegisterUpdateTemplateDisplayCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, uint* ptr3);
-
-            // GW::SkillbarMgr::RemoveTemplateCallback
-            [LibraryImport(DllName, EntryPoint = "?RemoveTemplateCallback@SkillbarMgr@GW@@YAXPAUHookEntry@2@@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void RemoveTemplateCallback(global::Daybreak.API.Interop.HookEntry* hookEntry);
-
-            // GW::SkillbarMgr::UseSkill
-            [LibraryImport(DllName, EntryPoint = "?UseSkill@SkillbarMgr@GW@@YA_NII@Z")]
+            // bool __cdecl GW_SkillbarMgr_LoadSkillTemplate(uint32_t agent_id, SkillTemplate& skill_template) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_SkillbarMgr_LoadSkillTemplate")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool UseSkill(uint value1, uint value2);
+            public static partial bool LoadSkillTemplate(uint agentId, global::Daybreak.API.Interop.GuildWars.SkillTemplate* skillTemplate);
 
-            // GW::SkillbarMgr::UseSkillByID
-            [LibraryImport(DllName, EntryPoint = "?UseSkillByID@SkillbarMgr@GW@@YA_NII@Z")]
+            // bool __cdecl GW_SkillbarMgr_RegisterDecodeTemplateHeaderCallback(HookEntry* entry, NativeDecodeTemplateHeaderCallback callback, void* context, int32_t altitude) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_SkillbarMgr_RegisterDecodeTemplateHeaderCallback")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool UseSkillByID(uint value1, uint value2);
+            public static partial bool RegisterDecodeTemplateHeaderCallback(global::Daybreak.API.Interop.HookEntry* entry, nint callback, void* context, int altitude);
+
+            // bool __cdecl GW_SkillbarMgr_RegisterDecodeTemplateStringCallback(HookEntry* entry, NativeDecodeTemplateStringCallback callback, void* context, int32_t altitude) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_SkillbarMgr_RegisterDecodeTemplateStringCallback")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool RegisterDecodeTemplateStringCallback(global::Daybreak.API.Interop.HookEntry* entry, nint callback, void* context, int altitude);
+
+            // bool __cdecl GW_SkillbarMgr_RegisterGetAccountTemplateDataCallback(HookEntry* entry, NativeGetAccountTemplateDataCallback callback, void* context, int32_t altitude) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_SkillbarMgr_RegisterGetAccountTemplateDataCallback")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool RegisterGetAccountTemplateDataCallback(global::Daybreak.API.Interop.HookEntry* entry, nint callback, void* context, int altitude);
+
+            // bool __cdecl GW_SkillbarMgr_RegisterLoadSkillTemplateCallback(HookEntry* entry, NativeLoadSkillTemplateCallback callback, void* context, int32_t altitude) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_SkillbarMgr_RegisterLoadSkillTemplateCallback")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool RegisterLoadSkillTemplateCallback(global::Daybreak.API.Interop.HookEntry* entry, nint callback, void* context, int altitude);
+
+            // bool __cdecl GW_SkillbarMgr_RegisterUpdateTemplateDisplayCallback(HookEntry* entry, NativeUpdateTemplateDisplayCallback callback, void* context, int32_t altitude) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_SkillbarMgr_RegisterUpdateTemplateDisplayCallback")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool RegisterUpdateTemplateDisplayCallback(global::Daybreak.API.Interop.HookEntry* entry, nint callback, void* context, int altitude);
+
+            // void __cdecl GW_SkillbarMgr_RemoveTemplateCallbackNative(HookEntry* entry) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_SkillbarMgr_RemoveTemplateCallbackNative")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial void RemoveTemplateCallbackNative(global::Daybreak.API.Interop.HookEntry* entry);
+
+            // bool __cdecl GW_SkillbarMgr_UseSkill(uint32_t slot, uint32_t target) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_SkillbarMgr_UseSkill")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool UseSkill(uint slot, uint target);
+
+            // bool __cdecl GW_SkillbarMgr_UseSkillByID(uint32_t skill_id, uint32_t target) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_SkillbarMgr_UseSkillByID")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool UseSkillByID(uint skillId, uint target);
         }
 
         public static partial class SkillbarSkill
         {
 
-            // GW::SkillbarSkill::GetRecharge
-            [LibraryImport(DllName, EntryPoint = "?GetRecharge@SkillbarSkill@GW@@QBEIXZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial void GetRecharge(nint self);
+            // uint32_t __cdecl GW_SkillbarSkill_GetRecharge(const SkillbarSkill* self) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_SkillbarSkill_GetRecharge")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial uint GetRecharge(global::Daybreak.API.Interop.GuildWars.SkillbarSkillData* self);
         }
 
         public static partial class SliderFrame
         {
 
-            // GW::SliderFrame::GetValue
-            [LibraryImport(DllName, EntryPoint = "?GetValue@SliderFrame@GW@@QAE_NPAI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double GetValue(nint self, uint* ptr2);
+            // bool __cdecl GW_SliderFrame_GetValue(SliderFrame* self, uint32_t* selected_value) noexcept | self: TODO: map struct SliderFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_SliderFrame_GetValue")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool GetValue(SliderFrame* self, uint* selectedValue);
 
-            // GW::SliderFrame::GetValue
-            [LibraryImport(DllName, EntryPoint = "?GetValue@SliderFrame@GW@@UAEIXZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial void GetValue(nint self);
-
-            // GW::SliderFrame::SetValue
-            [LibraryImport(DllName, EntryPoint = "?SetValue@SliderFrame@GW@@UAE_NI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double SetValue(nint self, uint value2);
+            // bool __cdecl GW_SliderFrame_SetValue(SliderFrame* self, uint32_t value) noexcept | self: TODO: map struct SliderFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_SliderFrame_SetValue")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool SetValue(SliderFrame* self, uint value);
         }
 
         public static partial class StoC
         {
 
-            // GW::StoC::EmulatePacket
-            [LibraryImport(DllName, EntryPoint = "?EmulatePacket@StoC@GW@@YA_NPAUPacketBase@1Packet@2@@Z")]
+            // bool __cdecl GW_StoC_EmulatePacket(Packet::StoC::PacketBase* packet) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_StoC_EmulatePacket")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool EmulatePacket(global::Daybreak.API.Interop.GuildWars.PacketBase* packetBase);
+            public static partial bool EmulatePacket(global::Daybreak.API.Interop.GuildWars.PacketBase* packet);
 
-            // GW::StoC::RegisterPacketCallback | function3: TODO: map struct function
-            // [LibraryImport(DllName, EntryPoint = "?RegisterPacketCallback@StoC@GW@@YA_NPAUHookEntry@2@IABV?$function@$$A6AXPAUHookStatus@GW@@PAUPacketBase@StoC@Packet@2@@Z@std@@H@Z")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // [return: MarshalAs(UnmanagedType.U1)]
-            // public static partial bool RegisterPacketCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, uint value2, function* function3, global::Daybreak.API.Interop.GuildWars.PacketBase* packetBase4);
-
-            // GW::StoC::RegisterPostPacketCallback | function3: TODO: map struct function
-            // [LibraryImport(DllName, EntryPoint = "?RegisterPostPacketCallback@StoC@GW@@YA_NPAUHookEntry@2@IABV?$function@$$A6AXPAUHookStatus@GW@@PAUPacketBase@StoC@Packet@2@@Z@std@@@Z")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // [return: MarshalAs(UnmanagedType.U1)]
-            // public static partial bool RegisterPostPacketCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, uint value2, function* function3, global::Daybreak.API.Interop.GuildWars.PacketBase* packetBase4);
-
-            // GW::StoC::RemoveCallback
-            [LibraryImport(DllName, EntryPoint = "?RemoveCallback@StoC@GW@@YAIIPAUHookEntry@2@@Z")]
+            // bool __cdecl GW_StoC_RegisterPacketCallback(HookEntry* entry, uint32_t header, NativePacketCallback callback, void* context, int32_t altitude) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_StoC_RegisterPacketCallback")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint RemoveCallback(uint value1, global::Daybreak.API.Interop.HookEntry* hookEntry2);
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool RegisterPacketCallback(global::Daybreak.API.Interop.HookEntry* entry, uint header, nint callback, void* context, int altitude);
 
-            // GW::StoC::RemoveCallbacks
-            [LibraryImport(DllName, EntryPoint = "?RemoveCallbacks@StoC@GW@@YAIPAUHookEntry@2@@Z")]
+            // bool __cdecl GW_StoC_RegisterPostPacketCallback(HookEntry* entry, uint32_t header, NativePacketCallback callback, void* context) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_StoC_RegisterPostPacketCallback")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint RemoveCallbacks(global::Daybreak.API.Interop.HookEntry* hookEntry);
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool RegisterPostPacketCallback(global::Daybreak.API.Interop.HookEntry* entry, uint header, nint callback, void* context);
 
-            // GW::StoC::RemovePostCallback
-            [LibraryImport(DllName, EntryPoint = "?RemovePostCallback@StoC@GW@@YAXIPAUHookEntry@2@@Z")]
+            // size_t __cdecl GW_StoC_RemoveCallbackNative(uint32_t header, HookEntry* entry) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_StoC_RemoveCallbackNative")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void RemovePostCallback(uint value1, global::Daybreak.API.Interop.HookEntry* hookEntry2);
+            public static partial nuint RemoveCallbackNative(uint header, global::Daybreak.API.Interop.HookEntry* entry);
+
+            // size_t __cdecl GW_StoC_RemoveCallbacksNative(HookEntry* entry) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_StoC_RemoveCallbacksNative")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial nuint RemoveCallbacksNative(global::Daybreak.API.Interop.HookEntry* entry);
         }
 
         public static partial class TabsFrame
         {
 
-            // GW::TabsFrame::AddTab
-            [LibraryImport(DllName, EntryPoint = "?AddTab@TabsFrame@GW@@QAEPAUFrame@UI@2@PB_WIIP6AXPAUInteractionMessage@42@PAX2@Z2@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial global::Daybreak.API.Interop.Frame* AddTab(nint self, ushort* ptr2, uint value3, uint value4, nint callback5, nint ptr6);
+            // GW::UI::Frame* __cdecl GW_TabsFrame_AddTab(TabsFrame* self, const wchar_t* tab_name_enc, uint32_t flags, uint32_t child_offset_id, GW::UI::UIInteractionCallback callback, void* wparam) noexcept | self: TODO: map struct TabsFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_TabsFrame_AddTab")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial global::Daybreak.API.Interop.Frame* AddTab(TabsFrame* self, ushort* tabNameEnc, uint flags, uint childOffsetId, nint callback, void* wparam);
 
-            // GW::TabsFrame::ChooseTab
-            [LibraryImport(DllName, EntryPoint = "?ChooseTab@TabsFrame@GW@@QAE_NI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double ChooseTab(nint self, uint value2);
+            // bool __cdecl GW_TabsFrame_ChooseTab(TabsFrame* self, uint32_t tab_index) noexcept | self: TODO: map struct TabsFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_TabsFrame_ChooseTab")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool ChooseTab(TabsFrame* self, uint tabIndex);
 
-            // GW::TabsFrame::ChooseTab
-            [LibraryImport(DllName, EntryPoint = "?ChooseTab@TabsFrame@GW@@QAE_NPAUFrame@UI@2@@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double ChooseTab(nint self, global::Daybreak.API.Interop.Frame* frame2);
+            // bool __cdecl GW_TabsFrame_DisableTab(TabsFrame* self, uint32_t tab_id) noexcept | self: TODO: map struct TabsFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_TabsFrame_DisableTab")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool DisableTab(TabsFrame* self, uint tabId);
 
-            // GW::TabsFrame::DisableTab
-            [LibraryImport(DllName, EntryPoint = "?DisableTab@TabsFrame@GW@@QAE_NI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double DisableTab(nint self, uint value2);
+            // bool __cdecl GW_TabsFrame_EnableTab(TabsFrame* self, uint32_t tab_id) noexcept | self: TODO: map struct TabsFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_TabsFrame_EnableTab")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool EnableTab(TabsFrame* self, uint tabId);
 
-            // GW::TabsFrame::EnableTab
-            [LibraryImport(DllName, EntryPoint = "?EnableTab@TabsFrame@GW@@QAE_NI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double EnableTab(nint self, uint value2);
+            // GW::UI::Frame* __cdecl GW_TabsFrame_GetCurrentTab(TabsFrame* self) noexcept | self: TODO: map struct TabsFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_TabsFrame_GetCurrentTab")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial global::Daybreak.API.Interop.Frame* GetCurrentTab(TabsFrame* self);
 
-            // GW::TabsFrame::GetCurrentTab
-            [LibraryImport(DllName, EntryPoint = "?GetCurrentTab@TabsFrame@GW@@QAEPAUFrame@UI@2@XZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial global::Daybreak.API.Interop.Frame* GetCurrentTab(nint self);
+            // bool __cdecl GW_TabsFrame_GetCurrentTabIndex(TabsFrame* self, uint32_t* tab_id) noexcept | self: TODO: map struct TabsFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_TabsFrame_GetCurrentTabIndex")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool GetCurrentTabIndex(TabsFrame* self, uint* tabId);
 
-            // GW::TabsFrame::GetCurrentTabIndex
-            [LibraryImport(DllName, EntryPoint = "?GetCurrentTabIndex@TabsFrame@GW@@QAE_NPAI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double GetCurrentTabIndex(nint self, uint* ptr2);
+            // bool __cdecl GW_TabsFrame_GetIsTabEnabled(TabsFrame* self, uint32_t tab_id, uint32_t* is_enabled) noexcept | self: TODO: map struct TabsFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_TabsFrame_GetIsTabEnabled")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool GetIsTabEnabled(TabsFrame* self, uint tabId, uint* isEnabled);
 
-            // GW::TabsFrame::GetIsTabEnabled
-            [LibraryImport(DllName, EntryPoint = "?GetIsTabEnabled@TabsFrame@GW@@QAE_NIPAI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double GetIsTabEnabled(nint self, uint value2, uint* ptr3);
+            // GW::ButtonFrame* __cdecl GW_TabsFrame_GetTabButton(TabsFrame* self, GW::UI::Frame* tab_frame) noexcept | returns TODO: map struct GW::ButtonFrame | self: TODO: map struct TabsFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_TabsFrame_GetTabButton")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial ButtonFrame* GetTabButton(TabsFrame* self, global::Daybreak.API.Interop.Frame* tabFrame);
 
-            // GW::TabsFrame::GetTabButton | returns TODO: map struct GW::ButtonFrame
-            // [LibraryImport(DllName, EntryPoint = "?GetTabButton@TabsFrame@GW@@QAEPAUButtonFrame@2@PAUFrame@UI@2@@Z")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            // public static partial ButtonFrame* GetTabButton(nint self, global::Daybreak.API.Interop.Frame* frame2);
+            // GW::UI::Frame* __cdecl GW_TabsFrame_GetTabByLabel(TabsFrame* self, const wchar_t* label) noexcept | self: TODO: map struct TabsFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_TabsFrame_GetTabByLabel")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial global::Daybreak.API.Interop.Frame* GetTabByLabel(TabsFrame* self, ushort* label);
 
-            // GW::TabsFrame::GetTabByLabel
-            [LibraryImport(DllName, EntryPoint = "?GetTabByLabel@TabsFrame@GW@@QAEPAUFrame@UI@2@PB_W@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial global::Daybreak.API.Interop.Frame* GetTabByLabel(nint self, ushort* ptr2);
+            // bool __cdecl GW_TabsFrame_GetTabFrameId(TabsFrame* self, uint32_t tab_id, uint32_t* frame_id) noexcept | self: TODO: map struct TabsFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_TabsFrame_GetTabFrameId")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool GetTabFrameId(TabsFrame* self, uint tabId, uint* frameId);
 
-            // GW::TabsFrame::GetTabFrameId
-            [LibraryImport(DllName, EntryPoint = "?GetTabFrameId@TabsFrame@GW@@QAE_NIPAI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double GetTabFrameId(nint self, uint value2, uint* ptr3);
-
-            // GW::TabsFrame::RemoveTab
-            [LibraryImport(DllName, EntryPoint = "?RemoveTab@TabsFrame@GW@@QAE_NI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double RemoveTab(nint self, uint value2);
+            // bool __cdecl GW_TabsFrame_RemoveTab(TabsFrame* self, uint32_t tab_id) noexcept | self: TODO: map struct TabsFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_TabsFrame_RemoveTab")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool RemoveTab(TabsFrame* self, uint tabId);
         }
 
         public static partial class TextLabelFrame
         {
 
-            // GW::TextLabelFrame::Create | returns TODO: map struct GW::TextLabelFrame
-            // [LibraryImport(DllName, EntryPoint = "?Create@TextLabelFrame@GW@@SAPAU12@IIIPB_W0@Z")]
+            // TextLabelFrame* __cdecl GW_TextLabelFrame_Create(uint32_t parent_frame_id, uint32_t flags, uint32_t child_offset_id, const wchar_t* text_label_enc_string, const wchar_t* frame_label) noexcept | returns TODO: map struct TextLabelFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_TextLabelFrame_Create")]
             // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // public static partial TextLabelFrame* Create(uint value1, uint value2, uint value3, ushort* ptr4, nint ptr5);
+            // public static partial TextLabelFrame* Create(uint parentFrameId, uint flags, uint childOffsetId, ushort* textLabelEncString, ushort* frameLabel);
 
-            // GW::TextLabelFrame::GetDecodedLabel
-            [LibraryImport(DllName, EntryPoint = "?GetDecodedLabel@TextLabelFrame@GW@@QAEPB_WXZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial nint GetDecodedLabel(nint self, ushort value2);
+            // const wchar_t* __cdecl GW_TextLabelFrame_GetDecodedLabel(TextLabelFrame* self) noexcept | self: TODO: map struct TextLabelFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_TextLabelFrame_GetDecodedLabel")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial ushort* GetDecodedLabel(TextLabelFrame* self);
 
-            // GW::TextLabelFrame::GetEncodedLabel
-            [LibraryImport(DllName, EntryPoint = "?GetEncodedLabel@TextLabelFrame@GW@@QAEPB_WXZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial nint GetEncodedLabel(nint self, ushort value2);
+            // const wchar_t* __cdecl GW_TextLabelFrame_GetEncodedLabel(TextLabelFrame* self) noexcept | self: TODO: map struct TextLabelFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_TextLabelFrame_GetEncodedLabel")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial ushort* GetEncodedLabel(TextLabelFrame* self);
 
-            // GW::TextLabelFrame::SetFont
-            [LibraryImport(DllName, EntryPoint = "?SetFont@TextLabelFrame@GW@@QAE_NI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double SetFont(nint self, uint value2);
+            // bool __cdecl GW_TextLabelFrame_SetFont(TextLabelFrame* self, uint32_t gwca_arg0) noexcept | self: TODO: map struct TextLabelFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_TextLabelFrame_SetFont")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool SetFont(TextLabelFrame* self, uint gwcaArg0);
 
-            // GW::TextLabelFrame::SetLabel
-            [LibraryImport(DllName, EntryPoint = "?SetLabel@TextLabelFrame@GW@@QAE_NPB_W@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            public static partial double SetLabel(nint self, ushort* ptr2);
+            // bool __cdecl GW_TextLabelFrame_SetLabel(TextLabelFrame* self, const wchar_t* enc_string) noexcept | self: TODO: map struct TextLabelFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_TextLabelFrame_SetLabel")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // [return: MarshalAs(UnmanagedType.U1)]
+            // public static partial bool SetLabel(TextLabelFrame* self, ushort* encString);
         }
 
         public static partial class Trade
         {
 
-            // GW::Trade::AcceptTrade
-            [LibraryImport(DllName, EntryPoint = "?AcceptTrade@Trade@GW@@YA_NXZ")]
+            // bool __cdecl GW_Trade_AcceptTrade() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Trade_AcceptTrade")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool AcceptTrade();
 
-            // GW::Trade::CancelTrade
-            [LibraryImport(DllName, EntryPoint = "?CancelTrade@Trade@GW@@YA_NXZ")]
+            // bool __cdecl GW_Trade_CancelTrade() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Trade_CancelTrade")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool CancelTrade();
 
-            // GW::Trade::ChangeOffer
-            [LibraryImport(DllName, EntryPoint = "?ChangeOffer@Trade@GW@@YA_NXZ")]
+            // bool __cdecl GW_Trade_ChangeOffer() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Trade_ChangeOffer")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool ChangeOffer();
 
-            // GW::Trade::IsItemOffered
-            [LibraryImport(DllName, EntryPoint = "?IsItemOffered@Trade@GW@@YAPAUTradeItem@2@I@Z")]
+            // TradeItem* __cdecl GW_Trade_IsItemOffered(uint32_t item_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Trade_IsItemOffered")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.TradeItem* IsItemOffered(uint value);
+            public static partial global::Daybreak.API.Interop.GuildWars.TradeItem* IsItemOffered(uint itemId);
 
-            // GW::Trade::OfferItem
-            [LibraryImport(DllName, EntryPoint = "?OfferItem@Trade@GW@@YA_NII@Z")]
+            // bool __cdecl GW_Trade_OfferItem(uint32_t item_id, uint32_t quantity) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Trade_OfferItem")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool OfferItem(uint value1, uint value2);
+            public static partial bool OfferItem(uint itemId, uint quantity);
 
-            // GW::Trade::OpenTradeWindow
-            [LibraryImport(DllName, EntryPoint = "?OpenTradeWindow@Trade@GW@@YA_NI@Z")]
+            // bool __cdecl GW_Trade_OpenTradeWindow(uint32_t agent_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Trade_OpenTradeWindow")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool OpenTradeWindow(uint value);
+            public static partial bool OpenTradeWindow(uint agentId);
 
-            // GW::Trade::RemoveItem
-            [LibraryImport(DllName, EntryPoint = "?RemoveItem@Trade@GW@@YA_NI@Z")]
+            // bool __cdecl GW_Trade_RemoveItem(uint32_t slot) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Trade_RemoveItem")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool RemoveItem(uint value);
+            public static partial bool RemoveItem(uint slot);
 
-            // GW::Trade::SubmitOffer
-            [LibraryImport(DllName, EntryPoint = "?SubmitOffer@Trade@GW@@YA_NI@Z")]
+            // bool __cdecl GW_Trade_SubmitOffer(uint32_t gold) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_Trade_SubmitOffer")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SubmitOffer(uint value);
+            public static partial bool SubmitOffer(uint gold);
         }
 
         public static partial class UI
         {
 
-            // GW::UI::AddFrameCallback
-            [LibraryImport(DllName, EntryPoint = "?AddFrameCallback@UI@GW@@YA_NPAUFrame@12@P6AXPAUInteractionMessage@12@PAX2@Z2@Z")]
+            // bool __cdecl GW_UI_AddFrameCallback(Frame* frame, UIInteractionCallback callback, void* uictl_context) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_AddFrameCallback")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool AddFrameCallback(global::Daybreak.API.Interop.Frame* frame1, nint callback2, nint ptr3);
+            public static partial bool AddFrameCallback(global::Daybreak.API.Interop.Frame* frame, nint callback, void* uictlContext);
 
-            // GW::UI::AddFrameUIInteractionCallback
-            [LibraryImport(DllName, EntryPoint = "?AddFrameUIInteractionCallback@UI@GW@@YA_NPAUFrame@12@P6AXPAUInteractionMessage@12@PAX2@Z2@Z")]
+            // bool __cdecl GW_UI_AddFrameUIInteractionCallback(GW::UI::Frame* gwca_arg0, UI::UIInteractionCallback callback, void* wparam) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_AddFrameUIInteractionCallback")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool AddFrameUIInteractionCallback(global::Daybreak.API.Interop.Frame* frame1, nint callback2, nint ptr3);
+            public static partial bool AddFrameUIInteractionCallback(global::Daybreak.API.Interop.Frame* gwcaArg0, nint callback, void* wparam);
 
-            // GW::UI::AsyncDecodeStr
-            [LibraryImport(DllName, EntryPoint = "?AsyncDecodeStr@UI@GW@@YAXPB_WP6AXPAX0@Z1W4Language@Constants@2@@Z")]
+            // void __cdecl GW_UI_AsyncDecodeStrToBuffer(const wchar_t* enc_str, wchar_t* buffer, size_t size) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_AsyncDecodeStrToBuffer")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void AsyncDecodeStr(ushort* ptr1, nint callback2, nint ptr3, global::Daybreak.API.Interop.GWCA.GW.Constants.Language language4);
+            public static partial void AsyncDecodeStrToBuffer(ushort* encStr, ushort* buffer, nuint size);
 
-            // GW::UI::AsyncDecodeStr
-            [LibraryImport(DllName, EntryPoint = "?AsyncDecodeStr@UI@GW@@YAXPB_WPA_WI@Z")]
+            // void __cdecl GW_UI_AsyncDecodeStrWithCallback(const wchar_t* enc_str, DecodeStr_Callback callback, void* callback_param, GW::Constants::Language language_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_AsyncDecodeStrWithCallback")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void AsyncDecodeStr(ushort* ptr1, ushort* ptr2, uint value3);
+            public static partial void AsyncDecodeStrWithCallback(ushort* encStr, nint callback, void* callbackParam, global::Daybreak.API.Interop.GWCA.GW.Constants.Language languageId);
 
-            // GW::UI::ButtonClick
-            [LibraryImport(DllName, EntryPoint = "?ButtonClick@UI@GW@@YA_NPAUFrame@12@@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool ButtonClick(global::Daybreak.API.Interop.Frame* frame);
-
-            // GW::UI::CreateUIComponent
-            [LibraryImport(DllName, EntryPoint = "?CreateUIComponent@UI@GW@@YAIIIIP6AXPAUInteractionMessage@12@PAX1@Z1PB_W@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint CreateUIComponent(uint value1, uint value2, uint value3, nint callback4, nint ptr5, ushort* ptr6);
-
-            // GW::UI::Default_UICallback
-            [LibraryImport(DllName, EntryPoint = "?Default_UICallback@UI@GW@@YA_NPAUInteractionMessage@12@PAX1@Z")]
+            // bool __cdecl GW_UI_ButtonClick(Frame* btn_frame) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_ButtonClick")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool Default_UICallback(global::Daybreak.API.Interop.GuildWars.InteractionMessage* interactionMessage1, void* ptr2, nint ptr3);
+            public static partial bool ButtonClick(global::Daybreak.API.Interop.Frame* btnFrame);
 
-            // GW::UI::DestroyUIComponent
-            [LibraryImport(DllName, EntryPoint = "?DestroyUIComponent@UI@GW@@YA_NPAUFrame@12@@Z")]
+            // uint32_t __cdecl GW_UI_CreateUIComponent(uint32_t parent_frame_id, uint32_t component_flags, uint32_t tab_index, UIInteractionCallback event_callback, void* wparam, const wchar_t* component_label) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_CreateUIComponent")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial uint CreateUIComponent(uint parentFrameId, uint componentFlags, uint tabIndex, nint eventCallback, void* wparam, ushort* componentLabel);
+
+            // bool __cdecl GW_UI_Default_UICallback(InteractionMessage* interaction, void* wparam, void* lparam) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_Default_UICallback")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool Default_UICallback(global::Daybreak.API.Interop.GuildWars.InteractionMessage* interaction, void* wparam, void* lparam);
+
+            // bool __cdecl GW_UI_DestroyUIComponent(Frame* frame) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_DestroyUIComponent")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool DestroyUIComponent(global::Daybreak.API.Interop.Frame* frame);
 
-            // GW::UI::DrawOnCompass
-            [LibraryImport(DllName, EntryPoint = "?DrawOnCompass@UI@GW@@YA_NIIPAUCompassPoint@12@@Z")]
+            // bool __cdecl GW_UI_DrawOnCompass(unsigned session_id, unsigned pt_count, CompassPoint* pts) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_DrawOnCompass")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool DrawOnCompass(uint value1, uint value2, global::Daybreak.API.Interop.GuildWars.CompassPoint* compassPoint3);
+            public static partial bool DrawOnCompass(uint sessionId, uint ptCount, global::Daybreak.API.Interop.GuildWars.CompassPoint* pts);
 
-            // GW::UI::EncStrToUInt32
-            [LibraryImport(DllName, EntryPoint = "?EncStrToUInt32@UI@GW@@YAIPB_W@Z")]
+            // uint32_t __cdecl GW_UI_EncStrToUInt32(const wchar_t* enc_str) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_EncStrToUInt32")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint EncStrToUInt32(ushort* ptr);
+            public static partial uint EncStrToUInt32(ushort* encStr);
 
-            // GW::UI::GetButtonFrameByEncodedString | returns TODO: map struct GW::ButtonFrame
-            // [LibraryImport(DllName, EntryPoint = "?GetButtonFrameByEncodedString@UI@GW@@YAPAUButtonFrame@2@PB_W_N@Z")]
+            // void __cdecl GW_UI_FramePosition_GetBottomRightOnScreenNative(const FramePosition* self, GW::Vec2f* result, const Frame* frame) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_FramePosition_GetBottomRightOnScreenNative")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial void FramePosition_GetBottomRightOnScreenNative(global::Daybreak.API.Interop.GuildWars.FramePosition* self, global::Daybreak.API.Interop.GuildWars.Vec2fStruct* result, global::Daybreak.API.Interop.Frame* frame);
+
+            // void __cdecl GW_UI_FramePosition_GetContentBottomRightNative(const FramePosition* self, GW::Vec2f* result, const Frame* frame) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_FramePosition_GetContentBottomRightNative")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial void FramePosition_GetContentBottomRightNative(global::Daybreak.API.Interop.GuildWars.FramePosition* self, global::Daybreak.API.Interop.GuildWars.Vec2fStruct* result, global::Daybreak.API.Interop.Frame* frame);
+
+            // void __cdecl GW_UI_FramePosition_GetContentTopLeftNative(const FramePosition* self, GW::Vec2f* result, const Frame* frame) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_FramePosition_GetContentTopLeftNative")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial void FramePosition_GetContentTopLeftNative(global::Daybreak.API.Interop.GuildWars.FramePosition* self, global::Daybreak.API.Interop.GuildWars.Vec2fStruct* result, global::Daybreak.API.Interop.Frame* frame);
+
+            // void __cdecl GW_UI_FramePosition_GetSizeOnScreenNative(const FramePosition* self, GW::Vec2f* result, const Frame* frame) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_FramePosition_GetSizeOnScreenNative")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial void FramePosition_GetSizeOnScreenNative(global::Daybreak.API.Interop.GuildWars.FramePosition* self, global::Daybreak.API.Interop.GuildWars.Vec2fStruct* result, global::Daybreak.API.Interop.Frame* frame);
+
+            // void __cdecl GW_UI_FramePosition_GetTopLeftOnScreenNative(const FramePosition* self, GW::Vec2f* result, const Frame* frame) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_FramePosition_GetTopLeftOnScreenNative")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial void FramePosition_GetTopLeftOnScreenNative(global::Daybreak.API.Interop.GuildWars.FramePosition* self, global::Daybreak.API.Interop.GuildWars.Vec2fStruct* result, global::Daybreak.API.Interop.Frame* frame);
+
+            // void __cdecl GW_UI_FramePosition_GetViewportScaleNative(const FramePosition* self, GW::Vec2f* result, const Frame* frame) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_FramePosition_GetViewportScaleNative")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial void FramePosition_GetViewportScaleNative(global::Daybreak.API.Interop.GuildWars.FramePosition* self, global::Daybreak.API.Interop.GuildWars.Vec2fStruct* result, global::Daybreak.API.Interop.Frame* frame);
+
+            // Frame* __cdecl GW_UI_FrameRelation_GetFrame(FrameRelation* self) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_FrameRelation_GetFrame")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial global::Daybreak.API.Interop.Frame* FrameRelation_GetFrame(global::Daybreak.API.Interop.GuildWars.FrameRelation* self);
+
+            // Frame* __cdecl GW_UI_FrameRelation_GetParent(const FrameRelation* self) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_FrameRelation_GetParent")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial global::Daybreak.API.Interop.Frame* FrameRelation_GetParent(global::Daybreak.API.Interop.GuildWars.FrameRelation* self);
+
+            // GW::ButtonFrame* __cdecl GW_UI_GetButtonFrameByEncodedString(const wchar_t* encoded_string, const bool partial_match) noexcept | returns TODO: map struct GW::ButtonFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_UI_GetButtonFrameByEncodedString")]
             // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // public static partial ButtonFrame* GetButtonFrameByEncodedString(ushort* ptr1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            // public static partial ButtonFrame* GetButtonFrameByEncodedString(ushort* encodedString, [MarshalAs(UnmanagedType.U1)] bool partialMatch);
 
-            // GW::UI::GetChildFrame
-            [LibraryImport(DllName, EntryPoint = "?GetChildFrame@UI@GW@@YAPAUFrame@12@PAU312@I@Z")]
+            // Frame* __cdecl GW_UI_GetChildFrame(Frame* parent, uint32_t child_offset) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_GetChildFrame")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.Frame* GetChildFrame(global::Daybreak.API.Interop.Frame* frame1, uint value2);
+            public static partial global::Daybreak.API.Interop.Frame* GetChildFrame(global::Daybreak.API.Interop.Frame* parent, uint childOffset);
 
-            // GW::UI::GetCommandLinePref
-            [LibraryImport(DllName, EntryPoint = "?GetCommandLinePref@UI@GW@@YA_NPB_WPAI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool GetCommandLinePref(ushort* ptr1, uint* ptr2);
-
-            // GW::UI::GetCommandLinePref
-            [LibraryImport(DllName, EntryPoint = "?GetCommandLinePref@UI@GW@@YA_NPB_WPAPA_W@Z")]
+            // bool __cdecl GW_UI_GetCommandLinePrefNumber(const wchar_t* label, uint32_t* out) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_GetCommandLinePrefNumber")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool GetCommandLinePref(ushort* ptr1, void* ptr2);
+            public static partial bool GetCommandLinePrefNumber(ushort* label, uint* @out);
 
-            // GW::UI::GetCurrentTooltip
-            [LibraryImport(DllName, EntryPoint = "?GetCurrentTooltip@UI@GW@@YAPAUTooltipInfo@12@XZ")]
+            // bool __cdecl GW_UI_GetCommandLinePrefString(const wchar_t* label, wchar_t** out) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_GetCommandLinePrefString")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool GetCommandLinePrefString(ushort* label, nint* @out);
+
+            // TooltipInfo* __cdecl GW_UI_GetCurrentTooltip() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_GetCurrentTooltip")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GuildWars.TooltipInfo* GetCurrentTooltip();
 
-            // GW::UI::GetFrameById
-            [LibraryImport(DllName, EntryPoint = "?GetFrameById@UI@GW@@YAPAUFrame@12@I@Z")]
+            // uint32_t __cdecl GW_UI_GetEnumPreference(EnumPreference pref) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_GetEnumPreference")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.Frame* GetFrameById(uint value);
+            public static partial uint GetEnumPreference(global::Daybreak.API.Interop.GWCA.GW.UI.EnumPreference pref);
 
-            // GW::UI::GetFrameByLabel
-            [LibraryImport(DllName, EntryPoint = "?GetFrameByLabel@UI@GW@@YAPAUFrame@12@PB_W@Z")]
+            // bool __cdecl GW_UI_GetFlagPreference(FlagPreference pref) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_GetFlagPreference")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.Frame* GetFrameByLabel(ushort* ptr);
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool GetFlagPreference(global::Daybreak.API.Interop.GWCA.GW.UI.FlagPreference pref);
 
-            // GW::UI::GetFrameContext
-            [LibraryImport(DllName, EntryPoint = "?GetFrameContext@UI@GW@@YAPAXPAUFrame@12@@Z")]
+            // Frame* __cdecl GW_UI_GetFrameById(uint32_t frame_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_GetFrameById")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial global::Daybreak.API.Interop.Frame* GetFrameById(uint frameId);
+
+            // Frame* __cdecl GW_UI_GetFrameByLabel(const wchar_t* frame_label) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_GetFrameByLabel")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial global::Daybreak.API.Interop.Frame* GetFrameByLabel(ushort* frameLabel);
+
+            // void* __cdecl GW_UI_GetFrameContext(GW::UI::Frame* frame) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_GetFrameContext")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial void* GetFrameContext(global::Daybreak.API.Interop.Frame* frame);
 
-            // GW::UI::GetIsShiftScreenShot
-            [LibraryImport(DllName, EntryPoint = "?GetIsShiftScreenShot@UI@GW@@YA_NXZ")]
+            // bool __cdecl GW_UI_GetIsShiftScreenShot() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_GetIsShiftScreenShot")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool GetIsShiftScreenShot();
 
-            // GW::UI::GetIsUIDrawn
-            [LibraryImport(DllName, EntryPoint = "?GetIsUIDrawn@UI@GW@@YA_NXZ")]
+            // bool __cdecl GW_UI_GetIsUIDrawn() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_GetIsUIDrawn")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool GetIsUIDrawn();
 
-            // GW::UI::GetIsWorldMapShowing
-            [LibraryImport(DllName, EntryPoint = "?GetIsWorldMapShowing@UI@GW@@YA_NXZ")]
+            // bool __cdecl GW_UI_GetIsWorldMapShowing() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_GetIsWorldMapShowing")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool GetIsWorldMapShowing();
 
-            // GW::UI::GetLastFrameContext
-            [LibraryImport(DllName, EntryPoint = "?GetLastFrameContext@UI@GW@@YAPAXPAUFrame@12@@Z")]
+            // void* __cdecl GW_UI_GetLastFrameContext(GW::UI::Frame* frame) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_GetLastFrameContext")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial void* GetLastFrameContext(global::Daybreak.API.Interop.Frame* frame);
 
-            // GW::UI::GetMultilineTextFrameByEncodedString | returns TODO: map struct GW::MultiLineTextLabelFrame
-            // [LibraryImport(DllName, EntryPoint = "?GetMultilineTextFrameByEncodedString@UI@GW@@YAPAUMultiLineTextLabelFrame@2@PB_W_N@Z")]
+            // GW::MultiLineTextLabelFrame* __cdecl GW_UI_GetMultilineTextFrameByEncodedString(const wchar_t* encoded_string, const bool partial_match) noexcept | returns TODO: map struct GW::MultiLineTextLabelFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_UI_GetMultilineTextFrameByEncodedString")]
             // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // public static partial MultiLineTextLabelFrame* GetMultilineTextFrameByEncodedString(ushort* ptr1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            // public static partial MultiLineTextLabelFrame* GetMultilineTextFrameByEncodedString(ushort* encodedString, [MarshalAs(UnmanagedType.U1)] bool partialMatch);
 
-            // GW::UI::GetParentFrame
-            [LibraryImport(DllName, EntryPoint = "?GetParentFrame@UI@GW@@YAPAUFrame@12@PAU312@@Z")]
+            // uint32_t __cdecl GW_UI_GetNumberPreference(NumberPreference pref) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_GetNumberPreference")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial uint GetNumberPreference(global::Daybreak.API.Interop.GWCA.GW.UI.NumberPreference pref);
+
+            // Frame* __cdecl GW_UI_GetParentFrame(Frame* frame) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_GetParentFrame")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.Frame* GetParentFrame(global::Daybreak.API.Interop.Frame* frame);
 
-            // GW::UI::GetPreference
-            [LibraryImport(DllName, EntryPoint = "?GetPreference@UI@GW@@YAIW4EnumPreference@12@@Z")]
+            // uint32_t __cdecl GW_UI_GetPreferenceOptions(EnumPreference pref, uint32_t** options_out) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_GetPreferenceOptions")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint GetPreference(global::Daybreak.API.Interop.GWCA.GW.UI.EnumPreference enumPreference);
+            public static partial uint GetPreferenceOptions(global::Daybreak.API.Interop.GWCA.GW.UI.EnumPreference pref, nint* optionsOut);
 
-            // GW::UI::GetPreference
-            [LibraryImport(DllName, EntryPoint = "?GetPreference@UI@GW@@YAIW4NumberPreference@12@@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint GetPreference(global::Daybreak.API.Interop.GWCA.GW.UI.NumberPreference numberPreference);
-
-            // GW::UI::GetPreference
-            [LibraryImport(DllName, EntryPoint = "?GetPreference@UI@GW@@YAPA_WW4StringPreference@12@@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial ushort* GetPreference(global::Daybreak.API.Interop.GWCA.GW.UI.StringPreference stringPreference);
-
-            // GW::UI::GetPreference
-            [LibraryImport(DllName, EntryPoint = "?GetPreference@UI@GW@@YA_NW4FlagPreference@12@@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool GetPreference(global::Daybreak.API.Interop.GWCA.GW.UI.FlagPreference flagPreference);
-
-            // GW::UI::GetPreferenceOptions
-            [LibraryImport(DllName, EntryPoint = "?GetPreferenceOptions@UI@GW@@YAIW4EnumPreference@12@PAPAI@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial uint GetPreferenceOptions(global::Daybreak.API.Interop.GWCA.GW.UI.EnumPreference enumPreference1, void* ptr2);
-
-            // GW::UI::GetRootFrame
-            [LibraryImport(DllName, EntryPoint = "?GetRootFrame@UI@GW@@YAPAUFrame@12@XZ")]
+            // Frame* __cdecl GW_UI_GetRootFrame() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_GetRootFrame")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.Frame* GetRootFrame();
 
-            // GW::UI::GetSettings
-            [LibraryImport(DllName, EntryPoint = "?GetSettings@UI@GW@@YAPAV?$Array@E@2@XZ")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<byte>* GetSettings();
-
-            // GW::UI::GetTextFrameByEncodedString | returns TODO: map struct GW::TextLabelFrame
-            // [LibraryImport(DllName, EntryPoint = "?GetTextFrameByEncodedString@UI@GW@@YAPAUTextLabelFrame@2@PB_W_N@Z")]
+            // ArrayByte* __cdecl GW_UI_GetSettings() noexcept | returns TODO: map struct ArrayByte
+            // [LibraryImport(DllName, EntryPoint = "GW_UI_GetSettings")]
             // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // public static partial TextLabelFrame* GetTextFrameByEncodedString(ushort* ptr1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            // public static partial ArrayByte* GetSettings();
 
-            // GW::UI::GetTextLanguage
-            [LibraryImport(DllName, EntryPoint = "?GetTextLanguage@UI@GW@@YA?AW4Language@Constants@2@XZ")]
+            // wchar_t* __cdecl GW_UI_GetStringPreference(StringPreference pref) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_GetStringPreference")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial ushort* GetStringPreference(global::Daybreak.API.Interop.GWCA.GW.UI.StringPreference pref);
+
+            // GW::TextLabelFrame* __cdecl GW_UI_GetTextFrameByEncodedString(const wchar_t* encoded_string, const bool partial_match) noexcept | returns TODO: map struct GW::TextLabelFrame
+            // [LibraryImport(DllName, EntryPoint = "GW_UI_GetTextFrameByEncodedString")]
+            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            // public static partial TextLabelFrame* GetTextFrameByEncodedString(ushort* encodedString, [MarshalAs(UnmanagedType.U1)] bool partialMatch);
+
+            // GW::Constants::Language __cdecl GW_UI_GetTextLanguage() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_GetTextLanguage")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             public static partial global::Daybreak.API.Interop.GWCA.GW.Constants.Language GetTextLanguage();
 
-            // GW::UI::GetWindowPosition
-            [LibraryImport(DllName, EntryPoint = "?GetWindowPosition@UI@GW@@YAPAUWindowPosition@12@W4WindowID@12@@Z")]
+            // UI::WindowPosition* __cdecl GW_UI_GetWindowPosition(UI::WindowID window_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_GetWindowPosition")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial global::Daybreak.API.Interop.GuildWars.WindowPositionData* GetWindowPosition(global::Daybreak.API.Interop.GWCA.GW.UI.WindowID windowID);
+            public static partial global::Daybreak.API.Interop.GuildWars.WindowPosition* GetWindowPosition(global::Daybreak.API.Interop.GWCA.GW.UI.WindowID windowId);
 
-            // GW::UI::IsInControllerCursorMode
-            [LibraryImport(DllName, EntryPoint = "?IsInControllerCursorMode@UI@GW@@YA_NXZ")]
+            // bool __cdecl GW_UI_IsInControllerCursorMode() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_IsInControllerCursorMode")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool IsInControllerCursorMode();
 
-            // GW::UI::IsInControllerMode
-            [LibraryImport(DllName, EntryPoint = "?IsInControllerMode@UI@GW@@YA_NXZ")]
+            // bool __cdecl GW_UI_IsInControllerMode() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_IsInControllerMode")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool IsInControllerMode();
 
-            // GW::UI::IsInMobileMode
-            [LibraryImport(DllName, EntryPoint = "?IsInMobileMode@UI@GW@@YA_NXZ")]
+            // bool __cdecl GW_UI_IsInMobileMode() noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_IsInMobileMode")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool IsInMobileMode();
 
-            // GW::UI::IsValidEncStr
-            [LibraryImport(DllName, EntryPoint = "?IsValidEncStr@UI@GW@@YA_NPB_W@Z")]
+            // bool __cdecl GW_UI_IsValidEncStr(const wchar_t* enc_str) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_IsValidEncStr")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool IsValidEncStr(ushort* ptr);
+            public static partial bool IsValidEncStr(ushort* encStr);
 
-            // GW::UI::Keydown
-            [LibraryImport(DllName, EntryPoint = "?Keydown@UI@GW@@YA_NW4ControlAction@12@PAUFrame@12@@Z")]
+            // bool __cdecl GW_UI_Keydown(ControlAction key, Frame* target) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_Keydown")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool Keydown(global::Daybreak.API.Interop.GWCA.GW.UI.ControlAction controlAction1, global::Daybreak.API.Interop.Frame* frame2);
+            public static partial bool Keydown(global::Daybreak.API.Interop.GWCA.GW.UI.ControlAction key, global::Daybreak.API.Interop.Frame* target);
 
-            // GW::UI::Keypress
-            [LibraryImport(DllName, EntryPoint = "?Keypress@UI@GW@@YA_NW4ControlAction@12@PAUFrame@12@@Z")]
+            // bool __cdecl GW_UI_Keypress(ControlAction key, Frame* target) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_Keypress")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool Keypress(global::Daybreak.API.Interop.GWCA.GW.UI.ControlAction controlAction1, global::Daybreak.API.Interop.Frame* frame2);
+            public static partial bool Keypress(global::Daybreak.API.Interop.GWCA.GW.UI.ControlAction key, global::Daybreak.API.Interop.Frame* target);
 
-            // GW::UI::Keyup
-            [LibraryImport(DllName, EntryPoint = "?Keyup@UI@GW@@YA_NW4ControlAction@12@PAUFrame@12@@Z")]
+            // bool __cdecl GW_UI_Keyup(ControlAction key, Frame* target) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_Keyup")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool Keyup(global::Daybreak.API.Interop.GWCA.GW.UI.ControlAction controlAction1, global::Daybreak.API.Interop.Frame* frame2);
+            public static partial bool Keyup(global::Daybreak.API.Interop.GWCA.GW.UI.ControlAction key, global::Daybreak.API.Interop.Frame* target);
 
-            // GW::UI::RegisterCreateUIComponentCallback | function2: TODO: map struct function
-            // [LibraryImport(DllName, EntryPoint = "?RegisterCreateUIComponentCallback@UI@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUCreateUIComponentPacket@UI@GW@@@Z@std@@H@Z")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // public static partial void RegisterCreateUIComponentCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2);
-
-            // GW::UI::RegisterFrameUIMessageCallback | function3: TODO: map struct function
-            // [LibraryImport(DllName, EntryPoint = "?RegisterFrameUIMessageCallback@UI@GW@@YAXPAUHookEntry@2@W4UIMessage@12@ABV?$function@$$A6AXPAUHookStatus@GW@@PBUFrame@UI@2@W4UIMessage@42@PAX3@Z@std@@H@Z")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // public static partial void RegisterFrameUIMessageCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, global::Daybreak.API.Interop.GWCA.GW.UI.UIMessage uIMessage2, function* function3, global::Daybreak.API.Interop.Frame* frame4, global::Daybreak.API.Interop.GWCA.GW.UI.UIMessage uIMessage5, void* ptr6, nint ptr7);
-
-            // GW::UI::RegisterKeydownCallback | function2: TODO: map struct function
-            // [LibraryImport(DllName, EntryPoint = "?RegisterKeydownCallback@UI@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUHookStatus@GW@@I@Z@std@@@Z")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // public static partial void RegisterKeydownCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, uint value3);
-
-            // GW::UI::RegisterKeyupCallback | function2: TODO: map struct function
-            // [LibraryImport(DllName, EntryPoint = "?RegisterKeyupCallback@UI@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUHookStatus@GW@@I@Z@std@@@Z")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // public static partial void RegisterKeyupCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2, uint value3);
-
-            // GW::UI::RegisterUIMessageCallback | function3: TODO: map struct function
-            // [LibraryImport(DllName, EntryPoint = "?RegisterUIMessageCallback@UI@GW@@YAXPAUHookEntry@2@W4UIMessage@12@ABV?$function@$$A6AXPAUHookStatus@GW@@W4UIMessage@UI@2@PAX2@Z@std@@H@Z")]
-            // [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            // public static partial void RegisterUIMessageCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, global::Daybreak.API.Interop.GWCA.GW.UI.UIMessage uIMessage2, function* function3, global::Daybreak.API.Interop.GWCA.GW.UI.UIMessage uIMessage4, void* ptr5, nint ptr6);
-
-            // GW::UI::RemoveCreateUIComponentCallback
-            [LibraryImport(DllName, EntryPoint = "?RemoveCreateUIComponentCallback@UI@GW@@YAXPAUHookEntry@2@@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void RemoveCreateUIComponentCallback(global::Daybreak.API.Interop.HookEntry* hookEntry);
-
-            // GW::UI::RemoveFrameUIMessageCallback
-            [LibraryImport(DllName, EntryPoint = "?RemoveFrameUIMessageCallback@UI@GW@@YAXPAUHookEntry@2@@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void RemoveFrameUIMessageCallback(global::Daybreak.API.Interop.HookEntry* hookEntry);
-
-            // GW::UI::RemoveKeydownCallback
-            [LibraryImport(DllName, EntryPoint = "?RemoveKeydownCallback@UI@GW@@YAXPAUHookEntry@2@@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void RemoveKeydownCallback(global::Daybreak.API.Interop.HookEntry* hookEntry);
-
-            // GW::UI::RemoveKeyupCallback
-            [LibraryImport(DllName, EntryPoint = "?RemoveKeyupCallback@UI@GW@@YAXPAUHookEntry@2@@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void RemoveKeyupCallback(global::Daybreak.API.Interop.HookEntry* hookEntry);
-
-            // GW::UI::RemoveUIMessageCallback
-            [LibraryImport(DllName, EntryPoint = "?RemoveUIMessageCallback@UI@GW@@YAXPAUHookEntry@2@W4UIMessage@12@@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void RemoveUIMessageCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, global::Daybreak.API.Interop.GWCA.GW.UI.UIMessage uIMessage2);
-
-            // GW::UI::SelectDropdownOption
-            [LibraryImport(DllName, EntryPoint = "?SelectDropdownOption@UI@GW@@YA_NPAUFrame@12@I@Z")]
+            // bool __cdecl GW_UI_RegisterCreateUIComponentCallback(HookEntry* entry, NativeCreateUIComponentCallback callback, void* context, int32_t altitude) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_RegisterCreateUIComponentCallback")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SelectDropdownOption(global::Daybreak.API.Interop.Frame* frame1, uint value2);
+            public static partial bool RegisterCreateUIComponentCallback(global::Daybreak.API.Interop.HookEntry* entry, nint callback, void* context, int altitude);
 
-            // GW::UI::SendFrameUIMessage
-            [LibraryImport(DllName, EntryPoint = "?SendFrameUIMessage@UI@GW@@YA_NPAUFrame@12@W4UIMessage@12@PAX2@Z")]
+            // bool __cdecl GW_UI_RegisterFrameUIMessageCallback(HookEntry* entry, UIMessage message_id, NativeFrameUIMessageCallback callback, void* context, int32_t altitude) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_RegisterFrameUIMessageCallback")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SendFrameUIMessage(global::Daybreak.API.Interop.Frame* frame1, global::Daybreak.API.Interop.GWCA.GW.UI.UIMessage uIMessage2, void* ptr3, nint ptr4);
+            public static partial bool RegisterFrameUIMessageCallback(global::Daybreak.API.Interop.HookEntry* entry, global::Daybreak.API.Interop.GWCA.GW.UI.UIMessage messageId, nint callback, void* context, int altitude);
 
-            // GW::UI::SendUIMessage
-            [LibraryImport(DllName, EntryPoint = "?SendUIMessage@UI@GW@@YA_NW4UIMessage@12@PAX1@Z")]
+            // bool __cdecl GW_UI_RegisterKeydownCallback(HookEntry* entry, NativeKeyCallback callback, void* context) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_RegisterKeydownCallback")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SendUIMessage(global::Daybreak.API.Interop.GWCA.GW.UI.UIMessage uIMessage1, void* ptr2, nint ptr3);
+            public static partial bool RegisterKeydownCallback(global::Daybreak.API.Interop.HookEntry* entry, nint callback, void* context);
 
-            // GW::UI::SetCommandLinePref
-            [LibraryImport(DllName, EntryPoint = "?SetCommandLinePref@UI@GW@@YA_NPB_WI@Z")]
+            // bool __cdecl GW_UI_RegisterKeyupCallback(HookEntry* entry, NativeKeyCallback callback, void* context) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_RegisterKeyupCallback")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SetCommandLinePref(ushort* ptr1, uint value2);
+            public static partial bool RegisterKeyupCallback(global::Daybreak.API.Interop.HookEntry* entry, nint callback, void* context);
 
-            // GW::UI::SetCommandLinePref
-            [LibraryImport(DllName, EntryPoint = "?SetCommandLinePref@UI@GW@@YA_NPB_WPA_W@Z")]
+            // bool __cdecl GW_UI_RegisterUIMessageCallback(HookEntry* entry, UIMessage message_id, NativeUIMessageCallback callback, void* context, int32_t altitude) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_RegisterUIMessageCallback")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SetCommandLinePref(ushort* ptr1, ushort* ptr2);
+            public static partial bool RegisterUIMessageCallback(global::Daybreak.API.Interop.HookEntry* entry, global::Daybreak.API.Interop.GWCA.GW.UI.UIMessage messageId, nint callback, void* context, int altitude);
 
-            // GW::UI::SetFrameBounds
-            [LibraryImport(DllName, EntryPoint = "?SetFrameBounds@UI@GW@@YAXPAUFrame@12@W4FrameLayoutMode@12@PAM2@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void SetFrameBounds(global::Daybreak.API.Interop.Frame* frame1, global::Daybreak.API.Interop.GWCA.GW.UI.FrameLayoutMode frameLayoutMode2, float* ptr3, nint ptr4);
-
-            // GW::UI::SetFrameDisabled
-            [LibraryImport(DllName, EntryPoint = "?SetFrameDisabled@UI@GW@@YA_NPAUFrame@12@_N@Z")]
+            // bool __cdecl GW_UI_RemoveCreateUIComponentCallbackNative(HookEntry* entry) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_RemoveCreateUIComponentCallbackNative")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SetFrameDisabled(global::Daybreak.API.Interop.Frame* frame1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            public static partial bool RemoveCreateUIComponentCallbackNative(global::Daybreak.API.Interop.HookEntry* entry);
 
-            // GW::UI::SetFrameMargins
-            [LibraryImport(DllName, EntryPoint = "?SetFrameMargins@UI@GW@@YA_NPAUFrame@12@IQAM1I@Z")]
+            // bool __cdecl GW_UI_RemoveFrameUIMessageCallbackNative(HookEntry* entry) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_RemoveFrameUIMessageCallbackNative")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SetFrameMargins(global::Daybreak.API.Interop.Frame* frame1, uint value2, float* ptr3, nint ptr4, uint value5);
+            public static partial bool RemoveFrameUIMessageCallbackNative(global::Daybreak.API.Interop.HookEntry* entry);
 
-            // GW::UI::SetFramePosition
-            [LibraryImport(DllName, EntryPoint = "?SetFramePosition@UI@GW@@YAXPAUFrame@12@W4FrameLayoutMode@12@PAM@Z")]
+            // void __cdecl GW_UI_RemoveKeydownCallbackNative(HookEntry* entry) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_RemoveKeydownCallbackNative")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void SetFramePosition(global::Daybreak.API.Interop.Frame* frame1, global::Daybreak.API.Interop.GWCA.GW.UI.FrameLayoutMode frameLayoutMode2, float* ptr3);
+            public static partial void RemoveKeydownCallbackNative(global::Daybreak.API.Interop.HookEntry* entry);
 
-            // GW::UI::SetFrameTitle
-            [LibraryImport(DllName, EntryPoint = "?SetFrameTitle@UI@GW@@YA_NPAUFrame@12@PB_W@Z")]
+            // void __cdecl GW_UI_RemoveKeyupCallbackNative(HookEntry* entry) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_RemoveKeyupCallbackNative")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SetFrameTitle(global::Daybreak.API.Interop.Frame* frame1, ushort* ptr2);
+            public static partial void RemoveKeyupCallbackNative(global::Daybreak.API.Interop.HookEntry* entry);
 
-            // GW::UI::SetFrameVisible
-            [LibraryImport(DllName, EntryPoint = "?SetFrameVisible@UI@GW@@YA_NPAUFrame@12@_N@Z")]
+            // void __cdecl GW_UI_RemoveUIMessageCallbackNative(HookEntry* entry, UIMessage message_id) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_RemoveUIMessageCallbackNative")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SetFrameVisible(global::Daybreak.API.Interop.Frame* frame1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            public static partial void RemoveUIMessageCallbackNative(global::Daybreak.API.Interop.HookEntry* entry, global::Daybreak.API.Interop.GWCA.GW.UI.UIMessage messageId);
 
-            // GW::UI::SetOpenLinks
-            [LibraryImport(DllName, EntryPoint = "?SetOpenLinks@UI@GW@@YAX_N@Z")]
-            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-            public static partial void SetOpenLinks([MarshalAs(UnmanagedType.U1)] bool flag);
-
-            // GW::UI::SetPreference
-            [LibraryImport(DllName, EntryPoint = "?SetPreference@UI@GW@@YA_NW4EnumPreference@12@I@Z")]
+            // bool __cdecl GW_UI_SelectDropdownOption(Frame* frame, uint32_t value) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_SelectDropdownOption")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SetPreference(global::Daybreak.API.Interop.GWCA.GW.UI.EnumPreference enumPreference1, uint value2);
+            public static partial bool SelectDropdownOption(global::Daybreak.API.Interop.Frame* frame, uint value);
 
-            // GW::UI::SetPreference
-            [LibraryImport(DllName, EntryPoint = "?SetPreference@UI@GW@@YA_NW4FlagPreference@12@_N@Z")]
+            // bool __cdecl GW_UI_SendFrameUIMessage(UI::Frame* frame, UI::UIMessage message_id, void* wParam, void* lParam) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_SendFrameUIMessage")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SetPreference(global::Daybreak.API.Interop.GWCA.GW.UI.FlagPreference flagPreference1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            public static partial bool SendFrameUIMessage(global::Daybreak.API.Interop.Frame* frame, global::Daybreak.API.Interop.GWCA.GW.UI.UIMessage messageId, void* wParam, void* lParam);
 
-            // GW::UI::SetPreference
-            [LibraryImport(DllName, EntryPoint = "?SetPreference@UI@GW@@YA_NW4NumberPreference@12@I@Z")]
+            // bool __cdecl GW_UI_SendUIMessage(UI::UIMessage msgid, void* wParam, void* lParam) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_SendUIMessage")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SetPreference(global::Daybreak.API.Interop.GWCA.GW.UI.NumberPreference numberPreference1, uint value2);
+            public static partial bool SendUIMessage(global::Daybreak.API.Interop.GWCA.GW.UI.UIMessage msgid, void* wParam, void* lParam);
 
-            // GW::UI::SetPreference
-            [LibraryImport(DllName, EntryPoint = "?SetPreference@UI@GW@@YA_NW4StringPreference@12@PA_W@Z")]
+            // bool __cdecl GW_UI_SetCommandLinePrefNumber(const wchar_t* label, uint32_t value) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_SetCommandLinePrefNumber")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SetPreference(global::Daybreak.API.Interop.GWCA.GW.UI.StringPreference stringPreference1, ushort* ptr2);
+            public static partial bool SetCommandLinePrefNumber(ushort* label, uint value);
 
-            // GW::UI::SetWindowPosition
-            [LibraryImport(DllName, EntryPoint = "?SetWindowPosition@UI@GW@@YA_NW4WindowID@12@PAUWindowPosition@12@@Z")]
+            // bool __cdecl GW_UI_SetCommandLinePrefString(const wchar_t* label, wchar_t* value) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_SetCommandLinePrefString")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SetWindowPosition(global::Daybreak.API.Interop.GWCA.GW.UI.WindowID windowID1, global::Daybreak.API.Interop.GuildWars.WindowPositionData* windowPositionData2);
+            public static partial bool SetCommandLinePrefString(ushort* label, ushort* value);
 
-            // GW::UI::SetWindowVisible
-            [LibraryImport(DllName, EntryPoint = "?SetWindowVisible@UI@GW@@YA_NW4WindowID@12@_N@Z")]
+            // bool __cdecl GW_UI_SetEnumPreference(EnumPreference pref, uint32_t value) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_SetEnumPreference")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool SetWindowVisible(global::Daybreak.API.Interop.GWCA.GW.UI.WindowID windowID1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            public static partial bool SetEnumPreference(global::Daybreak.API.Interop.GWCA.GW.UI.EnumPreference pref, uint value);
 
-            // GW::UI::TriggerFrameRedraw
-            [LibraryImport(DllName, EntryPoint = "?TriggerFrameRedraw@UI@GW@@YA_NPAUFrame@12@@Z")]
+            // bool __cdecl GW_UI_SetFlagPreference(FlagPreference pref, bool value) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_SetFlagPreference")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool SetFlagPreference(global::Daybreak.API.Interop.GWCA.GW.UI.FlagPreference pref, [MarshalAs(UnmanagedType.U1)] bool value);
+
+            // void __cdecl GW_UI_SetFrameBounds(Frame* frame, FrameLayoutMode mode, float* rect, float* size_out) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_SetFrameBounds")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial void SetFrameBounds(global::Daybreak.API.Interop.Frame* frame, global::Daybreak.API.Interop.GWCA.GW.UI.FrameLayoutMode mode, float* rect, float* sizeOut);
+
+            // bool __cdecl GW_UI_SetFrameDisabled(UI::Frame* frame, bool flag) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_SetFrameDisabled")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool SetFrameDisabled(global::Daybreak.API.Interop.Frame* frame, [MarshalAs(UnmanagedType.U1)] bool flag);
+
+            // bool __cdecl GW_UI_SetFrameMargins(GW::UI::Frame* frame, uint32_t flags, float size [4], float input_mask [4], uint32_t type) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_SetFrameMargins")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool SetFrameMargins(global::Daybreak.API.Interop.Frame* frame, uint flags, float* size, float* inputMask, uint type);
+
+            // void __cdecl GW_UI_SetFramePosition(Frame* frame, FrameLayoutMode mode, float* rect) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_SetFramePosition")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial void SetFramePosition(global::Daybreak.API.Interop.Frame* frame, global::Daybreak.API.Interop.GWCA.GW.UI.FrameLayoutMode mode, float* rect);
+
+            // bool __cdecl GW_UI_SetFrameTitle(GW::UI::Frame* gwca_arg0, const wchar_t* title) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_SetFrameTitle")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool SetFrameTitle(global::Daybreak.API.Interop.Frame* gwcaArg0, ushort* title);
+
+            // bool __cdecl GW_UI_SetFrameVisible(UI::Frame* frame, bool flag) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_SetFrameVisible")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool SetFrameVisible(global::Daybreak.API.Interop.Frame* frame, [MarshalAs(UnmanagedType.U1)] bool flag);
+
+            // bool __cdecl GW_UI_SetNumberPreference(NumberPreference pref, uint32_t value) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_SetNumberPreference")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool SetNumberPreference(global::Daybreak.API.Interop.GWCA.GW.UI.NumberPreference pref, uint value);
+
+            // void __cdecl GW_UI_SetOpenLinks(bool toggle) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_SetOpenLinks")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial void SetOpenLinks([MarshalAs(UnmanagedType.U1)] bool toggle);
+
+            // bool __cdecl GW_UI_SetStringPreference(StringPreference pref, wchar_t* value) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_SetStringPreference")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool SetStringPreference(global::Daybreak.API.Interop.GWCA.GW.UI.StringPreference pref, ushort* value);
+
+            // bool __cdecl GW_UI_SetWindowPosition(UI::WindowID window_id, UI::WindowPosition* info) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_SetWindowPosition")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool SetWindowPosition(global::Daybreak.API.Interop.GWCA.GW.UI.WindowID windowId, global::Daybreak.API.Interop.GuildWars.WindowPosition* info);
+
+            // bool __cdecl GW_UI_SetWindowVisible(UI::WindowID window_id, bool is_visible) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_SetWindowVisible")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            [return: MarshalAs(UnmanagedType.U1)]
+            public static partial bool SetWindowVisible(global::Daybreak.API.Interop.GWCA.GW.UI.WindowID windowId, [MarshalAs(UnmanagedType.U1)] bool isVisible);
+
+            // bool __cdecl GW_UI_TriggerFrameRedraw(UI::Frame* frame) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_TriggerFrameRedraw")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
             public static partial bool TriggerFrameRedraw(global::Daybreak.API.Interop.Frame* frame);
 
-            // GW::UI::UInt32ToEncStr
-            [LibraryImport(DllName, EntryPoint = "?UInt32ToEncStr@UI@GW@@YA_NIPA_WI@Z")]
+            // bool __cdecl GW_UI_UInt32ToEncStr(uint32_t value, wchar_t* buffer, size_t count) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_UInt32ToEncStr")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
             [return: MarshalAs(UnmanagedType.U1)]
-            public static partial bool UInt32ToEncStr(uint value1, ushort* ptr2, uint value3);
+            public static partial bool UInt32ToEncStr(uint value, ushort* buffer, nuint count);
 
-            public static partial class FramePosition
-            {
+            // void __cdecl GW_UI_WindowPosition_xAxisNative(const WindowPosition* self, Vec2f* result, float multiplier, bool clamp_position) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_WindowPosition_xAxisNative")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial void WindowPosition_xAxisNative(global::Daybreak.API.Interop.GuildWars.WindowPosition* self, global::Daybreak.API.Interop.GuildWars.Vec2fStruct* result, float multiplier, [MarshalAs(UnmanagedType.U1)] bool clampPosition);
 
-                // GW::UI::FramePosition::GetBottomRightOnScreen
-                [LibraryImport(DllName, EntryPoint = "?GetBottomRightOnScreen@FramePosition@UI@GW@@QBE?AUVec2f@3@PBUFrame@23@@Z")]
-                [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                public static partial global::Daybreak.API.Interop.GuildWars.Vec2fStruct* GetBottomRightOnScreen(nint self, global::Daybreak.API.Interop.Frame* frame2);
-
-                // GW::UI::FramePosition::GetContentBottomRight
-                [LibraryImport(DllName, EntryPoint = "?GetContentBottomRight@FramePosition@UI@GW@@QBE?AUVec2f@3@PBUFrame@23@@Z")]
-                [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                public static partial global::Daybreak.API.Interop.GuildWars.Vec2fStruct* GetContentBottomRight(nint self, global::Daybreak.API.Interop.Frame* frame2);
-
-                // GW::UI::FramePosition::GetContentTopLeft
-                [LibraryImport(DllName, EntryPoint = "?GetContentTopLeft@FramePosition@UI@GW@@QBE?AUVec2f@3@PBUFrame@23@@Z")]
-                [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                public static partial global::Daybreak.API.Interop.GuildWars.Vec2fStruct* GetContentTopLeft(nint self, global::Daybreak.API.Interop.Frame* frame2);
-
-                // GW::UI::FramePosition::GetSizeOnScreen
-                [LibraryImport(DllName, EntryPoint = "?GetSizeOnScreen@FramePosition@UI@GW@@QBE?AUVec2f@3@PBUFrame@23@@Z")]
-                [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                public static partial global::Daybreak.API.Interop.GuildWars.Vec2fStruct* GetSizeOnScreen(nint self, global::Daybreak.API.Interop.Frame* frame2);
-
-                // GW::UI::FramePosition::GetTopLeftOnScreen
-                [LibraryImport(DllName, EntryPoint = "?GetTopLeftOnScreen@FramePosition@UI@GW@@QBE?AUVec2f@3@PBUFrame@23@@Z")]
-                [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                public static partial global::Daybreak.API.Interop.GuildWars.Vec2fStruct* GetTopLeftOnScreen(nint self, global::Daybreak.API.Interop.Frame* frame2);
-
-                // GW::UI::FramePosition::GetViewportScale
-                [LibraryImport(DllName, EntryPoint = "?GetViewportScale@FramePosition@UI@GW@@QBE?AUVec2f@3@PBUFrame@23@@Z")]
-                [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                public static partial global::Daybreak.API.Interop.GuildWars.Vec2fStruct* GetViewportScale(nint self, global::Daybreak.API.Interop.Frame* frame2);
-            }
-
-            public static partial class FrameRelation
-            {
-
-                // GW::UI::FrameRelation::GetFrame
-                [LibraryImport(DllName, EntryPoint = "?GetFrame@FrameRelation@UI@GW@@QAEPAUFrame@23@XZ")]
-                [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                public static partial global::Daybreak.API.Interop.Frame* GetFrame(nint self);
-
-                // GW::UI::FrameRelation::GetParent
-                [LibraryImport(DllName, EntryPoint = "?GetParent@FrameRelation@UI@GW@@QBEPAUFrame@23@XZ")]
-                [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                public static partial global::Daybreak.API.Interop.Frame* GetParent(nint self);
-            }
-
-            public static partial class WindowPosition
-            {
-
-                // GW::UI::WindowPosition::xAxis
-                [LibraryImport(DllName, EntryPoint = "?xAxis@WindowPosition@UI@GW@@QBE?AUVec2f@3@M_N@Z")]
-                [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                public static partial global::Daybreak.API.Interop.GuildWars.Vec2fStruct* xAxis(nint self, float value2, [MarshalAs(UnmanagedType.U1)] bool flag3);
-
-                // GW::UI::WindowPosition::yAxis
-                [LibraryImport(DllName, EntryPoint = "?yAxis@WindowPosition@UI@GW@@QBE?AUVec2f@3@M_N@Z")]
-                [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-                public static partial global::Daybreak.API.Interop.GuildWars.Vec2fStruct* yAxis(nint self, float value2, [MarshalAs(UnmanagedType.U1)] bool flag3);
-            }
+            // void __cdecl GW_UI_WindowPosition_yAxisNative(const WindowPosition* self, Vec2f* result, float multiplier, bool clamp_position) noexcept
+            [LibraryImport(DllName, EntryPoint = "GW_UI_WindowPosition_yAxisNative")]
+            [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+            public static partial void WindowPosition_yAxisNative(global::Daybreak.API.Interop.GuildWars.WindowPosition* self, global::Daybreak.API.Interop.GuildWars.Vec2fStruct* result, float multiplier, [MarshalAs(UnmanagedType.U1)] bool clampPosition);
         }
     }
 
@@ -8286,6 +8338,8 @@ public static unsafe partial class GWCA
                 Heroic_Refrain,
                 Reforged_Mode = 0xD6A,
                 Dhuums_Covenant_Broken,
+                Seek_and_Destroy = 3438,
+                Birds_Eye_View = 3439,
             }
 
             public enum SkillType : int
@@ -8988,7 +9042,7 @@ public static unsafe partial class GWCA
         public static partial class EventMgr
         {
 
-            public enum EventID : int
+            public enum EventID : uint
             {
                 kAppActivated = 0x0, // WM_ACTIVATEAPP; packet is one dword, non-zero when activated
                 kFrameTick = 0x1, // once per frame from the pump, packet is the elapsed milliseconds
@@ -9028,7 +9082,7 @@ public static unsafe partial class GWCA
                 kNone = 0xffff,
             }
 
-            public enum FriendEventType : int
+            public enum FriendEventType : uint
             {
                 kStatusChanged = 0x26,
                 kLocationChanged = 0x28,
@@ -10177,6 +10231,27 @@ namespace Daybreak.API.Interop.GuildWars
     {
         public nint PrevLink;
         public nint NextNode;
+    }
+
+    /// <summary>
+    /// TList&lt;T&gt; - intrusive list head (12 bytes).
+    /// </summary>
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public struct TList
+    {
+        public nuint Offset;
+        public TLink Link;
+    }
+
+    /// <summary>
+    /// THashLink&lt;T&gt; - hash table element link (20 bytes).
+    /// </summary>
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    public struct THashLink
+    {
+        public uint Hash;
+        public TLink LinkToFull;
+        public TLink LinkToSlot;
     }
 
     /// <summary>
@@ -15068,6 +15143,8 @@ namespace Daybreak.API.Interop.GuildWars
         Heroic_Refrain,
         Reforged_Mode = 0xD6A,
         Dhuums_Covenant_Broken,
+        Seek_and_Destroy = 3438,
+        Birds_Eye_View = 3439,
     }
 
     public enum SkillType : int
@@ -16276,7 +16353,7 @@ namespace Daybreak.API.Interop.GuildWars
         KeyDown = 0xe,
     }
 
-    public enum EventID : int
+    public enum EventID : uint
     {
         kAppActivated = 0x0,
         kFrameTick = 0x1,
@@ -16316,7 +16393,7 @@ namespace Daybreak.API.Interop.GuildWars
         kNone = 0xffff,
     }
 
-    public enum FriendEventType : int
+    public enum FriendEventType : uint
     {
         kStatusChanged = 0x26,
         kLocationChanged = 0x28,
@@ -17062,7 +17139,7 @@ namespace Daybreak.API.Interop.GuildWars
         public byte Scale; // percent
     }
 
-    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x444)]
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x450)]
     public unsafe struct CharContext
     {
         [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
@@ -17128,12 +17205,16 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x02B0)]
         public uint PlayerNumber;
         [global::System.Runtime.InteropServices.FieldOffset(0x02B4)]
-        public fixed uint H02B4[40];
-        [global::System.Runtime.InteropServices.FieldOffset(0x0354)]
-        public global::Daybreak.API.Interop.GuildWars.ProgressBarContext* ProgressBar; // seems to never be nullptr
+        public fixed byte H02B4[148]; // 
+        [global::System.Runtime.InteropServices.FieldOffset(0x0348)]
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.ProgressBarContext> ProgressBars; // 
         [global::System.Runtime.InteropServices.FieldOffset(0x0358)]
-        public fixed uint H0358[27];
-        [global::System.Runtime.InteropServices.FieldOffset(0x03C4)]
+        public global::Daybreak.API.Interop.GuildWars.TList ProgressBarList; // sorted list, unsure what the sort order is
+        [global::System.Runtime.InteropServices.FieldOffset(0x0364)]
+        public fixed byte H0364[72]; // 
+        [global::System.Runtime.InteropServices.FieldOffset(0x03AC)]
+        public global::Daybreak.API.Interop.GuildWars.THash UnkPlayerAgentThing; // ? is a hash map, assuming this is a map of observable players; key type unverified
+        [global::System.Runtime.InteropServices.FieldOffset(0x03D0)]
         public fixed char PlayerEmail[64];
     }
 
@@ -17290,7 +17371,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0048)]
         public nint H0048;
         [global::System.Runtime.InteropServices.FieldOffset(0x004C)]
-        public nint Party;
+        public global::Daybreak.API.Interop.GuildWars.PartyContext* Party;
         [global::System.Runtime.InteropServices.FieldOffset(0x0050)]
         public nint H0050;
         [global::System.Runtime.InteropServices.FieldOffset(0x0054)]
@@ -17592,7 +17673,7 @@ namespace Daybreak.API.Interop.GuildWars
         public uint Level;
     }
 
-    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0xA4)]
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0xAC)]
     public unsafe struct Inventory
     {
         [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
@@ -17673,6 +17754,8 @@ namespace Daybreak.API.Interop.GuildWars
         public uint GoldCharacter;
         [global::System.Runtime.InteropServices.FieldOffset(0x0094)]
         public uint GoldStorage;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0098)]
+        public global::Daybreak.API.Interop.GuildWars.THashLink Next; // ItemContext::inventory_table
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
@@ -17910,7 +17993,7 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x0078)]
         public global::Daybreak.API.Interop.GuildWars.PathEngineContext* PathEngine;
         [global::System.Runtime.InteropServices.FieldOffset(0x007C)]
-        public nint Props;
+        public global::Daybreak.API.Interop.GuildWars.PropsContext* Props;
         [global::System.Runtime.InteropServices.FieldOffset(0x0080)]
         public uint H0080;
         [global::System.Runtime.InteropServices.FieldOffset(0x0084)]
@@ -18312,6 +18395,43 @@ namespace Daybreak.API.Interop.GuildWars
         public AttributeStructArray54 Attribute;
     }
 
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct PartyContext
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public uint H0000;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0004)]
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> H0004;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
+        public uint Flag;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0018)]
+        public uint H0018;
+        [global::System.Runtime.InteropServices.FieldOffset(0x001C)]
+        public global::Daybreak.API.Interop.GuildWars.TList Requests;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0028)]
+        public uint RequestsCount;
+        [global::System.Runtime.InteropServices.FieldOffset(0x002C)]
+        public global::Daybreak.API.Interop.GuildWars.TList Sending;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0038)]
+        public uint SendingCount;
+        [global::System.Runtime.InteropServices.FieldOffset(0x003C)]
+        public uint H003C;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0040)]
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Parties;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0050)]
+        public uint H0050;
+        [global::System.Runtime.InteropServices.FieldOffset(0x0054)]
+        public global::Daybreak.API.Interop.GuildWars.PartyInfo* PlayerParty; // Players party
+        [global::System.Runtime.InteropServices.FieldOffset(0x0058)]
+        public fixed uint H0058[17];
+        [global::System.Runtime.InteropServices.FieldOffset(0x009C)]
+        public uint MyPartySearchId;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00A0)]
+        public fixed uint H00A0[8];
+        [global::System.Runtime.InteropServices.FieldOffset(0x00C0)]
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> PartySearch;
+    }
+
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x84)]
     public unsafe struct PartyInfo
     {
@@ -18331,13 +18451,12 @@ namespace Daybreak.API.Interop.GuildWars
         public global::Daybreak.API.Interop.GuildWars.TLink InviteLink;
     }
 
-    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x1C)]
     public unsafe struct PartyMemberMoraleInfo
     {
         public uint AgentId;
-        public uint AgentIdDup;
-        public fixed uint Unk[4];
-        public uint Morale;
+        public global::Daybreak.API.Interop.GuildWars.THashLink Link;
+        public uint Morale; // base morale = 100, boost/dp is offset from 100
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0xC)]
@@ -18670,14 +18789,20 @@ namespace Daybreak.API.Interop.GuildWars
         public uint Unk;
     }
 
-    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x40)]
     public unsafe struct ProgressBarContext
     {
-        public int Pips;
-        public fixed byte Color[4]; // RGBA
-        public fixed byte Background[4]; // RGBA
-        public fixed int Unk[7];
-        public float Progress; // 0 ... 1
+        public int Pips; // 0x0000
+        public fixed byte Color[4]; // 0x0004  RGBA
+        public fixed byte Background[4]; // 0x0008 RGBA
+        public nint NameStrEnc; // 0x000C ? it is encoded string but it being name is a guess
+        public nint TooltopStrEnc; // 0x0010 ? it is encoded string but it being the tooltip description is a guess
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> SortOrder; // 0x0014 ? sort_order referenced in elements
+        public float ProgressRate; // 0x0024 ?
+        public float Progress; // 0x0028
+        public global::Daybreak.API.Interop.GuildWars.TLink Next; // 0x002C
+        public nint N000024BD; // 0x0034 texture information (DXT1 referenced)
+        public fixed byte Pad0038[8]; // 0x0038
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
@@ -18700,6 +18825,23 @@ namespace Daybreak.API.Interop.GuildWars
         public fixed float BoundsZOffsets[2];
         [global::System.Runtime.InteropServices.FieldOffset(0x0014)]
         public uint H0014;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit, Pack = 1, Size = 0x1A4)]
+    public unsafe struct PropsContext
+    {
+        [global::System.Runtime.InteropServices.FieldOffset(0x0000)]
+        public fixed uint Pad1[27];
+        [global::System.Runtime.InteropServices.FieldOffset(0x006C)]
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> PropsByType;
+        [global::System.Runtime.InteropServices.FieldOffset(0x007C)]
+        public fixed uint H007C[10];
+        [global::System.Runtime.InteropServices.FieldOffset(0x00A4)]
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.PropModelInfo> PropModels;
+        [global::System.Runtime.InteropServices.FieldOffset(0x00B4)]
+        public fixed uint H00B4[56];
+        [global::System.Runtime.InteropServices.FieldOffset(0x0194)]
+        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> PropArray;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x24)]
@@ -19156,14 +19298,14 @@ namespace Daybreak.API.Interop.GuildWars
         public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.TradeItem> Items;
     }
 
-    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x8)]
     public unsafe struct Vec2fStruct
     {
         public float X;
         public float Y;
     }
 
-    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0xC)]
     public unsafe struct Vec3fStruct
     {
         public float X;
@@ -19272,15 +19414,9 @@ namespace Daybreak.API.Interop.GuildWars
         [global::System.Runtime.InteropServices.FieldOffset(0x060C)]
         public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<uint> UnlockedMap;
         [global::System.Runtime.InteropServices.FieldOffset(0x061C)]
-        public fixed uint H061C[2];
-        [global::System.Runtime.InteropServices.FieldOffset(0x0624)]
-        public global::Daybreak.API.Interop.GuildWars.PartyMemberMoraleInfo* PlayerMoraleInfo;
-        [global::System.Runtime.InteropServices.FieldOffset(0x0628)]
-        public uint H028C;
-        [global::System.Runtime.InteropServices.FieldOffset(0x062C)]
-        public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.PartyMoraleLink> PartyMoraleRelated;
-        [global::System.Runtime.InteropServices.FieldOffset(0x063C)]
-        public fixed uint H063C[16];
+        public global::Daybreak.API.Interop.GuildWars.THash MoraleTable; // keyed on agentid
+        [global::System.Runtime.InteropServices.FieldOffset(0x0640)]
+        public fixed uint H0640[15];
         [global::System.Runtime.InteropServices.FieldOffset(0x067C)]
         public uint PlayerNumber;
         [global::System.Runtime.InteropServices.FieldOffset(0x0680)]
@@ -19560,7 +19696,7 @@ namespace Daybreak.API.Interop.GuildWars
         public int Y;
     }
 
-    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x18)]
     public unsafe struct CreateUIComponentPacket
     {
         public uint FrameId;
@@ -19611,7 +19747,7 @@ namespace Daybreak.API.Interop.GuildWars
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-    public unsafe struct FramePositionData
+    public unsafe struct FramePosition
     {
         public uint Flags;
         public float Left;
@@ -19630,6 +19766,17 @@ namespace Daybreak.API.Interop.GuildWars
         public float ScreenBottom;
         public float ScreenRight;
         public float ScreenTop;
+    }
+
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x28)]
+    public unsafe struct FrameRelation
+    {
+        public global::Daybreak.API.Interop.GuildWars.FrameRelation* Parent;
+        public uint ChildOffsetId;
+        public global::Daybreak.API.Interop.GuildWars.FrameRelation* ParentDupe;
+        public uint FrameHashId;
+        public global::Daybreak.API.Interop.GuildWars.TList Children;
+        public global::Daybreak.API.Interop.GuildWars.TList Siblings;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
@@ -19669,7 +19816,7 @@ namespace Daybreak.API.Interop.GuildWars
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-    public unsafe struct WindowPositionData
+    public unsafe struct WindowPosition
     {
         public uint State; // & 0x1 == visible
         public global::Daybreak.API.Interop.GuildWars.Vec2fStruct P1;
@@ -19880,7 +20027,7 @@ namespace Daybreak.API.Interop.GuildWars
         public uint Flags; // Not confirmed meaningful - see comment above
     }
 
-    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
+    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1, Size = 0x14)]
     public unsafe struct kMouseAction
     {
         public uint FrameId;
@@ -20169,7 +20316,7 @@ namespace Daybreak.API.Interop.GuildWars
     public unsafe struct kUIPositionChanged
     {
         public uint WindowId;
-        public global::Daybreak.API.Interop.GuildWars.WindowPositionData* Position;
+        public global::Daybreak.API.Interop.GuildWars.WindowPosition* Position;
     }
 
     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
@@ -20292,7 +20439,6 @@ namespace Daybreak.API.Interop.GuildWars
         public nuint Value;
     }
 
-    public unsafe struct KeyCallback { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<uint> Value; }
     public unsafe struct AgentArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Value; }
     public unsafe struct AgentEffectsArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.AgentEffects> Value; }
     public unsafe struct AgentInfoArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.AgentInfo> Value; }
@@ -20324,5 +20470,4 @@ namespace Daybreak.API.Interop.GuildWars
     public unsafe struct SkillbarCastArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.SkillbarCast> Value; }
     public unsafe struct TitleArray { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.Title> Value; }
     public unsafe struct VisibleEffectList { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.VisibleEffect> Value; }
-    public unsafe struct PacketCallback { public global::Daybreak.API.Interop.GuildWars.GuildWarsArray<nint> Value; }
 }

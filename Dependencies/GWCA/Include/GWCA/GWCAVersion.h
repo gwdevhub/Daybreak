@@ -1,10 +1,10 @@
 #pragma once
 
 #define GWCA_VERSION_MAJOR 4
-#define GWCA_VERSION_MINOR 8
-#define GWCA_VERSION_PATCH 10
+#define GWCA_VERSION_MINOR 13
+#define GWCA_VERSION_PATCH 1
 #define GWCA_VERSION_BUILD 0
-#define GWCA_VERSION "4.8.10.0"
+#define GWCA_VERSION "4.13.1.0"
 
 namespace GWCA {
     constexpr int VersionMajor = GWCA_VERSION_MAJOR;
