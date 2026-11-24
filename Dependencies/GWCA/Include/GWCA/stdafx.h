@@ -57,8 +57,8 @@
 // No Win32 here: the shim keeps the few Windows typedefs in GWCA's public headers parsing, and does not ship.
 #include <Platform/Wasm/Win32Shim.h>
 #else
-#include <Windows.h>
-#include <ShellApi.h>
+#include <windows.h>
+#include <shellapi.h>
 #endif
 
 #ifdef _MSC_VER
@@ -66,6 +66,10 @@
 #endif
 
 #ifndef _MSC_VER
+#ifdef __MINGW32__
+// intrin.h declares (but never defines) _ReturnAddress(void); parse it before the macro exists so a later include can't break.
+#include <intrin.h>
+#endif
 // GCC/MinGW diagnostic-build compatibility shim (not needed on MSVC).
 #define _ReturnAddress() __builtin_return_address(0)
 #endif

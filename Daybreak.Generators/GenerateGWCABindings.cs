@@ -7,19 +7,18 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Sybil;
-using static Daybreak.Generators.MsvcDemangler;
-using TypeKind = Daybreak.Generators.MsvcDemangler.TypeKind;
+using TypeKind = Daybreak.Generators.NativeTypeKind;
 
 namespace Daybreak.Generators;
 
 /// <summary>
-/// Incremental source generator that reads PE exports from gwca.dll,
-/// demangles MSVC-decorated C++ names to recover type and namespace
-/// information, and emits a <c>GWCA</c> class with nested static classes
-/// mirroring the C++ namespace hierarchy (e.g. GW::Agents → GWCA.GW.Agents).
+/// Incremental source generator that reads GWCA's exports.json (the C export
+/// names and declarations shipped next to gwca.dll), keeps the exports the DLL
+/// actually provides, and emits a <c>GWCA</c> class with nested static classes
+/// derived from the export names (e.g. GW_Agents_GetAgentByID → GWCA.GW.Agents).
 ///
-/// Additionally scans C++ header files under Constants/ for enum and constexpr
-/// declarations, emitting matching C# enums and const fields.
+/// Additionally scans the C++ headers for enum, constexpr and struct
+/// declarations, emitting matching C# enums, const fields and structs.
 ///
 /// Types annotated with <c>[GWCAEquivalent("CppName")]</c> are resolved
 /// automatically so the generated signatures use the correct C# types.
@@ -76,18 +75,15 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
             context.AddSource($"{AttributeName}.g", source);
         });
 
-        // Provider 1: DLL export names from AdditionalFiles
+        // Provider 1: GWCA's exports.json (C export names and signatures) from AdditionalFiles
         var exportsProvider = context.AdditionalTextsProvider
             .Where(static f =>
                 Path.GetFileName(f.Path)
-                    .Equals("gwca.dll", StringComparison.OrdinalIgnoreCase))
-            .Select(static (f, _) =>
-            {
-#pragma warning disable RS1035 // AdditionalText has no binary read API; file IO is required for PE parsing
-                try { return (f.Path, Exports: PeExportReader.ReadExportNames(File.ReadAllBytes(f.Path))); }
-                catch { return (f.Path, Exports: ImmutableArray<string>.Empty); }
-#pragma warning restore RS1035
-            });
+                    .Equals("exports.json", StringComparison.OrdinalIgnoreCase)
+                && Path.GetFileName(Path.GetDirectoryName(f.Path))
+                    .Equals("GWCA", StringComparison.OrdinalIgnoreCase))
+            .Select(static (f, cancellationToken) =>
+                (f.Path, Json: f.GetText(cancellationToken)?.ToString() ?? string.Empty));
 
         // Provider 2: [GWCAEquivalent] type mappings
         var typeMappingsProvider = context.SyntaxProvider
@@ -112,7 +108,7 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         // Combine each matching DLL with all type mappings and generate
         var combined = exportsProvider.Combine(typeMappingsProvider);
         context.RegisterSourceOutput(combined, static (ctx, source) =>
-            EmitSource(source.Left.Path, source.Left.Exports, source.Right));
+            EmitSource(source.Left.Path, source.Left.Json, source.Right));
     }
 
     // ════════════════════════════════════════════════════════════════
@@ -120,12 +116,22 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
     // ════════════════════════════════════════════════════════════════
 
     private static void EmitSource(
-        string dllPath,
-        ImmutableArray<string> exports,
+        string exportsJsonPath,
+        string exportsJson,
         ImmutableArray<TypeMapping> mappings)
     {
-        if (exports.IsDefaultOrEmpty)
+        var exports = NativeSignature.ReadExports(exportsJson);
+        if (exports.Count == 0)
             return;
+
+        // The DLL is the source of truth for what can actually be called; skip
+        // exports.json entries it does not export.
+        var gwcaDir = Path.GetDirectoryName(exportsJsonPath)!;
+#pragma warning disable RS1035 // AdditionalText has no binary read API; file IO is required for PE parsing
+        var dllExports = new HashSet<string>(
+            PeExportReader.ReadExportNames(File.ReadAllBytes(Path.Combine(gwcaDir, "gwca.dll"))),
+            StringComparer.Ordinal);
+#pragma warning restore RS1035
 
         // Build type map (gwcaName → fully qualified C# name)
         var typeMap = new Dictionary<string, string>(BuiltInTypeMappings);
@@ -137,26 +143,15 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
             typeMap[m.GwcaName] = fqn;
         }
 
-        // Build set of C export names (non-mangled exports)
-        var cExports = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var name in exports)
-        {
-            if (name.Length > 0 && name[0] != '?')
-                cExports.Add(name);
-        }
-
-        // Build namespace tree from mangled exports
+        // Build namespace tree from the export names (GW_UI_Foo → GW.UI.Foo)
         var root = new NamespaceNode("GWCA");
         int totalExports = 0;
         int skippedExports = 0;
 
-        foreach (var mangledName in exports)
+        foreach (var export in exports)
         {
-            if (mangledName.Length == 0 || mangledName[0] != '?')
-                continue; // skip C exports
-
-            var info = Demangle(mangledName);
-            if (info is null)
+            var split = NativeSignature.SplitExportName(export.Name);
+            if (split is null || !dllExports.Contains(export.Name))
             {
                 skippedExports++;
                 continue;
@@ -166,7 +161,7 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
 
             // Walk the namespace parts to find/create the correct node
             var node = root;
-            foreach (var ns in info.NamespaceParts)
+            foreach (var ns in split.Value.NamespaceParts)
             {
                 if (!node.Children.TryGetValue(ns, out var child))
                 {
@@ -177,13 +172,12 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
                 node = child;
             }
 
-            node.Functions.Add(new ExportEntry(mangledName, info));
+            node.Functions.Add(new ExportEntry(export, split.Value.FunctionName));
         }
 
         // ── Parse C++ headers for enums, constexpr, and structs ───
         var headerRoot = new ConstantsNode("GWCA");
-        var dllDir = Path.GetDirectoryName(dllPath)!;
-        var gwcaIncludeDir = Path.Combine(dllDir, "Include", "GWCA");
+        var gwcaIncludeDir = Path.Combine(gwcaDir, "Include", "GWCA");
 #pragma warning disable RS1035
         if (Directory.Exists(gwcaIncludeDir))
         {
@@ -206,6 +200,10 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
             // Also scan root GWCA headers
             foreach (var headerFile in Directory.GetFiles(gwcaIncludeDir, "*.h"))
             {
+                // Runtime.h/RuntimeLayout.h implement GWCA's C++ loader, not game data.
+                if (Path.GetFileName(headerFile).StartsWith("Runtime", StringComparison.Ordinal))
+                    continue;
+
                 try
                 {
                     var headerText = File.ReadAllText(headerFile);
@@ -237,7 +235,13 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
 
         // Emit
         var sb = new StringBuilder(65536);
-        EmitHeader(sb, totalExports, skippedExports);
+        EmitHeader(
+            sb,
+            totalExports,
+            skippedExports,
+            NativeSignature.ReadValue(exportsJson, "abi"),
+            NativeSignature.ReadValue(exportsJson, "schema"),
+            NativeSignature.ReadValue(exportsJson, "validation_export"));
 
         // Add diagnostic comment about parsed structs
         sb.AppendLine("    // ═══════════════════════════════════════════════════");
@@ -253,7 +257,7 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         // Emit the tree recursively (starting from GWCA's children)
         foreach (var child in root.Children.Values.OrderBy(c => c.Name, StringComparer.Ordinal))
         {
-            EmitNamespaceNode(sb, child, typeMap, cExports, 4);
+            EmitNamespaceNode(sb, child, typeMap, 4);
         }
 
         // Emit constants from headers (merge into the same GWCA class)
@@ -306,8 +310,8 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         sb.AppendLine("}");
 
         // Write to Daybreak.API/Interop/GWCA.cs so LibraryImport generator can process it
-        // DLL is at Dependencies/GWCA/gwca.dll, so go up 2 levels to repo root
-        var repoRoot = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(dllPath)));
+        // exports.json is at Dependencies/GWCA/exports.json, so go up 2 levels to repo root
+        var repoRoot = Path.GetDirectoryName(Path.GetDirectoryName(gwcaDir));
         var outputPath = Path.Combine(repoRoot!, "Daybreak.API", "Interop", "GWCA.cs");
 #pragma warning disable RS1035 // File IO required to emit source that LibraryImport generator can process
         File.WriteAllText(outputPath, sb.ToString());
@@ -316,7 +320,13 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
 
     // ── File header ────────────────────────────────────────────────
 
-    private static void EmitHeader(StringBuilder sb, int exportCount, int skippedCount)
+    private static void EmitHeader(
+        StringBuilder sb,
+        int exportCount,
+        int skippedCount,
+        string? abiVersion,
+        string? schema,
+        string? validationExport)
     {
         sb.AppendLine("// <auto-generated>");
         sb.AppendLine("// This file was generated by the GenerateGWCABindings source generator.");
@@ -333,13 +343,47 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         sb.AppendLine("{");
         sb.AppendLine();
         sb.AppendLine("/// <summary>");
-        sb.AppendLine($"/// P/Invoke bindings for {exportCount} C++ exports from gwca.dll ({skippedCount} skipped).");
-        sb.AppendLine("/// Nested classes mirror the C++ namespace hierarchy (e.g. GW::Agents → GWCA.GW.Agents).");
+        sb.AppendLine($"/// P/Invoke bindings for {exportCount} C exports from gwca.dll ({skippedCount} skipped).");
+        sb.AppendLine("/// Nested classes mirror the export names (e.g. GW_Agents_GetAgentByID → GWCA.GW.Agents.GetAgentByID).");
         sb.AppendLine("/// Types annotated with [GWCAEquivalent] are used in signatures where available.");
         sb.AppendLine("/// </summary>");
         sb.AppendLine("public static unsafe partial class GWCA");
         sb.AppendLine("{");
         sb.AppendLine("    private const string DllName = \"gwca.dll\";");
+
+        if (abiVersion is null || schema is null || validationExport is null)
+            return;
+
+        // Mirrors GW::Runtime::Request/Status (GWCA/Runtime.h). A gwca.dll built for a
+        // different ABI or export schema rejects the request instead of misbehaving later.
+        sb.AppendLine();
+        sb.AppendLine($"    public const uint AbiVersion = {abiVersion.TrimEnd('u', 'U')}u;");
+        sb.AppendLine($"    public const ulong ExportSchema = 0x{schema}UL;");
+        sb.AppendLine();
+        sb.AppendLine("    [StructLayout(LayoutKind.Explicit, Size = 24)]");
+        sb.AppendLine("    public struct ValidateApiRequest");
+        sb.AppendLine("    {");
+        sb.AppendLine("        [FieldOffset(0)] public uint Size;");
+        sb.AppendLine("        [FieldOffset(4)] public uint Abi;");
+        sb.AppendLine("        [FieldOffset(8)] public ulong Schema;");
+        sb.AppendLine("        [FieldOffset(16)] public uint PointerSize;");
+        sb.AppendLine("        [FieldOffset(20)] public uint Reserved;");
+        sb.AppendLine("    }");
+        sb.AppendLine();
+        sb.AppendLine("    public enum ValidateApiStatus : uint");
+        sb.AppendLine("    {");
+        sb.AppendLine("        Success,");
+        sb.AppendLine("        InvalidArgument,");
+        sb.AppendLine("        IncompatibleApi,");
+        sb.AppendLine("        IncompatibleArchitecture,");
+        sb.AppendLine("        MissingExport,");
+        sb.AppendLine("    }");
+        sb.AppendLine();
+        sb.AppendLine("    /// <summary>");
+        sb.AppendLine("    /// <c>ValidateApiStatus (__cdecl*)(const ValidateApiRequest*)</c>. Resolve it per module handle:");
+        sb.AppendLine("    /// a [LibraryImport] would bind every gwca.dll import to whichever copy it resolved first.");
+        sb.AppendLine("    /// </summary>");
+        sb.AppendLine($"    public const string ValidateApiExport = \"{validationExport}\";");
     }
 
     // ── Recursive namespace/class emission ─────────────────────────
@@ -348,7 +392,6 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         StringBuilder sb,
         NamespaceNode node,
         Dictionary<string, string> typeMap,
-        HashSet<string> cExports,
         int indent)
     {
         var pad = new string(' ', indent);
@@ -357,18 +400,15 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         sb.AppendLine($"{pad}public static partial class {SanitizeIdentifier(node.Name)}");
         sb.AppendLine($"{pad}{{");
 
-        // Emit functions in this namespace, disambiguating overloads that
-        // would produce identical C# signatures
-        var signatureCounts = new Dictionary<string, int>(StringComparer.Ordinal);
-        foreach (var entry in node.Functions.OrderBy(e => e.Info.FunctionName, StringComparer.Ordinal))
+        foreach (var entry in node.Functions.OrderBy(e => e.FunctionName, StringComparer.Ordinal))
         {
-            EmitFunction(sb, entry, typeMap, cExports, indent + 4, signatureCounts);
+            EmitFunction(sb, entry, typeMap, indent + 4);
         }
 
         // Emit child namespaces
         foreach (var child in node.Children.Values.OrderBy(c => c.Name, StringComparer.Ordinal))
         {
-            EmitNamespaceNode(sb, child, typeMap, cExports, indent + 4);
+            EmitNamespaceNode(sb, child, typeMap, indent + 4);
         }
 
         sb.AppendLine($"{pad}}}");
@@ -380,116 +420,64 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         StringBuilder sb,
         ExportEntry entry,
         Dictionary<string, string> typeMap,
-        HashSet<string> cExports,
-        int indent,
-        Dictionary<string, int> signatureCounts)
+        int indent)
     {
         var pad = new string(' ', indent);
-        var info = entry.Info;
+        sb.AppendLine();
 
-        // VarArgs — cannot be expressed with DllImport
+        var info = NativeSignature.Parse(entry.Export, typeMap);
+        if (info is null)
+        {
+            sb.AppendLine($"{pad}// {entry.Export.Name} — unparsed signature: {entry.Export.Signature}");
+            return;
+        }
+
+        // VarArgs (va_list) — cannot be expressed with LibraryImport
         if (info.IsVarArgs)
         {
-            sb.AppendLine();
-            sb.AppendLine($"{pad}// {info.QualifiedCppName} — varargs, requires manual interop");
+            sb.AppendLine($"{pad}// {entry.Export.Name} — va_list, requires manual interop");
             return;
         }
 
         var csRet = ResolveCsType(info.ReturnType, typeMap);
         var retComment = TypeComment(info.ReturnType, typeMap);
 
-        // Check for unmapped struct types
+        // Functions touching structs that have no C# equivalent are emitted commented out
         bool hasUnmapped = HasUnmappedStruct(info.ReturnType, typeMap)
             || info.ParameterTypes.Any(pt => HasUnmappedStruct(pt, typeMap));
 
-        // Check if this function has std::function params and a matching C export exists
-        bool hasStdFunction = HasStdFunction(info.ReturnType) || info.ParameterTypes.Any(HasStdFunction);
-        bool useCExport = hasStdFunction && cExports.Contains(info.FunctionName);
-        if (useCExport)
-        {
-            // Re-evaluate hasUnmapped ignoring std::function (which becomes nint in C export)
-            hasUnmapped = HasUnmappedStructIgnoringStdFunction(info.ReturnType, typeMap)
-                || info.ParameterTypes.Any(pt => HasUnmappedStructIgnoringStdFunction(pt, typeMap));
-        }
-
-        // Build parameter list
         var parms = new List<string>();
         var paramComments = new List<string>();
-        int pIdx = 0;
-
-        if (info.IsMember)
+        var usedNames = new HashSet<string>(StringComparer.Ordinal);
+        for (var i = 0; i < info.ParameterTypes.Length; i++)
         {
-            parms.Add("nint self");
-            pIdx++;
-        }
-
-        var usedNames = new HashSet<string>();
-        foreach (var pt in info.ParameterTypes)
-        {
-            // When using C export, std::function becomes a raw function pointer (nint)
-            var csType = (useCExport && IsStdFunction(pt))
-                ? "nint"
-                : ResolveCsType(pt, typeMap);
-            var name = MakeParamName(pt, typeMap, pIdx,
-                info.ParameterTypes.Length + (info.IsMember ? 1 : 0));
+            var pt = info.ParameterTypes[i];
+            var csType = ResolveCsType(pt, typeMap);
+            var name = SanitizeIdentifier(CamelCase(ToPascalCase(info.ParameterNames[i])));
             while (!usedNames.Add(name))
-                name += "_" + pIdx;
+                name += "_" + i;
 
-            var comment = (useCExport && IsStdFunction(pt))
-                ? null  // Don't add "unmapped" comment for std::function when using C export
-                : TypeComment(pt, typeMap);
+            var comment = TypeComment(pt, typeMap);
             if (comment is not null)
                 paramComments.Add(name + ": " + comment);
 
-            if (csType == "bool")
-                parms.Add("[MarshalAs(UnmanagedType.U1)] bool " + name);
-            else
-                parms.Add(csType + " " + name);
-            pIdx++;
+            parms.Add(csType == "bool"
+                ? "[MarshalAs(UnmanagedType.U1)] bool " + name
+                : csType + " " + name);
         }
 
-        var paramStr = string.Join(", ", parms);
-
-        // Comment lines
-        sb.AppendLine();
-        var commentParts = new List<string> { info.QualifiedCppName };
-        if (useCExport)
-            commentParts.Add("via C export");
+        var commentParts = new List<string> { entry.Export.Signature };
         if (retComment is not null)
             commentParts.Add("returns " + retComment);
         commentParts.AddRange(paramComments);
 
-        // Disambiguate overloads that collapse to the same C# signature
-        var sigKey = info.FunctionName + "(" + string.Join(",", parms.Select(p => p.Split(' ').First())) + ")";
-        if (!signatureCounts.TryGetValue(sigKey, out var count))
-            count = 0;
-        signatureCounts[sigKey] = count + 1;
-        var methodName = count == 0
-            ? SanitizeIdentifier(info.FunctionName)
-            : SanitizeIdentifier(info.FunctionName) + "_" + count;
-
-        // Use C export name when available for std::function params
-        var entryPoint = useCExport ? info.FunctionName : entry.MangledName;
-
-        // Build LibraryImport attribute and calling convention. GWCA's free
-        // functions are __cdecl (the 'YA' in the mangled name) and members are
-        // __thiscall ('QAE'/'AAE'). The convention must be explicit on x86
-        // because stack cleanup differs from the Winapi/__stdcall default.
-        var conventionAttr = info.IsMember
-            ? $"[UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]"
-            : $"[UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]";
-
-        // Bool return type needs explicit marshalling
-        var retAttr = csRet == "bool" ? "[return: MarshalAs(UnmanagedType.U1)]" : "";
-
         var prefix = hasUnmapped ? "// " : "";
         sb.AppendLine($"{pad}// {string.Join(" | ", commentParts)}");
-        sb.AppendLine($"{pad}{prefix}[LibraryImport(DllName, EntryPoint = \"{entryPoint}\")]");
-        if (conventionAttr.Length > 0)
-            sb.AppendLine($"{pad}{prefix}{conventionAttr}");
-        if (retAttr.Length > 0)
-            sb.AppendLine($"{pad}{prefix}{retAttr}");
-        sb.AppendLine($"{pad}{prefix}public static partial {csRet} {methodName}({paramStr});");
+        sb.AppendLine($"{pad}{prefix}[LibraryImport(DllName, EntryPoint = \"{entry.Export.Name}\")]");
+        sb.AppendLine($"{pad}{prefix}[UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]");
+        if (csRet == "bool")
+            sb.AppendLine($"{pad}{prefix}[return: MarshalAs(UnmanagedType.U1)]");
+        sb.AppendLine($"{pad}{prefix}public static partial {csRet} {SanitizeIdentifier(entry.FunctionName)}({string.Join(", ", parms)});");
     }
 
     // ════════════════════════════════════════════════════════════════
@@ -792,9 +780,8 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
             if (Regex.IsMatch(cppType, @"\bT\b") && !cppType.Contains("Array"))
                 return (false, $"template param T in field {field.Name}");
             // Skip structs with complex template containers we can't represent
-            // Note: TLink<T> is handled separately in MapCppFieldTypeToCs (8-byte linked list node)
-            if (cppType.Contains("TList<") ||
-                cppType.Contains("PrioQ<") || cppType.Contains("PrioQLink<") ||
+            // Note: TLink<T>, TList<T>, THashLink<T> and THash<T> are handled in MapCppFieldTypeToCs
+            if (cppType.Contains("PrioQ<") || cppType.Contains("PrioQLink<") ||
                 cppType.Contains("BaseArray<"))
                 return (false, $"complex template in field {field.Name}: {cppType}");
             // Skip if field type contains unresolved typedef names
@@ -980,6 +967,37 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
             sb.AppendLine($"{pad}{{");
             sb.AppendLine($"{pad}    public nint PrevLink;");
             sb.AppendLine($"{pad}    public nint NextNode;");
+            sb.AppendLine($"{pad}}}");
+            sb.AppendLine();
+        }
+
+        // TList<T> - intrusive list head (List.h): link offset within T + sentinel TLink.
+        if (emittedNames.Add("TList"))
+        {
+            sb.AppendLine($"{pad}/// <summary>");
+            sb.AppendLine($"{pad}/// TList&lt;T&gt; - intrusive list head (12 bytes).");
+            sb.AppendLine($"{pad}/// </summary>");
+            sb.AppendLine($"{pad}[global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]");
+            sb.AppendLine($"{pad}public struct TList");
+            sb.AppendLine($"{pad}{{");
+            sb.AppendLine($"{pad}    public nuint Offset;");
+            sb.AppendLine($"{pad}    public TLink Link;");
+            sb.AppendLine($"{pad}}}");
+            sb.AppendLine();
+        }
+
+        // THashLink<T> - link embedded in hash table elements (Hash.h): uint hash + two TLinks.
+        if (emittedNames.Add("THashLink"))
+        {
+            sb.AppendLine($"{pad}/// <summary>");
+            sb.AppendLine($"{pad}/// THashLink&lt;T&gt; - hash table element link (20 bytes).");
+            sb.AppendLine($"{pad}/// </summary>");
+            sb.AppendLine($"{pad}[global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]");
+            sb.AppendLine($"{pad}public struct THashLink");
+            sb.AppendLine($"{pad}{{");
+            sb.AppendLine($"{pad}    public uint Hash;");
+            sb.AppendLine($"{pad}    public TLink LinkToFull;");
+            sb.AppendLine($"{pad}    public TLink LinkToSlot;");
             sb.AppendLine($"{pad}}}");
             sb.AppendLine();
         }
@@ -1276,6 +1294,18 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
             return "global::Daybreak.API.Interop.GuildWars.TLink";
         }
 
+        // Handle TList<T> - intrusive list head, always 0x0C bytes (List.h).
+        if (cppType.StartsWith("TList<"))
+        {
+            return "global::Daybreak.API.Interop.GuildWars.TList";
+        }
+
+        // Handle THashLink<T> - hash table link embedded in elements, always 0x14 bytes.
+        if (cppType.StartsWith("THashLink<"))
+        {
+            return "global::Daybreak.API.Interop.GuildWars.THashLink";
+        }
+
         // Handle THash<T> - hash table, always 0x24 bytes; opaque to managed code.
         if (cppType.StartsWith("THash<"))
         {
@@ -1501,7 +1531,7 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
     /// Returns true if the type references a struct that is not in the typeMap.
     /// Enums are excluded — they fall back to their underlying integer type.
     /// </summary>
-    private static bool HasUnmappedStruct(DemangledType dt, Dictionary<string, string> typeMap)
+    private static bool HasUnmappedStruct(NativeType dt, Dictionary<string, string> typeMap)
     {
         if (dt.TemplateArg is not null && HasUnmappedStruct(dt.TemplateArg, typeMap))
             return true;
@@ -1515,7 +1545,7 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         if (dt.Kind is TypeKind.Pointer)
         {
             if (dt.Name is "void" or "byte" or "ushort" or "short" or "int" or "uint"
-                or "long" or "ulong" or "float" or "double" or "bool" or "funcptr")
+                or "long" or "ulong" or "float" or "double" or "bool" or "funcptr" or "nint" or "nuint" or "sbyte")
                 return false;
             if (dt.Name is "Array") return false;
             return !typeMap.ContainsKey(dt.Name);
@@ -1525,66 +1555,10 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
     }
 
     /// <summary>
-    /// Returns true if the type is a std::function (struct named "function").
-    /// </summary>
-    private static bool IsStdFunction(DemangledType dt)
-    {
-        // std::function is demangled as a Struct with name "function"
-        if (dt.Kind is TypeKind.Struct && dt.Name == "function")
-            return true;
-        // Also check pointer to std::function (const ref)
-        if (dt.Kind is TypeKind.Pointer && dt.Name == "function")
-            return true;
-        return false;
-    }
-
-    /// <summary>
-    /// Returns true if any parameter or return type involves std::function.
-    /// </summary>
-    private static bool HasStdFunction(DemangledType dt)
-    {
-        if (IsStdFunction(dt))
-            return true;
-        if (dt.TemplateArg is not null && HasStdFunction(dt.TemplateArg))
-            return true;
-        return false;
-    }
-
-    /// <summary>
-    /// Like HasUnmappedStruct but ignores std::function types (which will be converted to nint via C export).
-    /// </summary>
-    private static bool HasUnmappedStructIgnoringStdFunction(DemangledType dt, Dictionary<string, string> typeMap)
-    {
-        // Skip std::function types entirely
-        if (IsStdFunction(dt))
-            return false;
-
-        if (dt.TemplateArg is not null && HasUnmappedStructIgnoringStdFunction(dt.TemplateArg, typeMap))
-            return true;
-
-        if (dt.Kind is TypeKind.Struct)
-        {
-            if (dt.Name is "Array") return false;
-            return !typeMap.ContainsKey(dt.Name);
-        }
-
-        if (dt.Kind is TypeKind.Pointer)
-        {
-            if (dt.Name is "void" or "byte" or "ushort" or "short" or "int" or "uint"
-                or "long" or "ulong" or "float" or "double" or "bool" or "funcptr")
-                return false;
-            if (dt.Name is "Array") return false;
-            return !typeMap.ContainsKey(dt.Name);
-        }
-
-        return false;
-    }
-
-    /// <summary>
-    /// Resolves a <see cref="DemangledType"/> to a C# type string, using the
+    /// Resolves a <see cref="NativeType"/> to a C# type string, using the
     /// GWCAEquivalent type map for struct/enum types.
     /// </summary>
-    private static string ResolveCsType(DemangledType dt, Dictionary<string, string> typeMap)
+    private static string ResolveCsType(NativeType dt, Dictionary<string, string> typeMap)
     {
         switch (dt.Kind)
         {
@@ -1652,7 +1626,7 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         }
     }
 
-    private static string ResolveTemplateArgType(DemangledType arg, Dictionary<string, string> typeMap)
+    private static string ResolveTemplateArgType(NativeType arg, Dictionary<string, string> typeMap)
     {
         return arg.Kind switch
         {
@@ -1699,7 +1673,7 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
     /// Resolves a pointer type used as a template argument (e.g., Agent* in Array&lt;Agent*&gt;).
     /// In unsafe C#, pointer types can be used as generic type arguments for unmanaged structs.
     /// </summary>
-    private static string ResolvePointerTemplateArg(DemangledType arg, Dictionary<string, string> typeMap)
+    private static string ResolvePointerTemplateArg(NativeType arg, Dictionary<string, string> typeMap)
     {
         // arg.Name is the inner type (e.g., "Agent" for Agent*)
         var innerName = arg.Name;
@@ -1760,13 +1734,13 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
     /// <summary>
     /// Returns a comment annotation for unmapped struct/enum types, or null.
     /// </summary>
-    private static string? TypeComment(DemangledType dt, Dictionary<string, string> typeMap)
+    private static string? TypeComment(NativeType dt, Dictionary<string, string> typeMap)
     {
         switch (dt.Kind)
         {
             case TypeKind.Pointer:
                 if (dt.Name is "void" or "byte" or "ushort" or "short" or "int" or "uint"
-                    or "long" or "ulong" or "float" or "double" or "bool")
+                    or "long" or "ulong" or "float" or "double" or "bool" or "nint" or "nuint" or "sbyte")
                     return null;
                 if (typeMap.ContainsKey(dt.Name))
                     return null;
@@ -1790,45 +1764,6 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
     // ════════════════════════════════════════════════════════════════
     // Parameter naming
     // ════════════════════════════════════════════════════════════════
-
-    private static string MakeParamName(
-        DemangledType dt, Dictionary<string, string> typeMap, int idx, int total)
-    {
-        string baseName;
-        if (dt.Kind is TypeKind.Pointer)
-        {
-            baseName = dt.Name is "void" or "byte" or "ushort" or "short" or "int" or "uint"
-                or "long" or "ulong" or "float" or "double" or "bool"
-                ? "ptr"
-                : CamelCase(ShortName(typeMap.TryGetValue(dt.Name, out var mapped) ? mapped : dt.Name));
-        }
-        else if (dt.Kind is TypeKind.FuncPtr)
-        {
-            baseName = "callback";
-        }
-        else
-        {
-            var csType = ResolveCsType(dt, typeMap);
-            var shortType = ShortName(csType);
-            baseName = shortType switch
-            {
-                "uint" => "value",
-                "int" => "value",
-                "nint" => "ptr",
-                "bool" => "flag",
-                "float" => "value",
-                "double" => "value",
-                "short" => "value",
-                "ushort" => "value",
-                "byte" => "value",
-                "long" => "value",
-                "ulong" => "value",
-                _ => CamelCase(shortType),
-            };
-        }
-
-        return total > 1 ? baseName + (idx + 1) : baseName;
-    }
 
     private static string CamelCase(string name)
     {
@@ -1876,11 +1811,11 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         public List<ExportEntry> Functions { get; } = [];
     }
 
-    /// <summary>A single mangled export with its demangled info.</summary>
-    internal sealed class ExportEntry(string mangledName, DemangledFunction info)
+    /// <summary>A single C export and the C# method name it is bound to.</summary>
+    internal sealed class ExportEntry(NativeExport export, string functionName)
     {
-        public string MangledName { get; } = mangledName;
-        public DemangledFunction Info { get; } = info;
+        public NativeExport Export { get; } = export;
+        public string FunctionName { get; } = functionName;
     }
 
     // ════════════════════════════════════════════════════════════════

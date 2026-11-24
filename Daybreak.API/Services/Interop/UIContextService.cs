@@ -51,7 +51,7 @@ public sealed class UIContextService(ILogger<UIContextService> logger)
             return false;
         }
 
-        return GWCA.GW.UI.SendFrameUIMessage(frame, (GWCA.GW.UI.UIMessage)messageId, arg1, (nint)arg2);
+        return GWCA.GW.UI.SendFrameUIMessage(frame, (GWCA.GW.UI.UIMessage)messageId, arg1, arg2);
     }
 
     public unsafe bool SetFrameDisabled(WrappedPointer<Frame> frame, bool disabled) => GWCA.GW.UI.SetFrameDisabled(frame, disabled);
@@ -92,12 +92,16 @@ public sealed class UIContextService(ILogger<UIContextService> logger)
         return GWCA.GW.UI.ButtonClick(frame);
     }
 
-    public unsafe void SendMessage(UIMessage message, nuint wParam, nuint lParam) => GWCA.GW.UI.SendUIMessage((GWCA.GW.UI.UIMessage)message, (void*)wParam, (nint)lParam);
+    public unsafe void SendMessage(UIMessage message, nuint wParam, nuint lParam) => GWCA.GW.UI.SendUIMessage((GWCA.GW.UI.UIMessage)message, (void*)wParam, (void*)lParam);
 
     public unsafe Task<string> AsyncDecodeStringAsync(ushort* encodedString, GWCA.GW.Constants.Language language = GWCA.GW.Constants.Language.Unknown, CancellationToken cancellationToken = default)
     {
         var taskCompletionSource = new TaskCompletionSource<string>();
         cancellationToken.Register(() => taskCompletionSource.TrySetCanceled(cancellationToken));
+
+        // Native code calls back through this exact instance, so it is both the one kept
+        // alive and the one removed once the callback has run.
+        AsyncDecodeStrCallback? callbackDelegate = null;
         void callback(void* param, ushort* decodedString)
         {
             try
@@ -121,16 +125,16 @@ public sealed class UIContextService(ILogger<UIContextService> logger)
             }
             finally
             {
-                this.prevent_GC_callbacks.TryRemove(callback, out _);
+                this.prevent_GC_callbacks.TryRemove(callbackDelegate!, out _);
             }
         }
 
-        // CRITICAL: Keep delegate alive until callback executes
-        this.prevent_GC_callbacks[callback] = true;
+        callbackDelegate = callback;
+        this.prevent_GC_callbacks[callbackDelegate] = true;
 
-        var funcPtr = Marshal.GetFunctionPointerForDelegate(callback);
+        var funcPtr = Marshal.GetFunctionPointerForDelegate(callbackDelegate);
         // GWCA's AsyncDecodeStr handles language switching internally (sets language, decodes, restores)
-        GWCA.GW.UI.AsyncDecodeStr(encodedString, funcPtr, 0, language);
+        GWCA.GW.UI.AsyncDecodeStrWithCallback(encodedString, funcPtr, null, language);
 
         return taskCompletionSource.Task;
     }
