@@ -241,6 +241,11 @@ html, body {
         fill: var(--foreground-on-accent-rest-large) !important;
     }
 
+    /* Keep the hover target on the button so re-rendered icons don't cancel its tooltip. */
+    .title-bar-btn > * {
+        pointer-events: none;
+    }
+
 .title-bar-additional-btns-left {
     position: absolute;
     left: 50px;
