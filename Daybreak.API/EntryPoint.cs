@@ -140,7 +140,11 @@ public class EntryPoint
         try
         {
             scopedLogger.LogDebug("Initializing GWCA");
-            PreloadNativeDependencies(scopedLogger);
+            if (!PreloadNativeDependencies(scopedLogger))
+            {
+                throw new InvalidOperationException("No compatible gwca.dll could be loaded");
+            }
+
             var result = GWCA.GW.Initialize();
             scopedLogger.LogDebug($"GWCA.GW.Initialize() returned: {result}");
             await app.RunAsync();
@@ -185,7 +189,7 @@ public class EntryPoint
         return true;
     }
 
-    private static void PreloadNativeDependencies(ScopedLogger<EntryPoint> logger)
+    private static bool PreloadNativeDependencies(ScopedLogger<EntryPoint> logger)
     {
         // First, check if gwca.dll is already loaded in the process (e.g. by GWToolbox).
         // If so, reuse it via a ref-count bump on the existing path rather than loading
@@ -198,9 +202,18 @@ public class EntryPoint
             if (module.ModuleName?.Equals("gwca.dll", StringComparison.OrdinalIgnoreCase) is true)
             {
                 var handle = NativeLibrary.Load(module.FileName);
-                RegisterGwcaResolver(handle, module.FileName, logger);
-                logger.LogDebug($"Reused already-loaded gwca.dll from {module.FileName}");
-                return;
+                if (IsCompatibleGwca(handle, module.FileName, logger))
+                {
+                    RegisterGwcaResolver(handle, module.FileName, logger);
+                    logger.LogDebug($"Reused already-loaded gwca.dll from {module.FileName}");
+                    return true;
+                }
+
+                // A different GWCA release (e.g. bundled with another mod) would bind to the
+                // wrong exports or struct layouts, so fall back to the copy shipped with the API.
+                logger.LogWarning($"Already-loaded gwca.dll from {module.FileName} is not compatible. Loading the bundled copy instead");
+                NativeLibrary.Free(handle);
+                continue;
             }
 
             if (daybreakApiDir is null &&
@@ -213,20 +226,55 @@ public class EntryPoint
         if (daybreakApiDir is null)
         {
             logger.LogError("Could not locate Daybreak.API module directory to preload gwca.dll");
-            return;
+            return false;
         }
 
         var gwcaPath = Path.Combine(daybreakApiDir, "gwca.dll");
-        if (File.Exists(gwcaPath))
-        {
-            var handle = NativeLibrary.Load(gwcaPath);
-            RegisterGwcaResolver(handle, gwcaPath, logger);
-            logger.LogDebug($"Preloaded gwca.dll from {gwcaPath}");
-        }
-        else
+        if (!File.Exists(gwcaPath))
         {
             logger.LogError($"gwca.dll not found at {gwcaPath}");
+            return false;
         }
+
+        var bundledHandle = NativeLibrary.Load(gwcaPath);
+        if (!IsCompatibleGwca(bundledHandle, gwcaPath, logger))
+        {
+            return false;
+        }
+
+        RegisterGwcaResolver(bundledHandle, gwcaPath, logger);
+
+        logger.LogDebug($"Preloaded gwca.dll from {gwcaPath}");
+        return true;
+    }
+
+    /// <summary>
+    /// Validates a gwca.dll through its own export rather than a [LibraryImport]: the runtime
+    /// caches the first handle it resolves for "gwca.dll", so no import may bind before the
+    /// compatible copy has been chosen.
+    /// </summary>
+    private static unsafe bool IsCompatibleGwca(IntPtr handle, string path, ScopedLogger<EntryPoint> logger)
+    {
+        var request = new GWCA.ValidateApiRequest
+        {
+            Size = (uint)sizeof(GWCA.ValidateApiRequest),
+            Abi = GWCA.AbiVersion,
+            Schema = GWCA.ExportSchema,
+            PointerSize = (uint)IntPtr.Size,
+        };
+
+        // Releases before the C ABI do not export the validation function.
+        var status = NativeLibrary.TryGetExport(handle, GWCA.ValidateApiExport, out var validateApi)
+            ? ((delegate* unmanaged[Cdecl]<GWCA.ValidateApiRequest*, GWCA.ValidateApiStatus>)validateApi)(&request)
+            : GWCA.ValidateApiStatus.MissingExport;
+
+        if (status is not GWCA.ValidateApiStatus.Success)
+        {
+            logger.LogError($"gwca.dll at {path} failed validation with {status}. Expected ABI 0x{GWCA.AbiVersion:X8}");
+            return false;
+        }
+
+        return true;
     }
 
     private static void RegisterGwcaResolver(IntPtr handle, string path, ScopedLogger<EntryPoint> logger)

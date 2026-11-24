@@ -64,7 +64,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>gwca.dll</Link>
     </None>
-    <AdditionalFiles Include="..\Dependencies\GWCA\gwca.dll" />
+    <AdditionalFiles Include="..\Dependencies\GWCA\exports.json" />
   </ItemGroup>
 
   <ItemGroup>

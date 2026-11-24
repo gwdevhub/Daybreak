@@ -10,7 +10,7 @@ public sealed class GameThreadService
 {
     [SuppressUnmanagedCodeSecurity]
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void GameThreadCallback();
+    private delegate void GameThreadCallback(nint context);
 
     // Prevent GC of delegates passed to native code
     private readonly ConcurrentDictionary<GameThreadCallback, bool> prevent_GC_callbacks = [];
@@ -21,7 +21,7 @@ public sealed class GameThreadService
         var item = new WorkItem(action, taskCompletionSource, cancellationToken);
 
         GameThreadCallback callback = null!;
-        callback = () =>
+        callback = context =>
         {
             try
             {
@@ -47,7 +47,10 @@ public sealed class GameThreadService
         this.prevent_GC_callbacks[callback] = true;
 
         var funcPtr = Marshal.GetFunctionPointerForDelegate(callback);
-        GWCA.GW.GameThread.Enqueue(funcPtr, false);
+        unsafe
+        {
+            GWCA.GW.GameThread.Enqueue(funcPtr, null, 0);
+        }
 
         return taskCompletionSource.Task;
     }
@@ -58,7 +61,7 @@ public sealed class GameThreadService
         var item = new WorkItem<T>(action, taskCompletionSource, cancellationToken);
 
         GameThreadCallback callback = null!;
-        callback = () =>
+        callback = context =>
         {
             try
             {
@@ -85,7 +88,10 @@ public sealed class GameThreadService
         this.prevent_GC_callbacks[callback] = true;
 
         var funcPtr = Marshal.GetFunctionPointerForDelegate(callback);
-        GWCA.GW.GameThread.Enqueue(funcPtr, false);
+        unsafe
+        {
+            GWCA.GW.GameThread.Enqueue(funcPtr, null, 0);
+        }
 
         return taskCompletionSource.Task;
     }
