@@ -4,8 +4,8 @@
         <div class="option-description">@this.Description</div>
     </div>
     <div class="option-control">
-        <FluentNumberField @bind-Value="this.Value" 
-                          @onchange="OnValueChanged" 
+        <FluentNumberInput TValue="double" Value="@this.Value"
+                          ValueChanged="@this.OnValueChanged"
                           Placeholder="Enter a number" />
     </div>
 </div>
@@ -29,28 +29,25 @@
         return value;
     }
 
-    private void OnValueChanged(ChangeEventArgs e)
+    private void OnValueChanged(double newValue)
     {
-        if (double.TryParse(e.Value?.ToString(), out var newValue))
+        this.Value = newValue;
+
+        // Convert back to the original property type
+        var convertedValue = this.Property.Type switch
         {
-            this.Value = newValue;
+            Type t when t == typeof(int) => (object)(int)newValue,
+            Type t when t == typeof(uint) => (object)(uint)newValue,
+            Type t when t == typeof(long) => (object)(long)newValue,
+            Type t when t == typeof(ulong) => (object)(ulong)newValue,
+            Type t when t == typeof(short) => (object)(short)newValue,
+            Type t when t == typeof(ushort) => (object)(ushort)newValue,
+            Type t when t == typeof(float) => (object)(float)newValue,
+            Type t when t == typeof(double) => newValue,
+            _ => newValue
+        };
 
-            // Convert back to the original property type
-            var convertedValue = this.Property.Type switch
-            {
-                Type t when t == typeof(int) => (int)newValue,
-                Type t when t == typeof(uint) => (uint)newValue,
-                Type t when t == typeof(long) => (long)newValue,
-                Type t when t == typeof(ulong) => (ulong)newValue,
-                Type t when t == typeof(short) => (short)newValue,
-                Type t when t == typeof(ushort) => (ushort)newValue,
-                Type t when t == typeof(float) => (float)newValue,
-                Type t when t == typeof(double) => newValue,
-                _ => newValue
-            };
-
-            this.Property.Setter(this.Instance, convertedValue);
-            this.NotifyValueChanged();
-        }
+        this.Property.Setter(this.Instance, convertedValue);
+        this.NotifyValueChanged();
     }
 }

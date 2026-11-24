@@ -28,9 +28,9 @@
                         <div class="alert-toggle" @onclick:stopPropagation="true">
                             <FluentLabel class="label">@(alert.TradeAlert.Enabled ? "Enabled" : "Disabled")</FluentLabel>
                             <FluentSwitch Value="@alert.TradeAlert.Enabled"
-                                          @onchange="@(() => this.ViewModel.ToggleAlert(alert))" />
+                                          ValueChanged="@(_ => this.ViewModel.ToggleAlert(alert))" />
                         </div>
-                        <FluentButton Appearance="Appearance.Stealth"
+                        <FluentButton Appearance="ButtonAppearance.Subtle"
                                       Title="Delete alert"
                                       OnClick="@(() => this.ViewModel.DeleteAlert(alert))">
                             <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Delete())" />

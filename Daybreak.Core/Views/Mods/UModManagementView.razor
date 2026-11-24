@@ -16,7 +16,7 @@
                     <div class="mod-row-left">
                         @if (i > 0)
                         {
-                            <FluentButton Appearance="Appearance.Stealth"
+                            <FluentButton Appearance="ButtonAppearance.Subtle"
                                           IconOnly="true"
                                           OnClick="@(() => this.ViewModel.MoveModUp(mod))">
                                 <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowUp())" />
@@ -25,7 +25,7 @@
 
                         @if (i < this.ViewModel.Mods.Count - 1)
                         {
-                            <FluentButton Appearance="Appearance.Stealth"
+                            <FluentButton Appearance="ButtonAppearance.Subtle"
                                           IconOnly="true"
                                           OnClick="@(() => this.ViewModel.MoveModDown(mod))">
                                 <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowDown())"/>
@@ -38,10 +38,10 @@
                         <div class="mod-toggle">
                             <FluentLabel class="label">@((mod.Enabled) ? "Enabled" : "Disabled")</FluentLabel>
                             <FluentSwitch Value="@(mod.Enabled)"
-                                          @onclick="() => this.ViewModel.ToggleMod(mod)" />
+                                          ValueChanged="@(_ => this.ViewModel.ToggleMod(mod))" />
                         </div>
                         <div @onclick="@(() => this.ViewModel.RemoveMod(mod))" @onclick:stopPropagation="true">
-                            <FluentButton Appearance="Appearance.Stealth"
+                            <FluentButton Appearance="ButtonAppearance.Subtle"
                                           IconOnly="true">
                                 <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Delete())" />
                             </FluentButton>

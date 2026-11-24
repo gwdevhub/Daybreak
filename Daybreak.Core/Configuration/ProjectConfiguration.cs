@@ -99,7 +99,9 @@ using OpenTelemetry.Resources;
 using TrailBlazr.Extensions;
 using TrailBlazr.Services;
 using IMenuService = Daybreak.Shared.Services.Menu.IMenuService;
+using INotificationService = Daybreak.Shared.Services.Notifications.INotificationService;
 using MenuService = Daybreak.Services.Menu.MenuService;
+using NotificationService = Daybreak.Services.Notifications.NotificationService;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace Daybreak.Configuration;

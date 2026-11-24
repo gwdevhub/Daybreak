@@ -12,11 +12,11 @@
         </div>
     </div>
     <div class="option-control">
-        <FluentNumberField @bind-Value="this.Value" 
-                           @onchange="this.OnValueChanged"
-                           Min="@(this.MinValue?.ToString())"
-                           Max="@(this.MaxValue?.ToString())"
-                           Step="@(this.GetStep().ToString())"
+        <FluentNumberInput TValue="double" Value="@this.Value"
+                           ValueChanged="@this.OnValueChanged"
+                           Min="@(this.MinValue ?? double.MinValue)"
+                           Max="@(this.MaxValue ?? double.MaxValue)"
+                           Step="@this.GetStep()"
                            Placeholder="Enter a number" />
     </div>
 </div>
@@ -82,30 +82,27 @@
         };
     }
 
-    private void OnValueChanged(ChangeEventArgs e)
+    private void OnValueChanged(double newValue)
     {
-        if (double.TryParse(e.Value?.ToString(), out var newValue))
+        // Convert back to the original property type
+        var convertedValue = this.Property.Type switch
         {
-            // Convert back to the original property type
-            var convertedValue = this.Property.Type switch
-            {
-                Type t when t == typeof(int) => (object)(int)newValue,
-                Type t when t == typeof(uint) => (object)(uint)newValue,
-                Type t when t == typeof(long) => (object)(long)newValue,
-                Type t when t == typeof(ulong) => (object)(ulong)newValue,
-                Type t when t == typeof(short) => (object)(short)newValue,
-                Type t when t == typeof(ushort) => (object)(ushort)newValue,
-                Type t when t == typeof(float) => (object)(float)newValue,
-                Type t when t == typeof(byte) => (object)(byte)newValue,
-                _ => (object)newValue
-            };
+            Type t when t == typeof(int) => (object)(int)newValue,
+            Type t when t == typeof(uint) => (object)(uint)newValue,
+            Type t when t == typeof(long) => (object)(long)newValue,
+            Type t when t == typeof(ulong) => (object)(ulong)newValue,
+            Type t when t == typeof(short) => (object)(short)newValue,
+            Type t when t == typeof(ushort) => (object)(ushort)newValue,
+            Type t when t == typeof(float) => (object)(float)newValue,
+            Type t when t == typeof(byte) => (object)(byte)newValue,
+            _ => (object)newValue
+        };
 
-            if (this.Validator.IsValid(convertedValue))
-            {
-                this.Value = newValue;
-                this.Property.Setter(this.Instance, convertedValue);
-                this.NotifyValueChanged();
-            }
+        if (this.Validator.IsValid(convertedValue))
+        {
+            this.Value = newValue;
+            this.Property.Setter(this.Instance, convertedValue);
+            this.NotifyValueChanged();
         }
     }
 }

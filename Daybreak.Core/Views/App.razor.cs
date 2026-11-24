@@ -56,6 +56,7 @@ public sealed class AppViewModel
 
     public WindowState WindowState { get; private set; }
     public bool IsAdmin => this.privilegeManager.AdminPrivileges;
+    public bool IsLightMode => this.themeManager.IsLightMode;
     public bool IsNavigationOpen { get; private set; }
     public string CurrentVersionText => this.applicationUpdater.CurrentVersion.ToString();
     public INotificationProducer NotificationProducer { get; }

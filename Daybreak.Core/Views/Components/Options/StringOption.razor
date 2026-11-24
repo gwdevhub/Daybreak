@@ -4,8 +4,8 @@
         <div class="option-description">@this.Description</div>
     </div>
     <div class="option-control">
-        <FluentTextField @bind-Value="this.Value" 
-                        @onchange="this.OnValueChanged"
+        <FluentTextInput Value="@this.Value"
+                        ValueChanged="@this.OnValueChanged"
                         Placeholder="Enter text" />
     </div>
 </div>
@@ -18,9 +18,9 @@
         return value ?? string.Empty;
     }
 
-    private void OnValueChanged(ChangeEventArgs e)
+    private void OnValueChanged(string? value)
     {
-        var newValue = e.Value?.ToString() ?? string.Empty;
+        var newValue = value ?? string.Empty;
         this.Value = newValue;
         this.Property.Setter(this.Instance, newValue);
         this.NotifyValueChanged();
