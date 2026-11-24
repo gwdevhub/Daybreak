@@ -1,0 +1,215 @@
+@using Daybreak.Shared.Services.Wiki
+@using Daybreak.Shared.Services.Shell
+@implements IAsyncDisposable
+
+<div class="wiki-frame-container">
+    @* Pages are loaded by frameNavigation without browser history, so back/forward is tracked here.
+       No allow-same-origin: the wiki's scripts run in an opaque origin, isolated from Daybreak. *@
+    <iframe @ref="this.frame"
+            src="about:blank"
+            sandbox="allow-scripts allow-forms"
+            class="wiki-frame" />
+    @if (this.loading)
+    {
+        <div class="wiki-frame-overlay">
+            <SpinnerWidget IsLoading="true" />
+        </div>
+    }
+    else if (this.failedUrl is not null)
+    {
+        <div class="wiki-frame-overlay">
+            <p>Could not load the wiki page.</p>
+            <FluentButton Appearance="ButtonAppearance.Primary" OnClick="this.OpenFailedInBrowser">
+                Open in browser
+            </FluentButton>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string? Source { get; set; }
+
+    [Inject]
+    public required IWikiPageLoader WikiPageLoader { get; init; }
+
+    [Inject]
+    public required IShellExecutor ShellExecutor { get; init; }
+
+    [Inject]
+    public required IJSRuntime JSRuntime { get; init; }
+
+    private readonly Stack<string> backHistory = [];
+    private readonly Stack<string> forwardHistory = [];
+    private ElementReference frame;
+    private DotNetObjectReference<WikiFrame>? selfReference;
+    private bool attached;
+    private bool documentChanged;
+    private CancellationTokenSource? loadCancellation;
+    private string? loadedSource;
+    private string? currentUrl;
+    private string? document;
+    private string? failedUrl;
+    private bool loading;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (this.Source != this.loadedSource)
+        {
+            this.loadedSource = this.Source;
+            await this.Navigate(this.Source, NavigationKind.New);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            this.selfReference = DotNetObjectReference.Create(this);
+            await this.JSRuntime.InvokeVoidAsync("frameNavigation.attach", this.frame, this.selfReference);
+            this.attached = true;
+        }
+
+        if (this.documentChanged)
+        {
+            this.documentChanged = false;
+            await (this.document is null
+                ? this.JSRuntime.InvokeVoidAsync("frameNavigation.clear", this.frame)
+                : this.JSRuntime.InvokeVoidAsync("frameNavigation.show", this.frame, this.document));
+        }
+    }
+
+    [JSInvokable]
+    public Task OnFrameNavigate(string url) => this.InvokeAsync(() => this.Navigate(url, NavigationKind.New));
+
+    [JSInvokable]
+    public Task OnFrameHistory(int delta) => this.InvokeAsync(() =>
+    {
+        var history = delta < 0 ? this.backHistory : this.forwardHistory;
+        return history.TryPeek(out var url)
+            ? this.Navigate(url, delta < 0 ? NavigationKind.Back : NavigationKind.Forward)
+            : Task.CompletedTask;
+    });
+
+    public async ValueTask DisposeAsync()
+    {
+        this.loadCancellation?.Cancel();
+        this.loadCancellation?.Dispose();
+        if (this.attached)
+        {
+            try
+            {
+                await this.JSRuntime.InvokeVoidAsync("frameNavigation.detach", this.frame);
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+
+        this.selfReference?.Dispose();
+    }
+
+    private async Task Navigate(string? url, NavigationKind kind)
+    {
+        this.loadCancellation?.Cancel();
+        this.loadCancellation?.Dispose();
+        this.loadCancellation = null;
+        this.failedUrl = null;
+        if (string.IsNullOrWhiteSpace(url) || !Uri.TryCreate(url, UriKind.Absolute, out var uri))
+        {
+            this.document = null;
+            this.currentUrl = null;
+            this.documentChanged = true;
+            this.loading = false;
+            return;
+        }
+
+        if (!this.WikiPageLoader.IsWikiUrl(uri))
+        {
+            // Other sites may refuse framing too and are not part of the companion's scope
+            if (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
+            {
+                this.ShellExecutor.OpenUrl(uri.AbsoluteUri);
+            }
+
+            return;
+        }
+
+        var cancellation = new CancellationTokenSource();
+        this.loadCancellation = cancellation;
+        this.loading = true;
+        this.StateHasChanged();
+        string? page;
+        try
+        {
+            page = await this.WikiPageLoader.LoadPage(uri, cancellation.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        if (cancellation.IsCancellationRequested)
+        {
+            return;
+        }
+
+        if (page is null)
+        {
+            this.failedUrl = uri.AbsoluteUri;
+        }
+        else
+        {
+            this.RecordHistory(uri.AbsoluteUri, kind);
+            this.document = page;
+            this.documentChanged = true;
+        }
+
+        this.loading = false;
+        this.StateHasChanged();
+    }
+
+    private void RecordHistory(string url, NavigationKind kind)
+    {
+        switch (kind)
+        {
+            case NavigationKind.Back:
+                this.backHistory.Pop();
+                this.PushIfPresent(this.forwardHistory, this.currentUrl);
+                break;
+            case NavigationKind.Forward:
+                this.forwardHistory.Pop();
+                this.PushIfPresent(this.backHistory, this.currentUrl);
+                break;
+            default:
+                this.PushIfPresent(this.backHistory, this.currentUrl);
+                this.forwardHistory.Clear();
+                break;
+        }
+
+        this.currentUrl = url;
+    }
+
+    private void PushIfPresent(Stack<string> history, string? url)
+    {
+        if (url is not null)
+        {
+            history.Push(url);
+        }
+    }
+
+    private void OpenFailedInBrowser()
+    {
+        if (this.failedUrl is not null)
+        {
+            this.ShellExecutor.OpenUrl(this.failedUrl);
+        }
+    }
+
+    private enum NavigationKind
+    {
+        New,
+        Back,
+        Forward,
+    }
+}
